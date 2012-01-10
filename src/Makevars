@@ -1,0 +1,28 @@
+#MkInclude = $(R_HOME)/etc${R_ARCH}/Makeconf
+
+##
+## NEWMAT and MIXMOD
+##
+NEWMATDIR    = ./NEWMAT
+MIXMODDIR    = ./MIXMOD
+
+MIXMODLIB    = mixmod.a
+
+#PKG_CPPFLAGS = -DNDEBUG -I$(NEWMATINCDIR)
+
+## Use the R_HOME indirection to support installations of multiple R version
+PKG_LIBS = `$(R_HOME)/bin/Rscript -e "Rcpp:::LdFlags()"` -L$(NEWMATDIR) -L$(MIXMODDIR) $(MIXMODLIB)
+
+##
+## Targets
+##
+all: newmat mixmod $(SHLIB)
+
+newmat:
+	(cd $(NEWMATDIR) && $(MAKE) -f newmat_r.mk)
+
+mixmod:
+	(cd $(MIXMODDIR) && $(MAKE) -f mixmod_r.mk)
+
+.PHONY: newmat mixmod all 
+

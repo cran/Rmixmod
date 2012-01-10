@@ -1,0 +1,134 @@
+\name{mixmodAlgo}
+\alias{mixmodAlgo}
+\title{Create an instance of [\code{\linkS4class{Algo}}] class}
+\usage{
+  mixmodAlgo(name = "EM", nbTry = 1, initMethod =
+  "smallEM", nbTryInInit = 50, nbIterationInInit = 5,
+  nbIterationInAlgo = 200, epsilonInInit = 0.001,
+  epsilonInAlgo = 0.001)
+}
+\arguments{
+  \item{name}{character string with the estimation
+  algorithm.  Possible values: "EM", "SEM", "CEM". Default
+  value is "EM".}
+
+  \item{nbTry}{integer defining the number of tries. nbTry
+  must be a positive integer. Option available only if
+  \code{init} is "random" or "smallEM" or "CEM" or
+  "SEMMax". Default value: 1.}
+
+  \item{initMethod}{a character string with the method of
+  initialization of the algorithm specified in the
+  \code{name} argument. Possible values: "random",
+  "smallEM", "CEM", "SEMMax". Default value: "smallEM".}
+
+  \item{nbTryInInit}{integer defining number of tries in
+  \code{initMethod} algorithm. nbTryInInit must be a
+  positive integer. Option available only if \code{init} is
+  "smallEM" or "CEM". Default value: 50.}
+
+  \item{nbIterationInInit}{integer defining the number of
+  "EM" or "SEM" iterations in \code{initMethod}.
+  nbIterationInInit must be a positive integer. Only
+  available if \code{initMethod} is "smallEM" or "SEMMax".
+  Default values: 5 if \code{initMethod} is "smallEM" and
+  100 if \code{initMethod} is "SEMMax".}
+
+  \item{nbIterationInAlgo}{integer defining the number of
+  iterations if you want to use nbIteration as rule to stop
+  the algorithm(s). Default value: 200.}
+
+  \item{epsilonInInit}{real defining the epsilon value in
+  the initialization step. Only available if
+  \code{initMethod} is "smallEM". Default value: 0.001.}
+
+  \item{epsilonInAlgo}{real defining the epsilon value for
+  the algorithm. Warning: epsilonInAlgo doesn't have any
+  sens if \code{name} is SEM. Default value: 0.001.}
+}
+\value{
+  an object of [\code{\linkS4class{Algo}}]
+}
+\description{
+  This class will contain all the parameters needed by the
+  estimation algorithms.
+}
+\details{
+  There are different ways to initialize an algorithm :
+
+  \describe{
+
+  \item{random}{Initialization from a random position is a
+  standard way to initialize an algorithm. This random
+  initial position is obtained by choosing at random
+  centers in the data set. This simple strategy is repeated
+  \eqn{5} times (the user can choose the number of times)
+  from different random positions and the position that
+  maximises the likelihood is selected.}
+
+  \item{partition}{This option initializes the strategy
+  from a specified classification (full or partial) of the
+  observations. This option provides the possibility to use
+  mixmod for Discriminant Analysis and in this case,
+  partition must be full.}
+
+  \item{parameter}{This option starts the strategy with
+  specified initial values of the unknown mixture model
+  parameters, i.e. the mixing proportions and the
+  parameters of the distribution.}
+
+  \item{smallEM}{A maximum of \eqn{50} iterations of the EM
+  algorithm according to the process : \eqn{n_i} numbers of
+  iterations of EM are done (with random initialization)
+  until the \code{smallEM} stop criterion value has been
+  reached. This action is repeated until the sum of
+  \eqn{n_i}
+
+  reaches \eqn{50} iterations (or if in one action \eqn{50}
+  iterations are reached before the stop criterion
+  value).\\ It appears that repeating runs of EM is
+  generally profitable since using a single run of EM can
+  often lead to suboptimal solutions.}
+
+  \item{CEM}{\eqn{10} repetitions of \eqn{50} iterations of
+  the CEM algorithm are done. One advantage of initializing
+  an algorithm with CEM lies in the fact that CEM converges
+  generally in a small number of iterations. Thus, without
+  consuming a large amount of CPU times, several runs of
+  CEM are performed. Then EM is run with the best solution
+  among the \eqn{10} repetitions.}
+
+  \item{SEMMax}{A run of \eqn{500} iterations of SEM. The
+  idea is that an SEM sequence is expected to enter rapidly
+  in the neighbourhood of the global maximum of the
+  likelihood function.}
+
+  }
+
+  Defining the algorithms used in the strategy, the
+  stopping rule and when to stop. \itemize{ \item
+  Algorithms : \describe{ \item{EM}{Expectation
+  Maximisation} \item{CEM}{Classification EM}
+  \item{SEM}{Stochastic EM} } \item Stopping rules for the
+  algorithm : \describe{ \item{nbIterationInAlgo}{Sets the
+  maximum number of iterations} \item{epsilonInAlgo}{Sets
+  relative increase of the log-likelihood criterion} }
+  \item Default values are \eqn{200}
+  \code{nbIterationInAlgo} of \code{EM} with an
+  \code{epsilonInAlgo} value of \eqn{10-3}. }
+}
+\examples{
+mixmodAlgo()
+mixmodAlgo(name="CEM",initMethod="random",nbTry=10,epsilonInInit=0.00001)
+}
+\author{
+  Remi Lebret \email{remi.lebret@math.univ-lille1.fr}
+}
+\references{
+  Biernacki, C., Celeux, G., Govaert, G., 2003. "Choosing
+  starting values for the EM algorithm for getting the
+  highest likelihood in multivariate gaussian mixture
+  models". Computational Statistics and Data Analysis 41,
+  561-575.
+}
+

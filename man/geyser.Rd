@@ -1,0 +1,48 @@
+\docType{data}
+\name{geyser}
+\alias{geyser}
+\title{Quantitative data: Old Faithful Geyser}
+\format{A data frame with 272 observations on the following 2 variables.
+
+\describe{
+
+\item{\code{V1}}{a numeric vector}
+
+\item{\code{V2}}{a numeric vector}
+
+}}
+\source{
+  \url{http://www.geyserstudy.org/geyser.aspx?pGeyserNo=OLDFAITHFUL}
+}
+\description{
+  The file geyser.rda contains 272 observations from the
+  Old Faithful Geyser in the Yellowstone National Park.
+  Each observation consists of two measurements : the
+  duration (in minutes) of the eruption and the waiting
+  time (in minutes) to the next eruption.
+}
+\details{
+  Old Faithful erupts more frequently than any other big
+  geyser, although it is not the largest nor the most
+  regular geyser in the park. Its average interval between
+  two eruptions is about 76 minutes, varying from 45 - 110
+  minutes. An eruption lasts from 1.1/2 to 5 minutes,
+  expels 3,700 - 8,400 gallons (14,000 - 32,000 liters) of
+  boiling water, and reaches heights of 106 - 184 feet (30
+  - 55m). It was named for its consistent performance by
+  members of the Washburn Expedition in 1870. Old Faithful
+  is still as spectacular and predictable as it was a
+  century ago.
+}
+\examples{
+data(geyser)
+}
+\references{
+  Hardle, W. (1991). "Smoothing Techniques with
+  Implementation in S". Springer-Verlag, New York.
+  Azzalini, A. and Bowman, A. W. (1990). "A look at some
+  data on the Old Faithful geyser". Applied Statistics 39,
+  357-365.
+}
+\keyword{datasets}
+

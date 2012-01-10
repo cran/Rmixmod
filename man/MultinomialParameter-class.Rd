@@ -1,0 +1,29 @@
+\name{MultinomialParameter-class}
+\alias{MultinomialParameter-class}
+\title{Constructor of [\code{\linkS4class{MultinomialParameter}}] class}
+\description{
+  This class defines parameters of a Multinomial Mixture
+  Model. Inherits the [\code{\linkS4class{Parameter}}]
+  class.
+}
+\details{
+  \describe{
+
+  \item{center}{a numeric vector containing center of each
+  cluster.}
+
+  \item{scatter}{a vector of matrix containing dispersion
+  matrix of each cluster.}
+
+  \item{factor}{a character vector containing the
+  modalities.}
+
+  }
+}
+\examples{
+new("MultinomialParameter")
+}
+\author{
+  Remi Lebret \email{remi.lebret@math.univ-lille1.fr}
+}
+
