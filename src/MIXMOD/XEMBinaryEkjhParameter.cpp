@@ -24,7 +24,9 @@
 ***************************************************************************/
 #include "XEMBinaryEkjhParameter.h"
 #include "XEMBinaryData.h"
+#include "XEMBinarySample.h"
 #include "XEMModel.h"
+#include "XEMRandom.h"
 
 //--------------------
 // Default constructor
@@ -104,6 +106,28 @@ XEMBinaryEkjhParameter::XEMBinaryEkjhParameter(int64_t iNbCluster, int64_t iPbDi
 
 }
 
+//------------
+// Constructor
+//------------
+XEMBinaryEkjhParameter::XEMBinaryEkjhParameter( int64_t iNbCluster
+                                              , int64_t iPbDimension
+                                              , XEMModelType * iModelType
+                                              , int64_t * tabNbModality
+                                              , double * proportions
+                                              , double **  centers
+                                              , double *** scatters
+                                              )
+                                              : XEMBinaryParameter(iNbCluster,iPbDimension,iModelType,tabNbModality){	
+  _scatter = new double**[_nbCluster];
+  for (int64_t k=0; k<_nbCluster; k++){
+    _scatter[k] = new double*[_pbDimension];
+    for (int64_t j=0; j<_pbDimension; j++){
+      _scatter[k][j] = new double[_tabNbModality[j]];
+    }
+  }
+  input(proportions,centers,scatters);  
+}
+
 
 //---------
 // clone 
@@ -130,6 +154,22 @@ XEMBinaryEkjhParameter::~XEMBinaryEkjhParameter(){
     delete [] _scatter;
   }
   _scatter = NULL;
+}
+
+
+//---------------------
+/// Comparison operator
+//---------------------
+bool XEMBinaryEkjhParameter::operator ==(const XEMBinaryEkjhParameter & param) const{
+  if ( !XEMBinaryParameter::operator==(param) ) return false;
+  for (int64_t k=0; k<_nbCluster; k++){
+    for (int64_t j=0; j<_pbDimension; j++){
+      for (int64_t h=0; h<_tabNbModality[j]; h++){
+        if ( _scatter[k][j][h] != param.getScatter()[k][j][h] ) return false;
+      }
+    }
+  }
+  return true;
 }
 
 
@@ -489,6 +529,21 @@ void XEMBinaryEkjhParameter::inputScatter(ifstream & fi){
     }
   } // end for k
 
+}
+
+// Read Scatter in input containers
+//---------------------------
+void XEMBinaryEkjhParameter::inputScatter( double *** scatters ){
+    
+  // Scatter  //
+  for (int k=0; k<_nbCluster; k++){
+    for (int j=0; j<_pbDimension; j++){
+      for (int h=0; h<_tabNbModality[j]; h++){
+        _scatter[k][j][h]=scatters[k][j][h];
+      }
+    }
+  } // end for k
+  
 }
 
 double*** XEMBinaryEkjhParameter::scatterToArray() const{

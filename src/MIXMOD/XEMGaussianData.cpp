@@ -22,8 +22,13 @@
 
     All informations available on : http://www.mixmod.org                                                                                               
 ***************************************************************************/
-#include "XEMGaussianData.h"
 
+#include "XEMGaussianData.h"
+#include "XEMGaussianSample.h"
+#include "XEMDataDescription.h"
+#include "XEMWeightColumnDescription.h"
+#include "XEMQuantitativeColumnDescription.h"
+#include "XEMIndividualColumnDescription.h"
 
 //-----------
 //Constructor
@@ -343,7 +348,7 @@ void XEMGaussianData:: output(ostream & fo){
  cout<<"Sample size: "<<_nbSample << endl;
  cout<<"  Dimension: "<<_pbDimension << endl ;
 #endif
- editTab(_yStore,_nbSample,_pbDimension," ","",fo);
+ editTab(_yStore,_nbSample,_pbDimension,fo," ","");
  
 }
 

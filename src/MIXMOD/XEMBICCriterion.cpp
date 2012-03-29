@@ -23,44 +23,50 @@
     All informations available on : http://www.mixmod.org                                                                                               
 ***************************************************************************/
 #include "XEMBICCriterion.h"
+#include "XEMCriterionOutput.h"
+#include "XEMModel.h"
 
 
 
 //-----------
 //Constructor
 //-----------
-XEMBICCriterion::XEMBICCriterion(){
-}
+XEMBICCriterion::XEMBICCriterion(XEMModel * model) : XEMCriterion(model)
+{}
 
 
 
 //----------
 //Destructor
 //----------
-XEMBICCriterion::~XEMBICCriterion(){}
-
-
+XEMBICCriterion::~XEMBICCriterion()
+{}
 
 
 //---
 //run
 //---
-/* Compute BIC Criterion */
-void XEMBICCriterion::run(XEMModel * model, double & value, XEMErrorType & error){
-
-  double loglikelihood;
-  int64_t freeParameter;
-  double logN;
-  error = noError;
+void XEMBICCriterion::run(XEMCriterionOutput & output)
+{  
+  // initialize value
+  double value = 0.0;
+  // initialize error
+  XEMErrorType error = noError;
   try{
-    loglikelihood = model->getLogLikelihood(false);  // false : to not compute fik because already done
-    freeParameter = model->getFreeParameter();
-    logN          = model->getLogN();
-    value        = (-2*loglikelihood)+(freeParameter*logN);
+    const double loglikelihood  = _model->getLogLikelihood(false);  // false : to not compute fik because already done
+    const int64_t freeParameter  = _model->getFreeParameter();
+    const double logN           = _model->getLogN();
+    value = (-2*loglikelihood)+(freeParameter*logN);
   }
   catch (XEMErrorType & e){
     error = e;
-  }
+  } 
+  // add name to criterion output
+  output.setCriterionName(BIC);
+  // add value to criterion output
+  output.setValue(value);
+  // add error to criterion output
+  output.setError(error);
 }
 
 

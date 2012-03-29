@@ -22,9 +22,10 @@
 
     All informations available on : http://www.mixmod.org                                                                                               
 ***************************************************************************/
+
+
 #include "XEMGaussianSample.h"
-
-
+#include "XEMUtil.h"
 
 //------------
 // Constructor

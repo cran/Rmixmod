@@ -24,9 +24,7 @@
 ***************************************************************************/
 
 #include "XEMUtil.h"
-#include "XEMEMAlgo.h"
 #include "XEMRandom.h"
-#include "XEMModelType.h"
 #include <ctype.h>
 
 
@@ -100,8 +98,8 @@ int64_t XEMRound(double d) {
 //------------------------------------
 // Convert big char of str in low char
 //------------------------------------
-void ConvertBigtoLowString(string & str) {
-    for (int64_t i=0; i<str.length(); i++) {
+void ConvertBigtoLowString(std::string & str) {
+    for (unsigned int i=0; i<str.length(); i++) {
         if (isupper(str[i]))
             str[i]=tolower(str[i]);
     }
@@ -111,8 +109,8 @@ void ConvertBigtoLowString(string & str) {
 
 
 //XEMCriterionNameToString
-string XEMModelNameToString(const XEMModelName & modelName) {
-    string res;
+std::string XEMModelNameToString(const XEMModelName & modelName) {
+    std::string res;
 
     switch (modelName) {
     case (UNKNOWN_MODEL_NAME) :
@@ -293,7 +291,7 @@ string XEMModelNameToString(const XEMModelName & modelName) {
 }
 
 //StringToXEMModelName
-XEMModelName StringToXEMModelName(const string & strModelName) {
+XEMModelName StringToXEMModelName(const std::string & strModelName) {
     XEMModelName res = UNKNOWN_MODEL_NAME;
 
     if (strModelName.compare("UNKNOWN_MODEL_NAME") == 0)
@@ -428,8 +426,8 @@ void edit(const XEMModelName & modelName) {
 
 
 //XEMErrorTypeToString
-string XEMErrorTypeToString(const XEMErrorType & errorType) {
-    string res;
+std::string XEMErrorTypeToString(const XEMErrorType & errorType) {
+    std::string res;
     switch (errorType) {
     case (noError) :
         res = "No error";
@@ -930,18 +928,54 @@ string XEMErrorTypeToString(const XEMErrorType & errorType) {
         res = "Bad sort call method in a XEMModelOutput (creating without estimation)";
         break;
     case errorEstimationStrategyRun :
-	res = "Bad Estimation in run" ;
-	break;
+        res = "Bad Estimation in run" ;
+        break;
     case badFormat :
-	res = "Bad Format" ;
-	break; 
+        res = "Bad Format" ;
+        break; 
     case ColumnTypeNotValid :
-	res = "Bad Format" ;
-	break;   
+        res = "Bad Format" ;
+        break;   
     case badInputType :
-	res = "Bad Input type";
-	break;
-    }   
+        res = "Bad Input type";
+        break;
+    case SubDimensionFreeTooLarge :
+      res = "SubDimensionFree is too large";
+      break;
+    case SubDimensionFreeTooSmall :
+      res = "SubDimensionFree is too small";
+      break;
+    case SubDimensionEqualTooLarge :
+      res = "SubDimensionEqual is too large";
+      break;
+    case SubDimensionEqualTooSmall :
+      res = "SubDimensionEqual is too small";
+      break;
+    case errorComputationCriterion :
+      res = "error in criterion computation";
+      break;
+    case wrongSymmetricMatrixDimension :
+      res = "wrong dimension for the symmetric matrix";
+      break;
+    case wrongGeneralMatrixDimension :
+      res = "wrong dimension for the general matrix";
+      break;
+    case nonImplementedMethod :
+      res = "non implemented method";
+      break;
+    case tabNkNotInteger :
+      res = "tabNk is not an integer";
+      break;
+    case wrongKnownPartitionPositionInSet :
+      res = "wrong known partition position in set";
+      break;
+    case wrongKnownPartitionPositionInRemove :
+      res = "wrong known partition position in remove";
+      break;
+    case notAvailableForPrediction:
+      res = "Not available for prediction";
+      break;
+  }
     
     return res;
 }
@@ -949,8 +983,8 @@ string XEMErrorTypeToString(const XEMErrorType & errorType) {
 
 
 
-string XEMKeywordToString(const XEMKeyword & keyword) {
-    string res;
+std::string XEMKeywordToString(const XEMKeyword & keyword) {
+    std::string res;
     switch (keyword) {
     case NbLines :
         res = "NbLines";
@@ -1021,11 +1055,15 @@ string XEMKeywordToString(const XEMKeyword & keyword) {
     case DCVinitBlocks :
         res = "DCVinitBlocks";
         break;
+    case SizeKeyword :
+      res = "SizeKeyword";
+      break;
     }
+
     return res;
 }
 
-bool isKeyword(string  name) {
+bool isKeyword(std::string  name) {
     bool res = false;
     for (int64_t i=0; i<SizeKeyword; ++i) {
         if (name.compare(XEMKeywordToString(XEMKeyword(i)))==0) {
@@ -1043,8 +1081,8 @@ bool isKeyword(string  name) {
 
 
 //XEMCriterionNameToString
-string XEMCriterionNameToString(const XEMCriterionName & criterionName) {
-    string res;
+std::string XEMCriterionNameToString(const XEMCriterionName & criterionName) {
+    std::string res;
     switch (criterionName) {
     case UNKNOWN_CRITERION_NAME :
         res = "UNKNOWN_CRITERION_NAME" ;
@@ -1069,7 +1107,7 @@ string XEMCriterionNameToString(const XEMCriterionName & criterionName) {
 }
 
 //StringtoXEMCriterionName
-XEMCriterionName StringtoXEMCriterionName(const string & str) {
+XEMCriterionName StringtoXEMCriterionName(const std::string & str) {
     XEMCriterionName res = UNKNOWN_CRITERION_NAME;
     if (str.compare("UNKNOWN_CRITERION_NAME") == 0)
         res = UNKNOWN_CRITERION_NAME;
@@ -1100,8 +1138,8 @@ void edit(const XEMCriterionName & criterionName) {
 
 
 //XEMAlgoNameToString
-string XEMAlgoNameToString(const XEMAlgoName & typeAlgo) {
-    string res;
+std::string XEMAlgoNameToString(const XEMAlgoName & typeAlgo) {
+    std::string res;
     switch (typeAlgo) {
     case UNKNOWN_ALGO_NAME :
         res = "UNKNOWN_ALGO_NAME";
@@ -1126,7 +1164,7 @@ string XEMAlgoNameToString(const XEMAlgoName & typeAlgo) {
 }
 
 //StringToAlgoName
-XEMAlgoName StringToAlgoName(const string & str) {
+XEMAlgoName StringToAlgoName(const std::string & str) {
     XEMAlgoName res = UNKNOWN_ALGO_NAME;
     if (str.compare("UNKNOWN_ALGO_NAME") == 0)
         res = UNKNOWN_ALGO_NAME;
@@ -1147,8 +1185,8 @@ XEMAlgoName StringToAlgoName(const string & str) {
 }
 
 //XEMAlgoNameToString
-string XEMAlgoStopNameToString(const XEMAlgoStopName & algoStopName) {
-    string res;
+std::string XEMAlgoStopNameToString(const XEMAlgoStopName & algoStopName) {
+   std:: string res;
     switch (algoStopName) {
     case NO_STOP_NAME :
         res = "NO_STOP_NAME";
@@ -1167,7 +1205,7 @@ string XEMAlgoStopNameToString(const XEMAlgoStopName & algoStopName) {
 }
 
 //StringToAlgoStopName
-XEMAlgoStopName StringToAlgoStopName(const string & str) {
+XEMAlgoStopName StringToAlgoStopName(const std::string & str) {
     XEMAlgoStopName res = NO_STOP_NAME;
     if (str.compare("NO_STOP_NAME") == 0)
         res = NO_STOP_NAME;
@@ -1190,8 +1228,8 @@ void edit(const XEMAlgoName & typeAlgo) {
 }
 
 //XEMFormatNumericToString
-string XEMFormatNumericFileToString(const FormatNumeric::XEMFormatNumericFile & formatNumericFile){
-    string res;
+std::string XEMFormatNumericFileToString(const FormatNumeric::XEMFormatNumericFile & formatNumericFile){
+    std::string res;
     switch (formatNumericFile) {
     case FormatNumeric::txt :
         res = "txt";
@@ -1207,7 +1245,7 @@ string XEMFormatNumericFileToString(const FormatNumeric::XEMFormatNumericFile & 
 }
 
 //StringToXEMFormatFile
-FormatNumeric::XEMFormatNumericFile StringToXEMFormatNumericFile(const string & strFormatNumericFile){
+FormatNumeric::XEMFormatNumericFile StringToXEMFormatNumericFile(const std::string & strFormatNumericFile){
     FormatNumeric::XEMFormatNumericFile res ;
     if (strFormatNumericFile.compare("txt") == 0){
         res = FormatNumeric::txt;
@@ -1222,8 +1260,8 @@ FormatNumeric::XEMFormatNumericFile StringToXEMFormatNumericFile(const string & 
 }
 
 //XEMTypePartitionToString
-string XEMTypePartitionToString(const TypePartition::XEMTypePartition & typePartition){
-  string res;
+std::string XEMTypePartitionToString(const TypePartition::XEMTypePartition & typePartition){
+  std::string res;
   switch(typePartition){
     case TypePartition::UNKNOWN_PARTITION :
       res = "UNKNOWN_PARTITION";
@@ -1240,7 +1278,7 @@ string XEMTypePartitionToString(const TypePartition::XEMTypePartition & typePart
       
 
 //StringToXEMTypePartition
-TypePartition::XEMTypePartition StringToXEMTypePartition(const string & strTypePartition){
+TypePartition::XEMTypePartition StringToXEMTypePartition(const std::string & strTypePartition){
   TypePartition::XEMTypePartition res = TypePartition::UNKNOWN_PARTITION;
   if (strTypePartition.compare("UNKNOWN_PARTITION") == 0)
     res = TypePartition::UNKNOWN_PARTITION;
@@ -1253,8 +1291,8 @@ TypePartition::XEMTypePartition StringToXEMTypePartition(const string & strTypeP
 }
 
 // XEMStrategyInitNameToString
-string XEMStrategyInitNameToString(const XEMStrategyInitName & strategyInitName) {
-    string res;
+std::string XEMStrategyInitNameToString(const XEMStrategyInitName & strategyInitName) {
+    std::string res;
     switch (strategyInitName) {
     case RANDOM :
         res = "RANDOM";
@@ -1279,7 +1317,7 @@ string XEMStrategyInitNameToString(const XEMStrategyInitName & strategyInitName)
 }
 
 //StringToStrategyInitName
-XEMStrategyInitName StringToStrategyInitName(const string & str){
+XEMStrategyInitName StringToStrategyInitName(const std::string & str){
     
   XEMStrategyInitName res;
     if (str.compare("RANDOM") == 0)
@@ -1313,355 +1351,7 @@ void edit(const XEMAlgoStopName & algoStopName) {
 }
 
 
-//---------------
-/// editModelType
-//----------------
-void editModelType(ofstream & oFile, XEMModelType * modelType) {
-
-    oFile<<"\t\t\tModel Type : ";
-
-    switch (modelType->_nameModel) {
-
-        // Gaussian models //
-    case (Gaussian_p_L_B) :
-        oFile<<"Gaussian Diagonal Model : ";
-        oFile<<"p_L_B";
-        break;
-    case (Gaussian_p_Lk_B) :
-        oFile<<"p_Lk_B";
-        break;
-        oFile<<"Gaussian Diagonal Model : ";
-    case (Gaussian_p_L_Bk) :
-        oFile<<"Gaussian Diagonal Model : ";
-        oFile<<"p_L_Bk";
-        break;
-    case (Gaussian_p_Lk_Bk) :
-        oFile<<"Gaussian Diagonal Model : ";
-        oFile<<"p_Lk_Bk";
-        break;
-    case (Gaussian_pk_L_B) :
-        oFile<<"Gaussian Diagonal Model : ";
-        oFile<<" pk_L_B";
-        break;
-    case (Gaussian_pk_Lk_B) :
-        oFile<<"Gaussian Diagonal Model : ";
-        oFile<<" pk_Lk_B";
-        break;
-    case (Gaussian_pk_L_Bk) :
-        oFile<<"Gaussian Diagonal Model : ";
-        oFile<<"pk_L_Bk";
-        break;
-    case (Gaussian_pk_Lk_Bk) :
-        oFile<<"Gaussian Diagonal Model : ";
-        oFile<<"pk_Lk_Bk";
-        break;
-    case (Gaussian_p_L_I) :
-        oFile<<"Gaussian Spherical Model : ";
-        oFile<<"p_L_I";
-        break;
-    case (Gaussian_p_Lk_I) :
-        oFile<<"Gaussian Spherical Model : ";
-        oFile<<"p_Lk_I";
-        break;
-    case (Gaussian_pk_L_I) :
-        oFile<<"Gaussian Spherical Model : ";
-        oFile<<"pk_L_I";
-        break;
-    case (Gaussian_pk_Lk_I) :
-        oFile<<"Gaussian Spherical Model : ";
-        oFile<<"pk_Lk_I";
-        break;
-    case (Gaussian_p_L_C):
-        oFile<<"Gaussian Ellipsoidal Model : ";
-        oFile<<"p_L_C";
-        break;
-    case (Gaussian_p_Lk_C):
-        oFile<<"Gaussian Ellipsoidal Model : ";
-        oFile<<"p_Lk_C";
-        break;
-    case (Gaussian_p_L_D_Ak_D):
-        oFile<<"Gaussian Ellipsoidal Model : ";
-        oFile<<"p_L_D_Ak_D";
-        break;
-    case (Gaussian_p_Lk_D_Ak_D):
-        oFile<<"Gaussian Ellipsoidal Model : ";
-        oFile<<"p_Lk_D_Ak_D";
-        break;
-    case (Gaussian_p_L_Dk_A_Dk):
-        oFile<<"Gaussian Ellipsoidal Model : ";
-        oFile<<"p_L_Dk_A_Dk";
-        break;
-    case (Gaussian_p_Lk_Dk_A_Dk):
-        oFile<<"Gaussian Ellipsoidal Model : ";
-        oFile<<"p_Lk_Dk_A_Dk";
-        break;
-    case (Gaussian_p_L_Ck):
-        oFile<<"Gaussian Ellipsoidal Model : ";
-        oFile<<"p_L_Ck";
-        break;
-    case (Gaussian_p_Lk_Ck):
-        oFile<<"Gaussian Ellipsoidal Model : ";
-        oFile<<"p_Lk_Ck";
-        break;
-    case (Gaussian_pk_L_C):
-        oFile<<"Gaussian Ellipsoidal Model : ";
-        oFile<<"pk_L_C";
-        break;
-    case (Gaussian_pk_Lk_C):
-        oFile<<"Gaussian Ellipsoidal Model : ";
-        oFile<<"pk_Lk_C";
-        break;
-    case (Gaussian_pk_L_D_Ak_D):
-        oFile<<"Gaussian Ellipsoidal Model : ";
-        oFile<<"pk_L_D_Ak_D";
-        break;
-    case (Gaussian_pk_Lk_D_Ak_D):
-        oFile<<"Gaussian Ellipsoidal Model : ";
-        oFile<<"pk_Lk_D_Ak_D";
-        break;
-    case (Gaussian_pk_L_Dk_A_Dk):
-        oFile<<"Gaussian Ellipsoidal Model : ";
-        oFile<<"pk_L_Dk_A_Dk";
-        break;
-    case (Gaussian_pk_Lk_Dk_A_Dk):
-        oFile<<"Gaussian Ellipsoidal Model : ";
-        oFile<<"pk_Lk_Dk_A_Dk";
-        break;
-    case (Gaussian_pk_L_Ck):
-        oFile<<"Gaussian Ellipsoidal Model : ";
-        oFile<<"pk_L_Ck";
-        break;
-    case (Gaussian_pk_Lk_Ck):
-        oFile<<"Gaussian Ellipsoidal Model : ";
-        oFile<<"pk_Lk_Ck";
-        break;
-
-        // Binary models //
-    case (Binary_p_E):
-        oFile<<"Binary Model : ";
-        oFile<<"Binary_p_E";
-        break;
-    case (Binary_p_Ek):
-        oFile<<"Binary Model : ";
-        oFile<<"Binary_p_Ek";
-        break;
-    case (Binary_p_Ej):
-        oFile<<"Binary Model : ";
-        oFile<<"Binary_p_Ej";
-        break;
-    case (Binary_p_Ekj):
-        oFile<<"Binary Model : ";
-        oFile<<"Binary_p_Ekj";
-        break;
-    case (Binary_p_Ekjh):
-        oFile<<"Binary Model : ";
-        oFile<<"Binary_p_Ekjh";
-        break;
-    case (Binary_pk_E):
-        oFile<<"Binary Model : ";
-        oFile<<"Binary_pk_E";
-        break;
-    case (Binary_pk_Ek):
-        oFile<<"Binary Model : ";
-        oFile<<"Binary_pk_Ek";
-        break;
-    case (Binary_pk_Ej):
-        oFile<<"Binary Model : ";
-        oFile<<"Binary_pk_Ej";
-        break;
-    case (Binary_pk_Ekj):
-        oFile<<"Binary Model : ";
-        oFile<<"Binary_pk_Ekj";
-        break;
-    case (Binary_pk_Ekjh):
-        oFile<<"Binary Model : ";
-        oFile<<"Binary_pk_Ekjh";
-        break;
-
-    case (Gaussian_HD_pk_AkjBkQkD) :
-        oFile<<"HD Model : ";
-        oFile<<"Gaussian_HD_pk_AkjBkQkD";
-        break;
-    case (Gaussian_HD_pk_AkjBkQkDk) :
-        oFile<<"HD Model : ";
-        oFile<<"Gaussian_HD_pk_AkjBkQkDk";
-        break;
-    case (Gaussian_HD_pk_AkjBQkD) :
-        oFile<<"HD Model : ";
-        oFile<<"Gaussian_HD_pk_AkjBQkD";
-        break;
-    case (Gaussian_HD_pk_AjBkQkD) :
-        oFile<<"HD Model : ";
-        oFile<<"Gaussian_HD_pk_AjBkQkD";
-        break;
-    case (Gaussian_HD_pk_AjBQkD) :
-        oFile<<"HD Model : ";
-        oFile<<"Gaussian_HD_pk_AjBQkD";
-        break;
-    case (Gaussian_HD_pk_AkBkQkD) :
-        oFile<<"HD Model : ";
-        oFile<<"Gaussian_HD_pk_AkBkQkD";
-        break;
-    case (Gaussian_HD_pk_AkBkQkDk) :
-        oFile<<"HD Model : ";
-        oFile<<"Gaussian_HD_pk_AkBkQkDk";
-        break;
-    case (Gaussian_HD_pk_AkBQkD) :
-        oFile<<"HD Model : ";
-        oFile<<"Gaussian_HD_pk_AkBQkD";
-        break;
-    case (Gaussian_HD_p_AkjBkQkD) :
-        oFile<<"HD Model : ";
-        oFile<<"Gaussian_HD_p_AkjBkQkD";
-        break;
-    case (Gaussian_HD_p_AkjBkQkDk) :
-        oFile<<"HD Model : ";
-        oFile<<"Gaussian_HD_p_AkjBkQkDk";
-        break;
-    case (Gaussian_HD_p_AkjBQkD) :
-        oFile<<"HD Model : ";
-        oFile<<"Gaussian_HD_p_AkjBQkD";
-        break;
-    case (Gaussian_HD_p_AjBkQkD) :
-        oFile<<"HD Model : ";
-        oFile<<"Gaussian_HD_p_AjBkQkD";
-        break;
-    case (Gaussian_HD_p_AjBQkD) :
-        oFile<<"HD Model : ";
-        oFile<<"Gaussian_HD_p_AjBQkD";
-        break;
-    case (Gaussian_HD_p_AkBkQkD) :
-        oFile<<"HD Model : ";
-        oFile<<"Gaussian_HD_p_AkBkQkD";
-        break;
-    case (Gaussian_HD_p_AkBkQkDk) :
-        oFile<<"HD Model : ";
-        oFile<<"Gaussian_HD_p_AkBkQkDk";
-        break;
-    case (Gaussian_HD_p_AkBQkD) :
-        oFile<<"HD Model : ";
-        oFile<<"Gaussian_HD_p_AkBQkD";
-        break;
-
-
-
-    default :
-        oFile<<"Model Type Error";
-    }
-    oFile<<endl;
-    oFile<<"\t\t\t----------"<<endl<<endl;
-
-}
-
-
-
-
-//---------------
-// printModelType
-//----------------
-/*void printModelType(ostream & flux, const XEMModelName & modelName){
-
-    switch (modelName) {
-
-  // Gaussian models //
-  case (Gaussian_p_L_B) :
-  case (Gaussian_pk_L_B) :
-    flux<<"Gaussian_L_B";break;
-  case (Gaussian_p_Lk_B) :
-  case (Gaussian_pk_Lk_B) :
-    flux<<"Gaussian_Lk_B";      break;
-  case (Gaussian_p_L_Bk) :
-  case (Gaussian_pk_L_Bk) :
-    flux<<"Gaussian_L_Bk";      break;
-  case (Gaussian_p_Lk_Bk) :
-  case (Gaussian_pk_Lk_Bk) :
-    flux<<"Gaussian_Lk_Bk";     break;
-
-  case (Gaussian_p_L_I) :
-  case (Gaussian_pk_L_I) :
-    flux<<"Gaussian_L_I";break;
-  case (Gaussian_p_Lk_I) :
-  case (Gaussian_pk_Lk_I) :
-    flux<<"Gaussian_Lk_I";break;
-
-  case (Gaussian_p_L_C) :
-  case (Gaussian_pk_L_C):
-    flux<<"Gaussian_L_C";break;
-  case (Gaussian_p_Lk_C) :
-  case (Gaussian_pk_Lk_C):
-    flux<<"Gaussian_Lk_C";break;
-  case (Gaussian_p_L_D_Ak_D) :
-  case (Gaussian_pk_L_D_Ak_D):
-    flux<<"Gaussian_L_D_Ak_D";break;
-  case (Gaussian_p_Lk_D_Ak_D) :
-  case (Gaussian_pk_Lk_D_Ak_D):
-    flux<<"Gaussian_Lk_D_Ak_D";break;
-  case (Gaussian_p_L_Dk_A_Dk) :
-  case (Gaussian_pk_L_Dk_A_Dk ):
-    flux<<"Gaussian_L_Dk_A_Dk";break;
-  case (Gaussian_p_Lk_Dk_A_Dk) :
-  case (Gaussian_pk_Lk_Dk_A_Dk):
-    flux<<"Gaussian_Lk_Dk_A_Dk";break;
-  case (Gaussian_p_L_Ck) :
-  case (Gaussian_pk_L_Ck):
-    flux<<"Gaussian_L_Ck";break;
-  case (Gaussian_p_Lk_Ck) :
-  case (Gaussian_pk_Lk_Ck):
-    flux<<"Gaussian_Lk_Ck";break;
-
-
-  // Binary models //
-  case (Binary_p_E) :
-  case (Binary_pk_E):
-    flux<<"Binary_E"; break;
-  case (Binary_p_Ek) :
-  case (Binary_pk_Ek):
-    flux<<"Binary_Ek"; break;
-  case (Binary_p_Ej) :
-  case (Binary_pk_Ej):
-    flux<<"Binary_Ej"; break;
-  case (Binary_p_Ekj) :
-  case (Binary_pk_Ekj):
-    flux<<"Binary_Ekj"; break;
-  case (Binary_p_Ekjh) :
-  case (Binary_pk_Ekjh):
-    flux<<"Binary_Ekjh"; break;
-
-  case (Gaussian_HD_p_AkjBkQkD) :
-  case (Gaussian_HD_pk_AkjBkQkD) :
-    flux<<"Gaussian_HD_AkjBkQkD"; break;
-  case (Gaussian_HD_p_AkjBkQkDk) :
-  case (Gaussian_HD_pk_AkjBkQkDk) :
-    flux<<"Gaussian_HD_AkjBkQkDk"; break;
-  case (Gaussian_HD_p_AkjBQkD) :
-  case (Gaussian_HD_pk_AkjBQkD) :
-    flux<<"Gaussian_HD_AkjBQkD"; break;
-  case (Gaussian_HD_p_AjBkQkD) :
-  case (Gaussian_HD_pk_AjBkQkD) :
-    flux<<"Gaussian_HD_AjBkQkD"; break;
-  case (Gaussian_HD_p_AjBQkD) :
-  case (Gaussian_HD_pk_AjBQkD) :
-    flux<<"Gaussian_HD_AjBQkD"; break;
-  case (Gaussian_HD_p_AkBkQkD) :
-  case(Gaussian_HD_pk_AkBkQkD ) :
-    flux<<"Gaussian_HD_AkBkQkD"; break;
-  case (Gaussian_HD_p_AkBkQkDk) :
-  case (Gaussian_HD_pk_AkBkQkDk) :
-    flux<<"Gaussian_HD_AkBkQkDk"; break;
-  case (Gaussian_HD_p_AkBQkD) :
-  case (Gaussian_HD_pk_AkBQkD) :
-    flux<<"Gaussian_HD_AkBQkD"; break;
-
-  default :
-    flux<<"Model Type Error";
-  }
-
-
-}*/
-
-
-
-/*///printAlgoType
+///printAlgoType
 void printTypeAlgo(ostream & flux, const XEMAlgoName & typeAlgo){
  if (typeAlgo == EM)
           flux<<"EM"<<endl;
@@ -1673,8 +1363,7 @@ void printTypeAlgo(ostream & flux, const XEMAlgoName & typeAlgo){
           flux<<"MAP"<<endl;
   else if (typeAlgo == M)
           flux<<"M"<<endl;
-}*/
-
+}
 
 
 //-------------------------------
@@ -1892,7 +1581,7 @@ bool isDiagonal(Matrix * mat, int64_t n) {
 
 
 
-void editSimpleTab(double * tab, int64_t n, string sep, string before, ostream & flux) {
+void editSimpleTab(double * tab, int64_t n, std::string sep, std::string before, ostream & flux) {
     int64_t i;
     flux << before;
     for (i=0;i<n;i++) {
@@ -1910,7 +1599,7 @@ void editSimpleTab(int64_t    * tab, int64_t n, ostream & flux ) {
 
 
 
-void editMatrix(GeneralMatrix & mat, int64_t nRows,ostream & flux, string before) {
+void editMatrix(GeneralMatrix & mat, int64_t nRows,ostream & flux, std::string before) {
 
     int64_t i;
     for (i=1 ; i<=nRows ; i++) {
@@ -1919,7 +1608,7 @@ void editMatrix(GeneralMatrix & mat, int64_t nRows,ostream & flux, string before
 
 }
 
-void editSphericalMatrix(double mat, int64_t nRows, ostream & flux, string before) {
+void editSphericalMatrix(double mat, int64_t nRows, ostream & flux, std::string before) {
     int64_t i;
     int64_t j;
     for (i=0;i<nRows;i++) {
@@ -1935,7 +1624,7 @@ void editSphericalMatrix(double mat, int64_t nRows, ostream & flux, string befor
     }
 }
 
-void editDiagMatrix(double * mat, int64_t nRows, ostream & flux, string before) {
+void editDiagMatrix(double * mat, int64_t nRows, ostream & flux, std::string before) {
     int64_t i;
     int64_t j;
     for (i=0;i<nRows;i++) {
@@ -1954,18 +1643,13 @@ void editDiagMatrix(double * mat, int64_t nRows, ostream & flux, string before) 
 
 
 
-
-
-
-
-
 //---------------
 // Move on file fi until what is reached
 // after using that function fi is just after the first time what appears
 //---------------
 
-void moveUntilReach(ifstream & fi, string  what) {
-    string keyWord = "";
+void moveUntilReach(ifstream & fi, std::string  what) {
+    std::string keyWord = "";
     ConvertBigtoLowString(what);
     // init reading at the beginning of file //
     fi.clear();
@@ -1987,14 +1671,14 @@ void moveUntilReach(ifstream & fi, string  what) {
 //-------------------
 // read nbNbCluster file names (ex : titi ; toto;tutu)
 
-void readTabFileName(ifstream & fi, int64_t nbNbCluster,string* tabFileName, string& keyWord) {
+void readTabFileName(ifstream & fi, int64_t nbNbCluster,std::string* tabFileName, std::string& keyWord) {
     int64_t k=0;
 
-    string c = "";
-    string c1 = "";
-    string tmp = "";
-    string strBeforePv = "";
-    string strAfterPv = "";
+    std::string c = "";
+    std::string c1 = "";
+    std::string tmp = "";
+    std::string strBeforePv = "";
+    std::string strAfterPv = "";
 
     fi>>c;
 // on ne converti pas tout le nom en minuscules sinon il y a des erreurs dans le nom des fichiers
@@ -2014,7 +1698,7 @@ void readTabFileName(ifstream & fi, int64_t nbNbCluster,string* tabFileName, str
             else {
                 strAfterPv = c;
             }
-            while ((strAfterPv.find_first_of(';') != string::npos)) { // ; est dans la chaine de caracteres
+            while ((strAfterPv.find_first_of(';') != std::string::npos)) { // ; est dans la chaine de caracteres
                 tmp = strAfterPv;
                 strBeforePv = tmp.substr(0,tmp.find_first_of(';'));
                 strAfterPv = tmp.substr(tmp.find_first_of(';')+1,tmp.length());
@@ -2049,24 +1733,6 @@ void readTabFileName(ifstream & fi, int64_t nbNbCluster,string* tabFileName, str
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 void initToZero(double* tab, int64_t n) {
     double * p_tab = tab;
     int64_t i;
@@ -2074,260 +1740,6 @@ void initToZero(double* tab, int64_t n) {
         *p_tab = 0.0;
     }
 }
-
-void printShortcutModelType(const XEMModelType * const modelType, ostream & flux) {
-    switch (modelType->_nameModel) {
-    case (Gaussian_p_L_B) :
-    case (Gaussian_p_Lk_B) :
-    case (Gaussian_p_L_Bk) :
-    case (Gaussian_p_Lk_Bk) :
-    case (Gaussian_pk_L_B) :
-    case (Gaussian_pk_Lk_B) :
-    case (Gaussian_pk_L_Bk) :
-    case (Gaussian_pk_Lk_Bk) :
-        flux << "D" << flush;
-        break;
-
-    case (Gaussian_p_L_C):
-    case (Gaussian_p_Lk_C):
-    case (Gaussian_p_L_D_Ak_D):
-    case (Gaussian_p_Lk_D_Ak_D):
-    case (Gaussian_p_L_Dk_A_Dk):
-    case (Gaussian_p_Lk_Dk_A_Dk):
-    case (Gaussian_p_L_Ck):
-    case (Gaussian_p_Lk_Ck):
-    case (Gaussian_pk_L_C):
-    case (Gaussian_pk_Lk_C):
-    case (Gaussian_pk_L_D_Ak_D):
-    case (Gaussian_pk_Lk_D_Ak_D):
-    case (Gaussian_pk_L_Dk_A_Dk):
-    case (Gaussian_pk_Lk_Dk_A_Dk):
-    case (Gaussian_pk_L_Ck):
-    case (Gaussian_pk_Lk_Ck):
-        flux << "G" << flush;
-        break;
-
-    case (Gaussian_p_L_I) :
-    case (Gaussian_p_Lk_I) :
-    case (Gaussian_pk_L_I) :
-    case (Gaussian_pk_Lk_I) :
-        flux << "S" << flush;
-        break;
-
-        // Binary models //
-    case (Binary_p_E) :
-    case (Binary_p_Ek) :
-    case (Binary_p_Ej) :
-    case (Binary_p_Ekj) :
-    case (Binary_p_Ekjh) :
-    case (Binary_pk_E) :
-    case (Binary_pk_Ek) :
-    case (Binary_pk_Ej) :
-    case (Binary_pk_Ekj) :
-    case (Binary_pk_Ekjh) :
-        flux << "B" << flush;
-        break;
-
-    case (Gaussian_HD_pk_AkjBkQkD) :
-    case (Gaussian_HD_pk_AkjBkQkDk) :
-    case (Gaussian_HD_pk_AkjBQkD) :
-    case (Gaussian_HD_pk_AjBkQkD) :
-    case (Gaussian_HD_pk_AjBQkD) :
-    case (Gaussian_HD_pk_AkBkQkD) :
-    case (Gaussian_HD_pk_AkBkQkDk) :
-    case (Gaussian_HD_pk_AkBQkD) :
-    case (Gaussian_HD_p_AkjBkQkD) :
-    case (Gaussian_HD_p_AkjBkQkDk) :
-    case (Gaussian_HD_p_AkjBQkD) :
-    case (Gaussian_HD_p_AjBkQkD) :
-    case (Gaussian_HD_p_AjBQkD) :
-    case (Gaussian_HD_p_AkBkQkD) :
-    case (Gaussian_HD_p_AkBkQkDk) :
-    case (Gaussian_HD_p_AkBQkD) :
-        flux<< "H" << flush;
-        break;
-    default :
-        throw internalMixmodError;
-    }
-}
-
-void printModelType(const XEMModelType * const modelType,ostream & flux) {
-    switch (modelType->_nameModel) {
-
-        // Gaussian models //
-    case (Gaussian_p_L_B) :
-        flux<<"p_L_B         ";
-        break;
-    case (Gaussian_p_Lk_B) :
-        flux<<"p_Lk_B        ";
-        break;
-    case (Gaussian_p_L_Bk) :
-        flux<<"p_L_Bk        ";
-        break;
-    case (Gaussian_p_Lk_Bk) :
-        flux<<"p_Lk_Bk       ";
-        break;
-    case (Gaussian_pk_L_B) :
-        flux<<"pk_L_B        ";
-        break;
-    case (Gaussian_pk_Lk_B) :
-        flux<<"pk_Lk_B       ";
-        break;
-    case (Gaussian_pk_L_Bk) :
-        flux<<"pk_L_Bk       ";
-        break;
-    case (Gaussian_pk_Lk_Bk) :
-        flux<<"pk_Lk_Bk      ";
-        break;
-    case (Gaussian_p_L_C):
-        flux<<"p_L_C         ";
-        break;
-    case (Gaussian_p_Lk_C):
-        flux<<"p_Lk_C        ";
-        break;
-    case (Gaussian_p_L_D_Ak_D):
-        flux<<"p_L_D_Ak_D    ";
-        break;
-    case (Gaussian_p_Lk_D_Ak_D):
-        flux<<"p_Lk_D_Ak_D   ";
-        break;
-    case (Gaussian_p_L_Dk_A_Dk):
-        flux<<"p_L_Dk_A_Dk   ";
-        break;
-    case (Gaussian_p_Lk_Dk_A_Dk):
-        flux<<"p_Lk_Dk_A_Dk  ";
-        break;
-    case (Gaussian_p_L_Ck):
-        flux<<"p_L_Ck        ";
-        break;
-    case (Gaussian_p_Lk_Ck):
-        flux<<"p_Lk_Ck       ";
-        break;
-    case (Gaussian_pk_L_C):
-        flux<<"pk_L_C        ";
-        break;
-    case (Gaussian_pk_Lk_C):
-        flux<<"pk_Lk_C       ";
-        break;
-    case (Gaussian_pk_L_D_Ak_D):
-        flux<<"pk_L_D_Ak_D   ";
-        break;
-    case (Gaussian_pk_Lk_D_Ak_D):
-        flux<<"pk_Lk_D_Ak_D  ";
-        break;
-    case (Gaussian_pk_L_Dk_A_Dk):
-        flux<<"pk_L_Dk_A_Dk  ";
-        break;
-    case (Gaussian_pk_Lk_Dk_A_Dk):
-        flux<<"pk_Lk_Dk_A_Dk ";
-        break;
-    case (Gaussian_pk_L_Ck):
-        flux<<"pk_L_Ck       ";
-        break;
-    case (Gaussian_pk_Lk_Ck):
-        flux<<"pk_Lk_Ck      ";
-        break;
-    case (Gaussian_p_L_I) :
-        flux<<"p_L_I         ";
-        break;
-    case (Gaussian_p_Lk_I) :
-        flux<<"p_Lk_I        ";
-        break;
-    case (Gaussian_pk_L_I) :
-        flux<<"pk_L_I        ";
-        break;
-    case (Gaussian_pk_Lk_I) :
-        flux<<"pk_Lk_I       ";
-        break;
-
-        // Binary models //
-    case (Binary_p_E) :
-        flux<<"Binary_p_E    ";
-        break;
-    case (Binary_p_Ek) :
-        flux<<"Binary_p_Ek   ";
-        break;
-    case (Binary_p_Ej) :
-        flux<<"Binary_p_Ej   ";
-        break;
-    case (Binary_p_Ekj) :
-        flux<<"Binary_p_Ekj  ";
-        break;
-    case (Binary_p_Ekjh) :
-        flux<<"Binary_p_Ekjh  ";
-        break;
-    case (Binary_pk_E) :
-        flux<<"Binary_pk_E   ";
-        break;
-    case (Binary_pk_Ek) :
-        flux<<"Binary_pk_Ek  ";
-        break;
-    case (Binary_pk_Ej) :
-        flux<<"Binary_pk_Ej  ";
-        break;
-    case (Binary_pk_Ekj) :
-        flux<<"Binary_pk_Ekj ";
-        break;
-    case (Binary_pk_Ekjh) :
-        flux<<"Binary_pk_Ekjh ";
-        break;
-
-//HDDA models
-    case (Gaussian_HD_pk_AkjBkQkD) :
-        flux<<"HD_pk_AkjBkQkD   ";
-        break;
-    case (Gaussian_HD_pk_AkjBkQkDk) :
-        flux<<"HD_pk_AkjBkQkDk   ";
-        break;
-    case (Gaussian_HD_pk_AkjBQkD) :
-        flux<<"HD_pk_AkjBQkD    ";
-        break;
-    case (Gaussian_HD_pk_AjBkQkD) :
-        flux<<"HD_pk_AjBkQkD    ";
-        break;
-    case (Gaussian_HD_pk_AjBQkD) :
-        flux<<"HD_pk_AjBQkD     ";
-        break;
-    case (Gaussian_HD_pk_AkBkQkD) :
-        flux<<"HD_pk_AkBkQkD    ";
-        break;
-    case (Gaussian_HD_pk_AkBkQkDk) :
-        flux<<"HD_pk_AkBkQkDk    ";
-        break;
-    case (Gaussian_HD_pk_AkBQkD) :
-        flux<<"HD_pk_AkBQkD     ";
-        break;
-    case (Gaussian_HD_p_AkjBkQkD) :
-        flux<<"HD_p_AkjBkQkD    ";
-        break;
-    case (Gaussian_HD_p_AkjBkQkDk) :
-        flux<<"HD_p_AkjBkQkDk     ";
-        break;
-    case (Gaussian_HD_p_AkjBQkD) :
-        flux<<"HD_p_AkjBQkD     ";
-        break;
-    case (Gaussian_HD_p_AjBkQkD) :
-        flux<<"HD_p_AjBkQkD     ";
-        break;
-    case (Gaussian_HD_p_AjBQkD) :
-        flux<<"HD_p_AjBQkD      ";
-        break;
-    case (Gaussian_HD_p_AkBkQkD) :
-        flux<<"HD_p_AkBkQkD     ";
-        break;
-    case (Gaussian_HD_p_AkBkQkDk) :
-        flux<<"HD_p_AkBkQkDk     ";
-        break;
-    case (Gaussian_HD_p_AkBQkD) :
-        flux<<"HD_p_AkBQkD      ";
-        break;
-    default :
-        throw internalMixmodError;
-    }
-    flux << flush;
-
-}
-
 
 inline void echange(double * tab, int64_t i1, int64_t i2) {
     double tmp_double = tab[i1];
@@ -2422,7 +1834,7 @@ int64_t generateRandomIndex(bool * tabIndividualCanBeUsedForInitRandom, double *
 
 void inputCriterion(ifstream & fi,XEMCriterionName & criterionName) {
 
-    string a = "";
+    std::string a = "";
     fi>>a;
     if (a.compare("BIC")==0) {
         criterionName = BIC;
@@ -2445,10 +1857,8 @@ void inputCriterion(ifstream & fi,XEMCriterionName & criterionName) {
 }
 
 
-
-
 void inputCVinitBlocks(ifstream & fi,XEMCVinitBlocks & CVinitBlocks) {
-    string a = "";
+    std::string a = "";
     fi>>a;
     if (a.compare("CV_RANDOM")==0) {
         CVinitBlocks = CV_RANDOM;
@@ -2462,7 +1872,7 @@ void inputCVinitBlocks(ifstream & fi,XEMCVinitBlocks & CVinitBlocks) {
 }
 
 void inputDCVinitBlocks(ifstream & fi,XEMDCVinitBlocks & DCVinitBlocks) {
-    string a = "";
+    std::string a = "";
     fi>>a;
     if (a.compare("DCV_RANDOM")==0) {
         DCVinitBlocks = DCV_RANDOM;
@@ -2473,18 +1883,5 @@ void inputDCVinitBlocks(ifstream & fi,XEMDCVinitBlocks & DCVinitBlocks) {
     else {
         throw wrongDCVinitType;
     }
-}
-
-
-
-XEMAlgo * createDefaultAlgo() {
-    XEMAlgo * result = NULL;
-    if (defaultAlgoName == EM) {
-        result = new XEMEMAlgo();
-    }
-    else {
-        throw internalMixmodError;
-    }
-    return result;
 }
 

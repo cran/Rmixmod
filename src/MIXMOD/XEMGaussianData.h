@@ -25,10 +25,7 @@
 #ifndef XEMGAUSSIANDATA_H
 #define XEMGAUSSIANDATA_H
 
-#include "XEMUtil.h"
 #include "XEMData.h"
-#include "XEMGaussianSample.h"
-#include "XEMOldInput.h"
 
 /**
   @brief Base class for Gaussian Data
@@ -68,30 +65,30 @@ public:
   /** @brief Selector
       @return A copy of data
   */
-  XEMData * clone() const;
+  virtual XEMData * clone() const;
 
   /**  @brief Copy
        @return A copy data matrix
   */
-  XEMSample ** cloneMatrix();
+  virtual XEMSample ** cloneMatrix();
 
   
   //TODO a enlever XEMInput
   /** @brief Read data from gaussian data file
       @fi Gaussian Data file to read
   */
-  void input(ifstream & fi);
+  virtual void input(ifstream & fi);
   
   /** @brief Read data from XEMDataDescription
   */
-  void input(const XEMDataDescription & dataDescription);
+  virtual void input(const XEMDataDescription & dataDescription);
 
   /** @brief Write gaussian data in output file
       @f0 Output file to write into
   */
-  void output(ostream & fo);
+  virtual void output(ostream & fo);
 
-  bool verify()const; 
+  virtual bool verify()const; 
   
   /// pointer to stored values
   double ** _yStore ;

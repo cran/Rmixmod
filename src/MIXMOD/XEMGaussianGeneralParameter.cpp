@@ -26,6 +26,7 @@
 #include "XEMGaussianEDDAParameter.h"
 #include "XEMGaussianData.h"
 #include "XEMModel.h"
+#include "XEMModelType.h"
 #include "XEMDiagMatrix.h"
 #include "XEMSymmetricMatrix.h"
 #include "XEMGeneralMatrix.h"
@@ -68,9 +69,15 @@ XEMGaussianGeneralParameter::XEMGaussianGeneralParameter(XEMModel * iModel, XEMM
 
 
 //-------------------------------------------------------------------------------------
-//constructeur avec une initialisation USER
+//constructeur avec une initialisation USER from file
 //-------------------------------------------------------------------------------------
-XEMGaussianGeneralParameter::XEMGaussianGeneralParameter(int64_t  iNbCluster, int64_t  iPbDimension, XEMModelType * iModelType, string & iFileName) : XEMGaussianEDDAParameter(iNbCluster, iPbDimension, iModelType){
+XEMGaussianGeneralParameter::XEMGaussianGeneralParameter( int64_t  iNbCluster
+                                                        , int64_t  iPbDimension
+                                                        , XEMModelType * iModelType
+                                                        , string & iFileName
+                                                        ) 
+                                                        : XEMGaussianEDDAParameter(iNbCluster, iPbDimension, iModelType)
+{
   int64_t  k;
  __storeDim           = _pbDimension * (_pbDimension + 1) / 2;
   _tabShape           = new XEMDiagMatrix*[_nbCluster];
@@ -104,6 +111,43 @@ XEMGaussianGeneralParameter::XEMGaussianGeneralParameter(int64_t  iNbCluster, in
 
 }
 
+
+//-------------------------------------------------------------------------------------
+//constructeur avec une initialisation USER from containers
+//-------------------------------------------------------------------------------------
+XEMGaussianGeneralParameter::XEMGaussianGeneralParameter( int64_t  iNbCluster
+                                                         , int64_t  iPbDimension
+                                                         , XEMModelType * iModelType
+                                                         , double * proportions
+                                                         , double **  means
+                                                         , double *** variances
+                                                         ) 
+                                                         : XEMGaussianEDDAParameter(iNbCluster, iPbDimension, iModelType)
+{
+  int64_t  k;
+  __storeDim           = _pbDimension * (_pbDimension + 1) / 2;
+  _tabShape           = new XEMDiagMatrix*[_nbCluster];
+  _tabOrientation     = new XEMGeneralMatrix*[_nbCluster];
+  _tabLambda          = new double [_nbCluster];
+  
+  for (k=0; k<_nbCluster; k++){
+		_tabShape[k]     = new XEMDiagMatrix(_pbDimension); //Id
+		_tabOrientation[k] = new XEMGeneralMatrix(_pbDimension); //Id
+		_tabLambda[k]      = 1.0;
+		
+		// _tabSigma, _tabInvSigma, _tabWk will be initialized in XEMGaussianEDDAparameter
+		_tabInvSigma[k] = new XEMSymmetricMatrix(_pbDimension);  //Id
+		_tabSigma[k]    = new XEMSymmetricMatrix(_pbDimension); // Id
+    _tabWk[k]       = new XEMSymmetricMatrix(_pbDimension); //Id
+    *_tabWk[k]      = 1.0;
+  }
+  _W = new XEMSymmetricMatrix(_pbDimension); //Id
+
+  input(proportions, means, variances);
+  
+  updateTabInvSigmaAndDet(); // method of XEMGaussianParameter
+  
+}
 
 
 //-------------------------------------------------------------------------------------

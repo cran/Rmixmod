@@ -26,9 +26,11 @@
 #define XEMMATRIX_H
 
 #include "XEMUtil.h"
+
+// pre-declaration
 class XEMGeneralMatrix;
-class XEMSymmetricMatrix;
 class XEMDiagMatrix;
+
 /**
   @brief Base class for Matrix
   @author F Langrognet & A Echenim
@@ -96,7 +98,8 @@ public:
   void edit(ostream& flux, string before);
   /// read matrix from an input file
   virtual void input(ifstream & fi) = 0;
-
+  virtual void input(double ** variances ) = 0;
+  
 // pour ne plus faire de transtypages
 
   /// return store of a spherical matrix

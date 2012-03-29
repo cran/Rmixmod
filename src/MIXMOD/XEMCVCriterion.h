@@ -27,8 +27,9 @@
 
 
 #include "XEMCriterion.h"
-#include "XEMModel.h"
-#include "XEMClusteringInput.h"
+
+// pre-declaration
+class XEMLabelDescription;
 
 /**
   @brief Derived class of XEMCriterion for CV Criterion
@@ -40,45 +41,39 @@ class XEMCVCriterion : public XEMCriterion{
 public:
 
   /// Default constructor
-  XEMCVCriterion();
-
-
-  /// Constructor
-  XEMCVCriterion(XEMOldInput * input);
+  XEMCVCriterion( XEMModel * model
+                , const int64_t nbCVBlock
+                );
   
   /// Destructor
   virtual ~XEMCVCriterion();
   
-  XEMCriterionName getCriterionName() const;
-
   /// Run method
-  void run(XEMModel * model, double & value,  XEMErrorType & error);
-  
-  /// Run method
-  void run(XEMModel * model, double & value, int64_t *& cvLabel, XEMErrorType & error);
+  virtual void run(XEMCriterionOutput & output);
 
+  /// Accessor
+  std::vector<int64_t> & getCVLabel();
   
 private :
 
-
-  void createCVBlocks(XEMModel * model);
+  void createCVBlocks();
   
   /// Table of XEMCVBlock : testBlock
-  XEMCVBlock * _tabCVBlock;
+  XEMCVBlock* _tabCVBlock;
+  
+  // pointer to a XEMLabelDescription
+  std::vector<int64_t> _cvLabel;
   
   // number of CV Blocks  
   int64_t _nbCVBlock;
-  
+    
   // initialisation method of cv blocks
   XEMCVinitBlocks _CVinitBlocks;
 };
 
-inline void XEMCVCriterion::run(XEMModel * model, double & value,  XEMErrorType & error){
-  throw internalMixmodError;
-}
 
-inline XEMCriterionName XEMCVCriterion::getCriterionName() const{
-  return CV;
+inline std::vector<int64_t> & XEMCVCriterion::getCVLabel(){
+  return _cvLabel;
 }
 
 #endif

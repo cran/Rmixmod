@@ -25,9 +25,11 @@
 #ifndef XEMLikelihoodOutput_H
 #define XEMLikelihoodOutput_H
 
-#include "XEMModel.h"
+#include <fstream>
+#include <stdint.h>
 
-
+// pre-declaration
+class XEMModel;
 
 /** @brief Base class for Label(s)
     @author F Langrognet & A Echenim
@@ -48,7 +50,7 @@ public:
 	virtual ~XEMLikelihoodOutput();
 	
  /// Edit
- void edit(ofstream & oFile, bool text=false);
+ void edit(std::ofstream & oFile, bool text=false);
 
  
   ///Selector

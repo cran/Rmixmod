@@ -26,7 +26,6 @@
 #define XEMBICCRITERION_H
 
 #include "XEMCriterion.h"
-#include "XEMModel.h"
 
 /**
   @brief Derived class of XEMCriterion for BIC Criterion
@@ -38,21 +37,14 @@ class XEMBICCriterion : public XEMCriterion{
 public:
 
 	/// Default Constructor
-	XEMBICCriterion();
-
+	XEMBICCriterion(XEMModel * model);
 
 	/// Destructor
 	virtual ~XEMBICCriterion();
-  
-  XEMCriterionName getCriterionName() const;
 
 	/// Run method
-	void run(XEMModel * model, double & value, XEMErrorType & error);
+	virtual void run(XEMCriterionOutput & output);
 	
 };
-
-inline XEMCriterionName XEMBICCriterion::getCriterionName() const{
-  return BIC;
-}
 
 #endif

@@ -26,7 +26,6 @@
 #define XEMSYMMETRICMATRIX_H
 
 
-#include "XEMUtil.h"
 #include "XEMMatrix.h"
 
 /**
@@ -130,7 +129,8 @@ public:
 
   /// read symmetric matrix store in file
   void input(ifstream & fi);
-
+  virtual void input(double ** variances);
+  
  /* ///compute SVD decomposition for a symmetric matrix
   void computeSVD(XEMDiagMatrix* & S, XEMGeneralMatrix* & O);*/
 

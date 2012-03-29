@@ -27,9 +27,10 @@
 #define XEMLABELDESCRIPTION_H
 
 #include "XEMDescription.h"
-#include "XEMEstimation.h"
-#include "XEMLabel.h"
 
+// pre-declaration
+class XEMModel;
+class XEMLabel;
 
 class XEMLabelDescription : public XEMDescription
 {  
@@ -39,9 +40,12 @@ class XEMLabelDescription : public XEMDescription
     
     ///constructor by initilization
     XEMLabelDescription(int64_t nbSample, int64_t nbColumn, std::vector< XEMColumnDescription* > columnDescription, FormatNumeric::XEMFormatNumericFile format, string filename, string infoName = "");
-        
+    
+		/// constructor from a vector of int
+		XEMLabelDescription(int64_t nbSample, vector<int64_t> vLabel); 
+		
     ///constructor after an estimation->run
-    XEMLabelDescription(XEMEstimation * estimation);
+    XEMLabelDescription(XEMModel * estimation);
     
     
     ///constructor by copy
@@ -49,26 +53,38 @@ class XEMLabelDescription : public XEMDescription
     
     /// Destructor
     virtual ~XEMLabelDescription();
-    
+  
+  
+    /// Comparison operator
+    bool operator ==(const XEMLabelDescription & labelDescription) const;
   
     ///operator=    
     XEMLabelDescription & operator=( XEMLabelDescription & labelDescription);
     
     const XEMLabel * getLabel() const;
-    
+    XEMLabel * getLabel();
+  
+    const int64_t getNbCluster() const;
+  
     void saveNumericValues(string fileName="");
     
   private :
     
     XEMLabel * _label;
-    XEMLabel* createLabel();
+    XEMLabel * createLabel();
+    int64_t _nbCluster;
 };
 
 inline const XEMLabel * XEMLabelDescription::getLabel() const{
   return _label;
 }
 
+inline XEMLabel * XEMLabelDescription::getLabel(){
+  return _label;
+}
 
-
+inline const int64_t XEMLabelDescription::getNbCluster() const{
+  return _nbCluster;
+}
   
 #endif // XEMLABELDESCRIPTION_H

@@ -24,14 +24,17 @@
 ***************************************************************************/
 #ifndef XEMProbaOutput_H
 #define XEMProbaOutput_H
-#include "XEMEstimation.h"
-#include "XEMCVCriterion.h"
-
 
 
 /** @brief Base class for Label(s)
     @author F Langrognet & A Echenim
 */
+
+#include <iostream>
+#include <stdint.h>
+
+// pre-declaration
+class XEMModel;
 
 class XEMProbaOutput{
 
@@ -41,7 +44,7 @@ public:
 	XEMProbaOutput();
 
   /// Constructor
-	XEMProbaOutput(XEMEstimation * estimation);
+	XEMProbaOutput(XEMModel * model);
   
   XEMProbaOutput(XEMProbaOutput * iProbaOutput);
 	
@@ -52,19 +55,19 @@ public:
   void setCVLabel(int64_t  * CVLabel);
 
   /// editPartition
-  void editPartition(ofstream & oFile);
+  void editPartition(std::ofstream & oFile);
 
   /// editLabel
-  void editLabel(ofstream & oFile);
+  void editLabel(std::ofstream & oFile);
   
   /// editLabel
   void editLabel();
   
   /// editPostProba
-  void editPostProba(ofstream & oFile);
+  void editPostProba(std::ofstream & oFile);
 
   /// editCVLabel
-  void editCVLabel(ofstream & oFile);
+  void editCVLabel(std::ofstream & oFile);
 
   /// Selector
   int64_t  * getTabLabel() const;
@@ -112,9 +115,6 @@ private :
   double ** _tabPostProba;
 
 };
-
-
-
 
 
 

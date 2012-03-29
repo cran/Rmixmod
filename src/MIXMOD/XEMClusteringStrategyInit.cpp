@@ -24,13 +24,16 @@
 ***************************************************************************/
 
 #include "XEMClusteringStrategyInit.h"
-#include "XEMGaussianParameter.h"
 #include "XEMGaussianSphericalParameter.h"
 #include "XEMGaussianDiagParameter.h"
 #include "XEMGaussianGeneralParameter.h"
 #include "XEMGaussianHDDAParameter.h"
 #include "XEMBinaryEkjhParameter.h"
 #include "XEMBinaryData.h"
+#include "XEMModel.h"
+#include "XEMModelType.h"
+#include "XEMPartition.h"
+
 //#include <fstream.h>
 
 //------------
@@ -94,9 +97,8 @@ XEMClusteringStrategyInit::XEMClusteringStrategyInit(const XEMClusteringStrategy
 // Destructor
 //-----------
 XEMClusteringStrategyInit::~XEMClusteringStrategyInit(){
-  int64_t i;
   if (_tabInitParameter && _deleteTabParameter){
-    for (i=0; i<_nbInitParameter; i++){
+    for (unsigned int i=0; i<_nbInitParameter; i++){
       delete _tabInitParameter[i];    
     }
     delete [] _tabInitParameter;
@@ -104,7 +106,7 @@ XEMClusteringStrategyInit::~XEMClusteringStrategyInit(){
   }
 
   if (_tabPartition){
-    for (i=0; i<_nbPartition; i++){
+    for (unsigned  int i=0; i<_nbPartition; i++){
       delete _tabPartition[i];
       _tabPartition[i] = NULL;
     }
@@ -547,9 +549,6 @@ void XEMClusteringStrategyInit::input(ifstream & fi, XEMData *& data, int64_t nb
 }
 
 
-
-
-
     
 // ostream <<
 //-----------
@@ -591,3 +590,230 @@ ostream & operator << (ostream & fo, XEMClusteringStrategyInit & strategyInit){
 }
 
 
+
+/*------------------------------------------------------
+ initSMALL_EM
+ ------------
+ 
+ updated in this method : 
+ - _parameter
+ - _tabFik, _tabSumF, _tabCik, _tabTik, _tabNk (because an Estep is called to choose the bestParameter)
+ Note : _tabFik, _tabSumF, _tabCik, _tabTik, _tabNk wil be 're'computed in the following EStep
+ So only _parameter have to be updated in this method
+ 
+ -------------------------------------------------------*/
+void XEMClusteringStrategyInit::initSMALL_EM(XEMModel*& model)
+{
+  //  cout<<"init SMALL_EM, nbTryInInit="<<strategyInit->getNbTry()<<", nbIteration = "<<strategyInit->getNbIteration()<<", epsilon = "<<strategyInit->getEpsilon()<<endl;
+  model->setAlgoName(EM);
+  double logLikelihood, bestLogLikelihood;
+  // get pointer to Parameter
+  XEMParameter * bestParameter = model->getParameter()->clone();
+  int64_t  i, nbRunOfSmallEMOk = 0; 
+  bestLogLikelihood = 0.0;
+  for (i=0; i<_nbTry; i++){
+    nbRunOfSmallEMOk++;
+    try{
+      // one run of small EM
+      model->getParameter()->reset();
+      oneRunOfSmallEM(model, logLikelihood);
+      //cout<<"sortie de oneRunOfSmallEM, LL = "<<logLikelihood<<endl;
+      if ((nbRunOfSmallEMOk == 1) || (logLikelihood > bestLogLikelihood)){
+        bestLogLikelihood = logLikelihood;
+        bestParameter->recopy(model->getParameter());
+        //       cout<<"best LL dans SMALL_EM : " <<bestLogLikelihood<<endl;
+      }
+    }
+    catch(XEMErrorType errorType){
+      nbRunOfSmallEMOk--;
+    }
+  }
+  
+  if (nbRunOfSmallEMOk == 0){
+    throw SMALL_EM_error;
+  }
+  
+  // set best parameter
+  model->setParameter(bestParameter);
+  model->getParameter()->setModel(model);
+  //  cout<<"fin de init SMALL_EM, nb d'essais effectues="<<i<<endl;
+}
+
+
+
+//---------------------
+// one run if small EM
+//--------------------
+void XEMClusteringStrategyInit::oneRunOfSmallEM(XEMModel*& model, double & logLikelihood){
+  double lastLogLikelihood, eps;
+  eps = 1000;
+  model->initRANDOM(1);
+  model->Estep();
+  model->Mstep();
+  logLikelihood = model->getLogLikelihood(true);  // true : to compute fik
+  int64_t  nbIteration = 1;
+  bool continueAgain = true;
+  while (continueAgain){
+    //    cout<<"while de oneRunOfSmallEM, nbIteration = "<<nbIteration<<endl;
+    //(nbIteration < strategyInit->getNbIteration()) && (eps > strategyInit->getEpsilon())){
+    lastLogLikelihood = logLikelihood;
+    model->Estep();
+    model->Mstep();
+    nbIteration++; 
+    // update continueAgain
+    switch (_stopName) {
+      case NBITERATION :
+        continueAgain = (nbIteration < _nbIteration);
+        break;
+      case EPSILON :
+        logLikelihood = model->getLogLikelihood(true);  // true : to compute fik
+        eps = fabs(logLikelihood - lastLogLikelihood);
+        //continueAgain = (eps > strategyInit->getEpsilon());
+        continueAgain = (eps > _epsilon && (nbIteration < maxNbIterationInInit)); // on ajoute un test pour ne pas faire trop d'iterations quand meme ....
+        break;
+      case NBITERATION_EPSILON :
+        logLikelihood = model->getLogLikelihood(true);  // true : to compute fi
+        eps = fabs(logLikelihood - lastLogLikelihood);
+        continueAgain = ((eps > _epsilon) && (nbIteration < _nbIteration));
+        break;
+      default : throw internalMixmodError;
+    }
+  }
+  if (_stopName == NBITERATION){ // logLikelihood is an output
+    logLikelihood = model->getLogLikelihood(true);  // true : to compute fi
+  }
+  //cout<<"Fin de oneRunOfSmallEM, nb d'iterations effectuees = "<<nbIteration<<", logLikelihood = "<<logLikelihood<<endl;
+}
+
+
+
+
+
+/*---------------------------------------------------
+ initCEM_INIT
+ ---------------------------------------------------
+ updated in this method : 
+ - _parameter
+ - _tabFik, _tabSumF, _tabCik, _tabTik, _tabNk (because an Estep and a CStep are called to choose the bestParameter)
+ Note : _tabFik, _tabSumF, _tabCik, _tabTik, _tabNk wil be 're'computed in the following EStep
+ So only _parameter have to be updated in this method
+ 
+ ---------------------------------------------------*/
+void XEMClusteringStrategyInit::initCEM_INIT(XEMModel*& model){
+  //cout<<"init CEM, nbTryInInit="<<strategyInit->getNbTry()<<endl;
+  model->setAlgoName(CEM);
+  int64_t  i;
+  double cLogLikelihood=0.0, oldLogLikelihood=0.0;
+  
+  // get pointer to Parameter
+  XEMParameter * bestParameter = model->getParameter()->clone();
+  int64_t  nbRunOfCEMOk = 0;
+  double bestCLogLikelihood = 0.0;
+  
+  for (i=0; i<_nbTry; i++){
+    nbRunOfCEMOk++;
+    try{
+      model->getParameter()->reset(); // reset to default values
+      model->initRANDOM(1);
+      model->setAlgoName(CEM);
+      int64_t  nbIter = 0;
+      bool fin = false;
+      while (!fin && nbIter<=maxNbIterationInCEM_INIT){
+        model->Estep();
+        model->Cstep();
+        model->Mstep();
+        nbIter++;
+        if (nbIter == 1){
+          oldLogLikelihood = model->getCompletedLogLikelihood();
+        }
+        else{
+          cLogLikelihood = model->getCompletedLogLikelihood();
+          if (cLogLikelihood == oldLogLikelihood){
+            fin = true;
+          }
+          else{
+            oldLogLikelihood = cLogLikelihood;
+          }
+        }
+      }
+      //cout<<"dans init CEM, nb d'iterations effectuées : "<<nbIter<<endl;
+      // Compute log-likelihood 
+      cLogLikelihood = model->getCompletedLogLikelihood();
+      // Comparaison of log-likelihood between step p and p-1 
+      if ((nbRunOfCEMOk==1) || (cLogLikelihood > bestCLogLikelihood)){
+        bestCLogLikelihood = cLogLikelihood;
+        bestParameter->recopy(model->getParameter());
+      }
+      //cout<<"nbIter : "<<nbIter<<endl;
+    }
+    catch (XEMErrorType errorType){
+      nbRunOfCEMOk--;
+    }
+  }
+  
+  if (nbRunOfCEMOk==0){
+    // set best parameter
+    model->setParameter(bestParameter);
+    model->getParameter()->setModel(model);
+    throw CEM_INIT_error;
+  }
+  
+  // set Best parameter
+  model->setParameter(bestParameter);
+  model->getParameter()->setModel(model);
+  //cout<<"fin de init CEM, nb d'essais effectues="<<i<<endl;
+  
+}
+
+/*---------------------------------------------------------
+ Initialization by SEM
+ ---------------------
+ 
+ updated in this method : 
+ - _parameter
+ - _tabFik, _tabSumF, _tabCik, _tabTik, _tabNk (because an Estep and a SStep are called to choose the bestParameter)
+ Note : _tabFik, _tabSumF, _tabCik, _tabTik, _tabNk wil be 're'computed in the following EStep
+ So, only _parameter have to be updated in this method
+ 
+ -------------------------------------------------------*/
+void XEMClusteringStrategyInit::initSEM_MAX(XEMModel*& model){
+  //cout<<"init SEM_MAX, nbTryInInit="<<strategyInit->getNbIteration()<<endl;
+  model->setAlgoName(SEM);
+  int64_t  j;
+  double logLikelihood, bestLogLikelihood;
+  // get pointer to Parameter
+  XEMParameter * bestParameter = model->getParameter()->clone();
+  int64_t  nbRunOfSEMMAXOk = 0;
+  bestLogLikelihood = 0.0;
+  //  int64_t  bestIndex=0;
+  
+  for (j=0; j<_nbIteration; j++){
+    nbRunOfSEMMAXOk++;
+    try{
+      model->getParameter()->reset();
+      model->initRANDOM(1);
+      model->Estep();
+      model->Sstep();
+      model->Mstep();
+      // Compute log-likelihood 
+      logLikelihood = model->getLogLikelihood(true);  // true : to compute fik
+      if ((nbRunOfSEMMAXOk==1) || (logLikelihood > bestLogLikelihood)){
+        bestLogLikelihood = logLikelihood;
+        bestParameter->recopy(model->getParameter());
+        //        bestIndex = j;
+      }
+    }
+    catch (XEMErrorType errorType){
+      nbRunOfSEMMAXOk--;
+    }
+  }
+  
+  if (nbRunOfSEMMAXOk==0){
+    throw SEM_MAX_error;
+  }
+  
+  // set Best parameter
+  model->setParameter(bestParameter);
+  model->getParameter()->setModel(model);
+  //cout<<"fin de init SEM_MAX, nb d'iterations effectuees="<<j<<" meilleure solution : "<<bestIndex<<endl;
+}

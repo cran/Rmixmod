@@ -3,6 +3,7 @@
 ###################################################################################
 
 ###################################################################################
+##' @include global.R
 ##' @include Model.R
 NULL
 ###################################################################################
@@ -13,15 +14,15 @@ NULL
 ##' This class defines a gaussian Model. Inherits the [\code{\linkS4class{Model}}] class.
 ##' 
 ##' \describe{
-##'
 ##'   \item{family}{character defining a family of models.}
-##'
 ##' }
 ##'
 ##' @examples
 ##'   new("GaussianModel")
 ##'   new("GaussianModel",family="general")
-##' @author Remi Lebret \email{remi.lebret@@math.univ-lille1.fr}
+##'
+##'   getSlots("GaussianModel")
+##' 
 ##' @name GaussianModel-class
 ##' @rdname GaussianModel-class
 ##' @exportClass GaussianModel
@@ -33,13 +34,181 @@ setClass(
     ),
     contains=c("Model"),
     prototype=prototype(
-        listModels = "Gaussian_pk_Lk_C",
-        family = "general",
-        free.proportions = TRUE,
-        equal.proportions = FALSE
-    )
+        family = character(0)
+    ),
+    validity=function(object){
+      # spherical models
+      spherical.free=c("Gaussian_pk_L_I", "Gaussian_pk_Lk_I")
+      spherical.equal=c("Gaussian_p_L_I", "Gaussian_p_Lk_I")
+      # all spherical
+      spherical=c(spherical.free,spherical.equal)
+      # diagonal models
+      diagonal.free=c("Gaussian_pk_L_B", "Gaussian_pk_Lk_B", "Gaussian_pk_L_Bk", "Gaussian_pk_Lk_Bk")
+      diagonal.equal=c("Gaussian_p_L_B", "Gaussian_p_Lk_B", "Gaussian_p_L_Bk", "Gaussian_p_Lk_Bk")
+      # all diagonal
+      diagonal=c(diagonal.free,diagonal.equal)
+      #  general models
+      general.free=c("Gaussian_pk_L_C", "Gaussian_pk_Lk_C", "Gaussian_pk_L_D_Ak_D", "Gaussian_pk_Lk_D_Ak_D", "Gaussian_pk_L_Dk_A_Dk", "Gaussian_pk_Lk_Dk_A_Dk", "Gaussian_pk_L_Ck", "Gaussian_pk_Lk_Ck")
+      general.equal=c( "Gaussian_p_L_C", "Gaussian_p_Lk_C", "Gaussian_p_L_D_Ak_D", "Gaussian_p_Lk_D_Ak_D", "Gaussian_p_L_Dk_A_Dk", "Gaussian_p_Lk_Dk_A_Dk", "Gaussian_p_L_Ck", "Gaussian_p_Lk_Ck")
+      # all general
+      general=c(general.free,general.equal)
+      # all models
+      all.free=c(spherical.free,diagonal.free,general.free)
+      all.equal=c(spherical.equal,diagonal.equal,general.equal)
+      all=c(spherical,diagonal,general)
+          
+      # check listModels validity
+      if ( sum(object@listModels %in% all) != length(object@listModels) )
+          stop("At least one model is not a valid model. See ?mixmodGaussianModel for the list of all gaussian models.")
+          
+      # check proportions parameters validity
+      if ( !object@equal.proportions & !object@free.proportions )
+        stop("equal.proportions and free.porportions cannot be both as FALSE !")
+      
+      # check whether some family names are not valid
+      if ( sum( !(object@family %in% c("all","general","diagonal","spherical")) ) ){
+        warning( object@family[which(!(object@family %in% c("all","general","diagonal","spherical")))], ": unknown family name !")
+      }
+      
+      # check proportions
+      if ( !object@free.proportions & (sum(object@listModels %in% all.free)>0) )
+        stop("At least one model has a free proportions but free.proportions is set as FALSE. See ?mixmodGaussianModel for the list of models with equal proportions.")
+      if ( !object@equal.proportions & (sum(object@listModels %in% all.equal)>0) )
+        stop("At least one model has an equal proportions but equal.proportions is set as FALSE. See ?mixmodGaussianModel for the list of models with free proportions.")
+      
+      return(TRUE)
+    }
 )
 ###################################################################################
+
+###################################################################################
+##' Create an instance of the [\code{\linkS4class{GaussianModel}}] class using new/initialize.
+##' 
+##' Initialization method. Used internally in the `Rmixmod' package.
+##' 
+##' @seealso \code{\link{initialize}}
+##'
+##' @keywords internal
+##'
+##' @rdname initialize-methods
+##'
+setMethod(
+  f="initialize",
+  signature=c("GaussianModel"),
+  definition=function(.Object, listModels, family, free.proportions, equal.proportions){
+          
+    # spherical models
+    spherical.free=c("Gaussian_pk_L_I", "Gaussian_pk_Lk_I")
+    spherical.equal=c("Gaussian_p_L_I", "Gaussian_p_Lk_I")
+    # all spherical
+    spherical=c(spherical.free,spherical.equal)
+    
+    # diagonal models
+    diagonal.free=c("Gaussian_pk_L_B", "Gaussian_pk_Lk_B", "Gaussian_pk_L_Bk", "Gaussian_pk_Lk_Bk")
+    diagonal.equal=c("Gaussian_p_L_B", "Gaussian_p_Lk_B", "Gaussian_p_L_Bk", "Gaussian_p_Lk_Bk")
+    # all diagonal
+    diagonal=c(diagonal.free,diagonal.equal)
+    
+    #  general models
+    general.free=c("Gaussian_pk_L_C", "Gaussian_pk_Lk_C", "Gaussian_pk_L_D_Ak_D", "Gaussian_pk_Lk_D_Ak_D", "Gaussian_pk_L_Dk_A_Dk", "Gaussian_pk_Lk_Dk_A_Dk", "Gaussian_pk_L_Ck", "Gaussian_pk_Lk_Ck")
+    general.equal=c( "Gaussian_p_L_C", "Gaussian_p_Lk_C", "Gaussian_p_L_D_Ak_D", "Gaussian_p_Lk_D_Ak_D", "Gaussian_p_L_Dk_A_Dk", "Gaussian_p_Lk_Dk_A_Dk", "Gaussian_p_L_Ck", "Gaussian_p_Lk_Ck")
+    # all general
+    general=c(general.free,general.equal)
+    
+    # all models
+    all.free=c(spherical.free,diagonal.free,general.free)
+    all.equal=c(spherical.equal,diagonal.equal,general.equal)
+    all=c(spherical,diagonal,general)
+    
+    if ( !missing(listModels) ){
+      # save the list of models
+      .Object@listModels <- listModels
+      # set family 
+      if ( missing(family) ){
+        if ( sum(listModels %in% spherical) & sum(listModels %in% diagonal) & sum(listModels %in% general) ){
+          .Object@family<-"all"
+        }
+        else{
+          family<-character(0)
+          if ( sum(listModels %in% spherical) ){ family<-c(family,"spherical") }
+          if ( sum(listModels %in% diagonal) ){ family<-c(family,"diagonal") }
+          if ( sum(listModels %in% general) ){ family<-c(family,"general") }
+          .Object@family<-family
+        }
+      }
+      else { .Object@family<-family }
+      
+      # set free.proportions
+      if ( missing(free.proportions) ){
+        if ( sum(listModels %in% all.free) ){ .Object@free.proportions<-TRUE }
+        else{ .Object@free.proportions<-FALSE }
+      }
+      else{ .Object@free.proportions<-free.proportions }
+      # set equal.proportions
+      if ( missing(equal.proportions) ){
+        if ( sum(listModels %in% all.equal) ){ .Object@equal.proportions<-TRUE }
+        else{ .Object@equal.proportions<-FALSE }
+      }
+      else{ .Object@equal.proportions<-equal.proportions }
+    }
+    else{
+      # check free.proportions option
+      if ( missing(free.proportions) ){ .Object@free.proportions<-TRUE }
+      else{ .Object@free.proportions<-free.proportions }
+      
+      # check equal.proportions option
+      if ( missing(equal.proportions) ){ .Object@equal.proportions<-TRUE }
+      else{ .Object@equal.proportions<-equal.proportions }
+      
+      # define an empty list of models
+      list<-character(0)
+      
+      # set family as "all" if missing
+      if ( missing(family) ){
+        .Object@family<-"all"
+        if ( .Object@free.proportions ){ list<-c(list,all.free) }
+        if ( .Object@equal.proportions ){ list<-c(list,all.equal) }
+      }
+      else{
+        # all gaussian models
+        if (sum(family=="all")){
+          # set family label in case of multiple entries
+          .Object@family = "all"
+          if ( .Object@free.proportions ){ list<-c(list,all.free) }
+          if ( .Object@equal.proportions ){ list<-c(list,all.equal) }
+        }
+        else{
+          # all spherical models
+          if ( sum(family=="spherical") ){
+            if ( .Object@free.proportions ){ list<-c(list,spherical.free) }
+            if ( .Object@equal.proportions ){ list<-c(list,spherical.equal) }
+          }
+          # all diagonal models
+          if ( sum(family=="diagonal") ){
+            .Object@family = "diagonal"
+            if ( .Object@free.proportions ){ list<-c(list,diagonal.free) }
+            if ( .Object@equal.proportions ){ list<-c(list,diagonal.equal) }
+          }
+          # all general models
+          if ( sum(family=="general") ){
+            .Object@family = "general"
+            if ( .Object@free.proportions ){ list<-c(list,general.free) }
+            if ( .Object@equal.proportions ){ list<-c(list,general.equal) }
+          }
+          # set family label in case of multiple entries
+          .Object@family = family
+        }
+      }
+      # create the list of models depending on the proportions option
+      .Object@listModels<-list
+    }
+    
+    validObject(.Object)        
+    return(.Object)
+  }
+)
+###################################################################################
+
 
 ###################################################################################
 ##' Create an instance of the [\code{\linkS4class{GaussianModel}}] class
@@ -54,6 +223,7 @@ setClass(
 ##' In spherical family, we assume spherical shapes, namely \eqn{A_{k}=I}, \eqn{I} denoting the identity matrix. In such a case, two parsimonious models are in competition: \eqn{[\lambda I]} and \eqn{[\lambda_{k}I]}.
 ##'
 ##' @param family character defining a family of models. "general" for the general family, "diagonal" for the diagonal family, "spherical" for the spherical family and "all" for all families. Default is "general".
+##' @param listModels a list a character containing a list of models. It is optional.
 ##' @param free.proportions logical to include models with free proportions. Default is TRUE.
 ##' @param equal.proportions logical to include models with equal proportions. Default is TRUE.
 ##'
@@ -94,90 +264,73 @@ setClass(
 ##' @examples
 ##'   mixmodGaussianModel()
 ##'   mixmodGaussianModel(family="all",free.proportions=FALSE)
-##' @author Remi Lebret \email{remi.lebret@@math.univ-lille1.fr}
+##' @author Remi Lebret and Serge Iovleff and Florent Langrognet, with contributions from C. Biernacki and G. Celeux and G. Govaert \email{contact@@mixmod.org}
 ##' @export
 ##'
-mixmodGaussianModel<- function( family="all", free.proportions=TRUE, equal.proportions=TRUE ){
-    # check proportions parameters validity
-    if ( !equal.proportions & !free.proportions )
-    stop("equal.proportions and free.porportions cannot be both as FALSE !")
-    # all spherical models
-    if ( family=="spherical" ){
-        free=c("Gaussian_pk_L_I", "Gaussian_pk_Lk_I")
-        equal=c("Gaussian_p_L_I", "Gaussian_p_Lk_I")
+mixmodGaussianModel<- function( family="all", listModels=NULL, free.proportions=TRUE, equal.proportions=TRUE ){
+    if ( is.null(listModels) ){
+      new("GaussianModel", family=family, free.proportions=free.proportions, equal.proportions=equal.proportions)
+    }else{
+      new("GaussianModel", listModels=listModels)
     }
-    # all diagonal models
-    else if ( family=="diagonal" ){
-        free=c( "Gaussian_pk_L_B", "Gaussian_pk_Lk_B", "Gaussian_pk_L_Bk", "Gaussian_pk_Lk_Bk")
-        equal=c( "Gaussian_p_L_B", "Gaussian_p_Lk_B", "Gaussian_p_L_Bk", "Gaussian_p_Lk_Bk")
-    }
-    # all general models
-    else if ( family=="general" ){
-        free=c( "Gaussian_pk_L_C"
-        , "Gaussian_pk_Lk_C"
-        , "Gaussian_pk_L_D_Ak_D"
-        , "Gaussian_pk_Lk_D_Ak_D"
-        , "Gaussian_pk_L_Dk_A_Dk"
-        , "Gaussian_pk_Lk_Dk_A_Dk"
-        , "Gaussian_pk_L_Ck"
-        , "Gaussian_pk_Lk_Ck"
-        )
-        equal=c( "Gaussian_p_L_C"
-        , "Gaussian_p_Lk_C"
-        , "Gaussian_p_L_D_Ak_D"
-        , "Gaussian_p_Lk_D_Ak_D"
-        , "Gaussian_p_L_Dk_A_Dk"
-        , "Gaussian_p_Lk_Dk_A_Dk"
-        , "Gaussian_p_L_Ck"
-        , "Gaussian_p_Lk_Ck"
-        )
-    }
-    # all gaussian models
-    else if (family=="all"){
-        free=c( "Gaussian_pk_L_I"
-        , "Gaussian_pk_Lk_I"
-        , "Gaussian_pk_L_B"
-        , "Gaussian_pk_Lk_B"
-        , "Gaussian_pk_L_Bk"
-        , "Gaussian_pk_Lk_Bk"
-        , "Gaussian_pk_L_C"
-        , "Gaussian_pk_Lk_C"
-        , "Gaussian_pk_L_D_Ak_D"
-        , "Gaussian_pk_Lk_D_Ak_D"
-        , "Gaussian_pk_L_Dk_A_Dk"
-        , "Gaussian_pk_Lk_Dk_A_Dk"
-        , "Gaussian_pk_L_Ck"
-        , "Gaussian_pk_Lk_Ck"
-        )
-        equal=c( "Gaussian_p_L_I"
-        , "Gaussian_p_Lk_I"
-        , "Gaussian_p_L_B"
-        , "Gaussian_p_Lk_B"
-        , "Gaussian_p_L_Bk"
-        , "Gaussian_p_Lk_Bk"
-        , "Gaussian_p_L_C"
-        , "Gaussian_p_Lk_C"
-        , "Gaussian_p_L_D_Ak_D"
-        , "Gaussian_p_Lk_D_Ak_D"
-        , "Gaussian_p_L_Dk_A_Dk"
-        , "Gaussian_p_Lk_Dk_A_Dk"
-        , "Gaussian_p_L_Ck"
-        , "Gaussian_p_Lk_Ck"
-        )
-    }
-    else{
-        stop("unknown family name !")
-    }
-    # create the list of models depending on the proportions option
-    if ( free.proportions & equal.proportions ){
-        listModels=c(free, equal)
-    }
-    else if ( free.proportions ){
-        listModels=free
-    }
-    else if ( equal.proportions ){
-        listModels=equal
-    }
-    new("GaussianModel", listModels=listModels, family=family, free.proportions=free.proportions, equal.proportions=equal.proportions)
 }
+###################################################################################
+
+
+
+###################################################################################
+##' @rdname extract-methods
+##' @aliases [,GaussianModel-method
+##'
+setMethod(
+  f="[", 
+  signature(x = "GaussianModel"),
+  definition=function(x,i,j,drop){
+    if ( missing(j) ){
+      switch(EXPR=i,
+        "listModels"={return(x@listModels)},
+        "free.proportions"={return(x@free.proportions)},
+        "equal.proportions"={return(x@equal.proportions)},
+        "family"={return(x@family)},
+        stop("This attribute doesn't exist !")
+      )
+    }else{
+      switch(EXPR=i,
+        "listModels"={return(x@listModels[j])},
+        stop("This attribute doesn't exist !")
+      )
+    }
+  }
+)
+###################################################################################
+
+
+
+###################################################################################
+##' @name [
+##' @rdname extract-methods
+##' @aliases [<-,GaussianModel-method
+##'
+setReplaceMethod(
+  f="[", 
+  signature(x = "GaussianModel"), 
+  definition=function(x,i,j,value){
+    if ( missing(j) ){
+      switch(EXPR=i,
+        "listModels"={x@listModels<-value},
+        "free.proportions"={x@free.proportions<-value},
+        "equal.proportions"={x@equal.proportions<-value},
+        "family"={return(x@family)},
+        stop("This attribute doesn't exist !")
+      )
+    }else{
+      switch(EXPR=i,
+        "listModels"={x@listModels[j]<-value},
+        stop("This attribute doesn't exist !")
+      )
+    }
+    validObject(x)
+    return(x)
+  }
+)
 ###################################################################################

@@ -27,9 +27,10 @@
 #define XEMPROBADESCRIPTION_H
 
 #include "XEMDescription.h"
-#include "XEMEstimation.h"
-#include "XEMProba.h"
 
+// pre-declaration
+class XEMModel;
+class XEMProba;
 
 class XEMProbaDescription : public XEMDescription
 {  
@@ -41,7 +42,7 @@ class XEMProbaDescription : public XEMDescription
     XEMProbaDescription(int64_t nbSample,  int64_t nbCluster, FormatNumeric::XEMFormatNumericFile format, string filename, string infoName="");
     
     ///constructor after an estimation->run
-    XEMProbaDescription(XEMEstimation * estimation);
+    XEMProbaDescription(XEMModel * model);
     
     
     ///constructor by copy
@@ -50,6 +51,9 @@ class XEMProbaDescription : public XEMDescription
     /// Destructor
     virtual ~XEMProbaDescription();
     
+  
+    /// Comparison operator
+    bool operator==( XEMProbaDescription & probaDescription) const;
   
     ///operator=    
     XEMProbaDescription & operator=( XEMProbaDescription & probaDescription);

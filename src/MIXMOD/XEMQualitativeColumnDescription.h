@@ -55,7 +55,7 @@ class XEMQualitativeColumnDescription : public XEMColumnDescription
     
     const vector<VariableDescription> & getVariableDescription()const;
     
-    void setVariableDescription(VariableDescription & variableDescription, int64_t index);
+    void setVariableDescription(VariableDescription & variableDescription, unsigned int index);
     
   private :    
     int64_t _nbFactor;

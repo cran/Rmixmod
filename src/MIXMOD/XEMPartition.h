@@ -27,6 +27,9 @@
 
 #include "XEMUtil.h"
 
+// pre-declaration
+class XEMLabel;
+
 
 /** @brief Base class for Partition(s)
 @author F Langrognet & A Echenim
@@ -45,6 +48,9 @@ class XEMPartition{
     /// Constructor 
     XEMPartition(int64_t nbSample, int64_t nbCluster, const XEMNumericPartitionFile & partitionFile);
     
+		/// constructor from a XEMLabel
+		XEMPartition(const XEMLabel * label, int64_t nbCluster);
+		
     /// Constructor
     // used in DCV context
     XEMPartition(XEMPartition * originalPartition,  XEMCVBlock & block);

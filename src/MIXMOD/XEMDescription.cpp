@@ -24,6 +24,13 @@
 ***************************************************************************/
 
 #include "XEMDescription.h"
+#include "XEMColumnDescription.h"
+#include "XEMWeightColumnDescription.h"
+#include "XEMIndividualColumnDescription.h"
+#include "XEMQuantitativeColumnDescription.h"
+
+
+
 //------------
 // Constructor by default
 //------------
@@ -45,7 +52,8 @@ XEMDescription::XEMDescription(int64_t nbSample, int64_t nbColumn, vector<XEMCol
   _infoName = infoName;
   _nbSample = nbSample;
   _nbColumn = nbColumn;
-  if (columnDescription.size() != _nbColumn){
+  const unsigned int columnSize = columnDescription.size();
+  if ( columnSize != _nbColumn){
     throw errorInColumnDescription;
   }
   _columnDescription.resize(_nbColumn);
@@ -79,6 +87,7 @@ XEMDescription & XEMDescription::operator=(const XEMDescription & description){
     const XEMColumnDescription * cd = description.getColumnDescription(i);
     _columnDescription[i] = cd->clone();
   }
+  return *this ; 
 }
 
 //------------
@@ -86,7 +95,7 @@ XEMDescription & XEMDescription::operator=(const XEMDescription & description){
 //------------
 XEMDescription::~XEMDescription(){  
   if (_columnDescription.size() != 0){
-    for(int64_t i = 0; i< _columnDescription.size() ; ++i){
+    for(unsigned int i = 0; i< _columnDescription.size() ; ++i){
       delete _columnDescription[i];
     }
   }

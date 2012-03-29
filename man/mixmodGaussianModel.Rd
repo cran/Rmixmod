@@ -2,14 +2,17 @@
 \alias{mixmodGaussianModel}
 \title{Create an instance of the [\code{\linkS4class{GaussianModel}}] class}
 \usage{
-  mixmodGaussianModel(family = "all", free.proportions =
-  TRUE, equal.proportions = TRUE)
+  mixmodGaussianModel(family = "all", listModels = NULL,
+    free.proportions = TRUE, equal.proportions = TRUE)
 }
 \arguments{
   \item{family}{character defining a family of models.
   "general" for the general family, "diagonal" for the
   diagonal family, "spherical" for the spherical family and
   "all" for all families. Default is "general".}
+
+  \item{listModels}{a list a character containing a list of
+  models. It is optional.}
 
   \item{free.proportions}{logical to include models with
   free proportions. Default is TRUE.}
@@ -109,10 +112,12 @@
 }
 \examples{
 mixmodGaussianModel()
-mixmodGaussianModel(family="all",free.proportions=FALSE)
+  mixmodGaussianModel(family="all",free.proportions=FALSE)
 }
 \author{
-  Remi Lebret \email{remi.lebret@math.univ-lille1.fr}
+  Remi Lebret and Serge Iovleff and Florent Langrognet,
+  with contributions from C. Biernacki and G. Celeux and G.
+  Govaert \email{contact@mixmod.org}
 }
 \references{
   C. Biernacki, G. Celeux, G. Govaert, F. Langrognet.

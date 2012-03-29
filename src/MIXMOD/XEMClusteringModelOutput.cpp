@@ -29,14 +29,15 @@
 //--------------------
 // Default Constructor
 //--------------------
-XEMClusteringModelOutput::XEMClusteringModelOutput(){
-}
+XEMClusteringModelOutput::XEMClusteringModelOutput()
+{}
 
   
 //-----------------
 //  Copy constructor
 //-----------------
-XEMClusteringModelOutput::XEMClusteringModelOutput(const XEMClusteringModelOutput & cModelOutput){
+XEMClusteringModelOutput::XEMClusteringModelOutput(const XEMClusteringModelOutput & cModelOutput)
+{
   throw internalMixmodError;
 }
   
@@ -45,31 +46,34 @@ XEMClusteringModelOutput::XEMClusteringModelOutput(const XEMClusteringModelOutpu
 //-----------------
 //  Initialization Constructor
 //-----------------
-XEMClusteringModelOutput::XEMClusteringModelOutput(XEMEstimation * estimation) : XEMModelOutput(estimation){
-}
+XEMClusteringModelOutput::XEMClusteringModelOutput(XEMModel * estimation) : XEMModelOutput(estimation)
+{}
 
 //-----------------
 //  Initialization Constructor
 //-----------------
-XEMClusteringModelOutput::XEMClusteringModelOutput(XEMModelType& modelType, int64_t nbCluster, vector< XEMCriterionOutput >& criterionOutput, double likelihood, XEMParameterDescription& parameterDescription, XEMLabelDescription& labelDescription, XEMProbaDescription& probaDescription):XEMModelOutput(modelType, nbCluster, criterionOutput, likelihood, parameterDescription, labelDescription, probaDescription)
-{
-
-}
+XEMClusteringModelOutput::XEMClusteringModelOutput( XEMModelType & modelType
+                                                  , int64_t nbCluster
+                                                  , std::vector< XEMCriterionOutput >& criterionOutput
+                                                  , double likelihood
+                                                  , XEMParameterDescription& parameterDescription
+                                                  , XEMLabelDescription& labelDescription
+                                                  , XEMProbaDescription& probaDescription
+                                                  )
+                                                  : XEMModelOutput(modelType, nbCluster, criterionOutput, likelihood, parameterDescription, labelDescription, probaDescription)
+{}
 
 //-----------------
 //  Initialization Constructor
 //-----------------
 XEMClusteringModelOutput::XEMClusteringModelOutput(XEMModelType& modelType, int64_t nbCluster, XEMErrorType error): XEMModelOutput(modelType, nbCluster, error)
-{
-
-}
+{}
 
 //-----------
 // Destructor
 //-----------
-XEMClusteringModelOutput::~XEMClusteringModelOutput(){
-
-}
+XEMClusteringModelOutput::~XEMClusteringModelOutput()
+{}
 
   
 

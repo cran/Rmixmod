@@ -28,6 +28,7 @@
 
 #include "XEMDescription.h"
 
+// pre-declaration
 class XEMData;
 class XEMGaussianData;
 class XEMBinaryData;

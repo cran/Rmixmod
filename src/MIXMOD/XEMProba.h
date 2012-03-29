@@ -24,14 +24,17 @@
 ***************************************************************************/
 #ifndef XEMProba_H
 #define XEMProba_H
-#include "XEMEstimation.h"
-#include "XEMCVCriterion.h"
-
-
 
 /** @brief Base class for Label(s)
     @author F Langrognet & A Echenim
 */
+
+#include <vector>
+#include <iostream>
+#include <stdint.h>
+
+// pre-declaration
+class XEMModel;
 
 class XEMProba{
 
@@ -44,32 +47,35 @@ public:
   XEMProba(int64_t nbSample, int64_t nbCluster);
   
   /// Constructor
-	XEMProba(XEMEstimation * estimation);
+	XEMProba(XEMModel * model);
   
   XEMProba(const XEMProba & iProba);
 	
   /// Destructor
 	virtual ~XEMProba();
   
+  /// Comparison operator
+  bool operator ==(const XEMProba & proba) const;
+  
   /// editProba
-  void edit(ostream & stream);
+  void edit(std::ostream & stream);
 
   /// getProba
   double ** getTabProba() const;
   
   /// getProba
-  vector<vector<double> > getProba() const;
+  std::vector<std::vector<double> > getProba() const;
   
   /// set Proba
   void setProba(double ** proba, int64_t nbSample, int64_t nbCluster);
-  void setProba(vector<vector<double> > proba);
+  void setProba(std::vector<std::vector<double> > proba);
   
   /// Selector
   int64_t  getNbSample() const;
   int64_t  getNbCluster() const;
 
   ///input stream
-  void input(ifstream & flux);
+  void input(std::ifstream & flux);
   
 private :
 
@@ -80,12 +86,12 @@ private :
   int64_t  _nbCluster;
 
   /// dim : _nbSample *_nbCluster
-  vector<vector<double> > _proba;
+  std::vector<std::vector<double> > _proba;
 
 };
 
 
-inline vector<vector<double> > XEMProba::getProba() const{
+inline std::vector<std::vector<double> > XEMProba::getProba() const{
   return _proba;
 }
 
@@ -96,7 +102,5 @@ inline int64_t  XEMProba::getNbSample() const{
 inline int64_t  XEMProba::getNbCluster() const{
   return _nbCluster;
 }
-
-
 
 #endif

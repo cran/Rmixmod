@@ -25,42 +25,47 @@
 #ifndef XEMClusteringStrategy_H
 #define XEMClusteringStrategy_H
 
-#include "XEMAlgo.h"
-#include "XEMData.h"
-#include "XEMPartition.h"
-#include "XEMClusteringStrategyInit.h"
-#include "XEMModel.h"
+#include "XEMUtil.h"
+
+// pre-declaration
+class XEMClusteringStrategyInit;
+class XEMModelType;
+class XEMParameter;
+class XEMData;
+class XEMModel;
+class XEMPartition;
 
 /**
   @brief Base class for Strategy(s)
   @author F Langrognet 
  */
 
-class  XEMClusteringStrategy{
-
+class  XEMClusteringStrategy
+{
   public:
 
 	/// Default constructor
-    XEMClusteringStrategy();
+  XEMClusteringStrategy();
 
   /// Constructor
-    XEMClusteringStrategy(const XEMClusteringStrategy & strategy);
+  XEMClusteringStrategy(const XEMClusteringStrategy & strategy);
 
     
 	/// Destructor
-    virtual ~XEMClusteringStrategy();
-
+  ~XEMClusteringStrategy();
+  
+  ///--------------------------------
+  /// Strategy initialisation methods
+  ///--------------------------------
+  
   ///getStrategyInit
-    const XEMClusteringStrategyInit * getStrategyInit() const;
-
-  ///getAlgo[i]
-    const XEMAlgo * getAlgo(int64_t index) const;
+  const XEMClusteringStrategyInit * getStrategyInit() const;
 
   /// setStrategyInit
-    void setStrategyInit(XEMClusteringStrategyInit * iStrategyInit);
+  void setStrategyInit(XEMClusteringStrategyInit * iStrategyInit);
 
   /// setStrategyInit
-    void setStrategyInit(XEMStrategyInitName  initName,XEMData *& data, int64_t nbNbCluster, int64_t * tabNbCluster, XEMModelType * modelType);
+  void setStrategyInit(XEMStrategyInitName  initName, XEMData *& data, int64_t nbNbCluster, int64_t * tabNbCluster, XEMModelType * modelType);
 
   /// setStrategyInitName
   void setStrategyInitName(XEMStrategyInitName initName);
@@ -68,99 +73,106 @@ class  XEMClusteringStrategy{
   /// setInitParam
   void setInitParam(string & paramFileName, int64_t position);
   
-    /// setInitParam
-    void setTabInitParameter(XEMParameter ** tabInitParameter, int64_t nbInitParameter);
+  /// setInitParam
+  void setTabInitParameter(XEMParameter ** tabInitParameter, int64_t nbInitParameter);
     
   /// setInitPartition
-    void setInitPartition(string & partitionFileName, int64_t position);
+  void setInitPartition(string & partitionFileName, int64_t position);
     
   /// setInitPartition
-    void setInitPartition(XEMPartition * part, int64_t position);
+  void setInitPartition(XEMPartition * part, int64_t position);
 
-    /// setTabPartition
-    void setTabPartition(XEMPartition ** tabPartition, int64_t nbPartition);
+  /// setTabPartition
+  void setTabPartition(XEMPartition ** tabPartition, int64_t nbPartition);
     
   /// getNbTryInInit
-    const int64_t getNbTryInInit() const;
+  const int64_t getNbTryInInit() const;
   
   /// setNbTryInInit
-    void setNbTryInInit(int64_t nbTry);
+  void setNbTryInInit(int64_t nbTry);
   
   /// getNbIterationInInit
-    const int64_t getNbIterationInInit() const;
+  const int64_t getNbIterationInInit() const;
   
   /// set NbIterationInInit
-    void setNbIterationInInit(int64_t nbIteration);
+  void setNbIterationInInit(int64_t nbIteration);
   
   /// getEpsilonInInit
-    const double getEpsilonInInit() const;
+  const double getEpsilonInInit() const;
   
   /// setEpsilonInInit
-    void setEpsilonInInit(double epsilon);
+  void setEpsilonInInit(double epsilon);
   
   /// getStopNameInInit
-    const XEMAlgoStopName getStopNameInInit() const;
+  const XEMAlgoStopName getStopNameInInit() const;
   
   /// setStopNameInInit
-    void setStopNameInInit(XEMAlgoStopName stopName);
+  void setStopNameInInit(XEMAlgoStopName stopName);
   
-    
-    
-    
+  
+  ///--------------------------------
+  /// Algo methods
+  ///--------------------------------
+  
+  ///getAlgo[i]
+  const XEMAlgo * getAlgo(int64_t index) const;
+  
   /// setAlgo
-    void setAlgo(XEMAlgoName algoName, int64_t position);
+  void setAlgo(XEMAlgoName algoName, int64_t position);
+  
+  /// addAlgo
+  void addAlgo(XEMAlgoName algoName);
 
   /// removeAlgo
-    void removeAlgo(int64_t position);
+  void removeAlgo(unsigned int  position);
 
   /// getTabAlgo
-    XEMAlgo ** getTabAlgo() const;
+  std::vector<XEMAlgo*> const & getTabAlgo() const;
+  std::vector<XEMAlgo*> & getTabAlgo();
 
   /// insertAlgo
-    void insertAlgo(XEMAlgo * algo, int64_t position);
+  void insertAlgo(XEMAlgoName algoName, int64_t position);
 
-  
   /// setAlgoStopRuleTypeValue
-    void setAlgoStopRule(XEMAlgoStopName stopName, int64_t position);
-    void setAlgoIteration(  int64_t position, int64_t nbIterationValue);
-    void setAlgoEpsilon( int64_t position, double epsilonValue);
+  void setAlgoStopRule(XEMAlgoStopName stopName, int64_t position);
+  void setAlgoIteration(  int64_t position, int64_t nbIterationValue);
+  void setAlgoEpsilon( int64_t position, double epsilonValue);
   
   ///nbTry
-    const int64_t getNbTry()const;
-    void setNbTry(int64_t nbTry);
+  const int64_t getNbTry()const;
+  void setNbTry(int64_t nbTry);
 
-    const int64_t getNbAlgo() const; 
+  const int64_t getNbAlgo() const; 
     
   /// Input strategy (FLAT FORMAT)
   // TODO XEMInput : a enlever
-    void input_FLAT_FORMAT(ifstream & fi, XEMData *& data, int64_t nbNbCluster, int64_t * tabNbCluster, XEMModelType * modelType);
+  void input_FLAT_FORMAT(ifstream & fi, XEMData *& data, int64_t nbNbCluster, int64_t * tabNbCluster, XEMModelType * modelType);
   
 	/// Run method
-    void run(XEMModel *& model);
+  void run(XEMModel * model);
         
-    bool verify();
+  bool verify();
     
-    void edit(ofstream & oFile);
+  void edit(ofstream & oFile);
         
+  friend ostream & operator << (ostream & fo, XEMClusteringStrategy & strategy);
     
-    friend ostream & operator << (ostream & fo, XEMClusteringStrategy & strategy);
     
-    
-  private :
+private :
 
   /// Number of try in the strategy
-    int64_t _nbTry;
+  int64_t _nbTry;
 
   /// strategyInit
-    XEMClusteringStrategyInit * _strategyInit;
+  XEMClusteringStrategyInit * _strategyInit;
 
   /// Number of algorithm in the strategy
-    int64_t _nbAlgo;
+  int64_t _nbAlgo;
 
   /// Table of algorithm
-    XEMAlgo ** _tabAlgo;    // aggregate
+  std::vector<XEMAlgo*> _tabAlgo;    // aggregate
     
-    void oneTry(XEMModel *& model);
+  void oneTry(XEMModel *& model);
 
 };
 
@@ -173,7 +185,11 @@ inline const XEMAlgo * XEMClusteringStrategy::getAlgo(int64_t index) const{
   return _tabAlgo[index];
 }
 
-inline XEMAlgo ** XEMClusteringStrategy::getTabAlgo() const{
+inline std::vector<XEMAlgo*> const & XEMClusteringStrategy::getTabAlgo() const{
+  return _tabAlgo;
+}
+
+inline std::vector<XEMAlgo*> & XEMClusteringStrategy::getTabAlgo(){
   return _tabAlgo;
 }
 
@@ -183,42 +199,5 @@ inline const int64_t XEMClusteringStrategy::getNbAlgo() const{
 inline const int64_t XEMClusteringStrategy::getNbTry()const{
 return _nbTry;
 }
-
-inline const int64_t XEMClusteringStrategy::getNbTryInInit() const{
-  return _strategyInit->getNbTry();
-}
-
-inline const int64_t XEMClusteringStrategy::getNbIterationInInit() const{
-  return _strategyInit->getNbIteration();
-}
-  
-inline const double XEMClusteringStrategy::getEpsilonInInit() const{
-  return _strategyInit->getEpsilon();
-}
-  
-inline void XEMClusteringStrategy::setNbTryInInit(int64_t nbTry){
-  _strategyInit->setNbTry(nbTry);
-}
-  
-inline void XEMClusteringStrategy::setStrategyInitName(XEMStrategyInitName initName){
-  _strategyInit->setStrategyInitName(initName);
-}
-  
-inline     void XEMClusteringStrategy::setNbIterationInInit(int64_t nbIteration){
-  _strategyInit->setNbIteration(nbIteration);
-}
-  
-inline void XEMClusteringStrategy::setEpsilonInInit(double epsilon){
-  _strategyInit->setEpsilon(epsilon);
-}
- 
-inline const XEMAlgoStopName XEMClusteringStrategy::getStopNameInInit() const{
-  return(_strategyInit->getStopName());
-}
-  
-inline void XEMClusteringStrategy::setStopNameInInit(XEMAlgoStopName stopName){
-  _strategyInit->setStopName(stopName);
-}
-
     
 #endif

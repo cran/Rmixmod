@@ -24,6 +24,9 @@
 ***************************************************************************/
 
 #include "XEMProbaDescription.h"
+#include "XEMProba.h"
+#include "XEMModel.h"
+#include "XEMQuantitativeColumnDescription.h"
 #include <sstream>
 
 //------------
@@ -64,11 +67,11 @@ XEMProbaDescription::XEMProbaDescription(int64_t nbSample,  int64_t nbCluster, F
 //------------
 // Constructor after an estimation->run
 //------------
-XEMProbaDescription::XEMProbaDescription(XEMEstimation * estimation) : XEMDescription(){
-  if (estimation){
+XEMProbaDescription::XEMProbaDescription(XEMModel * model) : XEMDescription(){
+  if (model){
     _infoName = "Probability";
-    _nbSample = estimation->getNbSample();
-    _nbColumn = estimation->getNbCluster();
+    _nbSample = model->getNbSample();
+    _nbColumn = model->getNbCluster();
     _fileName = "";
     _format = FormatNumeric::txt;
     _columnDescription.resize(_nbColumn);
@@ -80,8 +83,8 @@ XEMProbaDescription::XEMProbaDescription(XEMEstimation * estimation) : XEMDescri
       name.append(sNum.str());
       _columnDescription[iCol]->setName(name);
     }
-    _proba = new XEMProba(estimation);
-    }
+    _proba = new XEMProba(model);
+  }
   else{
     throw nullPointerError;
   }
@@ -101,6 +104,22 @@ XEMProbaDescription::XEMProbaDescription(XEMProbaDescription & probaDescription)
   (*this) = probaDescription; 
 }
 
+//------------
+// operator ==
+//------------
+bool XEMProbaDescription::operator==( XEMProbaDescription & probaDescription) const{
+  if ( _fileName != probaDescription._fileName ) return false;
+  if ( _format != probaDescription._format ) return false;
+  if ( _infoName != probaDescription._infoName ) return false;
+  if ( _nbSample != probaDescription._nbSample ) return false;
+  if ( _nbColumn != probaDescription._nbColumn ) return false;
+  for (int64_t i = 0; i<_nbColumn; ++i){
+    if ( _columnDescription[i]->getName() != probaDescription.getColumnDescription(i)->getName() ) return false;
+  }
+  if ( !(_proba == probaDescription.getProba()) ) return false;
+  return true; 
+}
+
 
 //------------
 // operator =
@@ -117,6 +136,7 @@ XEMProbaDescription & XEMProbaDescription::operator=( XEMProbaDescription & prob
     _columnDescription[i] = cd->clone();
   }
   _proba = new XEMProba(*(probaDescription.getProba()));
+  return *this ; 
 }
 
 

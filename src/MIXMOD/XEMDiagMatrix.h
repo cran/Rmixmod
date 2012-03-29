@@ -25,9 +25,10 @@
 #ifndef XEMDIAGMATRIX_H
 #define XEMDIAGMATRIX_H
 
-#include "XEMUtil.h"
 #include "XEMMatrix.h"
-#include "XEMGeneralMatrix.h"
+
+// pre-declaration
+class XEMGeneralMatrix;
 
 /**
   @brief class XEMDiagMatrix
@@ -122,7 +123,8 @@ public:
 
   /// read general matrix in an input file
   void input(ifstream & fi);
-
+  virtual void input(double ** variances);
+  
   ///set store
    void setSymmetricStore(double * store);
    void setGeneralStore(double * store);

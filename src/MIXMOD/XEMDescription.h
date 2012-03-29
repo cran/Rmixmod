@@ -27,10 +27,9 @@
 #define XEMDESCRIPTION_H
 
 #include "XEMUtil.h"
-#include "XEMWeightColumnDescription.h"
-#include "XEMIndividualColumnDescription.h"
-#include "XEMQuantitativeColumnDescription.h"
-#include "XEMQualitativeColumnDescription.h"
+
+// pre-declaration
+class XEMColumnDescription;
 
 class XEMDescription
 {  
@@ -72,7 +71,7 @@ class XEMDescription
     //get ColumnDescription
     const XEMColumnDescription * getColumnDescription(int64_t index)const;
     
-    const vector<XEMColumnDescription *> getAllColumnDescription()const;
+    const vector<XEMColumnDescription*> getAllColumnDescription()const;
     
     int64_t getPbDimension() const;
     
@@ -89,7 +88,7 @@ class XEMDescription
     int64_t _nbColumn;
     string _fileName; //numeric file name
     FormatNumeric::XEMFormatNumericFile _format;//format of  numeric file
-    vector<XEMColumnDescription *> _columnDescription;//each variable has a description
+    vector<XEMColumnDescription*> _columnDescription;//each variable has a description
     
     
 };
@@ -112,10 +111,11 @@ inline string XEMDescription::getFileName()const{
 
 inline const XEMColumnDescription * XEMDescription::getColumnDescription(int64_t index)const{
   if (index>=0 && index <=_nbColumn)
-    return _columnDescription[index]; 
+    return _columnDescription[index];
+  else throw wrongIndexInGetMethod;
 }
 
-inline const vector<XEMColumnDescription *> XEMDescription::getAllColumnDescription()const{
+inline const vector<XEMColumnDescription*> XEMDescription::getAllColumnDescription()const{
  return _columnDescription; 
 }
 

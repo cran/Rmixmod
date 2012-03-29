@@ -22,6 +22,7 @@
 
     All informations available on : http://www.mixmod.org                                                                                               
 ***************************************************************************/
+
 #include "XEMCriterionOutput.h"
 
 
@@ -61,11 +62,18 @@ XEMCriterionOutput::~XEMCriterionOutput(){
 }
 
 
+/// Comparison operator
+bool XEMCriterionOutput::operator ==(const XEMCriterionOutput & criterionOutput) const{
+  if ( _value != criterionOutput.getValue() ) return false;
+  if ( _criterionName != criterionOutput.getCriterionName() ) return false;
+  if ( _error != criterionOutput.getError() ) return false;
+  return true;
+}
 
 //----------
 // edit Type
 //----------
-void XEMCriterionOutput::editType(ofstream & oFile){
+void XEMCriterionOutput::editType(ostream & oFile) const {
   oFile<<"Criterion Name : ";
   if (_criterionName == BIC){
      oFile<<"BIC";
@@ -90,7 +98,7 @@ void XEMCriterionOutput::editType(ofstream & oFile){
 //-----------
 // edit Value
 //-----------
-void XEMCriterionOutput::editValue(ofstream & oFile, bool text){
+void XEMCriterionOutput::editValue(ostream & oFile, bool text) const{
   if (text){
     oFile<<"\t\t\tCriterion Value : ";
     if (_error == noError){
@@ -112,7 +120,7 @@ void XEMCriterionOutput::editValue(ofstream & oFile, bool text){
 //--------------------
 // edit Type And Value
 //--------------------
-void XEMCriterionOutput::editTypeAndValue(ofstream & oFile){
+void XEMCriterionOutput::editTypeAndValue(ostream & oFile) const{
   if (_criterionName == BIC){
     oFile<<"\t\t\tBIC ";
   }

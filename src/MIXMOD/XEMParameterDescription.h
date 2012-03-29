@@ -27,8 +27,11 @@
 #define XEMPARAMETERDESCRIPTION_H
 
 #include "XEMUtil.h"
-#include "XEMParameter.h"
-#include "XEMEstimation.h"
+
+// pre-declaration
+class XEMModel;
+class XEMModelOutput;
+class XEMParameter;
 
 class XEMParameterDescription
 {  
@@ -37,19 +40,55 @@ class XEMParameterDescription
     XEMParameterDescription();
     
     /// Constructor
-    XEMParameterDescription(XEMEstimation* iEstimation);
-    
+    XEMParameterDescription(XEMModel* iEstimation);
+  
+    /// Constructor
+    XEMParameterDescription(XEMModelOutput* iEstimation);
+  
     // constructor for Binary
     /// Constructor
-    XEMParameterDescription(int64_t nbCluster, int64_t nbVariable, vector< int64_t > nbFactor, FormatNumeric::XEMFormatNumericFile format, string filename, string infoName, XEMModelName & modelName);
-    
+    XEMParameterDescription( int64_t nbCluster
+                           , int64_t nbVariable
+                           , vector< int64_t > nbFactor
+                           , FormatNumeric::XEMFormatNumericFile format
+                           , string filename
+                           , string infoName
+                           , XEMModelName & modelName
+                           );
+    // ---------------------------
+    XEMParameterDescription( int64_t nbCluster
+                           , int64_t nbVariable
+                           , vector< int64_t > nbFactor
+                           , XEMModelName& modelName
+                           , double * proportions
+                           , double **  centers
+                           , double *** scatters
+                           );
+  
     // constructor for Gaussian
     /// Constructor
-    XEMParameterDescription(int64_t nbCluster, int64_t nbVariable, FormatNumeric::XEMFormatNumericFile format, string filename, string infoName, XEMModelName & modelName);
-    
+    XEMParameterDescription( int64_t nbCluster
+                           , int64_t nbVariable
+                           , FormatNumeric::XEMFormatNumericFile format
+                           , string filename
+                           , string infoName
+                           , XEMModelName & modelName
+                           );
+    // ---------------------------
+    XEMParameterDescription( int64_t nbCluster
+                           , int64_t nbVariable
+                           , XEMModelName& modelName
+                           , double * proportions
+                           , double **  means
+                           , double *** variances
+                           );
+
     /// Desconstructor
     ~XEMParameterDescription();
-        
+  
+    /// Comparison operator
+    bool operator==( XEMParameterDescription & paramDescription) const;
+  
     /// getParameter
     XEMParameter * getParameter(); 
     
@@ -93,7 +132,7 @@ class XEMParameterDescription
    
    XEMModelType * _modelType;
     
-    XEMParameter * _parameter;
+   XEMParameter * _parameter;
     
 };
 

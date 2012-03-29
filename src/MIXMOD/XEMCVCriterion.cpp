@@ -23,7 +23,10 @@
     All informations available on : http://www.mixmod.org                                                                                               
 ***************************************************************************/
 #include "XEMCVCriterion.h"
-#include "XEMGaussianData.h"
+#include "XEMCriterionOutput.h"
+#include "XEMLabelDescription.h"
+#include "XEMModel.h"
+#include "XEMData.h"
 #include "XEMRandom.h"
 #include <list>
 
@@ -32,83 +35,68 @@
 //------------
 // Constructor
 //------------
-XEMCVCriterion::XEMCVCriterion(){
-  _tabCVBlock = NULL;
-  _nbCVBlock = 0;
+XEMCVCriterion::XEMCVCriterion( XEMModel * model
+                              , const int64_t nbCVBlock 
+                              ) 
+                              : XEMCriterion(model)
+                              , _tabCVBlock(0)
+                              , _cvLabel(model->getNbSample())
+                              , _nbCVBlock(nbCVBlock)
+{
   _CVinitBlocks = defaultCVinitBlocks;
-}
-
-
-//-----------
-// Constructor
-//------------
-XEMCVCriterion::XEMCVCriterion(XEMOldInput * input){
-  //updates _CVinitBlocks and _nbCVBlocks     
-  _CVinitBlocks = input->_CVinitBlocks; 
-  // _nbCVBlock is initialzed to the numberOfCVBlocks that the user wanted (issued from input)(or the default value)
-  // this value could chane if nbSample is too small (will be done in createCVBlock)  
-  _nbCVBlock = input->_numberOfCVBlocks;
-  _tabCVBlock = NULL;
 }
 
 
 //----------
 //Destructor
 //----------
-XEMCVCriterion::~XEMCVCriterion(){
-  
-  if (_tabCVBlock != NULL){
-    for (int64_t v=0; v<_nbCVBlock; v++){
-        delete [] _tabCVBlock[v]._tabWeightedIndividual;
-    }
-  delete [] _tabCVBlock;
-  }
+XEMCVCriterion::~XEMCVCriterion()
+{
+  if (_tabCVBlock) delete _tabCVBlock;
 }
-
 
 
 //---
 //run
 //---
-void XEMCVCriterion::run(XEMModel * model, double & value, int64_t *& cvLabel, XEMErrorType & error){
-  /* Compute CV (Cross Validation Criterion) */
-  error = noError;
-  XEMModel * CVModel = new XEMModel(model);
-  cvLabel = new int64_t[model->getNbSample()];
+void XEMCVCriterion::run(XEMCriterionOutput & output)
+{
+// initialize value
+  double value = 0.0;
+  // initialize error
+  XEMErrorType error = noError;
   
-  try{
-  /*cout<<endl<<"Parametre en entree de CVCriterion::run"<<endl;
-    (model->getParameter())->edit();*/
+  // copy of the current model
+  XEMModel * CVModel = new XEMModel(_model);
+  
+  try
+  {
     double missClass = 0.0;
-    XEMData * data   = model->getData();
+    XEMData * data   = _model->getData();
     XEMSample * x;
-    int64_t i, known_ki, v;
+    int64_t i, known_ki;
     
-    //cout<<"weight XEMCVCriterion "<<data[0]._weightTotal<<endl;
-    createCVBlocks(model);
-    for(v=0; v<_nbCVBlock; v++){
-  //cout<<"block :  "<<v<<endl;
-      /*cout<<"XEMCVCriterion::run, block N "<<v<<endl;
-      cout<<"fik sur le modele de d�art :"<<endl;
-      model->editFik();*/
-      CVModel->updateForCV(model, _tabCVBlock[v]);
-    /* cout<<"fik sur le modele modifi�:"<<endl;
-      CVModel->editFik();*/
-      /*cout<<"parametre du modele modifi�:"<<endl;
-      CVModel->getParameter()->edit();*/
-      
-      
-      for (int64_t ii=0; ii<_tabCVBlock[v]._nbSample; ii++){
+    // create CV blocks
+    createCVBlocks();
+    
+    // loop over the blocks
+    for( int64_t v=0; v<_nbCVBlock; v++)
+    {
+      CVModel->updateForCV(_model, _tabCVBlock[v]);
+   
+      // loop over samples
+      for (int64_t ii=0; ii<_tabCVBlock[v]._nbSample; ii++)
+      {
         i = _tabCVBlock[v]._tabWeightedIndividual[ii].val;
         //cout<<"individu : "<<i<<endl;
-        known_ki  = model->getKnownLabel(i);
+        known_ki  = _model->getKnownLabel(i);
         x         = data->_matrix[i];
-        cvLabel[i] = CVModel->computeLabel(x); 
-        if (cvLabel[i] != known_ki){
+        _cvLabel[i] = CVModel->computeLabel(x); 
+        if (_cvLabel[i] != known_ki){
           /*cout<<"labels differents dans CV pour l'individu : "<<i<<" de poids : "<<_tabCVBlock[v]._tabWeightedIndividual[ii].weight<<endl;*/
           missClass += _tabCVBlock[v]._tabWeightedIndividual[ii].weight;
         }
-        cvLabel[i] += 1; // because computeLable returns an integer between 0 and nbCluster-1
+        _cvLabel[i] += 1; // because computeLabel returns an integer between 0 and nbCluster-1
       } 
     }
     delete CVModel; 
@@ -117,8 +105,14 @@ void XEMCVCriterion::run(XEMModel * model, double & value, int64_t *& cvLabel, X
   catch(XEMErrorType & e){
     error = e;
     delete CVModel;
-    delete [] cvLabel;
   }
+  
+  // add name to criterion output
+  output.setCriterionName(CV);
+  // add value to criterion output
+  output.setValue(value);
+  // add error to criterion output
+  output.setError(error);
 }
 
 
@@ -126,12 +120,12 @@ void XEMCVCriterion::run(XEMModel * model, double & value, int64_t *& cvLabel, X
 //-------------------
 //- CreateCVBlock
 //-------------------
-void XEMCVCriterion::createCVBlocks(XEMModel * model){
+void XEMCVCriterion::createCVBlocks(){
   int64_t i, v, index;
-  XEMData * data = model->getData();
+  XEMData * data = _model->getData();
   double * weight = data->_weight;
   int64_t weightTotal = (int64_t) data->_weightTotal;
-  int64_t nbSample = model->getNbSample();
+  int64_t nbSample = _model->getNbSample();
   double sumWeight = 0.0;
   int64_t value = 0, sizeList;
   
@@ -139,7 +133,7 @@ void XEMCVCriterion::createCVBlocks(XEMModel * model){
   if(_nbCVBlock > weightTotal){ 
     _nbCVBlock = weightTotal;
   }
-  _tabCVBlock    = new XEMCVBlock[_nbCVBlock];
+  _tabCVBlock = new XEMCVBlock[_nbCVBlock];
     
   // creation of blocks
   if(_nbCVBlock == weightTotal){
@@ -282,9 +276,8 @@ void XEMCVCriterion::createCVBlocks(XEMModel * model){
           delete pelem;
         }
       } // end for v
-  delete[] tabRandom;
-  delete[] tabIndex;
-
+      delete[] tabRandom;
+      delete[] tabIndex;
     }
     //------------------------------
     else if(_CVinitBlocks == CV_DIAG){

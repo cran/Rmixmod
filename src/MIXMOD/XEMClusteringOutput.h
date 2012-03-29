@@ -27,31 +27,35 @@
 
 
 #include "XEMUtil.h"
-#include "XEMClusteringMain.h"
-#include "XEMEstimation.h"
-#include "XEMClusteringModelOutput.h"
 
-using namespace std;
+// pre-declaration
+class XEMModel;
+class XEMCriterion;
+class XEMClusteringModelOutput;
 
 class XEMClusteringOutput{
 
 public:	
 
   /// Default Constructor
-  XEMClusteringOutput();
+  XEMClusteringOutput(std::vector<XEMCriterionName> const & criterionName);
 
   
   /// Copy Constructor
   XEMClusteringOutput(const XEMClusteringOutput & cOutput);
   
   /// Initialisation constructor
-  XEMClusteringOutput(vector<XEMEstimation*> & estimations);
+  XEMClusteringOutput(std::vector<XEMModel*> const & estimations, std::vector<XEMCriterionName> const & criterionName);
 
   /// Destructor
   virtual ~XEMClusteringOutput();
 
+  /// Comparison operator
+  bool operator ==(const XEMClusteringOutput & output) const;
   
   bool atLeastOneEstimationNoError() const;
+  
+  const int getNbEstimationWithNoError() const;
   
   /// sort vector of XEMClusteringModelOutput (with the ith criterion value)
   void sort(XEMCriterionName criterionName);
@@ -60,42 +64,33 @@ public:
   
   /// return the index'th' ClusteringModelOutput
   /// Note : index is between 0 and size(ClusteringModelOutput)-1
-  XEMClusteringModelOutput * getClusteringModelOutput(int64_t index) const;
+  XEMClusteringModelOutput * getClusteringModelOutput(const int64_t index) const;
   
   int64_t getNbClusteringModelOutput() const;
   
-  
-  XEMErrorType getError() const;
-  
-  void setError(XEMErrorType & error);
+  std::vector<XEMClusteringModelOutput*> const &  getClusteringModelOutput() const;
   
   void setClusteringModelOutput(vector<XEMClusteringModelOutput *> & clusteringModelOutput);
   
+  const int getCriterionSize() const;
+  const XEMCriterionName & getCriterionName(const int index) const;
+  const std::vector<XEMCriterionName> & getCriterionName() const;
   
-  private :
-    vector<XEMClusteringModelOutput *> _clusteringModelOutput;
-    
-    XEMErrorType _error;
-    
+private :
+  // Vector containing output for each model
+  std::vector<XEMClusteringModelOutput*> _clusteringModelOutput;
+  // vector containing criterion name
+  // that will be useful to deal with output in mixmodGUI
+  std::vector<XEMCriterionName> const & _criterionName;
 };
 
 
-
-inline  XEMErrorType XEMClusteringOutput::getError() const{
-  return _error;
+inline  std::vector<XEMClusteringModelOutput*> const & XEMClusteringOutput::getClusteringModelOutput() const{
+  return _clusteringModelOutput;
 }
 
-inline  void XEMClusteringOutput::setError(XEMErrorType & error){
-  _error = error;
-}
-
-inline  XEMClusteringModelOutput *  XEMClusteringOutput::getClusteringModelOutput(int64_t index) const{
-  if (index>=0 && index<_clusteringModelOutput.size()) {
-    return _clusteringModelOutput[index];
-  }
-  else{
-    throw wrongIndexInGetMethod;
-  }
+inline  XEMClusteringModelOutput * XEMClusteringOutput::getClusteringModelOutput(const int64_t index) const{
+  return _clusteringModelOutput[index];
 }
 
 //
@@ -103,5 +98,16 @@ inline int64_t XEMClusteringOutput::getNbClusteringModelOutput() const{
   return _clusteringModelOutput.size();
 }
 
+inline const int XEMClusteringOutput::getCriterionSize() const{
+  return _criterionName.size();
+}
+
+inline const XEMCriterionName & XEMClusteringOutput::getCriterionName(const int index) const{
+  return _criterionName[index];
+}
+
+inline const std::vector<XEMCriterionName> & XEMClusteringOutput::getCriterionName() const{
+  return _criterionName;
+}
 
 #endif

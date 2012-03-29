@@ -43,7 +43,10 @@ public:
     
   /// Destructor
   ~XEMBinaryEParameter();
-
+  
+  /// Comparison operator
+  virtual bool operator ==(const XEMBinaryEParameter & param) const;
+  
 	/// reset to default values
 	virtual void reset();
   
@@ -90,6 +93,8 @@ public:
   
   // Read Scatter in input file
   void inputScatter(ifstream & fi);
+  void inputScatter(double *** scatters);
+  
   double *** scatterToArray() const;
   
   

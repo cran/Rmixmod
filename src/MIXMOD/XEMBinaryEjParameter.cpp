@@ -24,7 +24,9 @@
 ***************************************************************************/
 #include "XEMBinaryEjParameter.h"
 #include "XEMBinaryData.h"
+#include "XEMBinarySample.h"
 #include "XEMModel.h"
+#include "XEMRandom.h"
 
 //--------------------
 // Default constructor
@@ -93,6 +95,16 @@ XEMBinaryEjParameter::~XEMBinaryEjParameter(){
 }
 
 
+//---------------------
+/// Comparison operator
+//---------------------
+bool XEMBinaryEjParameter::operator ==(const XEMBinaryEjParameter & param) const{
+  if ( !XEMBinaryParameter::operator==(param) ) return false;
+  for (int64_t j=0; j<_pbDimension; j++){
+    if ( _scatter[j] != param.getScatter()[j] ) return false;
+  }
+  return true;
+}
 
 
 //-----------
@@ -375,25 +387,31 @@ void XEMBinaryEjParameter::inputScatter(ifstream & fi){
   throw internalMixmodError;
 }
 
- double *** XEMBinaryEjParameter::scatterToArray() const{
-   int64_t k,j,h;
-   double *** tabScatter = new double**[_nbCluster];
-   for (k=0; k<_nbCluster; k++){
-     tabScatter[k] = new double*[_pbDimension];
-     for (j=0; j<_pbDimension; j++){
-       tabScatter[k][j] = new double[_tabNbModality[j]];
-      for (h=0; h<_tabNbModality[j] ; h++){
-        if (h == _tabCenter[k][j]){ 
-          tabScatter[k][j][h] = _scatter[j]; 
-        }
-        else{
-          tabScatter[k][j][h] = _scatter[j]/(_tabNbModality[j]-1); 
-        }
+// Read Scatter in input containers
+//---------------------------
+void XEMBinaryEjParameter::inputScatter( double *** scatters ){
+  throw internalMixmodError;
+}
+
+double *** XEMBinaryEjParameter::scatterToArray() const{
+ int64_t k,j,h;
+ double *** tabScatter = new double**[_nbCluster];
+ for (k=0; k<_nbCluster; k++){
+   tabScatter[k] = new double*[_pbDimension];
+   for (j=0; j<_pbDimension; j++){
+     tabScatter[k][j] = new double[_tabNbModality[j]];
+    for (h=1; h<=_tabNbModality[j] ; h++){
+      if (h == _tabCenter[k][j]){ 
+        tabScatter[k][j][h-1] = _scatter[j]; 
       }
-     }
+      else{
+        tabScatter[k][j][h-1] = _scatter[j]/(_tabNbModality[j]-1); 
+      }
+    }
    }
-   return tabScatter;
  }
+ return tabScatter;
+}
 
 
 

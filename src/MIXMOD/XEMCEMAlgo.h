@@ -29,7 +29,7 @@
 
 /**
   @brief Derived class of XEMAlgo for CEM Algorithm(s)
-  @author F Langrognet &  A Echenim
+  @author F Langrognet
   */
 
 class XEMCEMAlgo : public XEMAlgo{
@@ -40,7 +40,7 @@ public:
 	XEMCEMAlgo();
 
 	/// Copy constructor
-        XEMCEMAlgo(const XEMCEMAlgo & cemAlgo);
+  XEMCEMAlgo(const XEMCEMAlgo & cemAlgo);
         
  	/// Constructor
 	XEMCEMAlgo(XEMAlgoStopName algoStopName, double epsilon,int64_t nbIteration);
@@ -48,13 +48,13 @@ public:
 	/// Destructor
 	virtual ~XEMCEMAlgo();
  
-    /// clone
-        XEMAlgo * clone();
+  /// clone
+  virtual XEMAlgo * clone();
         
 	/// Run method
 	virtual void run(XEMModel *& model);
 
-        const XEMAlgoName getAlgoName() const;
+  virtual const XEMAlgoName getAlgoName() const;
 };
 
 inline const XEMAlgoName XEMCEMAlgo::getAlgoName() const{

@@ -29,7 +29,7 @@
 
 /**
   @brief Derived class of XEMAlgo for SEM Algorithm(s)
-  @author F Langrognet & A Echenim
+  @author F Langrognet
   */
 
 class XEMSEMAlgo : public XEMAlgo{
@@ -48,22 +48,19 @@ public:
 	/// Destructor
 	virtual ~XEMSEMAlgo();
 
-    /// clone
-        XEMAlgo * clone();
+  /// clone
+  virtual XEMAlgo * clone();
         
 	/// Run method
-	void run(XEMModel *& model);
+	virtual void run(XEMModel *& model);
 
-        const XEMAlgoName getAlgoName() const;
+  virtual const XEMAlgoName getAlgoName() const;
         
+  virtual void setNbIteration(int64_t nbIteration);
         
-        void setAlgoStopName(XEMAlgoStopName * algoStopName);
-        
-        void setNbIteration(int64_t nbIteration);
-        
-        void setEpsilon(double epsilon);
+  virtual void setEpsilon(double epsilon);
     
-        const double getEpsilon() const;
+  virtual const double getEpsilon() const;
 };
 
 inline const XEMAlgoName XEMSEMAlgo::getAlgoName() const{

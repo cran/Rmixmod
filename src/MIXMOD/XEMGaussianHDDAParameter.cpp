@@ -25,7 +25,9 @@
 #include "XEMGaussianHDDAParameter.h"
 #include "XEMGaussianParameter.h"
 #include "XEMGaussianData.h"
+#include "XEMGaussianSample.h"
 #include "XEMModel.h"
+#include "XEMModelType.h"
 
 
 
@@ -37,6 +39,7 @@
 #include "XEMMatrix.h"
 #include "XEMDiagMatrix.h"
 #include "XEMSphericalMatrix.h"
+#include "XEMSymmetricMatrix.h"
 #include "XEMGeneralMatrix.h"
 
 /****************/
@@ -1020,9 +1023,9 @@ void XEMGaussianHDDAParameter:: edit(){
   for (k=0; k<_nbCluster; k++){
      cout<<"\tcomponent : " << k << endl;
      cout<<"\t\tproportion : " << _tabProportion[k]<<endl;
-     editTab(_tabMean+k,1,_pbDimension," ","\t\tmean : ",cout);
+     editTab(_tabMean+k,1,_pbDimension,cout," ","\t\tmean : ");
      cout<<"\tSub dimension : "<<_tabDk[k]<<endl;
-     editTab(_tabAkj+k,1,_tabDk[k]," ","\t\t\tParameters Akj : ",cout);
+     editTab(_tabAkj+k,1,_tabDk[k],cout," ","\t\t\tParameters Akj : ");
      cout<<"\t\t\tParameter Bk : "<<_tabBk[k]<<endl;
     cout<<"\t\tOrientation : "<<endl;
      _tabQk[k]->edit(cout, "\t\t\t"," ",_tabDk[k]);
@@ -1050,9 +1053,9 @@ void XEMGaussianHDDAParameter:: edit(ofstream & oFile, bool text){
       oFile<<"\t\t\tComponent "<<k+1<<endl;
       oFile<<"\t\t\t---------"<<endl;
       oFile<<"\t\t\tMixing proportion : "<<_tabProportion[k]<<endl;
-      editTab(_tabMean+k,1,_pbDimension," ","\t\t\tMean : ",oFile);
+      editTab(_tabMean+k,1,_pbDimension,oFile," ","\t\t\tMean : ");
       oFile<<"\t\t\tSub Dimension  : "<<_tabDk[k]<<endl;
-      editTab(_tabAkj+k,1,_tabDk[k]," ","\t\t\tParameters Akj : ",oFile);
+      editTab(_tabAkj+k,1,_tabDk[k],oFile," ","\t\t\tParameters Akj : ");
      oFile<<"\t\t\tParameter Bk : "<<_tabBk[k]<<endl;
       oFile<<"\t\t\tOrientation matrix : "<<endl;
      _tabQk[k]->edit(oFile, "\t\t\t\t\t"," ",_tabDk[k]);
@@ -1063,9 +1066,9 @@ void XEMGaussianHDDAParameter:: edit(ofstream & oFile, bool text){
   else{
     for (k=0; k<_nbCluster; k++){
       oFile<<_tabProportion[k]<<endl;
-      editTab(_tabMean+k,1,_pbDimension," ","",oFile);
+      editTab(_tabMean+k,1,_pbDimension,oFile," ","");
       oFile<<_tabDk[k]<<endl;
-      editTab(_tabAkj+k,1,_tabDk[k]," ","",oFile);
+      editTab(_tabAkj+k,1,_tabDk[k],oFile," ","");
       oFile<<_tabBk[k]<<endl;
      _tabQk[k]->edit(oFile, ""," ",_tabDk[k]);
       oFile<<endl;

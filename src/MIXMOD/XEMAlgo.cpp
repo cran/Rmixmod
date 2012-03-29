@@ -24,9 +24,6 @@
 ***************************************************************************/
 #include "XEMAlgo.h"
 #include "XEMEMAlgo.h"
-#include "XEMModel.h"
-#include "XEMBinaryData.h"
-#include "XEMGaussianParameter.h"
 
 
 //-----------
@@ -70,7 +67,6 @@ XEMAlgo::XEMAlgo(XEMAlgoStopName algoStopName, double espsilon, int64_t nbIterat
 //----------
 XEMAlgo::~XEMAlgo(){
 }
-
 
 
 //--------------
@@ -157,6 +153,7 @@ ostream & operator << (ostream & fo, XEMAlgo & algo){
     default :
       break;
   }
+  return fo;
 }
 
 

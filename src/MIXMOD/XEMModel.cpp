@@ -22,7 +22,9 @@
 
     All informations available on : http://www.mixmod.org                                                                                               
 ***************************************************************************/
+
 #include "XEMModel.h"
+#include "XEMModelType.h"
 #include "XEMGaussianDiagParameter.h"
 #include "XEMGaussianSphericalParameter.h"
 #include "XEMGaussianGeneralParameter.h"
@@ -35,6 +37,8 @@
 #include "XEMRandom.h"
 #include "XEMGaussianData.h"
 #include "XEMBinaryData.h"
+#include "XEMPartition.h"
+#include "XEMLabelDescription.h"
 #include <string.h>
 
 
@@ -51,15 +55,22 @@ XEMModel::XEMModel(){
 //------------
 // Constructor
 //------------
-XEMModel::XEMModel(XEMModel * iModel){
-  _deleteData = true;
-  _nbCluster              = iModel->getNbCluster();
-  _nbSample               = iModel->getNbSample();
-  _algoName = iModel->_algoName;
-	XEMModelType * iModelType = iModel->getParameter()->getModelType();
-  XEMModelName iModelName = iModelType->_nameModel;
-
-  if ( isBinary(iModelName )){
+XEMModel::XEMModel( XEMModel * iModel )
+                  : _modelType(iModel->getModelType())
+                  , _nbCluster(iModel->getNbCluster())
+                  , _nbSample(iModel->getNbSample())
+                  , _deleteData(true)
+                  , _parameter(iModel->getParameter()->clone())
+                  , _tabFik(copyTab(iModel->getTabFik(), _nbSample, _nbCluster))
+                  , _tabSumF(copyTab(iModel->getTabSumF(), _nbSample))
+                  , _tabTik(copyTab(iModel->getTabTik(), _nbSample, _nbCluster))
+                  , _tabZikKnown(copyTab(iModel->getTabZikKnown(), _nbSample,_nbCluster))
+                  , _tabCik(copyTab(iModel->getTabCik(), _nbSample, _nbCluster))
+                  , _tabZiKnown(copyTab(iModel->getTabZiKnown(), _nbSample))
+                  , _tabNk(copyTab(iModel->getTabNk(), _nbCluster))
+                  , _algoName(iModel->_algoName)
+{
+  if ( isBinary(_modelType->_nameModel )){
     XEMBinaryData * bD = (XEMBinaryData*)(iModel->getData());
     _data = new XEMBinaryData(*bD);
   }
@@ -67,34 +78,31 @@ XEMModel::XEMModel(XEMModel * iModel){
     XEMGaussianData * gD = (XEMGaussianData*)(iModel->getData());
     _data = new XEMGaussianData(*gD);
   }
-
-  _tabFik      = copyTab(iModel->getTabFik()     , _nbSample, _nbCluster);
-	_tabSumF     = copyTab(iModel->getTabSumF()    , _nbSample);
-	_tabTik      = copyTab(iModel->getTabTik()     , _nbSample, _nbCluster);
-  _tabZikKnown = copyTab(iModel->getTabZikKnown(), _nbSample,_nbCluster);
-  _tabZiKnown = copyTab(iModel->getTabZiKnown(), _nbSample);
-  _tabCik      = copyTab(iModel->getTabCik()     , _nbSample, _nbCluster);
-  _tabNk       = copyTab(iModel->getTabNk()      , _nbCluster);
-
-  _parameter   = (iModel->getParameter())->clone();
+  // set model into parameter object
   _parameter->setModel(this);
 
 }
 
 
-
 //------------
 // Constructor
 //------------
-XEMModel::XEMModel(XEMModelType * modelType, int64_t  nbCluster, XEMData *& data, XEMPartition *& knownPartition){
-  int64_t  k;
-  int64_t  i;
-  _deleteData = false;
-  _nbCluster     = nbCluster;
-  _data          = data;
-  _nbSample      = _data->_nbSample;
-  _algoName = UNKNOWN_ALGO_NAME;
-
+XEMModel::XEMModel( XEMModelType * modelType
+                  , int64_t  nbCluster
+                  , XEMData *& data
+                  , XEMPartition * knownPartition
+                  )
+                  : _modelType(modelType)
+                  , _nbCluster(nbCluster)
+                  , _nbSample(data->_nbSample)
+                  , _data(data)
+                  , _deleteData(false)
+                  , _parameter(0)
+                  , _algoName(UNKNOWN_ALGO_NAME)
+{
+  // initialize probabilities
+  int64_t  k, i;
+  
   _tabFik = new double*[_nbSample];
   _tabCik = new double*[_nbSample];
   _tabSumF = new double[_nbSample];
@@ -102,7 +110,7 @@ XEMModel::XEMModel(XEMModelType * modelType, int64_t  nbCluster, XEMData *& data
   _tabZikKnown = new int64_t *[_nbSample];
   _tabZiKnown = new bool[_nbSample];
   _tabNk = new double[_nbCluster];
-
+  
   for (i=0; i<_nbSample; i++){
 		_tabFik[i] = new double[_nbCluster];
 		_tabTik[i] = new double[_nbCluster];
@@ -122,62 +130,60 @@ XEMModel::XEMModel(XEMModelType * modelType, int64_t  nbCluster, XEMData *& data
 	for (k=0;k<_nbCluster;k++){
 		_tabNk[k] = 0.0;
 	}
-
+  
+  // save the partition
   FixKnownPartition(knownPartition);
-	XEMModelName modelName = modelType->_nameModel;
+  
+  // set the parameters 
+  XEMModelName modelName = _modelType->_nameModel;
   // create Param
 	if (isSpherical(modelName)){
-      _parameter = new XEMGaussianSphericalParameter(this, modelType); 
+    _parameter = new XEMGaussianSphericalParameter(this, _modelType); 
 	}
-	if (isDiagonal(modelName)){
-		_parameter = new XEMGaussianDiagParameter(this, modelType); 
+	else if (isDiagonal(modelName)){
+		_parameter = new XEMGaussianDiagParameter(this, _modelType); 
 	}
-	if (isGeneral(modelName)){
-		_parameter = new XEMGaussianGeneralParameter(this, modelType); 
+	else if (isGeneral(modelName)){
+		_parameter = new XEMGaussianGeneralParameter(this, _modelType); 
 	}
-	
-
-//HDDA models
-	if (isHD(modelName)){
-		_parameter = new XEMGaussianHDDAParameter(this, modelType);
+  //HDDA models
+	else if (isHD(modelName)){
+		_parameter = new XEMGaussianHDDAParameter(this, _modelType);
 	}
-	
-	
-	switch(modelName){
-      // Binary models //
-    case (Binary_p_E):
-      _parameter = new XEMBinaryEParameter(this, modelType, ((XEMBinaryData*)data)->getTabNbModality());
-      break;
-    case (Binary_p_Ek):
-      _parameter = new XEMBinaryEkParameter(this, modelType, ((XEMBinaryData*)data)->getTabNbModality());
-      break;
-    case (Binary_p_Ej):
-      _parameter = new XEMBinaryEjParameter(this, modelType, ((XEMBinaryData*)data)->getTabNbModality());
-      break;
-    case (Binary_p_Ekj):
-      _parameter = new XEMBinaryEkjParameter(this, modelType, ((XEMBinaryData*)data)->getTabNbModality());
-      break;
-    case (Binary_p_Ekjh):
-      _parameter = new XEMBinaryEkjhParameter(this, modelType, ((XEMBinaryData*)data)->getTabNbModality());
-      break;
-    case (Binary_pk_E):
-      _parameter = new XEMBinaryEParameter(this, modelType, ((XEMBinaryData*)data)->getTabNbModality());
-      break;
-    case (Binary_pk_Ek):
-      _parameter = new XEMBinaryEkParameter(this, modelType, ((XEMBinaryData*)data)->getTabNbModality());
-      break;
-    case (Binary_pk_Ej):
-      _parameter = new XEMBinaryEjParameter(this, modelType, ((XEMBinaryData*)data)->getTabNbModality());
-      break;
-    case (Binary_pk_Ekj):
-      _parameter = new XEMBinaryEkjParameter(this, modelType, ((XEMBinaryData*)data)->getTabNbModality());
-      break;
-    case (Binary_pk_Ekjh):
-      _parameter = new XEMBinaryEkjhParameter(this, modelType, ((XEMBinaryData*)data)->getTabNbModality());
-      break;
+  // Binary models
+  else{
+    if (modelName==Binary_p_E) { 
+      _parameter = new XEMBinaryEParameter(this, _modelType, ((XEMBinaryData*)_data)->getTabNbModality()); 
+    }
+    else if (modelName==Binary_p_Ek){
+      _parameter = new XEMBinaryEkParameter(this, _modelType, ((XEMBinaryData*)_data)->getTabNbModality());
+    }
+    else if (modelName==Binary_p_Ej){
+      _parameter = new XEMBinaryEjParameter(this, _modelType, ((XEMBinaryData*)_data)->getTabNbModality());
+    }
+    else if (modelName==Binary_p_Ekj){
+      _parameter = new XEMBinaryEkjParameter(this, _modelType, ((XEMBinaryData*)_data)->getTabNbModality());
 		}
+    else if (modelName==Binary_p_Ekjh){
+      _parameter = new XEMBinaryEkjhParameter(this, _modelType, ((XEMBinaryData*)_data)->getTabNbModality());
+		}
+    else if (modelName==Binary_pk_E){
+      _parameter = new XEMBinaryEParameter(this, _modelType, ((XEMBinaryData*)_data)->getTabNbModality());
+		}
+    else if (modelName==Binary_pk_Ek){
+      _parameter = new XEMBinaryEkParameter(this, _modelType, ((XEMBinaryData*)_data)->getTabNbModality());
+		}
+    else if (modelName==Binary_pk_Ej){
+      _parameter = new XEMBinaryEjParameter(this, _modelType, ((XEMBinaryData*)_data)->getTabNbModality());
+		}
+    else if (modelName==Binary_pk_Ekj){
+      _parameter = new XEMBinaryEkjParameter(this, _modelType, ((XEMBinaryData*)_data)->getTabNbModality());
+		}
+    else if  (modelName==Binary_pk_Ekjh){
+      _parameter = new XEMBinaryEkjhParameter(this, _modelType, ((XEMBinaryData*)_data)->getTabNbModality());
+		}
+  }
 }
-
 
 //-----------
 // Destructor
@@ -247,10 +253,14 @@ XEMModel::~XEMModel(){
   if (_deleteData){
     delete _data;
   }
-
 }
 
-
+//------------
+// get the log of N
+//------------
+double XEMModel::getLogN(){
+  return log(_data->_weightTotal);
+}
 
 //------------
 // updateForCV
@@ -558,12 +568,22 @@ double XEMModel::getEntropy(){
   return -entropy;
 }
 
+// set parameters
+void XEMModel::setParameter(XEMParameter * parameter){
+  if ( _parameter ) delete _parameter;
+  _parameter = parameter;
+}
 
-
+// set name of the algorithm
 void XEMModel::setAlgoName(XEMAlgoName algoName){
   _algoName = algoName;
 }
 
+// set an error for the model
+void XEMModel::setError(XEMErrorType errorType)
+{
+  _error.setError(errorType);
+}
 
 
 //----------------------------------
@@ -589,7 +609,6 @@ void XEMModel::computeFik(){
     p_tabSumF++;
   }
 }
-
 
 
 //-------------------------------------
@@ -624,15 +643,12 @@ void XEMModel::computeNk(){
 }
 
 
-
 //----------------
 //getFreeParameter
 //----------------
 int64_t  XEMModel::getFreeParameter(){
   return _parameter->getFreeParameter();
 }
-
-
 
 
 // compute label of samples in x  (res : 0 -> _nbCluster-1)
@@ -677,7 +693,6 @@ int64_t  XEMModel::computeLabel(XEMSample * x){
 }
 
 
-
 //-------------
 // computeLabel
 //-------------
@@ -698,8 +713,6 @@ int64_t  XEMModel::computeLabel(int64_t  i0){
 
   return res;
 }
-
-
 
 
 //-----------------
@@ -744,7 +757,7 @@ void XEMModel::FixKnownPartition(XEMPartition *& knownPartition){
 
 
 
-
+ 
 
 
 
@@ -825,7 +838,6 @@ void XEMModel::initRANDOM(int64_t  nbTry){
 
 
 
-
 //-----------------------------------------------
 // random step for init RANDOM or USER_PARTITION
 //----------------------------------------------
@@ -858,11 +870,6 @@ void XEMModel::randomForInitRANDOMorUSER_PARTITION(bool * tabIndividualCanBeUsed
 
 
 
-
-
-
-
-
 /*----------------------------------------
 			initUSER
 			--------
@@ -878,8 +885,6 @@ void XEMModel::initUSER(XEMParameter * initParameter){
     throw errorInitParameter;
   }
 }
-
-
 
 
 
@@ -1000,6 +1005,7 @@ void XEMModel::initUSER_PARTITION(XEMPartition * initPartition, int64_t nbTryInI
 	So only _parameter have to be updated in this method
 	
 -------------------------------------------------------*/
+/*
 void XEMModel::initSMALL_EM(XEMClusteringStrategyInit * clusteringStrategyInit){
 //  cout<<"init SMALL_EM, nbTryInInit="<<strategyInit->getNbTry()<<", nbIteration = "<<strategyInit->getNbIteration()<<", epsilon = "<<strategyInit->getEpsilon()<<endl;
   _algoName = EM;
@@ -1035,93 +1041,13 @@ void XEMModel::initSMALL_EM(XEMClusteringStrategyInit * clusteringStrategyInit){
   _parameter->setModel(this);
 //  cout<<"fin de init SMALL_EM, nb d'essais effectues="<<i<<endl;
 }
-
-
-
-void XEMModel::initSMALL_EM(XEMStrategyInit * strategyInit){
-  //cout<<"init SMALL_EM, nbTryInInit="<<strategyInit->getNbTry()<<", nbIteration = "<<strategyInit->getNbIteration()<<", epsilon = "<<strategyInit->getEpsilon()<<endl;
-  _algoName = EM;
-  double logLikelihood, bestLogLikelihood;
-  XEMParameter * bestParameter = _parameter->clone();
-  int64_t  i, nbRunOfSmallEMOk = 0; 
-  bestLogLikelihood = 0.0;
-  for (i=0; i<strategyInit->getNbTry(); i++){
-    nbRunOfSmallEMOk++;
-    try{
-      // one run of small EM
-      _parameter->reset();
-      oneRunOfSmallEM(strategyInit, logLikelihood);
-//cout<<"sortie de oneRunOfSmallEM, LL = "<<logLikelihood<<endl;
-      if ((nbRunOfSmallEMOk == 1) || (logLikelihood > bestLogLikelihood)){
-        bestLogLikelihood = logLikelihood;
-        bestParameter->recopy(_parameter);
-//       cout<<"best LL dans SMALL_EM : " <<bestLogLikelihood<<endl;
-      }
-    }
-    catch(XEMErrorType errorType){
-      nbRunOfSmallEMOk--;
-    }
-  }
-  
-  if (nbRunOfSmallEMOk == 0){
-    throw SMALL_EM_error;
-  }
-
-  // set best parameter
-  delete _parameter;
-  _parameter = bestParameter;
-  _parameter->setModel(this);
- // cout<<"fin de init SMALL_EM, nb d'essais effectues="<<i<<endl;
-}
-
+*/
 
 
 //---------------------
 // one run if small EM
 //--------------------
-void XEMModel::oneRunOfSmallEM(XEMStrategyInit * strategyInit, double & logLikelihood){
-  double lastLogLikelihood, eps;
-  eps = 1000;
-  initRANDOM(1);
-  Estep();
-  Mstep();
-  logLikelihood = getLogLikelihood(true);  // true : to compute fik
-  int64_t  nbIteration = 1;
-  bool continueAgain = true;
-  while (continueAgain){
-//    cout<<"while de oneRunOfSmallEM, nbIteration = "<<nbIteration<<endl;
-         //(nbIteration < strategyInit->getNbIteration()) && (eps > strategyInit->getEpsilon())){
-    lastLogLikelihood = logLikelihood;
-    Estep();
-    Mstep();
-    nbIteration++; 
-    // update continueAgain
-    switch (strategyInit->getStopName()) {
-      case NBITERATION :
-        continueAgain = (nbIteration < strategyInit->getNbIteration());
-        break;
-      case EPSILON :
-        logLikelihood = getLogLikelihood(true);  // true : to compute fik
-        eps = fabs(logLikelihood - lastLogLikelihood);
-        //continueAgain = (eps > strategyInit->getEpsilon());
-        continueAgain = (eps > strategyInit->getEpsilon() && (nbIteration < maxNbIterationInInit)); // on ajoute un test pour ne pas faire trop d'iterations quand meme ....
-        break;
-      case NBITERATION_EPSILON :
-        logLikelihood = getLogLikelihood(true);  // true : to compute fi
-        eps = fabs(logLikelihood - lastLogLikelihood);
-        continueAgain = ((eps > strategyInit->getEpsilon()) && (nbIteration < strategyInit->getNbIteration()));
-        break;
-        default : throw internalMixmodError;
-    }
-  }
-  if (strategyInit->getStopName() == NBITERATION){ // logLikelihood is an output
-    logLikelihood = getLogLikelihood(true);  // true : to compute fi
-  }
-//cout<<"Fin de oneRunOfSmallEM, nb d'iterations effectuees = "<<nbIteration<<", logLikelihood = "<<logLikelihood<<endl;
-}
-
-
-
+/*
 void XEMModel::oneRunOfSmallEM(XEMClusteringStrategyInit * clusteringStrategyInit, double & logLikelihood){
   double lastLogLikelihood, eps;
   eps = 1000;
@@ -1163,13 +1089,13 @@ void XEMModel::oneRunOfSmallEM(XEMClusteringStrategyInit * clusteringStrategyIni
 //cout<<"Fin de oneRunOfSmallEM, nb d'iterations effectuees = "<<nbIteration<<", logLikelihood = "<<logLikelihood<<endl;
 }
 
-
+*/
 
 
 
 /*---------------------------------------------------
  initCEM_INIT
-/*---------------------------------------------------
+ ---------------------------------------------------
   updated in this method : 
 	- _parameter
 	- _tabFik, _tabSumF, _tabCik, _tabTik, _tabNk (because an Estep and a CStep are called to choose the bestParameter)
@@ -1177,6 +1103,7 @@ void XEMModel::oneRunOfSmallEM(XEMClusteringStrategyInit * clusteringStrategyIni
 	So only _parameter have to be updated in this method
 
 ---------------------------------------------------*/
+/*
 void XEMModel::initCEM_INIT(XEMClusteringStrategyInit * clusteringStrategyInit){
   //cout<<"init CEM, nbTryInInit="<<strategyInit->getNbTry()<<endl;
   _algoName = CEM;
@@ -1241,76 +1168,7 @@ void XEMModel::initCEM_INIT(XEMClusteringStrategyInit * clusteringStrategyInit){
   _parameter->setModel(this);
 
 }
-
-void XEMModel::initCEM_INIT(XEMStrategyInit * strategyInit){
-  //cout<<"init CEM, nbTryInInit="<<strategyInit->getNbTry()<<endl;
-  _algoName = CEM;
-  int64_t  i;
-  double cLogLikelihood, oldLogLikelihood, bestCLogLikelihood;
-  XEMParameter * bestParameter = _parameter->clone();
-  int64_t  nbRunOfCEMOk = 0;
-  bestCLogLikelihood = 0.0;
-  
-  for (i=0; i<strategyInit->getNbTry(); i++){
-    nbRunOfCEMOk++;
-    try{
-      _parameter->reset(); // reset to default values
-      initRANDOM(1);
-      _algoName = CEM;
-      int64_t  nbIter = 0;
-      bool fin = false;
-      while (!fin && nbIter<=maxNbIterationInCEM_INIT){
-        Estep();
-        Cstep();
-        Mstep();
-        nbIter++;
-        if (nbIter == 1){
-          oldLogLikelihood = getCompletedLogLikelihood();
-        }
-        else{
-          cLogLikelihood = getCompletedLogLikelihood();
-          if (cLogLikelihood == oldLogLikelihood){
-            fin = true;
-          }
-          else{
-            oldLogLikelihood = cLogLikelihood;
-          }
-        }
-      }
-      //cout<<"dans init CEM, nb d'iterations effectuées : "<<nbIter<<endl;
-    // Compute log-likelihood 
-      cLogLikelihood = getCompletedLogLikelihood();
-    // Comparaison of log-likelihood between step p and p-1 
-      if ((nbRunOfCEMOk==1) || (cLogLikelihood > bestCLogLikelihood)){
-        bestCLogLikelihood = cLogLikelihood;
-        bestParameter->recopy(_parameter);
-      }
-      //cout<<"nbIter : "<<nbIter<<endl;
-    }
-    catch (XEMErrorType errorType){
-      nbRunOfCEMOk--;
-    }
-  }
-
-  if (nbRunOfCEMOk==0){
-    delete _parameter;
-    _parameter = bestParameter;
-    _parameter->setModel(this);
-    throw CEM_INIT_error;
-  }
-  
-  //cout<<"fin de init CEM, nb d'essais effectues="<<i<<endl;
-  // set Best parameter
-  delete _parameter;
-  _parameter = bestParameter;
-  _parameter->setModel(this);
-
-}
-
-
-
-
-
+*/
 /*---------------------------------------------------------
  					Initialization by SEM
  					---------------------
@@ -1321,7 +1179,7 @@ void XEMModel::initCEM_INIT(XEMStrategyInit * strategyInit){
 	Note : _tabFik, _tabSumF, _tabCik, _tabTik, _tabNk wil be 're'computed in the following EStep
 	So, only _parameter have to be updated in this method
 	
--------------------------------------------------------*/
+-------------------------------------------------------*//*
 void XEMModel::initSEM_MAX(XEMClusteringStrategyInit * clusteringStrategyInit){
   //cout<<"init SEM_MAX, nbTryInInit="<<strategyInit->getNbIteration()<<endl;
   _algoName = SEM;
@@ -1364,55 +1222,8 @@ void XEMModel::initSEM_MAX(XEMClusteringStrategyInit * clusteringStrategyInit){
   _parameter->setModel(this);
 }
 
-void XEMModel::initSEM_MAX(XEMStrategyInit * strategyInit){
-  //cout<<"init SEM_MAX, nbTryInInit="<<strategyInit->getNbIteration()<<endl;
-  _algoName = SEM;
-  int64_t  j;
-  double logLikelihood, bestLogLikelihood;
-  XEMParameter * bestParameter = _parameter->clone();
-  int64_t  nbRunOfSEMMAXOk = 0;
-  bestLogLikelihood = 0.0;
-//  int64_t  bestIndex=0;
-  
-  for (j=0; j<strategyInit->getNbIteration(); j++){
-    nbRunOfSEMMAXOk++;
-    try{
-      _parameter->reset();
-      initRANDOM(1);
-      Estep();
-      Sstep();
-      Mstep();
-      // Compute log-likelihood 
-      logLikelihood = getLogLikelihood(true);  // true : to compute fik
-      
-      if ((nbRunOfSEMMAXOk==1) || (logLikelihood > bestLogLikelihood)){
-        bestLogLikelihood = logLikelihood;
-        bestParameter->recopy(_parameter);
-//        bestIndex = j;
-      }
-    }
-    catch (XEMErrorType errorType){
-      nbRunOfSEMMAXOk--;
-    }
-  }
-  
-  if (nbRunOfSEMMAXOk==0){
-    throw SEM_MAX_error;
-  }
-  
-  //cout<<"fin de init SEM_MAX, nb d'iterations effectuees="<<j<<" meilleure solution : "<<bestIndex<<endl;
-  // set best parameter
-  delete _parameter;
-  _parameter = bestParameter;
-  _parameter->setModel(this);
-}
 
-
-
-
-
-
-
+*/
 
 
 //-----------------------------------------------------------------------------------------------

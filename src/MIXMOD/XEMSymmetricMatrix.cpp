@@ -23,10 +23,9 @@
     All informations available on : http://www.mixmod.org                                                                                               
 ***************************************************************************/
 
-#include "XEMMatrix.h"
 #include "XEMSymmetricMatrix.h"
-#include "XEMUtil.h"
 #include "XEMDiagMatrix.h"
+#include "XEMGeneralMatrix.h"
 
 //------------
 // Constructor
@@ -614,6 +613,19 @@ void XEMSymmetricMatrix::input(ifstream & fi){
     for (j=i+1; j<_s_pbDimension; j++){
       fi >> garbage;
     }
+  }
+}
+
+
+void XEMSymmetricMatrix::input( double ** variances ){
+  int64_t i,j, r=0;
+  
+  for (i=0; i<_s_pbDimension; i++){
+    for (j=0; j<i+1; j++){
+      _store[r] = variances[i][j];
+      r++;
+    }
+    for (j=i+1; j<_s_pbDimension; j++){}
   }
 }
 

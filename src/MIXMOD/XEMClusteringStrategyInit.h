@@ -26,8 +26,12 @@
 #define XEMClusteringStrategyInit_H
 
 #include "XEMUtil.h"
-#include "XEMParameter.h"
-#include "XEMPartition.h"
+
+// pre-declaration
+class XEMData;
+class XEMParameter;
+class XEMPartition;
+class XEMModel;
 
 /**
   @brief Base class for StrategyInitType(s)
@@ -123,16 +127,28 @@ public:
   /// setTabPartition
   void setTabPartition(XEMPartition ** tabPartition, int64_t nbPartition);
   
+  /* Initialization */
+  //----------------//
   
+  /// Initialization by EM of the parameters of the model
+  void initSMALL_EM(XEMModel*& model);
+  
+  /// Initialization by CEM of the parameters of the model
+  void initCEM_INIT(XEMModel*& model);
+  
+  /// Initialization by SEM of the parameters of the model
+  void initSEM_MAX(XEMModel*& model);
+  
+  /* Input / Output */
+  //----------------//
   // input
   void input(ifstream & fi,XEMData *& data, int64_t nbNbCluster, int64_t * tabNbCluster, XEMModelType * modelType, bool & alreadyRead);
 
+  // verification
   bool  verify() const;  
   
-  
+  // print out strategy initialization
   friend ostream & operator << (ostream & fo, XEMClusteringStrategyInit & strategyInit);
-  
-  //friend class XEMStrategy;
   
   
   private :  
@@ -170,6 +186,9 @@ public:
   
 
   bool _deleteTabParameter ;
+  
+  
+  void oneRunOfSmallEM(XEMModel*& model, double & logLikelihood);
   
 };
 

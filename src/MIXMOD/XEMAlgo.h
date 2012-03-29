@@ -25,15 +25,14 @@
 #ifndef XEMALGO_H
 #define XEMALGO_H
 
-#include "XEMModel.h"
 #include "XEMUtil.h"
-#include "XEMData.h"
-#include "XEMPartition.h"
 
+// pre-declaration
+class XEMModel;
 
 /**
         @brief Base class for Algorithm(s)
-        @author F Langrognet & A Echenim
+        @author F Langrognet
  */
 
 class XEMAlgo
@@ -57,7 +56,7 @@ class XEMAlgo
    virtual XEMAlgo * clone() = 0;
     
                 /// Run method
-    virtual void run(XEMModel *& model) = 0;
+   virtual void run(XEMModel *& model) = 0;
 
     
     void edit(ofstream & oFile);
@@ -77,7 +76,7 @@ class XEMAlgo
     virtual const double getEpsilon() const;
     
     friend ostream & operator << (ostream & fo, XEMAlgo & algo);
-    
+
   protected :
     
     
@@ -153,7 +152,7 @@ inline const XEMAlgoStopName XEMAlgo::getAlgoStopName() const{
 }
 
 
-// others fucntions
+// others functions
 XEMAlgo * createDefaultClusteringAlgo();
 
 #endif

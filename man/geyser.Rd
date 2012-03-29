@@ -6,9 +6,9 @@
 
 \describe{
 
-\item{\code{V1}}{a numeric vector}
+  \item{\code{Duration}}{a numeric vector containing the duration (in minutes) of the eruption}
 
-\item{\code{V2}}{a numeric vector}
+  \item{\code{Waiting.Time}}{a numeric vector containing the waiting time (in minutes) to the next eruption}
 
 }}
 \source{

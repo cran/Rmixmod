@@ -25,9 +25,7 @@
 
 #include "XEMSphericalMatrix.h"
 #include "XEMGeneralMatrix.h"
-#include "XEMSymmetricMatrix.h"
 #include "XEMDiagMatrix.h"
-#include "XEMUtil.h"
 
 //------------
 // Constructor
@@ -293,6 +291,19 @@ void XEMSphericalMatrix::input(ifstream & fi){
         }
       }
     }
+  
+}
+void XEMSphericalMatrix::input(double ** variances){
+  int64_t p,q;
+  
+  for (p=0; p<_s_pbDimension; p++){
+    // useless because all are 0
+    for (q=0; q<_s_pbDimension; q++){
+      if (p==0 && q==0){
+        _store=variances[p][q];
+      }
+    }
+  }
   
 }
 

@@ -26,13 +26,14 @@
 #define XEMGaussianGeneralParameter_H
 
 #include "XEMGaussianEDDAParameter.h"
-#include "XEMMatrix.h"
-#include "XEMGeneralMatrix.h"
-#include "XEMSymmetricMatrix.h"
+
+// pre-declaration
+class XEMDiagMatrix;
+class XEMGeneralMatrix;
 
 /**
   @brief Derived class of XEMGaussianParameter for Spherical Gaussian Model(s)
-  @author F Langrognet & A Echenim
+  @author F Langrognet
   */
 
 class XEMGaussianGeneralParameter : public XEMGaussianEDDAParameter{
@@ -48,8 +49,18 @@ public:
 
   // Constructor
   // called by XEMStrategyType if initialization is USER
-  XEMGaussianGeneralParameter(int64_t  iNbCluster, int64_t  iPbDimension, XEMModelType * iModelType, string & iFileName);
-
+  XEMGaussianGeneralParameter( int64_t  iNbCluster
+                             , int64_t  iPbDimension
+                             , XEMModelType * iModelType
+                             , string & iFileName
+                             );
+  XEMGaussianGeneralParameter( int64_t  iNbCluster
+                             , int64_t  iPbDimension
+                             , XEMModelType * iModelType
+                             , double * proportions
+                             , double **  means
+                             , double *** variances
+                             ); 
   /// Constructor (copy)
   XEMGaussianGeneralParameter(const XEMGaussianGeneralParameter * iParameter);
 

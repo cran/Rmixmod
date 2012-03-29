@@ -43,11 +43,24 @@ public:
   XEMBinaryEkjhParameter(int64_t iNbCluster, int64_t iPbDimension, XEMModelType *  iModelType, int64_t * tabNbModality, string & iFileName);
   
   /// Constructor
+  XEMBinaryEkjhParameter( int64_t iNbCluster
+                        , int64_t iPbDimension
+                        , XEMModelType * iModelType
+                        , int64_t * tabNbModality
+                        , double * proportions
+                        , double **  centers
+                        , double *** scatters
+                        );
+  
+  /// Constructor
   XEMBinaryEkjhParameter(const XEMBinaryEkjhParameter * iParameter);
     
   /// Destructor
   ~XEMBinaryEkjhParameter();
-
+  
+  /// Comparison operator
+  virtual bool operator ==(const XEMBinaryEkjhParameter & param) const;
+	
 	/// reset to default values
 	virtual void reset();
   
@@ -93,7 +106,10 @@ public:
   
   // Read Scatter in input file
   void inputScatter(ifstream & fi);
-
+  
+  // Read Scatter in input container
+  void inputScatter( double *** scatters );
+  
   double *** scatterToArray() const;
   
   private : 

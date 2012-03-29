@@ -23,7 +23,7 @@
     All informations available on : http://www.mixmod.org                                                                                               
 ***************************************************************************/
 #include "XEMLikelihoodOutput.h"
-
+#include "XEMModel.h"
 
 //------------
 // Constructor
@@ -63,7 +63,7 @@ XEMLikelihoodOutput::~XEMLikelihoodOutput(){
 //----
 //edit
 //----
-void XEMLikelihoodOutput::edit(ofstream & oFile, bool text){
+void XEMLikelihoodOutput::edit(std::ofstream & oFile, bool text){
   if(text){
     oFile<<"\t\t\tNumber of Free Parameters : "<<_nbFreeParam<<endl;
     oFile<<"\t\t\tLog-Likelihood : "<<_logLikelihood<<endl;

@@ -1,0 +1,26 @@
+\docType{methods}
+\name{sortByCriterion}
+\alias{sortByCriterion}
+\alias{sortByCriterion,Mixmod,character-method}
+\title{Sorting results of a [\code{\linkS4class{Mixmod}}] object by a given criterion}
+\arguments{
+  \item{object}{a [\code{\linkS4class{Mixmod}}] object}
+
+  \item{criterion}{a string containing the criterion name}
+}
+\value{
+  a modified [\code{\linkS4class{Mixmod}}] object
+}
+\description{
+  After calling the mixmodCluster() or mixmodLearn()
+  method, results will be sorted into ascending order
+  according to the first given criterion (descending order
+  for CV criterion). This method is able to reorder the
+  list of results according to a given criterion.
+}
+\examples{
+x<-mixmodCluster(iris[1:4],2:10,criterion=c("BIC","ICL"))
+  icl<-sortByCriterion(x,"ICL")
+  icl["results"]
+}
+

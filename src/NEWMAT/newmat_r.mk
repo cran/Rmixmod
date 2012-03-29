@@ -41,7 +41,7 @@ OBJS= $(SRCS:%.cpp=%.o)
 # rule for compiling the cpp files
 #
 %.o: %.cpp
-	$(CXX)  $(ALL_CXXFLAGS) $< -c -o $@
+	$(CXX)  $(CXXFLAGS) ${CPICFLAGS} $< -c -o $@
 
 #-----------------------------------------------------------------------
 # The rule lib create the library NEWMAT
@@ -49,12 +49,10 @@ OBJS= $(SRCS:%.cpp=%.o)
 lib: $(LIB)
 
 $(LIB): $(OBJS)
-	$(AR) -rus $@ $?
-
+	$(AR) -rc $@ $?
+  
 mostlyclean: clean
 
 clean:
 	@-rm -rf .libs _libs $(LIB)
 	@-rm -f *.o
-	
-	

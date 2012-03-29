@@ -22,7 +22,9 @@
 
     All informations available on : http://www.mixmod.org                                                                                               
 ***************************************************************************/
+
 #include "XEMPartition.h"
+#include "XEMLabel.h"
 
 
 //------------
@@ -52,6 +54,39 @@ XEMPartition::XEMPartition(XEMPartition * iPartition){
     _tabValue = NULL;
   _partitionFile = iPartition->getPartitionFile();
   _deleteValues = true;
+}
+
+//----------------------------
+// constructor from a XEMLabel
+//----------------------------
+XEMPartition::XEMPartition(const XEMLabel * label, int64_t nbCluster )
+{
+	if (label!=NULL){
+		_nbSample = label->getNbSample();
+		_nbCluster = nbCluster;
+		_tabValue  = new int64_t*[_nbSample];
+		vector<int64_t> const & vLabel = label->getLabel();
+		for (int64_t i=0; i<_nbSample; i++){
+			_tabValue[i] = new int64_t[_nbCluster];
+			for (int64_t k=0; k<_nbCluster; k++){
+				_tabValue[i][k]=0;
+			}
+			if (vLabel[i]<0 && vLabel[i]>_nbCluster){
+				throw badValueInLabelInput;
+			}
+			else{
+				_tabValue[i][vLabel[i]-1] = 1;
+			}
+		}
+		_deleteValues = true;
+		_partitionFile._fileName = "";
+		_partitionFile._format = FormatNumeric::defaultFormatNumericFile;
+		_partitionFile._type = TypePartition::defaultTypePartition;
+	}
+	else{
+		throw internalMixmodError;
+	}
+
 }
 
 
@@ -306,15 +341,13 @@ ifstream & operator >> (ifstream & fi, XEMPartition & partition){
 //-------------------------
 ostream & operator << (ostream & fo, const XEMPartition & partition){
   
-#ifdef VERBOSE
   fo<<"\n Sample size: "<<partition._nbSample;	
   fo<<"\n Number of Cluster: "<<partition._nbCluster<< endl;	
   for (int64_t i=0; i<partition._nbSample; i++){
     for (int64_t k=0; k<partition._nbCluster; k++){
-        cout<<partition._tabValue[i][k]<<"\t";
+        fo<<partition._tabValue[i][k]<<"\t";
       }
-      cout<<endl;
+      fo<<endl;
    }
-#endif
   return fo;
 }

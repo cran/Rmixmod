@@ -24,6 +24,7 @@
 ***************************************************************************/
 
 #include "XEMSEMAlgo.h"
+#include "XEMModel.h"
 
 
 //------------
@@ -64,11 +65,6 @@ XEMAlgo * XEMSEMAlgo::clone(){
 }
 
 
-void XEMSEMAlgo::setAlgoStopName(XEMAlgoStopName * algoStopName){
-  throw internalMixmodError;
-}
-
-
 //----------------
 // setNbIteration
 //----------------
@@ -83,8 +79,6 @@ void XEMSEMAlgo::setNbIteration(int64_t nbIteration){
     _nbIteration = nbIteration;
   }
 }
-
-
 
 //---
 //run

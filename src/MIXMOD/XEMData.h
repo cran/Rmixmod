@@ -26,9 +26,10 @@
 #define XEMDATA_H
 
 #include "XEMUtil.h"
-#include "XEMSample.h"
-#include "XEMDataDescription.h"
 
+// pre-declaration
+class XEMSample;
+class XEMDataDescription;
 
 /**
   @brief Base class for Data

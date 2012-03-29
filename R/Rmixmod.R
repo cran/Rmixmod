@@ -5,9 +5,9 @@
 ##' \tabular{ll}{
 ##'   Package: \tab Rmixmod\cr 
 ##'   Type: \tab Package\cr 
-##'   Version: \tab 1.0\cr
-##'   Date: \tab 2012-01-10\cr 
-##'   License: \tab GPL Version 3\cr 
+##'   Version: \tab 1.1.0\cr
+##'   Date: \tab 2012-03-29\cr 
+##'   License: \tab GPL-3 + file LICENSE\cr 
 ##'   LazyLoad: \tab yes\cr
 ##' }
 ##'
@@ -32,7 +32,7 @@
 ##'
 ##' In the qualitative case, five multinomial models are available. They are based on a reparametrization of the multinomial probabilities. 
 ##'
-##' In both cases, the models and the number of clusters can be chosen by different criteria : BIC (Bayesian Information Criterion), ICL (Integrated Completed Likelihood, a classification version of BIC), NEC (Entropy Criterion), Cross-Validation (CV) or Double Cross-Validation (DCV).
+##' In both cases, the models and the number of clusters can be chosen by different criteria : BIC (Bayesian Information Criterion), ICL (Integrated Completed Likelihood, a classification version of BIC), NEC (Entropy Criterion), or Cross-Validation (CV).
 ##'
 ##'
 ##' @name Rmixmod-package
@@ -42,16 +42,16 @@
 ##' @keywords package
 ##'
 ##' @author
-##' Author: Remi Lebret
-##' Maintainer: Remi Lebret \email{remi.lebret@@math.univ-lille1.fr}
+##' Author: Remi Lebret and Serge Iovleff and Florent Langrognet, with contributions from C. Biernacki and G. Celeux and G. Govaert \email{contact@@mixmod.org}
 ##'
 ##' @references Biernacki C., Celeux G., Govaert G., Langrognet F., 2006. "Model-Based Cluster and Discriminant Analysis with the MIXMOD Software". Computational Statistics and Data Analysis, vol. 51/2, pp. 587-600.
 ##'
 ##' @examples
+##'   ## Clustering Analysis
 ##'   # load quantitative data set
 ##'   data(geyser)
 ##'   # Clustering in gaussian case
-##'   xem1<-mixmodClustering(geyser)
+##'   xem1<-mixmodCluster(geyser,3)
 ##'   summary(xem1)
 ##'   plot(xem1)
 ##'   hist(xem1)
@@ -59,10 +59,21 @@
 ##'   # load qualitative data set
 ##'   data(birds)
 ##'   # Clustering in multinomial case
-##'   xem2<-mixmodClustering(birds)
+##'   xem2<-mixmodCluster(birds, 2, factor=c(2,5,6,3,5,4))
 ##'   summary(xem2)
-##'   plot(xem2)
 ##'   hist(xem2)
+##'
+##'   ## Discriminant Analysis
+##'   # start by extract 10 observations from iris data set
+##'   remaining.obs<-sample(1:nrow(iris),10)
+##'   # then run a mixmodLearn() analysis without those 10 observations
+##'   learn<-mixmodLearn(iris[-remaining.obs,1:4], iris$Species[-remaining.obs])
+##'   # create a MixmodPredict to predict those 10 observations
+##'   prediction <- mixmodPredict(data=iris[remaining.obs,1:4], classificationRule=learn["bestResult"])
+##'   # show results
+##'   prediction
+##'   # compare prediction with real results
+##'   as.integer(iris$Species[remaining.obs]) == prediction["partition"]
 ##'
 ##' @useDynLib Rmixmod
 ##' @exportPattern "^[[:alpha:]]+"
@@ -78,9 +89,9 @@ NULL
 ##'
 ##' \describe{
 ##'
-##'   \item{\code{V1}}{a numeric vector}
+##'   \item{\code{Duration}}{a numeric vector containing the duration (in minutes) of the eruption}
 ##'
-##'   \item{\code{V2}}{a numeric vector}
+##'   \item{\code{Waiting.Time}}{a numeric vector containing the waiting time (in minutes) to the next eruption}
 ##'
 ##' }
 ##'
@@ -137,23 +148,23 @@ NULL
 
 ##' Qualitative data : morphological description of birds
 ##' 
-##' The dataset contains details on the morphology of birds (puffins). Each individual (bird) is described by 6 qualitative variables. One variable for the gender and 5 variables giving a morphological description of the birds. There is 153 puffins divided in 3 sub-classes: dichrous (84 birds), lherminieri (34) and subalaris (35).
+##' The dataset contains details on the morphology of birds (puffins). Each individual (bird) is described by 6 qualitative variables. One variable for the gender and 5 variables giving a morphological description of the birds. There is 69 puffins divided in 2 sub-classes: lherminieri (34) and subalaris (35).
 ##'
-##' @format A data frame with 153 observations on the following 6 variables.
+##' @format A data frame with 69 observations on the following 6 variables.
 ##'
 ##' \describe{
 ##'
-##'   \item{\code{V1}}{a numeric vector defining the gender (2 modalities, male or female).}
+##'   \item{\code{gender}}{a numeric vector defining the gender (2 modalities, male or female).}
 ##'
-##'   \item{\code{V2}}{a numeric vector describing the eyebrow stripe (5 modalities).}
+##'   \item{\code{eyebrow}}{a numeric vector describing the eyebrow stripe (5 modalities).}
 ##'
-##'   \item{\code{V3}}{a numeric vector describing the breast (6 modalities).}
+##'   \item{\code{breast}}{a numeric vector describing the breast (6 modalities).}
 ##'
-##'   \item{\code{V4}}{a numeric vector describing the stripes (3 modalities).}
+##'   \item{\code{stripes}}{a numeric vector describing the stripes (3 modalities).}
 ##'
-##'   \item{\code{V5}}{a numeric vector describing the feathers (5 modalities).}
+##'   \item{\code{feathers}}{a numeric vector describing the feathers (5 modalities).}
 ##'
-##'   \item{\code{V6}}{a numeric vector describing the edging (4 modalities).}
+##'   \item{\code{edging}}{a numeric vector describing the edging (4 modalities).}
 ##'
 ##' }
 ##'
@@ -163,4 +174,41 @@ NULL
 ##' 
 ##' @examples
 ##'   data(birds)
+NULL
+
+
+##' Qualitative data : Car Evaluation
+##' 
+##' Car Evaluation Database was derived from a simple hierarchical decision model originally developed for the demonstration of DEX, M. Bohanec, V. Rajkovic: Expert system for decision making.
+##'
+##' @format A data frame with 1728 observations on the following 6 variables.
+##'
+##' \describe{
+##'
+##'   \item{\code{buying}}{the buying price (4 modalities: vhigh, high, med, low).}
+##'
+##'   \item{\code{maint}}{the price of the maintenance (4 modalities: vhigh, high, med, low).}
+##'
+##'   \item{\code{doors}}{the number of doors (4 modalities: 2, 3, 4, 5more).}
+##'
+##'   \item{\code{persons}}{the capacity in terms of persons to carry (3 modalities: 2, 4, more).}
+##'
+##'   \item{\code{lug_boot}}{the size of luggage boot  (3 modalities: small, med, big).}
+##'
+##'   \item{\code{safety}}{the estimated safety of the car (3 modalities: low, med, high).}
+##'
+##'   \item{\code{acceptability}}{the car acceptability (4 modalities: unacc, acc, good, vgood).}
+##' }
+##'
+##' @source
+##' Creator: Marko Bohanec 
+##' Donors: Marko Bohanec & Blaz Zupan
+##' http://archive.ics.uci.edu/ml/datasets/Car+Evaluation
+##'
+##' @name car
+##' @docType data
+##' @keywords datasets
+##' 
+##' @examples
+##'   data(car)
 NULL

@@ -24,6 +24,12 @@
 ***************************************************************************/
 #include "XEMLabel.h"
 #include "XEMLabelDescription.h"
+#include "XEMModel.h"
+#include "XEMBinaryModel.h"
+#include "XEMModelType.h"
+#include "XEMIndividualColumnDescription.h"
+
+#include <algorithm>
 
 //------------
 // Constructor
@@ -46,9 +52,8 @@ XEMLabel::XEMLabel(int64_t nbSample){
 //------------
 // Constructor
 //------------
-XEMLabel::XEMLabel(XEMEstimation * estimation){
+XEMLabel::XEMLabel(XEMModel * model){
   
-  XEMModel * model = estimation->getModel();
   if (model == NULL){
     throw internalMixmodError;
   }
@@ -56,35 +61,35 @@ XEMLabel::XEMLabel(XEMEstimation * estimation){
   // compute tabLabel
   //-----------------
   int64_t * tabLabel = NULL;
-  int64_t nbCluster = estimation->getNbCluster();
+  int64_t nbCluster = model->getNbCluster();
   
-  XEMModelType * modelType = model->getParameter()->getModelType();
+  XEMModelType * modelType = model->getModelType();
   bool binary = isBinary(modelType->_nameModel);
   if (!binary){ 
-    _nbSample = estimation->getNbSample();
+    _nbSample = model->getNbSample();
     int64_t ** tabPartition = new int64_t*[_nbSample];
     for (int64_t i=0; i<_nbSample; i++){
       tabPartition[i] = new int64_t[nbCluster];
     }
     tabLabel    = new int64_t[_nbSample];
-    estimation->getModel()->getLabelAndPartitionByMAPOrKnownPartition(tabLabel, tabPartition);
+    model->getLabelAndPartitionByMAPOrKnownPartition(tabLabel, tabPartition);
   }
   ////
   else{
   ////
     //binary case
-    const vector<int64_t> & correspondenceOriginDataToReduceData = estimation->getcorrespondenceOriginDataToReduceData();
+    const vector<int64_t> & correspondenceOriginDataToReduceData = dynamic_cast<XEMBinaryModel*>(model)->getCorrespondenceOriginDataToReduceData();
     _nbSample = correspondenceOriginDataToReduceData.size();
     tabLabel    = new int64_t[_nbSample];
     
     //label et partition on reduceData
-    int64_t nbSampleOfDataReduce = estimation->getModel()->getNbSample();
+    int64_t nbSampleOfDataReduce = model->getNbSample();
     int64_t * tabLabelReduce = new int64_t[nbSampleOfDataReduce];
     int64_t ** tabPartitionReduce = new int64_t*[nbSampleOfDataReduce];
     for (int64_t i=0; i<nbSampleOfDataReduce; i++){
       tabPartitionReduce[i] = new int64_t[nbCluster];
     }
-    estimation->getModel()->getLabelAndPartitionByMAPOrKnownPartition(tabLabelReduce, tabPartitionReduce);
+    model->getLabelAndPartitionByMAPOrKnownPartition(tabLabelReduce, tabPartitionReduce);
   
   //  double ** tabPostProbaReduce = NULL;
   //  tabPostProbaReduce = copyTab(estimation->getModel()->getPostProba(), nbSampleOfDataReduce, nbCluster); // copy
@@ -132,11 +137,21 @@ XEMLabel::~XEMLabel(){
 
 
 
+//--------------------
+/// Comparison operator
+//--------------------
+bool XEMLabel::operator ==(const XEMLabel & label) const{
+  if ( _nbSample != label.getNbSample() ) return false;
+  for (int64_t i=0; i<_nbSample; i++ ){
+    if ( _label[i] != label.getLabel()[i] ) return false;
+  }
+  return true;
+}
 
 //----------
 // editProba
 //----------
-void XEMLabel::edit(ostream & stream){
+void XEMLabel::edit(ostream & stream) const{
   stream.setf(ios::fixed, ios::floatfield);
   for (int64_t i=0; i<_nbSample; i++){
     stream<<_label[i]<<endl;
@@ -154,7 +169,49 @@ int64_t * XEMLabel::getTabLabel() const{
 }
 
 
+//---------
+// get Error Rate
+//---------
+const double XEMLabel::getErrorRate( std::vector<int64_t> const & label ) const
+{  
+  if ( _nbSample != (int64_t)label.size() )
+  {  throw notEnoughValuesInLabelInput; }
+  
+  double missClass = 0.0;
+  for ( int64_t i=0; i<_nbSample; i++ ){
+    if ( _label[i] != label[i] ) ++missClass;
+  }
+  return missClass/_nbSample;
+}
 
+
+//---------
+// get getClassificationTab
+//---------
+int64_t** XEMLabel::getClassificationTab( std::vector<int64_t> const & label ) const
+{  
+  if ( _nbSample != (int64_t)label.size() )
+  {  throw notEnoughValuesInLabelInput; }
+  
+  // get the number of cluster
+  const unsigned int nbCluster =  *max_element(_label.begin(), _label.end());
+  // memory allocation
+  int64_t** classTab = new int64_t*[nbCluster];
+  for (unsigned int i=0; i<nbCluster; i++) {
+    classTab[i] = new int64_t[nbCluster];
+  }
+  // initialization
+  for (unsigned int i=0; i<nbCluster; i++)
+    for (unsigned int j=0; j<nbCluster; j++ )
+      classTab[i][j] = 0;
+  
+  // loop over labels
+  for ( int64_t i=0; i<_nbSample; i++ ){
+    ++classTab[_label[i]-1][label[i]-1];
+  }
+  
+  return classTab;
+}
 
 // -----------
 //input stream
@@ -218,3 +275,5 @@ void XEMLabel::input(const XEMLabelDescription & labelDescription){
     throw notEnoughValuesInLabelInput;
   }
 }
+
+

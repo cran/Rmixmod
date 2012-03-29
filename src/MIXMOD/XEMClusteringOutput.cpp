@@ -23,42 +23,46 @@
     All informations available on : http://www.mixmod.org                                                                                               
 ***************************************************************************/
 #include "XEMClusteringOutput.h"
+#include "XEMClusteringModelOutput.h"
+#include "XEMModel.h"
+#include "XEMBICCriterion.h"
+#include "XEMICLCriterion.h"
+#include "XEMNECCriterion.h"
 
-
+#include <algorithm>
 
 //--------------------
 // Default Constructor
 //--------------------
-XEMClusteringOutput::XEMClusteringOutput(){
-
-}
+XEMClusteringOutput::XEMClusteringOutput(std::vector<XEMCriterionName> const & criterionName) : _criterionName(criterionName)
+{}
 
   
 //-----------------
 //  Copy constructor
 //-----------------
-XEMClusteringOutput::XEMClusteringOutput(const XEMClusteringOutput & cOutput){
-  _clusteringModelOutput.resize(cOutput.getNbClusteringModelOutput());
-  for (int64_t i=0; i<_clusteringModelOutput.size() ; i++){
-    XEMClusteringModelOutput * cMOuput = cOutput.getClusteringModelOutput(i);
-    XEMEstimation * estimation = cMOuput->getEstimation();
-    _clusteringModelOutput[i] = new XEMClusteringModelOutput(estimation);
-  }
-  _error = cOutput.getError(); 
-}
+XEMClusteringOutput::XEMClusteringOutput( const XEMClusteringOutput & cOutput )
+                                        : _clusteringModelOutput(cOutput.getClusteringModelOutput())
+                                        , _criterionName(cOutput.getCriterionName())
+{}
   
 
 //---------------------------
 // Initialisation Constructor
 //---------------------------
-XEMClusteringOutput::XEMClusteringOutput(vector<XEMEstimation*> & estimations){
-  int64_t sizeEstimation = estimations.size();
+XEMClusteringOutput::XEMClusteringOutput( std::vector<XEMModel*> const & estimations
+                                        , std::vector<XEMCriterionName> const & criterionName
+                                        )
+                                        : _clusteringModelOutput(estimations.size())
+                                        , _criterionName(criterionName)
+{
+  // get a constant of the number of estimations
+  const int64_t sizeEstimation = estimations.size();
   
-  _clusteringModelOutput.resize(sizeEstimation);
-  for (int64_t i=0; i<sizeEstimation; i++){
+  // loop over the estimations
+  for (unsigned int i=0; i<sizeEstimation; i++){
     _clusteringModelOutput[i] = new XEMClusteringModelOutput(estimations[i]);
   }
-  _error = noError; // TODO
   
 }
 
@@ -67,21 +71,34 @@ XEMClusteringOutput::XEMClusteringOutput(vector<XEMEstimation*> & estimations){
 //-----------
 // Destructor
 //-----------
-XEMClusteringOutput::~XEMClusteringOutput(){
-  for (int64_t i=0; i<_clusteringModelOutput.size(); i++){
+XEMClusteringOutput::~XEMClusteringOutput()
+{
+  for (unsigned int i=0; i<_clusteringModelOutput.size(); i++){
     delete _clusteringModelOutput[i];
   }
 }
 
+
+//---------------------
+/// Comparison operator
+//---------------------
+bool XEMClusteringOutput::operator ==(const XEMClusteringOutput & output) const{
+  
+  for (unsigned int i=0; i<_clusteringModelOutput.size(); i++){
+    if ( !(_clusteringModelOutput[i] == output.getClusteringModelOutput(i)) )
+      return false;
+  }
+  return true;
+}
 
 //--------------------
 // XEMClusteringOutput
 //--------------------
 bool XEMClusteringOutput::atLeastOneEstimationNoError() const{
   bool res = false;
-  int64_t i=0;
+  unsigned int i=0;
   while (res==false && i<_clusteringModelOutput.size()){
-    if (_clusteringModelOutput[i]->getStrategyRunError() == noError ){
+    if ( _clusteringModelOutput[i]->getStrategyRunError() == noError ){
       res = true;
     }
     i++;
@@ -89,12 +106,23 @@ bool XEMClusteringOutput::atLeastOneEstimationNoError() const{
   return res;
 }
 
+const int XEMClusteringOutput::getNbEstimationWithNoError() const{
+  int n=getNbClusteringModelOutput();
+  for( unsigned int i=0; i<_clusteringModelOutput.size(); i++ ){
+    if (_clusteringModelOutput[i]->getStrategyRunError() ){ --n; }
+  }
+  return n;
+}
 
 //-----
 // sort
 //-----
 void XEMClusteringOutput::sort(XEMCriterionName criterionName){
- int64_t i,j;
+  
+  // sort
+  std::sort(_clusteringModelOutput.begin(), _clusteringModelOutput.end(), SortByCriterion(criterionName));
+/*
+  int64_t i,j;
  i=0;
  
  //find indexCriterion
@@ -173,6 +201,7 @@ void XEMClusteringOutput::sort(XEMCriterionName criterionName){
       _clusteringModelOutput[bestIndex] = tmp;
     }
   }
+  */
 //    cout<<"Apres le tri - size : "<<_clusteringModelOutput.size()<<endl;
 //      cout<<((_clusteringModelOutput[0]->_estimation->getCriterionOutput())[indexCriterion])->_criterionName<<endl;
 //    for (i=0; i<_clusteringModelOutput.size(); i++){
@@ -222,15 +251,13 @@ void XEMClusteringOutput::sort(XEMCriterionName criterionName){
 }
 
 
-
-
 void XEMClusteringOutput::editFile() const{
   //TODO 
 }
 
 
 void XEMClusteringOutput::setClusteringModelOutput(vector<XEMClusteringModelOutput *> & clusteringModelOutput){
-  for (int64_t i=0; i<_clusteringModelOutput.size(); i++){
+  for (unsigned int i=0; i<_clusteringModelOutput.size(); i++){
     delete _clusteringModelOutput[i];
   }
   _clusteringModelOutput = clusteringModelOutput;

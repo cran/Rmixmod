@@ -22,8 +22,9 @@
 
     All informations available on : http://www.mixmod.org                                                                                               
 ***************************************************************************/
-#include "XEMBinarySample.h"
 
+#include "XEMBinarySample.h"
+#include "XEMUtil.h"
 
 
 //------------

@@ -44,7 +44,15 @@ public:
 	
 	/// Destructor
 	~XEMError();
-
+  
+  // setter
+  inline void setError(XEMErrorType const & errorType)
+  { _errorType = errorType; }
+  
+  // getter
+  inline XEMErrorType const getError() const
+  { return _errorType;  }
+  
 #ifdef DEBUG
 	/// Run method
 	void run(ostream & flux=std::cout);

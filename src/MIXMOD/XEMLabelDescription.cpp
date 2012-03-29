@@ -24,12 +24,20 @@
 ***************************************************************************/
 
 #include "XEMLabelDescription.h"
+#include "XEMLabel.h"
+#include "XEMModel.h"
+#include "XEMWeightColumnDescription.h"
+#include "XEMQualitativeColumnDescription.h"
+#include "XEMQuantitativeColumnDescription.h"
+#include "XEMIndividualColumnDescription.h"
+
+#include <algorithm>
 
 //------------
 // Constructor by default
 //------------
 XEMLabelDescription::XEMLabelDescription() : XEMDescription(){
-  _label = NULL;
+  _label = NULL; _nbCluster = 0;
 }
 
 
@@ -37,30 +45,50 @@ XEMLabelDescription::XEMLabelDescription() : XEMDescription(){
 // ---------------------------
 //constructor by initilization
 // ---------------------------
-XEMLabelDescription::XEMLabelDescription(int64_t nbSample, int64_t nbColumn, std::vector< XEMColumnDescription* > columnDescription, FormatNumeric::XEMFormatNumericFile format, string filename, string infoName):XEMDescription(nbSample, nbColumn, columnDescription, format, filename,  infoName){
+XEMLabelDescription::XEMLabelDescription( int64_t nbSample
+                                        , int64_t nbColumn
+                                        , std::vector< XEMColumnDescription* > columnDescription
+                                        , FormatNumeric::XEMFormatNumericFile format
+                                        , std::string filename
+                                        , std::string infoName
+                                        )
+                                        : XEMDescription(nbSample, nbColumn, columnDescription, format, filename,  infoName)
+{
   _label = createLabel();
-//   _infoName = "infoName";
-//   _nbSample = nbSample;
-//   _nbColumn = 1;
-//   _fileName = filename;
-//   _format = format;
-//   _columnDescription.resize(1);
-//   _columnDescription[0] = new XEMQualitativeColumnDescription(0, nbCluster);
-//   string name("Label");
-//   _columnDescription[0]->setName(name);
-//   _label = new XEMLabel(_nbSample);
-//   ifstream fi(filename.c_str(), ios::in);
-//   if (! fi.is_open()){
-//     throw wrongLabelFileName;
-//   }
-//   _label->input(fi, nbCluster);
+  // get the number of cluster
+  _nbCluster = *max_element(_label->getLabel().begin(), _label->getLabel().end());
 }
+
+//---------------------------------
+// constructor from a vector of int
+//----------------------------------
+XEMLabelDescription::XEMLabelDescription( int64_t nbSample
+                                        , std::vector<int64_t> vLabel
+                                        )
+                                        : XEMDescription()
+{
+  // get the number of cluster
+  _nbCluster = *max_element(vLabel.begin(), vLabel.end());
+  _infoName = "Label";
+  _nbSample = nbSample;
+  _nbColumn = 1;
+  _fileName = ""; 
+  _format = FormatNumeric::txt;
+  _columnDescription.resize(1);
+  _columnDescription[0] = new XEMQualitativeColumnDescription(0, _nbCluster);
+  string name("Label");
+  _columnDescription[0]->setName(name);
+
+	_label = new XEMLabel(vLabel.size());
+	_label->setLabel(vLabel, vLabel.size());
+}
+		
 
 
 //-------------------------------------
 // Constructor after an estimation->run
 //--------------------------------------
-XEMLabelDescription::XEMLabelDescription(XEMEstimation * estimation) : XEMDescription(){
+XEMLabelDescription::XEMLabelDescription(XEMModel * estimation) : XEMDescription(){
    if (estimation){
     _infoName = "Label";
     _nbSample = estimation->getNbSample();
@@ -72,6 +100,7 @@ XEMLabelDescription::XEMLabelDescription(XEMEstimation * estimation) : XEMDescri
     string name("Label");
     _columnDescription[0]->setName(name);
     _label = new XEMLabel(estimation);
+    _nbCluster = estimation->getNbCluster();
   }
   else{
     throw nullPointerError;
@@ -103,13 +132,33 @@ XEMLabelDescription & XEMLabelDescription::operator=( XEMLabelDescription & labe
   _nbSample = labelDescription._nbSample;
   _nbColumn = labelDescription._nbColumn;
   _columnDescription.resize(_nbColumn);
+  _nbCluster = labelDescription._nbCluster;
   _label = new XEMLabel(*(labelDescription.getLabel()));
+  return *this;
+}
+
+//---------------------
+/// Comparison operator
+//---------------------
+bool XEMLabelDescription::operator ==(const XEMLabelDescription & labelDescription) const{
+  if ( _fileName != labelDescription._fileName ) return false;
+  if ( _format != labelDescription._format ) return false;
+  if ( _infoName != labelDescription._infoName ) return false;
+  if ( _nbSample != labelDescription._nbSample ) return false;
+  if ( _nbColumn != labelDescription._nbColumn ) return false;
+  for (int64_t i = 0; i<_nbColumn; ++i){
+    if ( _columnDescription[i]->getName() != labelDescription.getColumnDescription(i)->getName() ) return false;
+  }
+  if ( _nbCluster != labelDescription._nbCluster ) return false;
+  if ( !(_label == labelDescription.getLabel()) ) return false;
+  return true;
 }
 
 //------------
 // Destructor
 //------------
 XEMLabelDescription::~XEMLabelDescription(){  
+  if (_label) delete _label;
 }
 
 

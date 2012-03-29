@@ -23,9 +23,7 @@
     All informations available on : http://www.mixmod.org                                                                                               
 ***************************************************************************/
 #include "XEMEMAlgo.h"
-#include "XEMUtil.h" 
-#include <string>
-#include <sstream>
+#include "XEMModel.h"
 
 //-----------
 //Constructor

@@ -22,27 +22,18 @@
 
     All informations available on : http://www.mixmod.org                                                                                               
 ***************************************************************************/
+
 #include "XEMCriterion.h"
 
 
 //-----------
 //Constructor
 //-----------
-XEMCriterion::XEMCriterion(){
-}
-
-
-
-
+XEMCriterion::XEMCriterion(XEMModel * model) : _model(model)
+{}
 
 //----------
 //Destructor
 //----------
-XEMCriterion::~XEMCriterion(){
-}
-
-
-
-
-
-
+XEMCriterion::~XEMCriterion()
+{}

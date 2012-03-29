@@ -22,11 +22,12 @@
 
     All informations available on : http://www.mixmod.org                                                                                               
 ***************************************************************************/
+
 #include "XEMInput.h"
-#include "XEMGaussianData.h"
-#include "XEMBinaryData.h"
-#include "XEMError.h"
+#include "XEMData.h"
+#include "XEMPartition.h"
 #include "XEMLabelDescription.h"
+#include "XEMModelType.h"
 
 //--------------------
 // Default Constructor
@@ -35,8 +36,8 @@ XEMInput::XEMInput(){
   _nbSample         = 0;
   _pbDimension      = 0;
   _nbCluster.clear();
-  _knownPartition   = NULL;
-  _labelDescription = NULL;
+  //_knownPartition   = NULL;
+  _knownLabelDescription = NULL;
   _finalized        = false;
   //_dataDescription will be created by default XEMDataDescription constructor
 }
@@ -45,7 +46,8 @@ XEMInput::XEMInput(){
 //-----------------
 // Copy Constructor
 //-----------------
-XEMInput::XEMInput(const XEMInput & input){
+XEMInput::XEMInput( const XEMInput & input )
+{
   _finalized = input._finalized;
 
   _nbSample      = input._nbSample;
@@ -60,12 +62,12 @@ XEMInput::XEMInput(const XEMInput & input){
     _knownPartition = new XEMPartition(input._knownPartition);
   }
   
-  if (!_labelDescription)
-    delete _labelDescription;
+  if (!_knownLabelDescription)
+    delete _knownLabelDescription;
   
-  _labelDescription = NULL;
-  if (input._labelDescription != NULL){
-    _labelDescription = new XEMLabelDescription(*input._labelDescription);
+  _knownLabelDescription = NULL;
+  if (input._knownLabelDescription != NULL){
+    _knownLabelDescription = new XEMLabelDescription(*input._knownLabelDescription);
   }
   
   _criterionName = input._criterionName;
@@ -78,14 +80,14 @@ XEMInput::XEMInput(const XEMInput & input){
 //---------------------------
 // Initialisation Constructor
 //---------------------------
-XEMInput::XEMInput(const vector<int64_t> & iNbCluster, const XEMDataDescription & iDataDescription){
+XEMInput::XEMInput(const std::vector<int64_t> & iNbCluster, const XEMDataDescription & iDataDescription){
   cloneInitialisation(iNbCluster, iDataDescription);
 }
 
 //---------------------
 // Clone Initialisation 
 //---------------------
-void XEMInput::cloneInitialisation(const vector<int64_t> & iNbCluster, const XEMDataDescription & iDataDescription){
+void XEMInput::cloneInitialisation(const std::vector<int64_t> & iNbCluster, const XEMDataDescription & iDataDescription){
   _finalized     = false;
 
   _nbSample      = iDataDescription.getNbSample();
@@ -96,7 +98,7 @@ void XEMInput::cloneInitialisation(const vector<int64_t> & iNbCluster, const XEM
   _dataDescription = iDataDescription;
   
   _knownPartition   = NULL;
-  _labelDescription   = NULL;
+  _knownLabelDescription   = NULL;
   _criterionName.push_back(defaultCriterionName);
   
   if ( _dataDescription.isBinaryData()==false ){
@@ -121,13 +123,15 @@ XEMInput::XEMInput(XEMInput * originalInput, XEMCVBlock & learningBlock){
 // Destructor
 //-----------
 XEMInput::~XEMInput(){
-  if (!_knownPartition){
-    delete _knownPartition;
+   if (!_knownPartition){
+     delete _knownPartition;
+   }
+  if (!_knownLabelDescription){
+    delete _knownLabelDescription;
   }
-  if (!_labelDescription){
-    delete _labelDescription;
+  for (unsigned int i=0; i<_modelType.size(); i++){
+    delete _modelType[i];
   }
-  
 }
 
 
@@ -140,10 +144,10 @@ XEMInput::~XEMInput(){
   
 //------ Criterion  ----//
 
-//getCriterionName[i]
+//getCriterion[i]
 //-------------------
-XEMCriterionName XEMInput::getCriterionName(int64_t index) const{
-  if (index>=0 && index<_criterionName.size()){
+XEMCriterionName XEMInput::getCriterionName(unsigned int index) const{
+  if (index<_criterionName.size()){
     return _criterionName[index];
   }
   else{
@@ -151,37 +155,10 @@ XEMCriterionName XEMInput::getCriterionName(int64_t index) const{
   }
 }
 
-
-//setCriterionName
-//----------------
-void XEMInput::setCriterionName(XEMCriterionName criterionName, int64_t index){
-  if (index>=0 && index<_criterionName.size()){
-    _criterionName[index] = criterionName;
-  }
-  else{
-    throw wrongCriterionPositionInSet;
-  }
-  _finalized = false;
-}
-
-
-// insertCriterionName
-//-----------------
-void XEMInput::insertCriterionName(XEMCriterionName criterionName, int64_t index){
-  if (index>=0 && index<=_criterionName.size()){
-    _criterionName.insert (_criterionName.begin()+index , criterionName);
-  }
-  else{
-    throw wrongCriterionPositionInInsert;
-  }
-  _finalized = false;
-}
-
-
 // removeCriterionName
 //--------------------
-void XEMInput::removeCriterionName(int64_t index){
-  if (index>=0 && index<_criterionName.size()){
+void XEMInput::removeCriterion(unsigned int index){
+  if (index<_criterionName.size()){
     _criterionName.erase(_criterionName.begin()+index);
   }
   else{
@@ -191,16 +168,12 @@ void XEMInput::removeCriterionName(int64_t index){
 }
 	
 
-
-
-
-
 //------ modelType  ----//
 
 //getModelType[i]
 //-------------------
-XEMModelType * XEMInput::getModelType(int64_t index) const{
-  if (index>=0 && index<_modelType.size()){
+XEMModelType * XEMInput::getModelType(unsigned int index) const{
+  if (index<_modelType.size()){
     return _modelType[index];
   }
   else{
@@ -208,11 +181,21 @@ XEMModelType * XEMInput::getModelType(int64_t index) const{
   }
 }
 
+/// setModel
+void XEMInput::setModel(std::vector<XEMModelName> const & modelName){
+  // resize vector
+  _modelType.resize(modelName.size());
+  for (unsigned int iModel=0; iModel<_modelType.size(); iModel++){
+    // copy vector contents
+    _modelType[iModel] = new XEMModelType(modelName[iModel]);
+  }
+}
 
 //setModelType
 //----------------
-void XEMInput::setModelType(const XEMModelType * modelType, int64_t index){
-  if (index>=0 && index<_modelType.size()){
+void XEMInput::setModelType(const XEMModelType * modelType, unsigned int index){
+  if (index<_modelType.size()){
+    if ( _modelType[index] ) delete _modelType[index];
     _modelType[index] = new XEMModelType(*modelType);
   }
   else{
@@ -224,8 +207,9 @@ void XEMInput::setModelType(const XEMModelType * modelType, int64_t index){
 
 // insertModelType
 //-----------------
-void XEMInput::insertModelType(const XEMModelType * modelType, int64_t index){
-  if (index>=0 && index<=_modelType.size()){
+void XEMInput::insertModelType(const XEMModelType * modelType, unsigned int index){
+  if (index<=_modelType.size()){
+    if ( _modelType[index] ) delete _modelType[index];
     _modelType.insert (_modelType.begin()+index , new XEMModelType(*modelType));
   }
   else{
@@ -234,11 +218,22 @@ void XEMInput::insertModelType(const XEMModelType * modelType, int64_t index){
   _finalized = false;
 }
 
+// add new model type
+void XEMInput::addModel( XEMModelName const modelName ){
+  
+  if ( (isBinaryData() && isBinary(modelName)) ||  (!isBinaryData() && !isBinary(modelName)) ){
+    bool found = false;
+    for ( unsigned int iModel=0; iModel<_modelType.size(); iModel++ ){
+      if ( _modelType[iModel]->getModelName() == modelName ) found = true;
+    }
+    if (!found) _modelType.push_back(new XEMModelType(modelName));
+  }
+}
 
 // removeModelType
 //--------------------
-void XEMInput::removeModelType(int64_t index){
-  if (index>=0 && index<_modelType.size()){
+void XEMInput::removeModelType(unsigned int index){
+  if (index<_modelType.size()){
     _modelType.erase(_modelType.begin()+index);
   }
   else{
@@ -257,7 +252,7 @@ void XEMInput::removeModelType(int64_t index){
 //setWeight()
 //-----------
 //TODO a enlever
-void XEMInput::setWeight(string weightFileName){
+void XEMInput::setWeight(std::string weightFileName){
   //_data->setWeight(weightFileName);
   _finalized = false;
 }
@@ -269,7 +264,7 @@ void XEMInput::setWeight(double* weight){
 }
 
 //TODO a enlever
-void XEMInput::insertWeight(string weightFileName){
+void XEMInput::insertWeight(std::string weightFileName){
   //_data->setWeight(weightFileName);
   _finalized = false;
 }
@@ -286,7 +281,7 @@ void XEMInput::removeWeight(){
 
 // setKnownPartition
 //------------------
-void XEMInput::setKnownPartition(string iFileName){
+void XEMInput::setKnownPartition(std::string iFileName){
   if (_nbCluster.size() != 1){
     throw badSetKnownPartition;
   }
@@ -307,7 +302,7 @@ void XEMInput::setKnownPartition(string iFileName){
   
 // insertKnownPartition
 //---------------------
-void XEMInput::insertKnownPartition(string iFileName){ 
+void XEMInput::insertKnownPartition(std::string iFileName){ 
   if (_nbCluster.size() != 1){
     throw badSetKnownPartition;
   }
@@ -333,19 +328,19 @@ void XEMInput::removeKnownPartition(){
   _finalized = false;
 }
 
-void XEMInput::setLabel(XEMLabelDescription & labeldescription)
+void XEMInput::setKnownLabelDescription(XEMLabelDescription & labeldescription)
 {
-    removeLabel();
+    removeKnownLabelDescription();
     
-    _labelDescription = new XEMLabelDescription(labeldescription);    
+    _knownLabelDescription = new XEMLabelDescription(labeldescription);    
 }
 
-void XEMInput::removeLabel()
+void XEMInput::removeKnownLabelDescription()
 {
-  if (!_labelDescription)
-    delete _labelDescription;
+  if (!_knownLabelDescription)
+    delete _knownLabelDescription;
   
-  _labelDescription = NULL;
+  _knownLabelDescription = NULL;
 }
 
 // --------
@@ -381,4 +376,20 @@ bool XEMInput::verif(){
   return res;
 }
 
+
+// ----------------
+// print out input
+// ----------------
+void XEMInput::edit(std::ostream & out ) const
+{
+  out << "Models : ";
+  for ( unsigned int iModel=0; iModel<_modelType.size(); iModel++ )
+    out << XEMModelNameToString(_modelType[iModel]->getModelName()) << " ";
+  out << std::endl;
+  
+  out << "Criterions : ";
+  for ( unsigned int iCriterion=0; iCriterion<_criterionName.size(); iCriterion++ )
+    out << XEMCriterionNameToString(_criterionName[iCriterion]) << " ";
+  out << std::endl;
+}
 

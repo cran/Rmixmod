@@ -23,6 +23,7 @@
     All informations available on : http://www.mixmod.org                                                                                               
 ***************************************************************************/
 #include "XEMMAPAlgo.h"
+#include "XEMModel.h"
 
 
 //------------
@@ -56,7 +57,6 @@ XEMMAPAlgo::~XEMMAPAlgo(){
 }
 
 
-
 // clone
 //------
 XEMAlgo * XEMMAPAlgo::clone(){
@@ -64,19 +64,12 @@ XEMAlgo * XEMMAPAlgo::clone(){
 }
 
 
-
-void XEMMAPAlgo::setAlgoStopName(XEMAlgoStopName * algoStopName){
-  throw internalMixmodError;
-}
-
-
-
 //---
 //run
 //---
 void XEMMAPAlgo::run(XEMModel *& model){
   _indexIteration = 0;
-  model = model;
+//  model = model;
   model->setAlgoName(MAP);
   model->MAPstep();   // MAP Step
   //cout << "\nMAP algorithm \n";

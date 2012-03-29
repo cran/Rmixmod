@@ -29,7 +29,7 @@
 
 /**
   @brief Derived class of XEMGaussianParameter for Spherical Gaussian Model(s)
-  @author F Langrognet & A Echenim
+  @author F Langrognet
   */
 
 class XEMGaussianSphericalParameter : public XEMGaussianEDDAParameter{

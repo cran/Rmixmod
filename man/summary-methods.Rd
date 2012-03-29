@@ -2,61 +2,33 @@
 \name{summary}
 \alias{summary}
 \alias{summary,GaussianParameter-method}
-\alias{summary,MixmodClustering-method}
+\alias{summary,Mixmod-method}
+\alias{summary,MixmodPredict-method}
+\alias{summary,MixmodResults-method}
 \alias{summary,MultinomialParameter-method}
-\title{Produce result summaries of a class [\code{\linkS4class{GaussianParameter}}]}
+\title{Produce result summaries of a Rmixmod class}
 \arguments{
-  \item{x}{A \code{GaussianParameter} object.}
-
-  \item{...}{further arguments passed to or from other
-  methods}
-
-  \item{x}{A \code{MixmodClustering} object.}
-
-  \item{...}{further arguments passed to or from other
-  methods}
-
-  \item{x}{A \code{MultinomialParameter} object.}
+  \item{x}{Either a \code{\linkS4class{Mixmod}} object, a
+  \code{\linkS4class{Parameter}} object or a
+  \code{\linkS4class{MixmodResults}} object.}
 
   \item{...}{further arguments passed to or from other
   methods}
 }
 \value{
   NULL. Summaries to standard out.
-
-  NULL. Summaries to standard out.
-
-  NULL. Summaries to standard out.
 }
 \description{
-  Produce result summaries of a class
-  [\code{\linkS4class{GaussianParameter}}]
-
-  Produce result summaries of a class
-  [\code{\linkS4class{MixmodClustering}}]
-
-  Produce result summaries of a class
-  [\code{\linkS4class{MultinomialParameter}}]
+  Produce result summaries of a Rmixmod class
 }
 \examples{
 data(geyser)
-xem <- mixmodClustering(geyser)
-summary(xem@parameters)
-getMethod("summary", "GaussianParameter")
-data(geyser)
-xem <- mixmodClustering(geyser)
-summary(xem)
-getMethod("summary", "MixmodClustering")
-data(birds)
-xem <- mixmodClustering(birds)
-summary(xem@parameters)
-getMethod("summary", "MultinomialParameter")
+  xem <- mixmodCluster(geyser,3)
+  summary(xem)
+  summary(xem["bestResult"])
+  summary(xem["bestResult"]["parameters"])
 }
 \seealso{
-  \code{\link{summary}}
-
-  \code{\link{summary}}
-
   \code{\link{summary}}
 }
 

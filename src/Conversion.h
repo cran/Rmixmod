@@ -10,12 +10,12 @@
 #ifndef CONVERSIONRCPP_H_
 #define CONVERSIONRCPP_H_
 
-#include "./MIXMOD/XEMClusteringOutput.h"
-#include "./MIXMOD/XEMGaussianData.h"
-#include "./MIXMOD/XEMBinaryData.h"
-
 #include <Rcpp.h>
 #include <vector>
+
+// pre-declaration
+class XEMBinaryData;
+class XEMGaussianData;
 
 namespace Conversion
 {
@@ -27,21 +27,13 @@ namespace Conversion
    * @return the Rcpp Matrix
    */
   Rcpp::NumericMatrix CMatrixToRcppMatrix(int64_t nbSample, int64_t pdDimension, double** matrix);
-  /**
-   * Convert a C 3D matrix in a Vector of Rcpp Matrix
-   * @param nbCluster number of cluster
-   * @param pdDimension number of column of the matrix
-   * @param tabNbModality number of modality for each cluster
-   * @param matrix the matrix to convert
-   * @return the Rcpp Vector
-   */
-  Rcpp::GenericVector CMatrixToVectorOfRcppMatrix(int64_t nbCluster, int64_t pdDimension, int64_t* tabNbModality, double*** matrix);
+  
   /**
    * Convert a matrix vector of vector in a Rcpp Matrix
    * @param source the matrix to convert
    * @return the Rcpp Matrix
    */
-  Rcpp::NumericMatrix XEMMatrixToRcppMatrix(vector<vector<double> > const& source);
+  Rcpp::NumericMatrix XEMMatrixToRcppMatrix(std::vector<std::vector<double> > const& source);
   /**
    * Convert a c vector in a Rcpp Vector
    * @param dim the dimension of the vector
@@ -82,9 +74,31 @@ namespace Conversion
   /**
    *  convert a numeric dataset to a XEM Binary data set
    * @param data the input data set
+   * @param factor the input factor
    * @return a pointer on a XEMBinaryData set
    */
-  XEMBinaryData * DataToXemBinaryData(Rcpp::NumericMatrix& data);
+  XEMBinaryData * DataToXemBinaryData(Rcpp::NumericMatrix& data, Rcpp::NumericVector& factor);
+  
+  /*
+   * convert a R numeric vector to a C array
+   * @param in the R object
+   * @return a pointer to a double* array
+   */
+  double * RcppVectorToCArray(Rcpp::NumericVector& in);
+  
+  /*
+   * convert a R numeric matrix to a C 2D array
+   * @param in the R object
+   * @return a pointer to a double** array
+   */
+  double ** RcppMatrixToC2DArray(Rcpp::NumericMatrix& in);
+  
+  /*
+   * convert a R numeric matrix to a C 2D array
+   * @param in the R object
+   * @return a pointer to a double** array
+   */
+  double *** RcppListOfMatrixToC3DArray(Rcpp::List& in);
 }
 
 

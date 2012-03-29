@@ -24,7 +24,9 @@
 ***************************************************************************/
 #include "XEMBinaryEkParameter.h"
 #include "XEMBinaryData.h"
+#include "XEMBinarySample.h"
 #include "XEMModel.h"
+#include "XEMRandom.h"
 
 //--------------------
 // Default constructor
@@ -82,6 +84,17 @@ XEMBinaryEkParameter::~XEMBinaryEkParameter(){
   }
 }
 
+
+//---------------------
+/// Comparison operator
+//---------------------
+bool XEMBinaryEkParameter::operator ==(const XEMBinaryEkParameter & param) const{
+  if ( !XEMBinaryParameter::operator==(param) ) return false;
+  for (int64_t k=0; k<_nbCluster; k++){
+    if ( _scatter[k] != param.getScatter()[k] ) return false;
+  }
+  return true;
+}
 
 
 //------------------------
@@ -362,6 +375,12 @@ void XEMBinaryEkParameter::inputScatter(ifstream & fi){
   throw internalMixmodError;
 }
 
+// Read Scatter in input containers
+//---------------------------
+void XEMBinaryEkParameter::inputScatter( double *** scatters ){
+  throw internalMixmodError;
+}
+
   
  double *** XEMBinaryEkParameter::scatterToArray() const{
    int64_t k,j,h;
@@ -370,12 +389,12 @@ void XEMBinaryEkParameter::inputScatter(ifstream & fi){
      tabScatter[k] = new double*[_pbDimension];
      for (j=0; j<_pbDimension; j++){
        tabScatter[k][j] = new double[_tabNbModality[j]];
-      for (h=0; h<_tabNbModality[j] ; h++){
+      for (h=1; h<=_tabNbModality[j] ; h++){
         if (h == _tabCenter[k][j]){ 
-          tabScatter[k][j][h] = _scatter[k]; 
+          tabScatter[k][j][h-1] = _scatter[k]; 
         }
         else{
-          tabScatter[k][j][h] = _scatter[k]/(_tabNbModality[j]-1); 
+          tabScatter[k][j][h-1] = _scatter[k]/(_tabNbModality[j]-1); 
         }
       }
      }

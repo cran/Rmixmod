@@ -25,16 +25,15 @@
 #ifndef XEMGENERALMATRIX_H
 #define XEMGENERALMATRIX_H
 
-
-#include "XEMUtil.h"
 #include "XEMMatrix.h"
+
+// pre-declaration
+class XEMDiagMatrix;
 
 /**
   @brief class GeneralMatrix
   @author F Langrognet & A Echenim
 */
-
-class XEMDiagMatrix;
 
 class XEMGeneralMatrix : public XEMMatrix{
 
@@ -136,7 +135,8 @@ public:
   void input(ifstream & fi);
   /// read general matrix from input file
   void input(ifstream & fi, int64_t dim);
-
+  virtual void input(double ** variances);
+  
   /// compute general matrix SVD decomposition
   void computeSVD(XEMDiagMatrix* & S, XEMGeneralMatrix* & O);
 

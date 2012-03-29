@@ -34,8 +34,8 @@
 #endif
 
 /* Need matrix applications */
-#include "../NEWMAT/newmatap.h"
-#include "../NEWMAT/newmatio.h"
+#include "NEWMAT/newmatap.h"
+#include "NEWMAT/newmatio.h"
 
 
 
@@ -47,6 +47,7 @@
 #include <ctype.h>
 #include <stdint.h>
 #include <memory>
+#include <limits>
 
 //#include <fstream.h>
 //#include <string.h>
@@ -62,6 +63,8 @@
   // 2 : param and fik, tik, zik debug
 
 #define DATA_REDUCE 1 // to activate DATA_REDUCE : 1
+
+#define RANDOMISE 1 // to activate RANDOMIZE (0 to desactive)
 
 class XEMModelType;
 class XEMMatrix;
@@ -112,14 +115,14 @@ const double defaultEpsilonInInit = 0.001;   /* default number of iterations in 
 
 const int64_t maxNbIterationInCEM_INIT = 100;  /* Maximum number of iterations of CEM in CEM_INIT */
 
-const double minOverflow = 1.e-100;          /* Minimum value for overflow                                */
-const double minUnderflow = 1.e-100;         /* Minimum value for underflow                               */
+const double minOverflow = numeric_limits<double>::min() ;          /* Minimum value for overflow                                */
+const double minUnderflow = numeric_limits<double>::min() ;         /* Minimum value for underflow                               */
 const int64_t nbMaxSelection  = 5;               /* Maximum number of selection                               */
 const int64_t maxNbOutputFiles = 52;             /* Maximum number of output Files                            */
 const int64_t nbTestOutputFiles = 25;            /* Number of output files to compare in test                 */
 const double defaultFluryEpsilon = 0.001;    /* default value for espilon in flury algorthm               */
 const int64_t maxFluryIter = 7;                  /* maximum of number of Flury iterations                     */
-const double minDeterminantValue = 1.e-100;  /* minimum value of determinant of sigma                     */
+const double minDeterminantValue = numeric_limits<double>::min() ;  /* minimum value of determinant of sigma                     */
 const double maxRelativeDiffValueTest = 1.0E-5;      /* Maximum difference between 2 value in test                */
 const double maxAbsoluteDiffValueTest = 1.0E-8;      /* Maximum difference between 2 value in test                */
 
@@ -128,7 +131,7 @@ const int64_t defaultCVnumberOfBlocks  = 10 ;   // CV
 
 const double minValueForLLandLLOne = 1.e-10;  // minimum value for LL - LLone    
 
-const int64_t int64_t_max = +9223372036854775807LL;
+const int64_t int64_t_max = numeric_limits<int64_t>::max();
 
 const int64_t nbQualitativeGraphics = 2;
 const int64_t nbQuantitativeGraphics = 3;
@@ -144,52 +147,52 @@ Ex : XEMStrategyInitName
 enum XEMCVinitBlocks{
 	CV_RANDOM = 0,     // initialize the CV blocks by random
   
-        CV_DIAG   = 1      // initialize the CV blocks by assiging 
-             /* sample 1 : for w=1 to its weight : sample 1 in block w
-              sample 2 : for w=1 to its weight : sample w1+1 in block w1+w
-              
-            Ex : 1
-            //-----
-                   ind  weight
-                    1     1
-                    2     1
-                    3     1
-                  ...
-              ind 1 -> block1
-              ind 2 -> block2
-              ...
-              ind V -> blockV
-              ind V+1->block1
-              ...  
-            
-            Ex 2 : 
-            //-----
-                ind weight
-                1     2
-                2     2
-                3     2
-                4     2
-                5     2
-            if V=4
-            ind 1 -> block1
-            ind 1 -> block2
-            ind 2 -> block3
-            ind 2 -> block4
-            ind 3 -> block1
-            ind 3 -> block2
-            ind 4 -> block3
-            ind 4 -> block4
-            ind 5 -> block1
-            ind 5 -> block2
-            
-            ->>  block 1 : ind 1 - 3 - 5
-                block 2 : ind 1 - 3 - 5
-                block 3 : ind 2 - 4
-                block 4 : ind 4 - 5
-              
-             
-             */                   
-        
+  CV_DIAG   = 1      // initialize the CV blocks by assiging 
+  /* sample 1 : for w=1 to its weight : sample 1 in block w
+     sample 2 : for w=1 to its weight : sample w1+1 in block w1+w
+      
+    Ex : 1
+    //-----
+           ind  weight
+            1     1
+            2     1
+            3     1
+          ...
+      ind 1 -> block1
+      ind 2 -> block2
+      ...
+      ind V -> blockV
+      ind V+1->block1
+      ...  
+    
+    Ex 2 : 
+    //-----
+        ind weight
+        1     2
+        2     2
+        3     2
+        4     2
+        5     2
+    if V=4
+    ind 1 -> block1
+    ind 1 -> block2
+    ind 2 -> block3
+    ind 2 -> block4
+    ind 3 -> block1
+    ind 3 -> block2
+    ind 4 -> block3
+    ind 4 -> block4
+    ind 5 -> block1
+    ind 5 -> block2
+    
+    ->>  block 1 : ind 1 - 3 - 5
+        block 2 : ind 1 - 3 - 5
+        block 3 : ind 2 - 4
+        block 4 : ind 4 - 5
+      
+     
+     */                   
+
 };
 const XEMCVinitBlocks defaultCVinitBlocks = CV_RANDOM;
 
@@ -294,6 +297,7 @@ enum XEMCriterionName {
   DCV = 4                       /* Double Cross validation criterion */
 };
 const XEMCriterionName defaultCriterionName = BIC;
+const XEMCriterionName defaultLearnCriterionName = CV;
 
 /** @enum XEMAlgoName
 @brief Enumeration of Algo type
@@ -321,7 +325,7 @@ namespace FormatNumeric
 enum XEMFormatNumericFile {
   txt = 0,         	/* Format txt (ascii)                       */
   hdf5 = 1,           	/* Format hdf5 */
-  XML = 2, 		/* Format XML         */
+  XML = 2 		/* Format XML         */
 };
 const XEMFormatNumericFile defaultFormatNumericFile = txt;
 }
@@ -337,13 +341,13 @@ namespace TypePartition
 enum XEMTypePartition {
   UNKNOWN_PARTITION = 0,
   label = 1,
-  partition = 2,
+  partition = 2
 };
 const XEMTypePartition defaultTypePartition = label;
 }
 
 struct XEMNumericPartitionFile{
-  string _fileName;
+  std::string _fileName;
   FormatNumeric::XEMFormatNumericFile _format;
   TypePartition::XEMTypePartition _type;
 };
@@ -375,9 +379,9 @@ enum XEMKeyword{
   SizeKeyword
 };
 
-string XEMKeywordToString(const XEMKeyword & keyword);
+std::string XEMKeywordToString(const XEMKeyword & keyword);
 
-bool isKeyword(string  name);
+bool isKeyword(std::string  name);
 
 
 /** @struct TWeightedIndividual
@@ -430,9 +434,9 @@ enum XEMModelName {
   Gaussian_p_Lk_Bk,
 	
 	Gaussian_pk_L_B,
- Gaussian_pk_Lk_B,
- Gaussian_pk_L_Bk,
- Gaussian_pk_Lk_Bk,
+  Gaussian_pk_Lk_B,
+  Gaussian_pk_L_Bk,
+  Gaussian_pk_Lk_Bk,
 
   /* Ellipsoidal Gaussian model: proportion fixed */
   Gaussian_p_L_C,
@@ -456,19 +460,19 @@ enum XEMModelName {
 	/*----------------*/
 	/* 16 HD models*/
 	/*----------------*/
- Gaussian_HD_p_AkjBkQkDk,
- Gaussian_HD_p_AkBkQkDk,
- Gaussian_HD_p_AkjBkQkD ,
- Gaussian_HD_p_AjBkQkD ,
- Gaussian_HD_p_AkjBQkD  , 
+  Gaussian_HD_p_AkjBkQkDk,
+  Gaussian_HD_p_AkBkQkDk,
+  Gaussian_HD_p_AkjBkQkD ,
+  Gaussian_HD_p_AjBkQkD ,
+  Gaussian_HD_p_AkjBQkD  , 
  	Gaussian_HD_p_AjBQkD  ,
  	Gaussian_HD_p_AkBkQkD ,
  	Gaussian_HD_p_AkBQkD , 
 	
 	Gaussian_HD_pk_AkjBkQkDk,
  	Gaussian_HD_pk_AkBkQkDk ,
-	Gaussian_HD_pk_AkjBkQkD,
- Gaussian_HD_pk_AjBkQkD,
+ 	Gaussian_HD_pk_AkjBkQkD,
+  Gaussian_HD_pk_AjBkQkD,
  	Gaussian_HD_pk_AkjBQkD,
  	Gaussian_HD_pk_AjBQkD ,
  	Gaussian_HD_pk_AkBkQkD,
@@ -483,18 +487,18 @@ enum XEMModelName {
 
 	/* : proportion fixed  */
 	Binary_p_E ,
- Binary_p_Ek,
- Binary_p_Ej ,
- Binary_p_Ekj,
- Binary_p_Ekjh ,
- /* : proportion free  */
- Binary_pk_E ,
- Binary_pk_Ek,
- Binary_pk_Ej ,
- Binary_pk_Ekj,
- Binary_pk_Ekjh ,
+  Binary_p_Ek,
+  Binary_p_Ej ,
+  Binary_p_Ekj,
+  Binary_p_Ekjh ,
+  /* : proportion free  */
+  Binary_pk_E ,
+  Binary_pk_Ek,
+  Binary_pk_Ej ,
+  Binary_pk_Ekj,
+  Binary_pk_Ekjh ,
  
- nbXEMModelName = 54
+  nbXEMModelName = 54
 
 };
 
@@ -780,7 +784,8 @@ enum XEMErrorType {
   errorEstimationStrategyRun, 
   wrongSortCallInXEMModelOutput,
   badFormat, 
-  ColumnTypeNotValid
+  ColumnTypeNotValid,
+  notAvailableForPrediction
 };
 
 
@@ -797,28 +802,27 @@ void XEMSVD(const Matrix& A, DiagonalMatrix& Q, Matrix& U);
 int64_t XEMRound(double d);
 
 /// convert big char of a string in low char
-void ConvertBigtoLowString(string & str);
-
+void ConvertBigtoLowString(std::string & str);
 
 
 //XEMModelNameToString
-string XEMModelNameToString(const XEMModelName & modelName);
+std::string XEMModelNameToString(const XEMModelName & modelName);
 
 //StringToXEMModelName
-XEMModelName StringToXEMModelName(const string & strModelName);
+XEMModelName StringToXEMModelName(const std::string & strModelName);
 
 //XEMErrorTypeToString
-string XEMErrorTypeToString(const XEMErrorType & errorType);
+std::string XEMErrorTypeToString(const XEMErrorType & errorType);
 
 // edit modelName
 void edit(const XEMModelName & modelName);
 
 
 //criterionNameToString
-string XEMCriterionNameToString(const XEMCriterionName & criterionName);
+std::string XEMCriterionNameToString(const XEMCriterionName & criterionName);
 
 //StringtoXEMCriterionName
-XEMCriterionName StringtoXEMCriterionName(const string & str);
+XEMCriterionName StringtoXEMCriterionName(const std::string & str);
 
 //
 
@@ -826,49 +830,39 @@ XEMCriterionName StringtoXEMCriterionName(const string & str);
 void edit(const XEMCriterionName & criterionName);
 
 
-
-
-/// editModelType
-void editModelType(ofstream & oFile, XEMModelType * modelType);
-
-
-
-
-
-
 // XEMAlgoNameToString
-string XEMAlgoNameToString(const XEMAlgoName & typeAlgo);
+std::string XEMAlgoNameToString(const XEMAlgoName & typeAlgo);
 
 //StringToAlgoName
-XEMAlgoName StringToAlgoName(const string & str);
+XEMAlgoName StringToAlgoName(const std::string & str);
 
 // edit XEMAlgoName
 void edit(const XEMAlgoName & typeAlgo);
 
 
 //XEMFormatFileToString
-string XEMFormatNumericFileToString(const FormatNumeric::XEMFormatNumericFile & formatNumericFile);
+std::string XEMFormatNumericFileToString(const FormatNumeric::XEMFormatNumericFile & formatNumericFile);
 
 //StringToXEMFormatFile
-FormatNumeric::XEMFormatNumericFile StringToXEMFormatNumericFile(const string & strFormatNumericFile);
+FormatNumeric::XEMFormatNumericFile StringToXEMFormatNumericFile(const std::string & strFormatNumericFile);
 
 //XEMTypePartitionToString
-string XEMTypePartitionToString(const TypePartition::XEMTypePartition & typePartition);
+std::string XEMTypePartitionToString(const TypePartition::XEMTypePartition & typePartition);
 
 //StringToXEMTypePartition
-TypePartition::XEMTypePartition StringToXEMTypePartition(const string & strTypePartition);
+TypePartition::XEMTypePartition StringToXEMTypePartition(const std::string & strTypePartition);
 
 //XEMStrategyInitNameToString
-string XEMStrategyInitNameToString(const XEMStrategyInitName & strategyInitName);
+std::string XEMStrategyInitNameToString(const XEMStrategyInitName & strategyInitName);
 
 //StringToStrategyInitName
-XEMStrategyInitName StringToStrategyInitName(const string & str);
+XEMStrategyInitName StringToStrategyInitName(const std::string & str);
 
 // edit XEMStrategyInitName
 void edit(const XEMStrategyInitName & strategyInitName);
 
 // XEMAlgoStopNameToString
-string XEMAlgoStopNameToString(const XEMAlgoStopName & algoStopName);
+std::string XEMAlgoStopNameToString(const XEMAlgoStopName & algoStopName);
 
 // void XEMAlgoStopName
 void edit(const XEMAlgoStopName & algoStopName);
@@ -1004,12 +998,12 @@ template<typename T> void recopyTab(T ** source, T ** destination, int64_t dim1,
 }
 
 
-void editSimpleTab(double * tab, int64_t n, string sep = " ",string before=" ", ostream & flux = cout);
-void editSimpleTab(int64_t    * tab, int64_t n, ostream & flux = cout);
+void editSimpleTab(double * tab, int64_t n, ostream & flux, std::string sep = " ",std::string before=" ");
+void editSimpleTab(int64_t    * tab, int64_t n, ostream & flux);
 
 
 
-template<typename T> void editTab(T ** tab, int64_t dim1, int64_t dim2, string sep=" ", string before="", ostream & flux=cout){
+template<typename T> void editTab(T ** tab, int64_t dim1, int64_t dim2, ostream & flux, std::string sep=" ", std::string before=""){
 	T ** p_tab = tab;
 	T *  p_tab_i;
   int64_t i, j ;
@@ -1025,22 +1019,18 @@ template<typename T> void editTab(T ** tab, int64_t dim1, int64_t dim2, string s
 }
 
 
-void editMatrix(GeneralMatrix & mat, int64_t nRows, ostream & flux = cout, string before = "");
-void editSphericalMatrix(double mat, int64_t nRows, ostream & flux = cout, string before = "");
-void editDiagMatrix(double * mat, int64_t nRows, ostream & flux = cout, string before="");
+void editMatrix(GeneralMatrix & mat, int64_t nRows, ostream & flux, std::string before = "");
+void editSphericalMatrix(double mat, int64_t nRows, ostream & flux, std::string before = "");
+void editDiagMatrix(double * mat, int64_t nRows, ostream & flux, std::string before="");
 
 // move on a file until *what* is reached
 
-void moveUntilReach(ifstream & fi, string  what="datafile");
+void moveUntilReach(ifstream & fi, std::string  what="datafile");
 
-void readTabFileName(ifstream & fi, int64_t nbNbCluster, string * tabFileName, string & keyWord);
+void readTabFileName(ifstream & fi, int64_t nbNbCluster, std::string * tabFileName, std::string & keyWord);
 
 void initToZero(double * tab,int64_t n);
 void initToZero(double * tab,int64_t n);
-
-void printShortcutModelType(const XEMModelType * const modelType,ostream & flux = cout);
-
-void printModelType(const XEMModelType * const modelType,ostream & flux = cout);
 
 const int64_t SMALL_ENOUGH_TO_USE_SELECTION_SORT = 15;
 void echange(double * tab, int64_t i1, int64_t i2);
@@ -1052,7 +1042,6 @@ int64_t partition(double * tabRandom, int64_t * tabOrder, int64_t left, int64_t 
 
 void quickSortWithOrder(double * tabRandom, int64_t * tabOrder, int64_t left, int64_t right);
 
-
 int64_t generateRandomIndex(bool * tabIndividualCanBeUsedForInitRandom, double * weight, double totalWeight);
 
 void inputCriterion(ifstream & fi,XEMCriterionName & criterionName);
@@ -1061,6 +1050,6 @@ void inputCVinitBlocks(ifstream & fi,XEMCVinitBlocks & CVinitBlocks);
 
 void inputDCVinitBlocks(ifstream & fi,XEMDCVinitBlocks & CVinitBlocks);
 
-XEMAlgo * createDefaultAlgo();
+//XEMAlgo * createDefaultAlgo();
 
 #endif

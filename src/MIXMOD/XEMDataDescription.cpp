@@ -26,6 +26,9 @@
 #include "XEMDataDescription.h"
 #include "XEMBinaryData.h"
 #include "XEMGaussianData.h"
+#include "XEMWeightColumnDescription.h"
+#include "XEMQuantitativeColumnDescription.h"
+#include "XEMQualitativeColumnDescription.h"
 
 //------------
 // Constructor by default
@@ -120,6 +123,7 @@ XEMDataDescription & XEMDataDescription::operator=(const XEMDataDescription & da
     const XEMColumnDescription * cd = dataDescription.getColumnDescription(i);
     _columnDescription[i] = cd->clone();
   }
+  return *this ; 
 }
 
 //------------
@@ -218,8 +222,6 @@ bool XEMDataDescription::isBinaryData() const{
   }
   return res;
 }
-
-
 
 
 //---------------------

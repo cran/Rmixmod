@@ -1,3 +1,4 @@
+
 /***************************************************************************
                              SRC/MIXMOD/XEMModelType.cpp  description
     copyright            : (C) MIXMOD Team - 2001-2011
@@ -67,6 +68,19 @@ XEMModelType::~XEMModelType(){
 }
 
 
+/// Comparison operator
+bool XEMModelType::operator ==(const XEMModelType & modelType) const{
+  
+  if ( _nameModel != modelType.getModelName() ) return false;
+  if ( _nbSubDimensionFree != modelType._nbSubDimensionFree ) return false;
+  if ( _subDimensionEqual != modelType._subDimensionEqual ) return false;
+  if ( _tabSubDimensionFree ){
+    for (int64_t i=0; i<_nbSubDimensionFree; i++ ){
+      if ( _tabSubDimensionFree[i] != modelType.getTabSubDimensionFreeI(i) ) return false;
+    }
+  }
+  return true;
+}
 
 
 
@@ -417,8 +431,6 @@ void XEMModelType::input(ifstream & fi, int64_t nbCluster){
 
 }
 
-
-
 // <<
 ostream & operator<<(ostream & fo, XEMModelType & modelType){
   string name = XEMModelNameToString(modelType._nameModel);
@@ -437,3 +449,503 @@ ostream & operator<<(ostream & fo, XEMModelType & modelType){
 }
 
 
+
+//-------------------------
+// printModelType Short Cut
+//-------------------------
+void XEMModelType::printShortcut(ostream & flux){
+  
+ switch (_nameModel) {
+   case (Gaussian_p_L_B) :
+   case (Gaussian_p_Lk_B) :
+   case (Gaussian_p_L_Bk) :
+   case (Gaussian_p_Lk_Bk) :
+   case (Gaussian_pk_L_B) :
+   case (Gaussian_pk_Lk_B) :
+   case (Gaussian_pk_L_Bk) :
+   case (Gaussian_pk_Lk_Bk) :
+     flux << "D" << flush;
+     break;
+   
+   case (Gaussian_p_L_C):
+   case (Gaussian_p_Lk_C):
+   case (Gaussian_p_L_D_Ak_D):
+   case (Gaussian_p_Lk_D_Ak_D):
+   case (Gaussian_p_L_Dk_A_Dk):
+   case (Gaussian_p_Lk_Dk_A_Dk):
+   case (Gaussian_p_L_Ck):
+   case (Gaussian_p_Lk_Ck):
+   case (Gaussian_pk_L_C):
+   case (Gaussian_pk_Lk_C):
+   case (Gaussian_pk_L_D_Ak_D):
+   case (Gaussian_pk_Lk_D_Ak_D):
+   case (Gaussian_pk_L_Dk_A_Dk):
+   case (Gaussian_pk_Lk_Dk_A_Dk):
+   case (Gaussian_pk_L_Ck):
+   case (Gaussian_pk_Lk_Ck):
+     flux << "G" << flush;
+     break;
+   
+   case (Gaussian_p_L_I) :
+   case (Gaussian_p_Lk_I) :
+   case (Gaussian_pk_L_I) :
+   case (Gaussian_pk_Lk_I) :
+     flux << "S" << flush;
+     break;
+   
+   // Binary models //
+   case (Binary_p_E) :
+   case (Binary_p_Ek) :
+   case (Binary_p_Ej) :
+   case (Binary_p_Ekj) :
+   case (Binary_p_Ekjh) :
+   case (Binary_pk_E) :
+   case (Binary_pk_Ek) :
+   case (Binary_pk_Ej) :
+   case (Binary_pk_Ekj) :
+   case (Binary_pk_Ekjh) :
+     flux << "B" << flush;
+     break;
+   
+   case (Gaussian_HD_pk_AkjBkQkD) :
+   case (Gaussian_HD_pk_AkjBkQkDk) :
+   case (Gaussian_HD_pk_AkjBQkD) :
+   case (Gaussian_HD_pk_AjBkQkD) :
+   case (Gaussian_HD_pk_AjBQkD) :
+   case (Gaussian_HD_pk_AkBkQkD) :
+   case (Gaussian_HD_pk_AkBkQkDk) :
+   case (Gaussian_HD_pk_AkBQkD) :
+   case (Gaussian_HD_p_AkjBkQkD) :
+   case (Gaussian_HD_p_AkjBkQkDk) :
+   case (Gaussian_HD_p_AkjBQkD) :
+   case (Gaussian_HD_p_AjBkQkD) :
+   case (Gaussian_HD_p_AjBQkD) :
+   case (Gaussian_HD_p_AkBkQkD) :
+   case (Gaussian_HD_p_AkBkQkDk) :
+   case (Gaussian_HD_p_AkBQkD) :
+     flux<< "H" << flush;
+     break;
+   
+   default :
+     throw internalMixmodError;
+ }
+}
+
+//---------------------
+// print out Model Type
+//---------------------
+void XEMModelType::print(ostream & flux) {
+   
+ switch (_nameModel) {
+ 
+   // Gaussian models //
+   case (Gaussian_p_L_B) :
+     flux<<"p_L_B         ";
+     break;
+   case (Gaussian_p_Lk_B) :
+     flux<<"p_Lk_B        ";
+     break;
+   case (Gaussian_p_L_Bk) :
+     flux<<"p_L_Bk        ";
+     break;
+   case (Gaussian_p_Lk_Bk) :
+     flux<<"p_Lk_Bk       ";
+     break;
+   case (Gaussian_pk_L_B) :
+     flux<<"pk_L_B        ";
+     break;
+   case (Gaussian_pk_Lk_B) :
+     flux<<"pk_Lk_B       ";
+     break;
+   case (Gaussian_pk_L_Bk) :
+     flux<<"pk_L_Bk       ";
+     break;
+   case (Gaussian_pk_Lk_Bk) :
+     flux<<"pk_Lk_Bk      ";
+     break;
+   case (Gaussian_p_L_C):
+     flux<<"p_L_C         ";
+     break;
+   case (Gaussian_p_Lk_C):
+     flux<<"p_Lk_C        ";
+     break;
+   case (Gaussian_p_L_D_Ak_D):
+     flux<<"p_L_D_Ak_D    ";
+     break;
+   case (Gaussian_p_Lk_D_Ak_D):
+     flux<<"p_Lk_D_Ak_D   ";
+     break;
+   case (Gaussian_p_L_Dk_A_Dk):
+     flux<<"p_L_Dk_A_Dk   ";
+     break;
+   case (Gaussian_p_Lk_Dk_A_Dk):
+     flux<<"p_Lk_Dk_A_Dk  ";
+     break;
+   case (Gaussian_p_L_Ck):
+     flux<<"p_L_Ck        ";
+     break;
+   case (Gaussian_p_Lk_Ck):
+     flux<<"p_Lk_Ck       ";
+     break;
+   case (Gaussian_pk_L_C):
+     flux<<"pk_L_C        ";
+     break;
+   case (Gaussian_pk_Lk_C):
+     flux<<"pk_Lk_C       ";
+     break;
+   case (Gaussian_pk_L_D_Ak_D):
+     flux<<"pk_L_D_Ak_D   ";
+     break;
+   case (Gaussian_pk_Lk_D_Ak_D):
+     flux<<"pk_Lk_D_Ak_D  ";
+     break;
+   case (Gaussian_pk_L_Dk_A_Dk):
+     flux<<"pk_L_Dk_A_Dk  ";
+     break;
+   case (Gaussian_pk_Lk_Dk_A_Dk):
+     flux<<"pk_Lk_Dk_A_Dk ";
+     break;
+   case (Gaussian_pk_L_Ck):
+     flux<<"pk_L_Ck       ";
+     break;
+   case (Gaussian_pk_Lk_Ck):
+     flux<<"pk_Lk_Ck      ";
+     break;
+   case (Gaussian_p_L_I) :
+     flux<<"p_L_I         ";
+     break;
+   case (Gaussian_p_Lk_I) :
+     flux<<"p_Lk_I        ";
+     break;
+   case (Gaussian_pk_L_I) :
+     flux<<"pk_L_I        ";
+     break;
+   case (Gaussian_pk_Lk_I) :
+     flux<<"pk_Lk_I       ";
+     break;
+   
+   // Binary models //
+   case (Binary_p_E) :
+     flux<<"Binary_p_E    ";
+     break;
+   case (Binary_p_Ek) :
+     flux<<"Binary_p_Ek   ";
+     break;
+   case (Binary_p_Ej) :
+     flux<<"Binary_p_Ej   ";
+     break;
+   case (Binary_p_Ekj) :
+     flux<<"Binary_p_Ekj  ";
+     break;
+   case (Binary_p_Ekjh) :
+     flux<<"Binary_p_Ekjh  ";
+     break;
+   case (Binary_pk_E) :
+     flux<<"Binary_pk_E   ";
+     break;
+   case (Binary_pk_Ek) :
+     flux<<"Binary_pk_Ek  ";
+     break;
+   case (Binary_pk_Ej) :
+     flux<<"Binary_pk_Ej  ";
+     break;
+   case (Binary_pk_Ekj) :
+     flux<<"Binary_pk_Ekj ";
+     break;
+   case (Binary_pk_Ekjh) :
+     flux<<"Binary_pk_Ekjh ";
+     break;
+   
+   //HDDA models
+   case (Gaussian_HD_pk_AkjBkQkD) :
+     flux<<"HD_pk_AkjBkQkD   ";
+     break;
+   case (Gaussian_HD_pk_AkjBkQkDk) :
+     flux<<"HD_pk_AkjBkQkDk   ";
+     break;
+   case (Gaussian_HD_pk_AkjBQkD) :
+     flux<<"HD_pk_AkjBQkD    ";
+     break;
+   case (Gaussian_HD_pk_AjBkQkD) :
+     flux<<"HD_pk_AjBkQkD    ";
+     break;
+   case (Gaussian_HD_pk_AjBQkD) :
+     flux<<"HD_pk_AjBQkD     ";
+     break;
+   case (Gaussian_HD_pk_AkBkQkD) :
+     flux<<"HD_pk_AkBkQkD    ";
+     break;
+   case (Gaussian_HD_pk_AkBkQkDk) :
+     flux<<"HD_pk_AkBkQkDk    ";
+     break;
+   case (Gaussian_HD_pk_AkBQkD) :
+     flux<<"HD_pk_AkBQkD     ";
+     break;
+   case (Gaussian_HD_p_AkjBkQkD) :
+     flux<<"HD_p_AkjBkQkD    ";
+     break;
+   case (Gaussian_HD_p_AkjBkQkDk) :
+     flux<<"HD_p_AkjBkQkDk     ";
+     break;
+   case (Gaussian_HD_p_AkjBQkD) :
+     flux<<"HD_p_AkjBQkD     ";
+     break;
+   case (Gaussian_HD_p_AjBkQkD) :
+     flux<<"HD_p_AjBkQkD     ";
+     break;
+   case (Gaussian_HD_p_AjBQkD) :
+     flux<<"HD_p_AjBQkD      ";
+     break;
+   case (Gaussian_HD_p_AkBkQkD) :
+     flux<<"HD_p_AkBkQkD     ";
+     break;
+   case (Gaussian_HD_p_AkBkQkDk) :
+     flux<<"HD_p_AkBkQkDk     ";
+     break;
+   case (Gaussian_HD_p_AkBQkD) :
+     flux<<"HD_p_AkBQkD      ";
+     break;
+   default :
+     throw internalMixmodError;
+ }
+ flux << flush;
+}
+
+//---------------
+/// editModelType
+//----------------
+void XEMModelType::edit(ostream & oFile) {
+ 
+ oFile<<"\t\t\tModel Type : ";
+ 
+ switch (_nameModel) {
+ 
+   // Gaussian models //
+   case (Gaussian_p_L_B) :
+     oFile<<"Gaussian Diagonal Model : ";
+     oFile<<"p_L_B";
+     break;
+   case (Gaussian_p_Lk_B) :
+     oFile<<"p_Lk_B";
+     break;
+     oFile<<"Gaussian Diagonal Model : ";
+   case (Gaussian_p_L_Bk) :
+     oFile<<"Gaussian Diagonal Model : ";
+     oFile<<"p_L_Bk";
+     break;
+   case (Gaussian_p_Lk_Bk) :
+     oFile<<"Gaussian Diagonal Model : ";
+     oFile<<"p_Lk_Bk";
+     break;
+   case (Gaussian_pk_L_B) :
+     oFile<<"Gaussian Diagonal Model : ";
+     oFile<<" pk_L_B";
+     break;
+   case (Gaussian_pk_Lk_B) :
+     oFile<<"Gaussian Diagonal Model : ";
+     oFile<<" pk_Lk_B";
+     break;
+   case (Gaussian_pk_L_Bk) :
+     oFile<<"Gaussian Diagonal Model : ";
+     oFile<<"pk_L_Bk";
+     break;
+   case (Gaussian_pk_Lk_Bk) :
+     oFile<<"Gaussian Diagonal Model : ";
+     oFile<<"pk_Lk_Bk";
+     break;
+   case (Gaussian_p_L_I) :
+     oFile<<"Gaussian Spherical Model : ";
+     oFile<<"p_L_I";
+     break;
+   case (Gaussian_p_Lk_I) :
+     oFile<<"Gaussian Spherical Model : ";
+     oFile<<"p_Lk_I";
+   break;
+   case (Gaussian_pk_L_I) :
+     oFile<<"Gaussian Spherical Model : ";
+     oFile<<"pk_L_I";
+     break;
+   case (Gaussian_pk_Lk_I) :
+     oFile<<"Gaussian Spherical Model : ";
+     oFile<<"pk_Lk_I";
+     break;
+   case (Gaussian_p_L_C):
+     oFile<<"Gaussian Ellipsoidal Model : ";
+     oFile<<"p_L_C";
+     break;
+   case (Gaussian_p_Lk_C):
+     oFile<<"Gaussian Ellipsoidal Model : ";
+     oFile<<"p_Lk_C";
+     break;
+   case (Gaussian_p_L_D_Ak_D):
+     oFile<<"Gaussian Ellipsoidal Model : ";
+     oFile<<"p_L_D_Ak_D";
+     break;
+   case (Gaussian_p_Lk_D_Ak_D):
+     oFile<<"Gaussian Ellipsoidal Model : ";
+     oFile<<"p_Lk_D_Ak_D";
+     break;
+   case (Gaussian_p_L_Dk_A_Dk):
+     oFile<<"Gaussian Ellipsoidal Model : ";
+     oFile<<"p_L_Dk_A_Dk";
+     break;
+   case (Gaussian_p_Lk_Dk_A_Dk):
+     oFile<<"Gaussian Ellipsoidal Model : ";
+     oFile<<"p_Lk_Dk_A_Dk";
+     break;
+   case (Gaussian_p_L_Ck):
+     oFile<<"Gaussian Ellipsoidal Model : ";
+     oFile<<"p_L_Ck";
+     break;
+   case (Gaussian_p_Lk_Ck):
+     oFile<<"Gaussian Ellipsoidal Model : ";
+     oFile<<"p_Lk_Ck";
+     break;
+   case (Gaussian_pk_L_C):
+     oFile<<"Gaussian Ellipsoidal Model : ";
+     oFile<<"pk_L_C";
+     break;
+   case (Gaussian_pk_Lk_C):
+     oFile<<"Gaussian Ellipsoidal Model : ";
+     oFile<<"pk_Lk_C";
+     break;
+   case (Gaussian_pk_L_D_Ak_D):
+     oFile<<"Gaussian Ellipsoidal Model : ";
+     oFile<<"pk_L_D_Ak_D";
+     break;
+   case (Gaussian_pk_Lk_D_Ak_D):
+     oFile<<"Gaussian Ellipsoidal Model : ";
+     oFile<<"pk_Lk_D_Ak_D";
+     break;
+   case (Gaussian_pk_L_Dk_A_Dk):
+     oFile<<"Gaussian Ellipsoidal Model : ";
+     oFile<<"pk_L_Dk_A_Dk";
+     break;
+   case (Gaussian_pk_Lk_Dk_A_Dk):
+     oFile<<"Gaussian Ellipsoidal Model : ";
+     oFile<<"pk_Lk_Dk_A_Dk";
+     break;
+   case (Gaussian_pk_L_Ck):
+     oFile<<"Gaussian Ellipsoidal Model : ";
+     oFile<<"pk_L_Ck";
+     break;
+   case (Gaussian_pk_Lk_Ck):
+     oFile<<"Gaussian Ellipsoidal Model : ";
+     oFile<<"pk_Lk_Ck";
+     break;
+   
+   // Binary models //
+   case (Binary_p_E):
+     oFile<<"Binary Model : ";
+     oFile<<"Binary_p_E";
+     break;
+   case (Binary_p_Ek):
+     oFile<<"Binary Model : ";
+     oFile<<"Binary_p_Ek";
+     break;
+   case (Binary_p_Ej):
+     oFile<<"Binary Model : ";
+     oFile<<"Binary_p_Ej";
+     break;
+   case (Binary_p_Ekj):
+     oFile<<"Binary Model : ";
+     oFile<<"Binary_p_Ekj";
+     break;
+   case (Binary_p_Ekjh):
+     oFile<<"Binary Model : ";
+     oFile<<"Binary_p_Ekjh";
+     break;
+   case (Binary_pk_E):
+     oFile<<"Binary Model : ";
+     oFile<<"Binary_pk_E";
+     break;
+   case (Binary_pk_Ek):
+     oFile<<"Binary Model : ";
+     oFile<<"Binary_pk_Ek";
+     break;
+   case (Binary_pk_Ej):
+     oFile<<"Binary Model : ";
+     oFile<<"Binary_pk_Ej";
+     break;
+   case (Binary_pk_Ekj):
+     oFile<<"Binary Model : ";
+     oFile<<"Binary_pk_Ekj";
+     break;
+   case (Binary_pk_Ekjh):
+     oFile<<"Binary Model : ";
+     oFile<<"Binary_pk_Ekjh";
+      break;
+   
+   case (Gaussian_HD_pk_AkjBkQkD) :
+     oFile<<"HD Model : ";
+     oFile<<"Gaussian_HD_pk_AkjBkQkD";
+     break;
+   case (Gaussian_HD_pk_AkjBkQkDk) :
+     oFile<<"HD Model : ";
+     oFile<<"Gaussian_HD_pk_AkjBkQkDk";
+     break;
+   case (Gaussian_HD_pk_AkjBQkD) :
+     oFile<<"HD Model : ";
+     oFile<<"Gaussian_HD_pk_AkjBQkD";
+     break;
+   case (Gaussian_HD_pk_AjBkQkD) :
+     oFile<<"HD Model : ";
+     oFile<<"Gaussian_HD_pk_AjBkQkD";
+     break;
+   case (Gaussian_HD_pk_AjBQkD) :
+     oFile<<"HD Model : ";
+     oFile<<"Gaussian_HD_pk_AjBQkD";
+     break;
+   case (Gaussian_HD_pk_AkBkQkD) :
+     oFile<<"HD Model : ";
+     oFile<<"Gaussian_HD_pk_AkBkQkD";
+     break;
+   case (Gaussian_HD_pk_AkBkQkDk) :
+     oFile<<"HD Model : ";
+     oFile<<"Gaussian_HD_pk_AkBkQkDk";
+     break;
+   case (Gaussian_HD_pk_AkBQkD) :
+     oFile<<"HD Model : ";
+     oFile<<"Gaussian_HD_pk_AkBQkD";
+     break;
+   case (Gaussian_HD_p_AkjBkQkD) :
+     oFile<<"HD Model : ";
+     oFile<<"Gaussian_HD_p_AkjBkQkD";
+     break;
+   case (Gaussian_HD_p_AkjBkQkDk) :
+     oFile<<"HD Model : ";
+     oFile<<"Gaussian_HD_p_AkjBkQkDk";
+     break;
+   case (Gaussian_HD_p_AkjBQkD) :
+     oFile<<"HD Model : ";
+     oFile<<"Gaussian_HD_p_AkjBQkD";
+     break;
+   case (Gaussian_HD_p_AjBkQkD) :
+     oFile<<"HD Model : ";
+     oFile<<"Gaussian_HD_p_AjBkQkD";
+     break;
+   case (Gaussian_HD_p_AjBQkD) :
+     oFile<<"HD Model : ";
+     oFile<<"Gaussian_HD_p_AjBQkD";
+     break;
+   case (Gaussian_HD_p_AkBkQkD) :
+     oFile<<"HD Model : ";
+     oFile<<"Gaussian_HD_p_AkBkQkD";
+     break;
+   case (Gaussian_HD_p_AkBkQkDk) :
+     oFile<<"HD Model : ";
+     oFile<<"Gaussian_HD_p_AkBkQkDk";
+     break;
+   case (Gaussian_HD_p_AkBQkD) :
+     oFile<<"HD Model : ";
+     oFile<<"Gaussian_HD_p_AkBQkD";
+     break;
+   
+   default :
+     oFile<<"Model Type Error";
+ }
+ oFile<<endl;
+ oFile<<"\t\t\t----------"<<endl<<endl;
+ 
+ }
+ 

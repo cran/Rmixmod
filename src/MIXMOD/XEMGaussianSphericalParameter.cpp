@@ -27,6 +27,7 @@
 #include "XEMGaussianEDDAParameter.h"
 #include "XEMGaussianData.h"
 #include "XEMModel.h"
+#include "XEMModelType.h"
 
 #include "XEMSphericalMatrix.h"
 

@@ -2,11 +2,15 @@
 \alias{mixmodMultinomialModel}
 \title{Create an instance of the [\code{\linkS4class{MultinomialModel}}] class}
 \usage{
-  mixmodMultinomialModel(free.proportions = TRUE,
-  equal.proportions = TRUE, variable.independency,
-  component.independency)
+  mixmodMultinomialModel(listModels = NULL,
+    free.proportions = TRUE, equal.proportions = TRUE,
+    variable.independency = NULL,
+    component.independency = NULL)
 }
 \arguments{
+  \item{listModels}{a list a character containing a list of
+  models. It is optional.}
+
   \item{free.proportions}{logical to include models with
   free proportions. Default is TRUE.}
 
@@ -61,10 +65,13 @@
 }
 \examples{
 mixmodMultinomialModel()
-mixmodMultinomialModel(equal.proportions=TRUE)
+  mixmodMultinomialModel(equal.proportions=TRUE)
+  mixmodMultinomialModel( listModels=c("Binary_pk_E","Binary_p_E") )
 }
 \author{
-  Remi Lebret \email{remi.lebret@math.univ-lille1.fr}
+  Remi Lebret and Serge Iovleff and Florent Langrognet,
+  with contributions from C. Biernacki and G. Celeux and G.
+  Govaert \email{contact@mixmod.org}
 }
 \references{
   C. Biernacki, G. Celeux, G. Govaert, F. Langrognet.

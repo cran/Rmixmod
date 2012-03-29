@@ -26,7 +26,10 @@
 #include "XEMGaussianGeneralParameter.h"
 #include "XEMUtil.h"
 #include "XEMModel.h"
+#include "XEMModelType.h"
 #include "XEMGaussianData.h"
+#include "XEMGaussianSample.h"
+#include "XEMPartition.h"
 
 #include "XEMMatrix.h"
 #include "XEMDiagMatrix.h"
@@ -143,6 +146,19 @@ XEMGaussianParameter::~XEMGaussianParameter(){
     _tabSigma = NULL;
   }*/
   
+}
+
+//---------------------
+/// Comparison operator
+//---------------------
+bool XEMGaussianParameter::operator ==(const XEMGaussianParameter & param) const{
+  if ( !XEMParameter::operator==(param) ) return false;
+  for (int64_t k=0; k<_nbCluster; k++){
+    for (int64_t  j=0; j<_pbDimension; j++){
+      if ( _tabMean[k][j] != param.getTabMean()[k][j] ) return false;
+    }
+  }
+  return true;
 }
 
 //------------------------

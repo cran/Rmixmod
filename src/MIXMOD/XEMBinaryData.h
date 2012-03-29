@@ -25,12 +25,11 @@
 #ifndef XEMBINARYDATA_H
 #define XEMBINARYDATA_H
 
-#include "XEMUtil.h"
-#include "XEMPartition.h"
 #include "XEMData.h"
-#include "XEMBinarySample.h"
-#include "XEMOldInput.h"
 
+// pre-declaration
+class XEMPartition;
+class XEMBinarySample;
 
 /**
   @brief Base class for Binary Data
@@ -68,30 +67,30 @@ public:
 
 
   
-  void input(const XEMDataDescription & dataDescription);
+  virtual void input(const XEMDataDescription & dataDescription);
   
   /** @brief copy
       @return A copy of data
   */
-  XEMData * clone() const;
+  virtual XEMData * clone() const;
 
   /**  @brief Copy
        @return A copy data matrix
   */
-  XEMSample ** cloneMatrix();
+  virtual XEMSample ** cloneMatrix();
 
   /** @brief Read data from binary data file
       @param fi Binary Data file to read
   */
-  void input(ifstream & fi);
+  virtual void input(ifstream & fi);
 
   /** @brief Write binary data in output file
       @param fo Output file to write into
   */
-  void output(ostream & fo);
+  virtual void output(ostream & fo);
 
   
-  bool verify()const;
+  virtual bool verify()const;
   
   /** @brief Get matrix of data Sample
       @return A vector of XEMSample
@@ -127,10 +126,6 @@ protected :
 
 inline  XEMSample ** XEMBinaryData::getDataMatrix() const{
   return _matrix;
-}
-
-inline  int64_t * XEMBinaryData::getDataTabValue(int64_t idxSample) const{
-  return ((XEMBinarySample*)_matrix[idxSample])->getTabValue();
 }
 
 inline  int64_t * XEMBinaryData::getTabNbModality() const{

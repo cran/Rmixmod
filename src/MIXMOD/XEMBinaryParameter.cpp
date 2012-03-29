@@ -25,7 +25,10 @@
 #include "XEMBinaryParameter.h"
 #include "XEMBinaryEkjhParameter.h"
 #include "XEMBinaryData.h"
+#include "XEMBinarySample.h"
 #include "XEMModel.h"
+#include "XEMModelType.h"
+#include "XEMPartition.h"
 #include "XEMRandom.h"
 
 
@@ -162,6 +165,25 @@ XEMBinaryParameter::~XEMBinaryParameter(){
     _tabNbModality = NULL;
   }
 }
+
+
+//---------------------
+/// Comparison operator
+//---------------------
+bool XEMBinaryParameter::operator ==(const XEMBinaryParameter & param) const{
+  if ( !XEMParameter::operator==(param) ) return false;
+  if ( _totalNbModality != param.getTotalNbModality() ) return false;
+  for (int64_t k=0; k<_nbCluster; k++){
+    for (int64_t  j=0; j<_pbDimension; j++){
+      if ( _tabCenter[k][j] != param.getTabCenter()[k][j] ) return false;
+    }
+  }
+  for (int64_t j=0; j<_pbDimension; j++){
+    if ( _tabNbModality[j] != param.getTabNbModality()[j] ) return false;
+  }
+  return true;
+}
+
 
 //-------------------------
 // reset to default values
@@ -646,6 +668,32 @@ void XEMBinaryParameter::input(ifstream & fi){
     inputScatter(fi); // virtual
   }
 }
+
+//------------------------------
+// Read Parameters in input containers
+//------------------------------
+void XEMBinaryParameter::input( double * proportions
+                              , double **  centers
+                              , double *** scatters
+                              )
+{
+  int64_t j,k;
+  
+  for (k=0; k<_nbCluster; k++){
+    
+    // Proportions //
+    _tabProportion[k]=proportions[k];
+    
+    // Centers //
+    for (j=0; j<_pbDimension; j++){
+      _tabCenter[k][j]=centers[k][j];
+    }
+    
+    // Scatters //
+    inputScatter(scatters); // virtual
+  }
+}
+
 
 
 

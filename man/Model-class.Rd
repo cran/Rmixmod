@@ -5,19 +5,13 @@
   This class defines the Mixmod models.
 }
 \details{
-  \describe{
-
-  \item{listModels}{character containing a list of models.}
-
-  \item{free.proportions}{logical to include models with
-  free proportions. Default is TRUE.}
-
+  \describe{ \item{listModels}{character containing a list
+  of models.} \item{free.proportions}{logical to include
+  models with free proportions. Default is TRUE.}
   \item{equal.proportions}{logical to include models with
-  equal proportions. Default is FALSE.}
-
-  }
+  equal proportions. Default is FALSE.} }
 }
-\author{
-  Remi Lebret \email{remi.lebret@math.univ-lille1.fr}
+\examples{
+getSlots("Model")
 }
 

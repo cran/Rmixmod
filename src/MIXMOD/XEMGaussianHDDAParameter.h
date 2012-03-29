@@ -28,9 +28,11 @@
 
 
 #include "XEMGaussianParameter.h"
-#include "XEMMatrix.h"
-#include "XEMGeneralMatrix.h"
-#include "XEMOldInput.h"
+
+// pre-declaration
+class XEMDiagMatrix;
+class XEMGeneralMatrix;
+class XEMSymmetricMatrix;
 
 class XEMGaussianHDDAParameter : public XEMGaussianParameter{
 

@@ -26,15 +26,13 @@
 #define XEMBinaryParameter_H
 
 #include "XEMUtil.h"
-#include "XEMRandom.h"
 #include "XEMParameter.h"
-#include "XEMPartition.h"
 
 
 
 /**
   @brief Base class for XEMBinaryParameter(s)
-  @authors  A. Echenim & F. Langrognet & Y. Vernaz
+  @authors F. Langrognet
 */
 
 class XEMBinaryParameter : public XEMParameter{
@@ -59,12 +57,15 @@ public :
 
   /// Constructor
   XEMBinaryParameter(const XEMBinaryParameter * iParameter);
-
   
   
   /// Destructor
   virtual ~XEMBinaryParameter();
-
+  
+	
+  /// Comparison operator
+  virtual bool operator ==(const XEMBinaryParameter & param) const;
+	
 	
 	/// reset to default values
 	virtual void reset();
@@ -191,9 +192,15 @@ public :
   // Read Parameters in input file
   void input(ifstream & fi);
   
+  // Read Parameters in input containers
+  void input( double * proportions
+            , double **  centers
+            , double *** scatters
+            );
+  
   // Read Scatter in input file
   virtual void inputScatter(ifstream & fi) = 0;
-
+  virtual void inputScatter( double *** scatters ) = 0;
 
   /// recopie sans faire construction / destruction
   // utilis� par SMALL_EM, CEM_INIT, SEM ...

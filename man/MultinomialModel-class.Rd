@@ -6,18 +6,14 @@
   [\code{\linkS4class{Model}}] class.
 }
 \details{
-  \describe{
-
-  \item{variable.independency}{logical}
-
-  \item{component.independency}{logical}
-
-  }
+  \describe{ \item{variable.independency}{logical}
+  \item{component.independency}{logical} }
 }
 \examples{
 new("MultinomialModel")
-}
-\author{
-  Remi Lebret \email{remi.lebret@math.univ-lille1.fr}
+  new("MultinomialModel", listModels=c("Binary_pk_E","Binary_p_E") )
+  new("MultinomialModel", free.proportions=FALSE, variable.independency=TRUE )
+
+  getSlots("MultinomialModel")
 }
 

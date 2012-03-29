@@ -22,8 +22,12 @@
 
     All informations available on : http://www.mixmod.org                                                                                               
 ***************************************************************************/
-#include "XEMProbaOutput.h"
 
+#include "XEMProbaOutput.h"
+#include "XEMModel.h"
+#include "XEMBinaryModel.h"
+#include "XEMModelType.h"
+#include <vector>
 
 //------------
 // Constructor
@@ -42,19 +46,18 @@ XEMProbaOutput::XEMProbaOutput(){
 // Constructor
 //------------
 
-XEMProbaOutput::XEMProbaOutput(XEMEstimation * estimation){
-  const vector<int64_t> & correspondenceOriginDataToReduceData = estimation->getcorrespondenceOriginDataToReduceData();
+XEMProbaOutput::XEMProbaOutput(XEMModel * model){
   
   _CVLabelAvailable  = false;
   _tabCVLabel        = NULL;
-  _nbCluster         = estimation->getNbCluster();
-  XEMModel * model = estimation->getModel();
+  _nbCluster         = model->getNbCluster();
+  
   if (model == NULL){
     throw internalMixmodError;
   }
   
-  bool gaussian = correspondenceOriginDataToReduceData.empty();
-  if (gaussian){
+  bool binary = isBinary(model->getModelType()->_nameModel);
+  if (!binary){
     // gaussian case 
     _nbSample  = model->getNbSample();
     _tabLabel          = new int64_t[_nbSample];
@@ -66,6 +69,7 @@ XEMProbaOutput::XEMProbaOutput(XEMEstimation * estimation){
     _tabPostProba      = copyTab(model->getPostProba(), _nbSample, _nbCluster); // copy
   }
   else{
+    const std::vector<int64_t> & correspondenceOriginDataToReduceData = dynamic_cast<XEMBinaryModel*>(model)->getCorrespondenceOriginDataToReduceData();
     //binary case
     _nbSample = correspondenceOriginDataToReduceData.size();
     _tabLabel          = new int64_t[_nbSample];
@@ -235,7 +239,7 @@ void XEMProbaOutput::editLabel(){
 void XEMProbaOutput::editPostProba(ofstream & oFile){
   
   oFile.setf(ios::fixed, ios::floatfield);
-    editTab(_tabPostProba,_nbSample,_nbCluster,"\t","",oFile);
+    editTab(_tabPostProba,_nbSample,_nbCluster,oFile,"\t","");
  
   
 }

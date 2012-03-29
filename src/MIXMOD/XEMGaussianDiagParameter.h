@@ -26,12 +26,13 @@
 #define XEMGaussianDiagParameter_H
 
 #include "XEMGaussianEDDAParameter.h"
-#include "XEMMatrix.h"
-#include "XEMDiagMatrix.h"
+
+// pre-declaration
+class XEMDiagMatrix;
 
 /**
   @brief Derived class of XEMGaussianParameter for Spherical Gaussian Model(s)
-  @author F Langrognet & A Echenim
+  @author F Langrognet
   */
 
 class XEMGaussianDiagParameter : public XEMGaussianEDDAParameter{

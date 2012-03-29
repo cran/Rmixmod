@@ -25,18 +25,22 @@
 #ifndef XEMMODEL_H
 #define XEMMODEL_H
 
-#include  "XEMData.h"
-#include  "XEMPartition.h"
-#include  "XEMParameter.h"
-#include  "XEMStrategyInit.h"
-#include  "XEMClusteringStrategyInit.h"
-#include  "XEMOldInput.h"
-
+#include "XEMUtil.h"
+#include "XEMError.h"
 
 /**
 	  @brief Base class for Model(s)
 	  @author F Langrognet & A Echenim
 */
+
+// pre-declaration
+class XEMParameter;
+class XEMData;
+class XEMClusteringStrategyInit;
+class XEMPartition;
+class XEMSample;
+class XEMModelType;
+class XEMLabelDescription;
 
 class XEMModel{
 
@@ -48,10 +52,9 @@ public:
   /// Constructor
   XEMModel(XEMModel * iModel);
 
-
   /// Constructor
-  XEMModel(XEMModelType * modelType, int64_t  nbCluster, XEMData *& data, XEMPartition *& knownPartition);
-
+  XEMModel(XEMModelType * modelType, int64_t  nbCluster, XEMData *& data, XEMPartition * knownPartition);
+  
   /// Destructor
   virtual ~XEMModel();
 
@@ -77,14 +80,20 @@ public:
   XEMData * getData();
 
   /** @brief Selector
-      @return The known partition
+      @return The type of Error
   */
-
+  XEMErrorType const getErrorType() const;
+  
+  /** @brief Selector
+   @return The type of the model
+   */
+  XEMModelType * const & getModelType() const;
+  
   /** @brief Selector
       @return The number of samples
   */
   int64_t  getNbSample();
-
+  
   /** @brief Selector
       @return Table of Fik of each cluster : probabilitites: _fik = pk * f(xi,muk,Sk)
   */
@@ -105,7 +114,7 @@ public:
   int64_t  ** getTabZikKnown();
 
 
-double ** getTabCik();
+  double ** getTabCik();
 
   /// getTabZikKnown
   bool * getTabZiKnown();
@@ -116,7 +125,7 @@ double ** getTabCik();
   double * getTabNk();
 
   bool getDeleteData();
-	
+  
   //---------
   // compute
   //--------
@@ -219,12 +228,10 @@ double ** getTabCik();
   void Cstep();	
 
 
-
-
   //-----
   // init
   //-----
-
+  
   /// Random center initialization of the parameters of the model
   void initRANDOM(int64_t  nbTry);
 
@@ -237,27 +244,15 @@ double ** getTabCik();
 
   /// User partition initialisation of the parameters of the model
   void initUSER_PARTITION(XEMPartition * initPartition, int64_t nbTryInInit=defaultNbTryInInit);
-
-  //TODO a enlever
-  /// Initialization by EM of the parameters of the model
-  void initSMALL_EM(XEMStrategyInit * strategyInit);
-  /// Initialization by EM of the parameters of the model
-  void initSMALL_EM(XEMClusteringStrategyInit * clustreringStrategyInit);
-
-  //TODO a enlever
-  /// Initialization by CEM of the parameters of the model
-  void initCEM_INIT(XEMStrategyInit * strategyInit);
-  /// Initialization by CEM of the parameters of the model
-  void initCEM_INIT(XEMClusteringStrategyInit * clustreringStrategyInit);
-
-  //TODO a enlever
-  /// Initialization by SEM of the parameters of the model
-  void initSEM_MAX(XEMStrategyInit * strategyInit);
-  /// Initialization by SEM of the parameters of the model
-  void initSEM_MAX(XEMClusteringStrategyInit * clustreringStrategyInit);
-
-    void setAlgoName(XEMAlgoName algoName);
-
+  
+  // set name of the algorithm
+  void setParameter(XEMParameter * parameter);
+  
+  // set name of the algorithm
+  void setAlgoName(XEMAlgoName algoName);
+  
+  // set an error for the model
+  void setError(XEMErrorType errorType);
 
   /// Fix label Known
   void FixKnownPartition(XEMPartition *& y);
@@ -272,6 +267,9 @@ double ** getTabCik();
 
 protected :
 
+  /// type of the model
+  XEMModelType * _modelType;
+  
   /// Number of clusters
   int64_t  _nbCluster;
 
@@ -284,9 +282,7 @@ protected :
 
   /// parameter of model
   XEMParameter * _parameter;
-
-  /// Type of the model
-
+  
   /// Probabilitites: _fik = pk * f(xi,muk,Sk)
   /// dim : _nbSample * _nbCluster
   double ** _tabFik;
@@ -314,82 +310,81 @@ protected :
 
 	
   /// is the label zik known (fixed)
- bool * _tabZiKnown;
+  bool * _tabZiKnown;
 
 
   /// Number of points in each class
   double * _tabNk;
 
+  // name of the algorithm
   XEMAlgoName _algoName;
-
-
-private :
-//-------
-  //TODO a enlever
-  void oneRunOfSmallEM(XEMStrategyInit * strategyInit, double & logLikelihood);
-  void oneRunOfSmallEM(XEMClusteringStrategyInit * clusteringStrategyInit, double & logLikelihood);
-
+  
+  // Error handler
+  XEMError _error;
+  
 };
 
 
 //--------------
 //inline methods
 //--------------
- inline bool * XEMModel::getTabZiKnown(){
+inline bool * XEMModel::getTabZiKnown(){
   return _tabZiKnown;
- }
+}
 
- inline int64_t  ** XEMModel::getTabZikKnown(){
+inline int64_t  ** XEMModel::getTabZikKnown(){
   return _tabZikKnown;
-  }
+}
 
 
 inline double ** XEMModel::getTabCik(){
   return _tabCik;
 }
 
-  inline double ** XEMModel::getTabTik(){
-    return _tabTik;
-  }
+inline double ** XEMModel::getTabTik(){
+  return _tabTik;
+}
 
-  inline double ** XEMModel::getTabFik(){
-    return _tabFik;
-  }
+inline double ** XEMModel::getTabFik(){
+  return _tabFik;
+}
 
-  inline double * XEMModel::getTabSumF(){
-    return _tabSumF;
-  }
+inline double * XEMModel::getTabSumF(){
+  return _tabSumF;
+}
 
-  inline double * XEMModel::getTabNk(){
-    return _tabNk;
-  }
+inline double * XEMModel::getTabNk(){
+  return _tabNk;
+}
 
-  inline int64_t  XEMModel::getNbCluster(){
-   	return _nbCluster;	
-  }
+inline int64_t  XEMModel::getNbCluster(){
+  return _nbCluster;	
+}
 
-  inline XEMData * XEMModel::getData(){
-   	return _data;
-  }
-
-
-  inline XEMParameter * XEMModel::getParameter(){
-    return _parameter;
-  }
+inline XEMData * XEMModel::getData(){
+  return _data;
+}
 
 
-  inline  int64_t  XEMModel::getNbSample(){
+inline XEMParameter * XEMModel::getParameter(){
+  return _parameter;
+}
 
-   	return  _nbSample;
-  }
+inline  int64_t  XEMModel::getNbSample(){
 
+  return  _nbSample;
+}
 
-  inline double XEMModel::getLogN(){
-    return log(_data->_weightTotal);
-  }
+inline double ** XEMModel::getPostProba(){
+  return _tabTik;
+}
 
-  inline double ** XEMModel::getPostProba(){
-    return _tabTik;
-  }
+inline XEMModelType * const & XEMModel::getModelType() const{
+  return _modelType;
+}
+
+inline XEMErrorType const XEMModel::getErrorType() const{
+  return _error.getError();
+}
 
 #endif

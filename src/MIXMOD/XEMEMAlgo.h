@@ -46,15 +46,15 @@ public:
 	XEMEMAlgo(XEMAlgoStopName algoStopName, double epsilon, int64_t nbIteration);
 
 	/// Destructor
-	~XEMEMAlgo();
+	virtual ~XEMEMAlgo();
  
-    /// clone
-     XEMAlgo * clone();
+  /// clone
+  virtual XEMAlgo * clone();
         
 	/// Run method
 	virtual void run(XEMModel *& model);
         
-        const XEMAlgoName getAlgoName() const;
+  virtual const XEMAlgoName getAlgoName() const;
 };
 
 inline const XEMAlgoName XEMEMAlgo::getAlgoName() const{

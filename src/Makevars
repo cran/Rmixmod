@@ -8,21 +8,22 @@ MIXMODDIR    = ./MIXMOD
 
 MIXMODLIB    = mixmod.a
 
-#PKG_CPPFLAGS = -DNDEBUG -I$(NEWMATINCDIR)
+PKG_CPPFLAGS = -I./
 
 ## Use the R_HOME indirection to support installations of multiple R version
-PKG_LIBS = `$(R_HOME)/bin/Rscript -e "Rcpp:::LdFlags()"` -L$(NEWMATDIR) -L$(MIXMODDIR) $(MIXMODLIB)
+PKG_LIBS = `$(R_HOME)/bin/Rscript -e "Rcpp:::LdFlags()"` -L $(MIXMODDIR) $(MIXMODLIB)
 
 ##
 ## Targets
 ##
-all: newmat mixmod $(SHLIB)
+.PHONY: all mixmod
 
-newmat:
-	(cd $(NEWMATDIR) && $(MAKE) -f newmat_r.mk)
+all: $(SHLIB)
+$(SHLIB): mixmod
 
 mixmod:
+	(cd $(NEWMATDIR) && $(MAKE) -f newmat_r.mk)
 	(cd $(MIXMODDIR) && $(MAKE) -f mixmod_r.mk)
+	$(RANLIB) $(MIXMODLIB)
 
-.PHONY: newmat mixmod all 
 

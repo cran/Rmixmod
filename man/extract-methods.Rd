@@ -1,16 +1,23 @@
 \docType{methods}
 \name{[}
 \alias{[}
-\alias{[,GaussianParameter,ANY,numeric-method}
-\alias{[,MixmodClustering,ANY,numeric-method}
-\alias{[,MultinomialParameter,ANY,numeric-method}
+\alias{[,GaussianModel-method}
+\alias{[,GaussianParameter-method}
+\alias{[,MixmodCluster-method}
+\alias{[,MixmodLearn-method}
+\alias{[,MixmodPredict-method}
+\alias{[,MixmodResults-method}
+\alias{[,MultinomialModel-method}
+\alias{[,MultinomialParameter-method}
+\alias{[,Strategy-method}
+\alias{[<-,GaussianModel-method}
 \alias{[<-,GaussianParameter-method}
-\alias{[<-,GaussianParameter,ANY-method}
-\alias{[<-,MixmodClustering-method}
-\alias{[<-,MixmodClustering,ANY-method}
+\alias{[<-,MixmodCluster-method}
+\alias{[<-,MixmodLearn-method}
+\alias{[<-,MultinomialModel-method}
 \alias{[<-,MultinomialParameter-method}
-\alias{[<-,MultinomialParameter,ANY-method}
-\title{Extract parts of a [\code{\linkS4class{GaussianParameter}}] class}
+\alias{[<-,Strategy-method}
+\title{Extract parts of a Rmixmod class}
 \arguments{
   \item{x}{object from which to extract element(s) or in
   which to replace element(s).}
@@ -27,22 +34,6 @@
   for the replacement.  See drop for further details.}
 }
 \description{
-  Extract parts of a
-  [\code{\linkS4class{GaussianParameter}}] class
-
-  Replace names of [\code{\linkS4class{GaussianParameter}}]
-  class
-
-  Extract parts of a
-  [\code{\linkS4class{MixmodClustering}}] class
-
-  Replace names of [\code{\linkS4class{MixmodClustering}}]
-  class
-
-  Extract parts of a
-  [\code{\linkS4class{MultinomialParameter}}] class
-
-  Replace names of
-  [\code{\linkS4class{MultinomialParameter}}] class
+  Extract parts of a Rmixmod class
 }
 

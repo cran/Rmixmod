@@ -26,9 +26,9 @@
 #define XEMGaussianEDDAParameter_H
 
 #include "XEMGaussianParameter.h"
-#include "XEMMatrix.h"
-#include "XEMGeneralMatrix.h"
-#include "XEMOldInput.h"
+
+// pre-declaration
+class XEMMatrix;
 
 class XEMGaussianEDDAParameter : public XEMGaussianParameter{
 
@@ -52,7 +52,10 @@ public:
 
   /// Destructor
   virtual ~XEMGaussianEDDAParameter();
-
+  
+  /// Comparison operator
+  virtual bool operator ==(const XEMGaussianEDDAParameter & param) const;
+  
 	/// reset to default values
 	virtual void reset();
 
@@ -108,7 +111,10 @@ public:
 	void MStep();
 	void MAPStep();
 	virtual void input(ifstream & fi);
-	
+	virtual void input( double * proportions
+                    , double **  means
+                    , double *** variances
+                    );
 	
 	//init
 	//----
@@ -128,11 +134,11 @@ public:
   void initForInitUSER_PARTITION(int64_t  & nbInitializedCluster, bool * tabNotInitializedCluster, XEMPartition * initPartition);
 
 protected :
-/// Table of inverse of covariance matrix of each cluster
+  /// Table of inverse of covariance matrix of each cluster
   XEMMatrix ** _tabInvSigma; 
 
-    /// Table of covariance Matrix of each cluster
-XEMMatrix ** _tabSigma;
+  /// Table of covariance Matrix of each cluster
+  XEMMatrix ** _tabSigma;
 
   /// 1/det(Sigma)
   double * _tabInvSqrtDetSigma;

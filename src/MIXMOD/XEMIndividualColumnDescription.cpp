@@ -48,7 +48,7 @@ XEMColumnDescription * XEMIndividualColumnDescription::clone()const{
   
   //filling of structure which describes individuals
   ICD->_individualDescription.resize(_individualDescription.size());
-  for (int64_t i = 0; i<_individualDescription.size() ; ++i){
+  for (unsigned int i = 0; i<_individualDescription.size() ; ++i){
     IndividualDescription indDescription;
     indDescription.name = _individualDescription[i].name;
     indDescription.num = _individualDescription[i].num;
@@ -57,15 +57,15 @@ XEMColumnDescription * XEMIndividualColumnDescription::clone()const{
   return ICD;  
 }
 
-void XEMIndividualColumnDescription::setIndividualDescription(IndividualDescription & individualDescription, int64_t index){
-  if (index>=0 && index<_individualDescription.size()){
+void XEMIndividualColumnDescription::setIndividualDescription(IndividualDescription & individualDescription, unsigned int index){
+  if (index<_individualDescription.size()){
     _individualDescription[index].name  = individualDescription.name;
     _individualDescription[index].num  = individualDescription.num;
   }
 }
 
-void XEMIndividualColumnDescription::insertIndividualDescription(IndividualDescription individualDescription, int64_t index){
-  if (index>=0 && index<=_individualDescription.size()){
+void XEMIndividualColumnDescription::insertIndividualDescription(IndividualDescription individualDescription, unsigned int index){
+  if (index<=_individualDescription.size()){
     _individualDescription.insert(_individualDescription.begin()+index, individualDescription);
   }else{
     throw;

@@ -12,8 +12,9 @@
 }
 \details{
   \tabular{ll}{ Package: \tab Rmixmod\cr Type: \tab
-  Package\cr Version: \tab 1.0\cr Date: \tab 2012-01-10\cr
-  License: \tab GPL Version 3\cr LazyLoad: \tab yes\cr }
+  Package\cr Version: \tab 1.1.0\cr Date: \tab
+  2012-03-29\cr License: \tab GPL-3 + file LICENSE\cr
+  LazyLoad: \tab yes\cr }
 
   The general purpose of the package is to discover, or
   explain, group structures in multivariate data sets with
@@ -78,29 +79,41 @@
   be chosen by different criteria : BIC (Bayesian
   Information Criterion), ICL (Integrated Completed
   Likelihood, a classification version of BIC), NEC
-  (Entropy Criterion), Cross-Validation (CV) or Double
-  Cross-Validation (DCV).
+  (Entropy Criterion), or Cross-Validation (CV).
 }
 \examples{
-# load quantitative data set
-data(geyser)
-# Clustering in gaussian case
-xem1<-mixmodClustering(geyser)
-summary(xem1)
-plot(xem1)
-hist(xem1)
+## Clustering Analysis
+  # load quantitative data set
+  data(geyser)
+  # Clustering in gaussian case
+  xem1<-mixmodCluster(geyser,3)
+  summary(xem1)
+  plot(xem1)
+  hist(xem1)
 
-# load qualitative data set
-data(birds)
-# Clustering in multinomial case
-xem2<-mixmodClustering(birds)
-summary(xem2)
-plot(xem2)
-hist(xem2)
+  # load qualitative data set
+  data(birds)
+  # Clustering in multinomial case
+  xem2<-mixmodCluster(birds, 2, factor=c(2,5,6,3,5,4))
+  summary(xem2)
+  hist(xem2)
+
+  ## Discriminant Analysis
+  # start by extract 10 observations from iris data set
+  remaining.obs<-sample(1:nrow(iris),10)
+  # then run a mixmodLearn() analysis without those 10 observations
+  learn<-mixmodLearn(iris[-remaining.obs,1:4], iris$Species[-remaining.obs])
+  # create a MixmodPredict to predict those 10 observations
+  prediction <- mixmodPredict(data=iris[remaining.obs,1:4], classificationRule=learn["bestResult"])
+  # show results
+  prediction
+  # compare prediction with real results
+  as.integer(iris$Species[remaining.obs]) == prediction["partition"]
 }
 \author{
-  Author: Remi Lebret Maintainer: Remi Lebret
-  \email{remi.lebret@math.univ-lille1.fr}
+  Author: Remi Lebret and Serge Iovleff and Florent
+  Langrognet, with contributions from C. Biernacki and G.
+  Celeux and G. Govaert \email{contact@mixmod.org}
 }
 \references{
   Biernacki C., Celeux G., Govaert G., Langrognet F., 2006.

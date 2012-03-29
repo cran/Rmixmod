@@ -24,10 +24,13 @@
 ***************************************************************************/
 
 #include "XEMParameterDescription.h"
-#include "XEMBinaryParameter.h"
 #include "XEMGaussianGeneralParameter.h"
 #include "XEMBinaryEkjhParameter.h"
-
+#include "XEMModel.h"
+#include "XEMModelType.h"
+#include "XEMModelOutput.h"
+#include "XEMParameter.h"
+#include "XEMData.h"
 
 //------------
 // Constructor by default
@@ -41,7 +44,7 @@ XEMParameterDescription::XEMParameterDescription(){
 //-------------------------------------
 // Constructor after an estimation->run
 //--------------------------------------
-XEMParameterDescription::XEMParameterDescription(XEMEstimation* iEstimation){
+XEMParameterDescription::XEMParameterDescription(XEMModel* iEstimation){
  
   if (iEstimation){
      _infoName = "Parameter";
@@ -50,8 +53,8 @@ XEMParameterDescription::XEMParameterDescription(XEMEstimation* iEstimation){
      _nbVariable = iEstimation->getData()->_pbDimension;
      _format = FormatNumeric::defaultFormatNumericFile;
      _filename = "";     
-     _modelType = iEstimation->getModelType();
-    _parameter = iEstimation->getParameter();
+     _modelType = new XEMModelType(*iEstimation->getModelType());
+     _parameter = iEstimation->getParameter()->clone();
      if (isBinary(_modelType->_nameModel)){
        XEMBinaryParameter * bParameter = dynamic_cast<XEMBinaryParameter*> (iEstimation->getParameter());
        recopyTabToVector(bParameter->getTabNbModality(), _nbFactor, _nbCluster);
@@ -65,10 +68,44 @@ XEMParameterDescription::XEMParameterDescription(XEMEstimation* iEstimation){
 }
 
 
+//-------------------------------------
+// Constructor after an estimation->run
+//--------------------------------------
+XEMParameterDescription::XEMParameterDescription(XEMModelOutput* iEstimation){
+  
+  if (iEstimation){
+    _infoName = "Parameter";
+    //_nbSample = iEstimation->getNbSample();
+    _nbCluster = iEstimation->getNbCluster();
+    _nbVariable = iEstimation->getParameterDescription()->getNbVariable();
+    _format = FormatNumeric::defaultFormatNumericFile;
+    _filename = "";     
+    _modelType = new XEMModelType(*iEstimation->getParameterDescription()->getModelType());
+    _parameter = iEstimation->getParameterDescription()->getParameter()->clone();
+    if (isBinary(_modelType->_nameModel)){
+      XEMBinaryParameter * bParameter = dynamic_cast<XEMBinaryParameter*> (iEstimation->getParameterDescription()->getParameter());
+      recopyTabToVector(bParameter->getTabNbModality(), _nbFactor, _nbCluster);
+    }
+  }
+  else{
+    throw nullPointerError;
+  }
+  
+}
+
+
 // ---------------------------
 //constructor by initilization for Binary
 // ---------------------------
-XEMParameterDescription::XEMParameterDescription(int64_t nbCluster, int64_t nbVariable, vector< int64_t > nbFactor, FormatNumeric::XEMFormatNumericFile format, string filename, string infoName, XEMModelName& modelName){
+XEMParameterDescription::XEMParameterDescription( int64_t nbCluster
+                                                , int64_t nbVariable
+                                                , vector< int64_t > nbFactor
+                                                , FormatNumeric::XEMFormatNumericFile format
+                                                , string filename
+                                                , string infoName
+                                                , XEMModelName& modelName
+                                                )
+{
   _infoName = "Parameter";
   _nbVariable = nbVariable;
   _filename = filename;
@@ -87,10 +124,44 @@ XEMParameterDescription::XEMParameterDescription(int64_t nbCluster, int64_t nbVa
 }
 
 
+// ---------------------------
+//constructor by initilization for Binary
+// ---------------------------
+XEMParameterDescription::XEMParameterDescription( int64_t nbCluster
+                                                , int64_t nbVariable
+                                                , vector< int64_t > nbFactor
+                                                , XEMModelName& modelName
+                                                , double * proportions
+                                                , double **  centers
+                                                , double *** scatters
+                                                )
+{
+  _infoName = "Parameter";
+  _nbVariable = nbVariable;
+  _filename = "";
+  _nbCluster = nbCluster;
+  _format = FormatNumeric::defaultFormatNumericFile;
+  _nbFactor = nbFactor;
+  _modelType = new XEMModelType(modelName);
+
+  int64_t * tabNbFactor = new int64_t[_nbVariable];
+  recopyVectorToTab(nbFactor,  tabNbFactor);
+  // create _parameter : always a XEMBinaryEkjhParameter is created
+  _parameter = new XEMBinaryEkjhParameter(nbCluster, _nbVariable , _modelType, tabNbFactor, proportions, centers, scatters);
+}
+
+
 // -----------------------------------------
 //constructor by initilization for Gaussian
 // ----------------------------------------
-XEMParameterDescription::XEMParameterDescription( int64_t nbCluster, int64_t nbVariable, FormatNumeric::XEMFormatNumericFile format, string filename, string infoName, XEMModelName& modelName){
+XEMParameterDescription::XEMParameterDescription( int64_t nbCluster
+                                                , int64_t nbVariable
+                                                , FormatNumeric::XEMFormatNumericFile format
+                                                , string filename
+                                                , string infoName
+                                                , XEMModelName& modelName
+                                                )
+{
   _infoName = "Parameter";
   _nbVariable = nbVariable;
   _filename = filename;
@@ -107,13 +178,53 @@ XEMParameterDescription::XEMParameterDescription( int64_t nbCluster, int64_t nbV
 }
 
 
+// ---------------------------
+//constructor by initilization for Gaussian
+// ---------------------------
+XEMParameterDescription::XEMParameterDescription( int64_t nbCluster
+                                                , int64_t nbVariable
+                                                , XEMModelName& modelName
+                                                , double * proportions
+                                                , double **  means
+                                                , double *** variances
+                                                )
+{
+  _infoName = "Parameter";
+  _nbVariable = nbVariable;
+  _filename = "";
+  _nbCluster = nbCluster;
+  _format = FormatNumeric::defaultFormatNumericFile;
+  //_nbFactor  empty
+  _modelType = new XEMModelType(modelName);
+  
+  // create _parameter : always a XEMBinaryEkjhParameter is created
+  _parameter = new XEMGaussianGeneralParameter(nbCluster, _nbVariable , _modelType, proportions, means, variances);
+}
 
 //------------
 // Desconstructor 
 //------------
-XEMParameterDescription::~XEMParameterDescription(){
+XEMParameterDescription::~XEMParameterDescription()
+{
+  if ( _modelType ) delete _modelType;
+  if ( _parameter ) delete _parameter;
 }
 
+
+/// Comparison operator
+bool XEMParameterDescription::operator==( XEMParameterDescription & paramDescription) const{
+  if ( _infoName != paramDescription.getInfoName() ) return false;
+  if ( _nbVariable != paramDescription.getNbVariable() ) return false;
+  if ( _filename != paramDescription.getFilename() ) return false;
+  if ( _nbCluster != paramDescription.getNbCluster() ) return false;
+  if ( _format != paramDescription.getFormat() ) return false;
+  if ( !(_modelType == paramDescription.getModelType()) ) return false;
+  for (unsigned int i = 0; i<_nbFactor.size(); ++i){
+    if ( _nbFactor[i] != paramDescription.getTabNbFactor()[i] ) return false;
+  }
+  if ( !(_parameter == paramDescription.getParameter()) ) return false;
+  return true; 
+}
 
 
 //--------

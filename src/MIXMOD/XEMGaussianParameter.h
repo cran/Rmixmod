@@ -27,12 +27,15 @@
 
 #include "XEMUtil.h"
 #include "XEMParameter.h"
-#include "XEMDiagMatrix.h"
 
+// pre-declaration
+class XEMModel;
 class XEMMatrix;
+class XEMDiagMatrix;
+
 /**
   @brief Base class for XEMGaussianParameter(s)
-  @authors A Echenim & F. Langrognet & Y. Vernaz
+  @authors F. Langrognet
 */
 class XEMGaussianParameter : public XEMParameter{
 
@@ -59,7 +62,10 @@ public:
 
   /// Destructor
   virtual ~XEMGaussianParameter();
-
+	
+  /// Comparison operator
+  virtual bool operator ==(const XEMGaussianParameter & param) const;
+  
   virtual XEMParameter* clone()const =0  ;
 
 	/// reset to default values

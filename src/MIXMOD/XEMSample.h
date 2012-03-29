@@ -25,7 +25,7 @@
 #ifndef XEMSample_H
 #define XEMSample_H
 
-#include "XEMUtil.h"
+#include <stdint.h>
 
 
 /**

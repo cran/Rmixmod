@@ -36,21 +36,24 @@ class XEMModelType{
 
 public:
 
-        /// Default constructor
-        XEMModelType();
+  /// Default constructor
+  XEMModelType();
 
-        // constructor
-        XEMModelType(XEMModelName name,int64_t nbSubDimensionFree=0);
+  // constructor
+  XEMModelType(XEMModelName name,int64_t nbSubDimensionFree=0);
 
-        XEMModelType(const XEMModelType & iModelType);
-        /// Destructor
-        virtual ~XEMModelType();
-
-
-
+  // copy constructor
+  XEMModelType(const XEMModelType & iModelType);
+  
+  /// Destructor
+  ~XEMModelType();
+  
+  
+  /// Comparison operator
+  bool operator ==(const XEMModelType & modelType) const;
+  
   /// Input model type
-        void input(ifstream & fi, int64_t nbCluster);
-
+  void input(ifstream & fi, int64_t nbCluster);
 
   /// name of the model
   XEMModelName _nameModel;
@@ -92,7 +95,13 @@ public:
   /// <<
   friend ostream & operator<<(ostream & fo, XEMModelType & modelType);
 
-
+  // print out model type
+  void print(ostream & flux);
+  // print out model type short cut
+  void printShortcut(ostream & flux);
+  /// editModelType
+  void edit(ostream & oFile);
+  
 };
 
 inline const XEMModelName & XEMModelType::getModelName() const{

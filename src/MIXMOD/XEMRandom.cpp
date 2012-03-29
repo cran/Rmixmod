@@ -66,8 +66,8 @@ double rnd()
     uint32_t n = 8;
     while (n-- > 0) {
         s += d;
-        y += (z << 4) + k0 ^ z + s ^ (z >> 5) + k1;
-        z += (y << 4) + k2 ^ y + s ^ (y >> 5) + k3;
+        y += (z << 4) + (k0^z) + (s^(z >> 5)) + k1;
+        z += (y << 4) + (k2^y) + (s^(y >> 5)) + k3;
     }
     return (z + y / m) / m;
 }

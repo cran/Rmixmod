@@ -22,13 +22,24 @@
 
     All informations available on : http://www.mixmod.org                                                                                               
 ***************************************************************************/
-#include "XEMError.h"
-#include "XEMClusteringMain.h"
-#include "XEMRandom.h"
-#include "XEMOldInput.h"
-#include "XEMBinaryData.h"
-#include "XEMClusteringOutput.h"
 
+#include "XEMClusteringMain.h"
+#include "XEMClusteringInput.h"
+#include "XEMClusteringOutput.h"
+#include "XEMClusteringModelOutput.h"
+#include "XEMClusteringStrategy.h"
+#include "XEMClusteringStrategyInit.h"
+#include "XEMRandom.h"
+#include "XEMBinaryData.h"
+#include "XEMLabel.h"
+#include "XEMBinaryModel.h"
+#include "XEMLabelDescription.h"
+#include "XEMPartition.h"
+#include "XEMError.h"
+#include "XEMBICCriterion.h"
+#include "XEMICLCriterion.h"
+#include "XEMNECCriterion.h"
+#include "XEMModelOutput.h"
 
 //------------
 // Constructor
@@ -42,65 +53,39 @@ XEMClusteringMain::XEMClusteringMain(){
 //------------
 // Constructor
 //------------
-XEMClusteringMain::XEMClusteringMain(XEMClusteringInput * input, XEMClusteringOutput * output){
-  _input  = input;
-  _output = output;
-}
-
-
-
+XEMClusteringMain::XEMClusteringMain( XEMClusteringInput * input
+                                    , XEMClusteringOutput * output
+                                    )
+                                    : _input(input)
+                                    , _output(output)
+{}
 
 
 //-----------
 // Destructor
 //-----------
-XEMClusteringMain::~XEMClusteringMain(){
- if (_output){
-  delete _output;
- }
- if (_input){
-  delete _input; 
- }
+XEMClusteringMain::~XEMClusteringMain()
+{
+  if (_output){
+    delete _output;
+  }
 }
-
-
-
-//----------------
-// getDCVCriterion
-//----------------
-//TODO
-// XEMDCVCriterion * XEMClusteringMain::getDCVCriterion(){
-//   XEMDCVCriterion * res = NULL;
-//   int64_t iSelection=0;
-//   while (iSelection<_nbSelection && res==NULL){
-//     if (_tabSelection[iSelection]->getCriterionName() == DCV){
-//       XEMCriterion * tmp = _tabSelection[iSelection]->getCriterion();
-//       res =  dynamic_cast< XEMDCVCriterion*> (tmp);
-//     }  
-//     iSelection++;
-//   }
-//   return res;
-// }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 //---
 //run
 //---
 void XEMClusteringMain::run(){
-  
+  //--------------------------------------------------------------------
+  // Important : Call randomise function to change random seed or not ...
+  //---------------------------------------------------------------------
+#if RANDOMISE == 1
+  randomise();
+#else
+	antiRandomise();
+#endif
+	
+	
   //----------------------
   // 1. Create Estimations
   //----------------------
@@ -111,14 +96,15 @@ void XEMClusteringMain::run(){
     throw inputNotFinalized;
   }
   
-  vector<XEMCriterionName> criterionName = _input->getCriterionName();
-  
- // _nbCriterion = _input->getNbCriterionName();
+  // get the number of models
   int64_t nbModelType = _input->getNbModelType();
+  // get the list of cluster
   vector<int64_t> vNbCluster = _input->getNbCluster();
+  // get the length of the cluster's list
   int64_t nbNbCluster = vNbCluster.size();
+  // compute the number of estimations to run
   int64_t nbEstimation = nbNbCluster * nbModelType;
-  vector<XEMEstimation*> estimations(nbEstimation);
+	std::vector<XEMModel*> estimations(nbEstimation);
   
   int64_t iNbCluster, iModelType, nbCluster;
   XEMModelType * modelType;
@@ -128,90 +114,113 @@ void XEMClusteringMain::run(){
   XEMData * workingData = inputData; 
   
   //Strategy
-  XEMClusteringStrategy * inputStrategy = NULL;
-  XEMClusteringStrategy * workingStrategy = NULL;
+  XEMClusteringStrategy * inputStrategy = _input->getStrategy();
+  XEMClusteringStrategy * workingStrategy = inputStrategy;
   
   // knownPartition
   XEMPartition * inputKnownPartition = NULL;
   XEMPartition * workingKnownPartition = NULL;
   
+	if (_input->getKnownLabelDescription()){
+		const XEMLabel * lab = _input->getKnownLabelDescription()->getLabel();
+		//inputKnownPartition = new XEMPartition(_input->getKnownLabelDescription()->getLabel(), vNbCluster[0]);
+		inputKnownPartition = new XEMPartition(lab, vNbCluster[0]);
+		workingKnownPartition = inputKnownPartition;
+		if (_input->getKnownPartition()){
+			 // _knowPartition and knownLabelDescription can't together not NULL !
+			 //_knownPartition will be removed from XEMInput
+			throw internalMixmodError;
+		}
+	}
+	else {
+		inputKnownPartition = _input->getKnownPartition();
+		workingKnownPartition = inputKnownPartition ;
+	}
+  
   int64_t iEstimation = 0; // counting the estimations
-  inputStrategy =  _input->getStrategy();
-  workingStrategy = inputStrategy; 
-    
-    
-    for (iNbCluster=0 ; iNbCluster<nbNbCluster ; iNbCluster++){
-      nbCluster = vNbCluster[iNbCluster];
+  
+  // loop over the number of cluster 
+  for (iNbCluster=0 ; iNbCluster<nbNbCluster ; iNbCluster++)
+  {
+    nbCluster = vNbCluster[iNbCluster];
       
-      //inputKnownPartition
-      inputKnownPartition = _input->getKnownPartition();
-      workingKnownPartition = inputKnownPartition ;
+      //KnownPartition
+//       inputKnownPartition = _input->getKnownPartition();
+//       workingKnownPartition = inputKnownPartition ;
+      
+    // create model for binary data
+    if (_input->isBinaryData()){
+    
       vector<int64_t> correspondenceOriginDataToReduceData;
-      
 #if DATA_REDUCE == 1
+      //--------------------------------
       //Reduce Data
       //------------
-      if (_input->isBinaryData()){
-        XEMBinaryData * bData =  dynamic_cast<XEMBinaryData*>(inputData);
-  
-        // initPartition
-        XEMPartition * inputInitPartition = NULL;
-        XEMPartition * workingInitPartition = NULL;
-        if (inputStrategy->getStrategyInit()->getStrategyInitName() == USER_PARTITION){
-          inputInitPartition = inputStrategy->getStrategyInit()->getPartition(iNbCluster);
-        } 
-        try{
-          //TODO RD : data ne doit pas forcément etre recréé
-          workingData = bData->reduceData(correspondenceOriginDataToReduceData, inputKnownPartition, inputInitPartition, workingKnownPartition, workingInitPartition);
-          workingStrategy = new XEMClusteringStrategy(*inputStrategy);
-          if (workingInitPartition
-             ){
-            workingStrategy->setInitPartition(workingInitPartition, iNbCluster);
-          }
-          /* TODO ?:
-          if inputKnownPartition : delete workingKnownPartition 
-          if inputInitPartition : delete workingStrategy, workingInitPartition
-          
-          */
+      XEMBinaryData * bData =  dynamic_cast<XEMBinaryData*>(inputData);
+
+      // initPartition
+      XEMPartition * inputInitPartition = NULL;
+      XEMPartition * workingInitPartition = NULL;
+      if (inputStrategy->getStrategyInit()->getStrategyInitName() == USER_PARTITION){
+        inputInitPartition = inputStrategy->getStrategyInit()->getPartition(iNbCluster);
+      } 
+      try{
+        //TODO RD : data ne doit pas forcément etre recréé
+        workingData = bData->reduceData(correspondenceOriginDataToReduceData, inputKnownPartition, inputInitPartition, workingKnownPartition, workingInitPartition);
+        workingStrategy = new XEMClusteringStrategy(*inputStrategy);
+        if (workingInitPartition
+           ){
+          workingStrategy->setInitPartition(workingInitPartition, iNbCluster);
         }
-        catch(XEMErrorType errorType){
-          workingData = NULL;
-          throw errorType;
-        } 
+        /* TODO ?:
+        if inputKnownPartition : delete workingKnownPartition 
+        if inputInitPartition : delete workingStrategy, workingInitPartition
+        
+        */
       }
-      // fin de ReduceData
+      catch(XEMErrorType errorType){
+        workingData = NULL;
+        throw errorType;
+      } 
+      // fin de ReduceData    
 #endif
-      
       // create tabEstmation[iEstimation]
       //--------------------------------
       for (iModelType=0 ; iModelType<nbModelType ; iModelType++){
         modelType = _input->getModelType(iModelType);
-          estimations[iEstimation] = new XEMEstimation(workingStrategy, modelType, nbCluster, workingData, criterionName, workingKnownPartition, correspondenceOriginDataToReduceData);
-         iEstimation++;
+        estimations[iEstimation] = new XEMBinaryModel( modelType, nbCluster, workingData, workingKnownPartition, correspondenceOriginDataToReduceData );
+        iEstimation++;
+      }
+    }
+    // create model for quantitative data
+    else{
+      // create tabEstmation[iEstimation]
+      //--------------------------------
+      for (iModelType=0 ; iModelType<nbModelType ; iModelType++){
+        modelType = _input->getModelType(iModelType);
+        estimations[iEstimation] = new XEMModel( modelType, nbCluster, workingData, workingKnownPartition );
+        iEstimation++;
        }
-    } // end for iNbCluster
+    }
+  } // end for iNbCluster
+  // release memory
+  delete inputKnownPartition;
 
-
-
-
-  
   
   //-------------------
   // 2. run Estimations
   //-------------------
   
-
-
   // Estimation
   //-----------
-  //_tabEstimation : run
-  iEstimation = 0;
 #ifdef VERBOSE
   int64_t todo = nbEstimation-1;
   int64_t j;
   cout << "...running" << endl;  
 #endif
-
+  
+  // loop over the number of estimation to do
+  iEstimation = 0;
   while (iEstimation < nbEstimation){
 #ifdef VERBOSE
 
@@ -236,15 +245,15 @@ void XEMClusteringMain::run(){
     
 
     try{
-      estimations[iEstimation]->run();
+      workingStrategy->run(estimations[iEstimation]);
     }
-
     catch (XEMErrorType errorType){
-      estimations[iEstimation]->setErrorType(errorType);
-      XEMError error(errorType);
 #ifdef VERBOSE
+      XEMError error(errorType);
       error.run();
 #endif
+      // set error for that model
+      estimations[iEstimation]->setError(errorType);
     }
     iEstimation++;
     
@@ -253,7 +262,6 @@ void XEMClusteringMain::run(){
 #endif
     
   }
-  
   
 #ifdef VERBOSE
     j = nbEstimation;
@@ -266,19 +274,59 @@ void XEMClusteringMain::run(){
   
     cout << endl;
 #endif
-  
+
+
   //----------------
-  // 3. create Output
-  //-----------------
-  _output = new XEMClusteringOutput(estimations);
-  _output->sort(_input->getCriterionName()[0]);
+  // create Output
+  //-----------------  
+  // get criterion names
+  std::vector<XEMCriterionName> const & criterion = _input->getCriterionName();
+  _output = new XEMClusteringOutput(estimations, criterion);  
+  //-------------------
+  // 3. run Selections
+  //-------------------
+  // loop over all models
+  for (unsigned int iModel=0; iModel<nbEstimation; iModel++){
+    // chek whether error occured for that model
+    if ( estimations[iModel]->getErrorType() == noError ){
+      // loop over criterion name
+      for (unsigned int iCriterion=0; iCriterion<criterion.size(); iCriterion++ ){
+        switch (criterion[iCriterion]) {
+          case BIC : 
+          {
+            XEMBICCriterion bic(estimations[iModel]);
+            bic.run(_output->getClusteringModelOutput(iModel)->getCriterionOutput(BIC));
+            break;
+          }
+          case CV : throw XEMDAInput;
+          case ICL : 
+          {
+            XEMICLCriterion icl(estimations[iModel]);
+            icl.run(_output->getClusteringModelOutput(iModel)->getCriterionOutput(ICL));
+            break;
+          }
+          case NEC :  
+          {
+            XEMNECCriterion nec(estimations[iModel]);
+            nec.run(_output->getClusteringModelOutput(iModel)->getCriterionOutput(NEC));
+            break;
+          }
+          case UNKNOWN_CRITERION_NAME : throw internalMixmodError;
+          default : throw internalMixmodError;
+        }
+      }// end iCriterion
+    }
+    else{ // set criterion error
+      // loop over criterion name
+      for (unsigned int iCriterion=0; iCriterion<criterion.size(); iCriterion++ ){
+        _output->getClusteringModelOutput(iModel)->setCriterionOutput(XEMCriterionOutput(criterion[iCriterion], 0.0, estimations[iModel]->getErrorType()));
+      }
+    }
+  }//end iModel
   
-// TODO 
-//  _output->sort(_input->getCriterionName(0));
-  
-  
+  // release memory
+  for (unsigned int iModel=0; iModel<nbEstimation; iModel++){
+    delete estimations[iModel];
+  }
 }
-
-
-
 

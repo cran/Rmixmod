@@ -6,13 +6,13 @@
 
 \describe{
 
-\item{\code{Class}}{0 = crew, 1 = first, 2 = second, 3 = third, which denote the economic status of the subject}
+  \item{\code{Class}}{0 = crew, 1 = first, 2 = second, 3 = third, which denote the economic status of the subject}
 
-\item{\code{Age}}{1 = adult, 0 = child, which denote if the subject is an adult or a child}
+  \item{\code{Age}}{1 = adult, 0 = child, which denote if the subject is an adult or a child}
 
-\item{\code{Sex}}{1 = male, 0 = female, which denote the sex of the subject}
+  \item{\code{Sex}}{1 = male, 0 = female, which denote the sex of the subject}
 
-\item{\code{Survived}}{1 = yes, 0 = no, which denote if the subject lived through the fatal maiden voyage of the ocean liner Titanic}
+  \item{\code{Survived}}{1 = yes, 0 = no, which denote if the subject lived through the fatal maiden voyage of the ocean liner Titanic}
 
 }}
 \source{

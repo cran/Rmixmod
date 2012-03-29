@@ -22,6 +22,7 @@
 
     All informations available on : http://www.mixmod.org                                                                                               
 ***************************************************************************/
+
 #include "XEMData.h"
 
 
@@ -148,6 +149,9 @@ void XEMData::setWeight(double* weight){
   int64_t i=0;
   while(i<_nbSample){
     _weight[i] = weight[i];
+      if (_weight[i] != 1){
+        _defaultWeight = false;
+      }
     _weightTotal += _weight[i];
     i++;
   }

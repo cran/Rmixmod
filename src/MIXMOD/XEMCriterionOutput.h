@@ -26,7 +26,6 @@
 #define XEMCriterionOutput_H
 
 #include "XEMUtil.h"
-#include "XEMCriterion.h"
 
 
 
@@ -49,27 +48,30 @@ public:
 
   /// Destructor
   virtual ~XEMCriterionOutput();
-
+  
+  /// Comparison operator
+  bool operator ==(const XEMCriterionOutput & criterionOutput) const;
+  
   ///editType
-  void editType(ofstream & oFile);
+  void editType(ostream & oFile) const;
 
   ///editValue
-  void editValue(ofstream & oFile, bool text=false);
+  void editValue(ostream & oFile, bool text=false) const;
 
   /// editTypeAndValue
-  void editTypeAndValue(ofstream & oFile);
+  void editTypeAndValue(ostream & oFile) const;
 
   //--------------
   // get
   //--------------
   /// getCriterionName
-  XEMCriterionName getCriterionName() const;
+  XEMCriterionName const getCriterionName() const;
   
   /// getValue
-  double getValue() const;
+  double const getValue() const;
   
   /// getError
-  XEMErrorType getError() const;
+  XEMErrorType const getError() const;
 
   //--------------
   // set
@@ -99,15 +101,15 @@ public:
   
 };
 
-inline XEMCriterionName XEMCriterionOutput::getCriterionName() const{
+inline XEMCriterionName const XEMCriterionOutput::getCriterionName() const{
   return _criterionName;
 }
 
-inline double XEMCriterionOutput::getValue() const{
+inline double const XEMCriterionOutput::getValue() const{
   return _value;
 }
 
-inline XEMErrorType XEMCriterionOutput::getError() const{
+inline XEMErrorType const XEMCriterionOutput::getError() const{
   return _error;
 }
 

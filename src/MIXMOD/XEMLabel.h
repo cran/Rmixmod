@@ -24,14 +24,18 @@
 ***************************************************************************/
 #ifndef XEMLabel_H
 #define XEMLabel_H
-#include "XEMEstimation.h"
-#include "XEMCVCriterion.h"
-
-
 
 /** @brief Base class for Label(s)
     @author F Langrognet & A Echenim
 */
+
+#include <iostream>
+#include <vector>
+#include <stdint.h>
+
+// pre-declaration
+class XEMModel;
+class XEMLabelDescription;
 
 class XEMLabel{
 
@@ -44,32 +48,42 @@ public:
   XEMLabel(int64_t nbSample);
 
   /// Constructor
-	XEMLabel(XEMEstimation * estimation);
+	XEMLabel(XEMModel * model);
   
   XEMLabel(const XEMLabel & iLabel);
 	
   /// Destructor
 	virtual ~XEMLabel();
   
-  /// editProba
-  void edit(ostream & stream);
+  /// Comparison operator
+  bool operator ==(const XEMLabel & label) const;
+  
+  /// edit labels
+  void edit(std::ostream & stream) const;
 
-  /// getProba
+  /// get label
   int64_t * getTabLabel() const;
   
-  /// getProba
-  vector<int64_t> const & getLabel() const;
+  /// get label
+  std::vector<int64_t> const & getLabel() const;
   
   /// set Label
   void setLabel(int64_t * label, int64_t nbSample);
-  void setLabel(vector<int64_t> label);
+  void setLabel(std::vector<int64_t> label, int64_t nbSample);
   
   /// Selector
   int64_t  getNbSample() const;
 
+  // get Error Rate
+  const double getErrorRate( std::vector<int64_t> const & label ) const;
+  
+  // get getClassificationTab
+  int64_t** getClassificationTab( std::vector<int64_t> const & label ) const;
+  
   ///input stream
-  void input(ifstream & flux, int64_t nbCluster);
+  void input(std::ifstream & flux, int64_t nbCluster);
   void input(const XEMLabelDescription & labelDescription);
+	
   
 private :
 
@@ -77,12 +91,12 @@ private :
   int64_t  _nbSample;
 
   /// dim : _nbSample *_nbCluster
-  vector<int64_t> _label;
+  std::vector<int64_t> _label;
 
 };
 
 
-inline vector<int64_t> const & XEMLabel::getLabel() const{
+inline std::vector<int64_t> const & XEMLabel::getLabel() const{
   return _label;
 }
 
@@ -90,6 +104,10 @@ inline int64_t  XEMLabel::getNbSample() const{
   return _nbSample;
 }
 
+inline void XEMLabel::setLabel(std::vector<int64_t> label, int64_t nbSample){
+	_nbSample = nbSample;
+	_label = label;
+}
 
 
 

@@ -25,7 +25,9 @@
 #include "XEMGaussianEDDAParameter.h"
 #include "XEMGaussianParameter.h"
 #include "XEMGaussianData.h"
+#include "XEMGaussianSample.h"
 #include "XEMModel.h"
+#include "XEMModelType.h"
 
 
 
@@ -115,6 +117,16 @@ XEMGaussianEDDAParameter::~XEMGaussianEDDAParameter(){
   
 }
 
+//---------------------
+/// Comparison operator
+//---------------------
+bool XEMGaussianEDDAParameter::operator ==(const XEMGaussianEDDAParameter & param) const{
+  if ( !XEMGaussianParameter::operator==(param) ) return false;
+  for (int64_t k=0; k<_nbCluster; k++){
+    if ( _tabSigma[k] != param.getTabSigma()[k] ) return false;
+  }
+  return true;
+}
 
 //------------------------
 // reset to default values
@@ -359,6 +371,26 @@ void  XEMGaussianEDDAParameter::input(ifstream & fi){
 
 
 
+void  XEMGaussianEDDAParameter::input( double * proportions
+                                     , double **  means
+                                     , double *** variances
+                                     )
+{
+  for (int k=0; k<_nbCluster; k++){
+    
+    // Proportions //
+    _tabProportion[k]=proportions[k];
+    // Center (mean) //
+    for (int j=0; j<_pbDimension; j++){
+      _tabMean[k][j]=means[k][j];
+    }
+    // Variance matrix //
+    _tabSigma[k]->input(variances[k]) ; // virtual method
+  } // end for k
+}
+
+
+
 
 
 void XEMGaussianEDDAParameter::updateForCV(XEMModel * originalModel, XEMCVBlock & CVBlock){
@@ -502,7 +534,7 @@ void XEMGaussianEDDAParameter::edit(){
   for (k=0; k<_nbCluster; k++){
      cout<<"\tcomponent : " << k << endl;
      cout<<"\t\tproportion : " << _tabProportion[k]<<endl;
-     editTab(_tabMean+k,1,_pbDimension," ","\t\tmean : ",cout);
+     editTab(_tabMean+k,1,_pbDimension,cout," ","\t\tmean : ");
      cout<<"\t\tsigma : "<<endl;
      _tabSigma[k]->edit(cout, "\t\t\t");
 
@@ -535,7 +567,7 @@ void XEMGaussianEDDAParameter::edit(ofstream & oFile, bool text){
       oFile<<"\t\t\tComponent "<<k+1<<endl;
       oFile<<"\t\t\t---------"<<endl;
       oFile<<"\t\t\tMixing proportion : "<<_tabProportion[k]<<endl;
-      editTab(_tabMean+k,1,_pbDimension," ","\t\t\tMean : ",oFile);
+      editTab(_tabMean+k,1,_pbDimension,oFile," ","\t\t\tMean : ");
 
       oFile<<"\t\t\tCovariance matrix : "<<endl;
       _tabSigma[k]->edit(oFile, "\t\t\t\t");
@@ -547,7 +579,7 @@ void XEMGaussianEDDAParameter::edit(ofstream & oFile, bool text){
   else{
     for (k=0; k<_nbCluster; k++){
       oFile<<_tabProportion[k]<<endl;
-      editTab(_tabMean+k,1,_pbDimension," ","",oFile);
+      editTab(_tabMean+k,1,_pbDimension,oFile," ","");
       _tabSigma[k]->edit(oFile, "");
       oFile<<endl;
 

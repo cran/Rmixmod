@@ -23,14 +23,14 @@
     All informations available on : http://www.mixmod.org                                                                                               
 ***************************************************************************/
 #include "XEMNECCriterion.h"
+#include "XEMCriterionOutput.h"
+#include "XEMModel.h"
 
 //------------
 // Constructor
 //------------
-XEMNECCriterion::XEMNECCriterion(){
-}
-
-
+XEMNECCriterion::XEMNECCriterion(XEMModel * model) : XEMCriterion(model)
+{}
 
 
 //-----------
@@ -39,25 +39,26 @@ XEMNECCriterion::XEMNECCriterion(){
 XEMNECCriterion::~XEMNECCriterion(){}
 
 
-
-
 //---
 //run
 //---
-void XEMNECCriterion::run(XEMModel * model, double & value, XEMErrorType & error){
-
-  error = noError;
-  
+void XEMNECCriterion::run(XEMCriterionOutput & output)
+{
+  /* Compute NEC (An Entropy Criterion) */
+   // initialize value
+  double value = 0.0;
+  // initialize error
+  XEMErrorType error = noError;
+    
   try{
-    /* Compute NEC (An Entropy Criterion) */
     value = 0;
-    if (model->getNbCluster() == 1){
+    if (_model->getNbCluster() == 1){
       value = 1;
     }
     else{
-      double entropy          = model->getEntropy();
-      double loglikelihood    = model->getLogLikelihood(false);  // false : to not compute fik because already done
-      double loglikelihoodOne = model->getLogLikelihoodOne();
+      const double entropy          = _model->getEntropy();
+      const double loglikelihood    = _model->getLogLikelihood(false);  // false : to not compute fik because already done
+      const double loglikelihoodOne = _model->getLogLikelihoodOne();
       if (fabs(loglikelihood-loglikelihoodOne) < minValueForLLandLLOne){
         throw pbNEC;
       }  
@@ -67,5 +68,10 @@ void XEMNECCriterion::run(XEMModel * model, double & value, XEMErrorType & error
   catch(XEMErrorType & e){
     error = e;
   }
+  // add name to criterion output
+  output.setCriterionName(NEC);
+  // add value to criterion output
+  output.setValue(value);
+  // add error to criterion output
+  output.setError(error);
 }
-

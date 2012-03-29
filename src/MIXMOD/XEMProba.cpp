@@ -22,8 +22,11 @@
 
     All informations available on : http://www.mixmod.org                                                                                               
 ***************************************************************************/
-#include "XEMProba.h"
 
+#include "XEMProba.h"
+#include "XEMModel.h"
+#include "XEMBinaryModel.h"
+#include "XEMModelType.h"
 
 //------------
 // Constructor
@@ -51,10 +54,9 @@ XEMProba::XEMProba(int64_t nbSample, int64_t nbCluster){
 //------------
 // Constructor
 //------------
-XEMProba::XEMProba(XEMEstimation * estimation){
-  _nbCluster = estimation->getNbCluster();
-  
-  XEMModel * model = estimation->getModel();
+XEMProba::XEMProba(XEMModel * model){
+  _nbCluster = model->getNbCluster();
+
   if (model == NULL){
     throw internalMixmodError;
   }
@@ -63,18 +65,17 @@ XEMProba::XEMProba(XEMEstimation * estimation){
   //-----------------
   double ** tabProba = NULL;
   
-  XEMModelType * modelType = model->getParameter()->getModelType();
+  XEMModelType * modelType = model->getModelType();
   bool binary = isBinary(modelType->_nameModel);
   if (!binary){ 
-    _nbSample = estimation->getNbSample();
+    _nbSample = model->getNbSample();
     tabProba      = copyTab(model->getPostProba(), _nbSample, _nbCluster); // copy
   }
   ////
   else{
   ////
     //binary case
-    
-    const vector<int64_t> & correspondenceOriginDataToReduceData = estimation->getcorrespondenceOriginDataToReduceData();
+    const vector<int64_t> & correspondenceOriginDataToReduceData = dynamic_cast<XEMBinaryModel*>(model)->getCorrespondenceOriginDataToReduceData();
     _nbSample = correspondenceOriginDataToReduceData.size();
     tabProba = new double*[_nbSample];
     for (int64_t i=0; i<_nbSample; i++){
@@ -129,6 +130,19 @@ XEMProba::~XEMProba(){
 }
 
 
+//--------------------
+/// Comparison operator
+//--------------------
+bool XEMProba::operator ==(const XEMProba & proba) const{
+  if ( _nbSample != proba.getNbSample() ) return false;
+  if ( _nbCluster != proba.getNbCluster() ) return false;
+  for (int64_t i=0; i<_nbSample; i++ ){
+    for (int64_t k=0; k<_nbCluster ;k++){
+      if ( _proba[i][k] != proba.getProba()[i][k] ) return false;
+    }
+  }
+  return true;
+}
 
 
 //----------

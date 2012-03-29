@@ -22,7 +22,15 @@
 
     All informations available on : http://www.mixmod.org                                                                                               
 ***************************************************************************/
+
 #include "XEMBinaryData.h"
+#include "XEMBinarySample.h"
+#include "XEMPartition.h"
+#include "XEMDataDescription.h"
+#include "XEMWeightColumnDescription.h"
+#include "XEMQualitativeColumnDescription.h"
+#include "XEMIndividualColumnDescription.h"
+#include "XEMUtil.h"
 #include <list>
 
 
@@ -595,8 +603,9 @@ XEMData * XEMBinaryData::reduceData(vector<int64_t> & correspondcenceOriginDataT
 }
 
 
-
-
+//-------
+// Verify
+//-------
 bool XEMBinaryData::verify()const{
   bool res = XEMData::verify();
   
@@ -605,3 +614,10 @@ bool XEMBinaryData::verify()const{
   return res;
 }
 
+
+//------------------
+// Return tab value
+//-----------------
+int64_t * XEMBinaryData::getDataTabValue(int64_t idxSample) const{
+  return ((XEMBinarySample*)_matrix[idxSample])->getTabValue();
+}

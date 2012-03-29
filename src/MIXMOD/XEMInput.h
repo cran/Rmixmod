@@ -27,14 +27,11 @@
 
 
 #include "XEMUtil.h"
-#include "XEMData.h"
-#include "XEMPartition.h"
-#include "XEMClusteringStrategy.h"
+#include "XEMDataDescription.h"
 
-
+// pre-declaration
 class XEMLabelDescription;
-
-using namespace std;
+class XEMPartition;
 
 class XEMInput{
 
@@ -47,10 +44,10 @@ public:
   XEMInput(const XEMInput & input);
   
   /// Initialisation constructor
-  XEMInput(const vector<int64_t> & iNbCluster, const XEMDataDescription & iDataDescription);
+  XEMInput(const std::vector<int64_t> & iNbCluster, const XEMDataDescription & iDataDescription);
 
   /// clone initialisation
-  void cloneInitialisation(const vector<int64_t> & iNbCluster, const XEMDataDescription & iDataDescription);
+  void cloneInitialisation(const std::vector<int64_t> & iNbCluster, const XEMDataDescription & iDataDescription);
   
   // Constructor used in DCV context
   XEMInput(XEMInput * originalInput, XEMCVBlock & learningBlock);
@@ -75,7 +72,7 @@ public:
   
   //------ nbCluster  ----//
   /// get all NbCluster
-  vector<int64_t> getNbCluster() const;
+  std::vector<int64_t> getNbCluster() const;
   
   /// get ith NbCluster
   int64_t getNbCluster(int64_t index) const;
@@ -86,22 +83,28 @@ public:
   
   //------ Criterion  ----//
   /// get All Criterion Name
-  vector <XEMCriterionName> getCriterionName() const;
+  std::vector <XEMCriterionName> const & getCriterionName() const;
   
   ///getNbCriterionName
-  int64_t getNbCriterionName() const;
+  int64_t getNbCriterion() const;
 
   ///getCriterionName[i]
-  XEMCriterionName getCriterionName(int64_t index) const;
-
+  XEMCriterionName getCriterionName(unsigned int index) const;
+  
   /// setCriterionName
-  void setCriterionName(XEMCriterionName criterionName, int64_t index);
+  virtual void setCriterion(std::vector<XEMCriterionName> const & criterionName) =0;
+  
+  /// setCriterionName
+  virtual void setCriterion(const XEMCriterionName criterion, unsigned int index) =0;
 
   ///insertCriterionName[i]
-  void insertCriterionName(XEMCriterionName criterionName, int64_t index);
-
+  virtual void insertCriterion(const XEMCriterionName criterion, unsigned int index) =0;
+  
+  // add new criterion
+  virtual void addCriterion( const XEMCriterionName criterion ) =0;
+  
   /// removeCriterionName
-  void removeCriterionName(int64_t index);
+  void removeCriterion(unsigned int index);
 	
   
   // ----- ModelType ----//
@@ -109,16 +112,24 @@ public:
   int64_t getNbModelType() const;
 
   /// getModelType[i]
-  XEMModelType *  getModelType(int64_t index) const;
+  XEMModelType *  getModelType(unsigned int index) const;
 
+  
+  
   /// setModelType
-  void setModelType(const XEMModelType * modelType, int64_t index);
+  void setModelType(const XEMModelType * modelType, unsigned int index);
 
   /// insertModelType
-  void insertModelType(const XEMModelType * modelType, int64_t index);
+  void insertModelType(const XEMModelType * modelType, unsigned int index);
 
+  // add new model type
+  void addModel( XEMModelName const modelName );
+  
+  /// setModel
+  void setModel(std::vector<XEMModelName> const & modelName);
+  
   /// removeModelType
-  void removeModelType(int64_t index);
+  void removeModelType(unsigned int index);
 
   /// setSubDimensionEqual
  // void setSubDimensionEqual(int64_t modelTypePosition, int64_t subDimensionValue);
@@ -127,7 +138,7 @@ public:
  // void setSubDimensionFree(int64_t modelTypePosition, int64_t subDimensionValue, int64_t dimensionPosition);
 
   ///setWeight();
-  void setWeight(string weightFileName);
+  void setWeight(std::string weightFileName);
   
   ///setWeight();
   void setWeight(double* weight);
@@ -136,51 +147,42 @@ public:
   void removeWeight();
   
   ///insertWeight();
-  void insertWeight(string weightFileName);
+  void insertWeight(std::string weightFileName);
   
   
   ///removeWeight();
   //void removeWeight();
-  
   
   // ----- KnownPartition ----//
   /// getKnownPartition
   XEMPartition * getKnownPartition() const;
   
   /// setKnownPartition
-  void setKnownPartition(string iFileName);
+  void setKnownPartition(std::string iFileName);
   
   /// insertKnownPartition
-  void insertKnownPartition(string iFileName);
+  void insertKnownPartition(std::string iFileName);
   
   /// removeKnownPartition
   void removeKnownPartition();
   
-  //------- Label -----------//
-  ///getLabel
-  const XEMLabelDescription * getLabel() const;
+	
+	
+  //------- KnownLabel -----------//
+  ///getKnownLabelDescription
+  const XEMLabelDescription * getKnownLabelDescription() const;
   
-  /// setLabel
-  void setLabel(XEMLabelDescription & labeldescription);
+  /// setKnownLabelDescription
+  void setKnownLabelDescription(XEMLabelDescription & labeldescription);
   
   /// removeLabel
-  void removeLabel();
-  
-  // -----------------------------------------------------------------------------------------------
-  // Other virtual Selector methods throw error (otherwise this method is write in inherited classes
-  // -----------------------------------------------------------------------------------------------
-  virtual XEMClusteringStrategy * getStrategy() const;
-  
-    // setStrategy
-  virtual void setStrategy(XEMClusteringStrategy * strat);
-  
-  
+  void removeKnownLabelDescription();
   
   //
   /// isBinaryData
   const bool isBinaryData() const;
   
-  
+  // finalize 
   void finalize();
   
   /// get Data Description
@@ -191,18 +193,34 @@ public:
   
   bool isFinalized() const;
   
+  // print out input
+  void edit(std::ostream & out ) const;
+  
   protected : 
   //---------
   ///. verification of inputs validity  
-    virtual bool verif();
+  virtual bool verif();
+  
+  // Criterion
+  std::vector <XEMCriterionName> _criterionName;
+  
+  // ModelType
+  std::vector <XEMModelType*> _modelType;
+  
+  /** a input object must be finalized (verif, ...)
+   */
+  bool _finalized;
  
-
   //-------
   private :
   //-------
     
   /// Data Description
   XEMDataDescription _dataDescription;
+  
+  // Known Partition
+  XEMPartition * _knownPartition; 
+  XEMLabelDescription * _knownLabelDescription;
     
   // Number of samples (no reduced data)
   int64_t  _nbSample;
@@ -211,21 +229,7 @@ public:
   int64_t _pbDimension;
   
   // nbCluster
-  vector<int64_t> _nbCluster;
-
-  // Known Partition
-  XEMPartition * _knownPartition; 
-  XEMLabelDescription * _labelDescription;
-  
-  // CriterionName
-  vector <XEMCriterionName> _criterionName;
-  
-  // ModelType
-  vector <XEMModelType *> _modelType;
-  
-  /** a input object must be finalized (verif, ...)
-  */
-  bool _finalized;
+  std::vector<int64_t> _nbCluster;
 
 };
 
@@ -238,7 +242,7 @@ inline int64_t XEMInput::getPbDimension() const{
 }
 
 
-inline vector<int64_t> XEMInput::getNbCluster() const{
+inline std::vector<int64_t> XEMInput::getNbCluster() const{
   return _nbCluster;
 }
 
@@ -250,7 +254,7 @@ inline int64_t XEMInput::getNbClusterSize() const{
   return _nbCluster.size();
 }
 
-inline int64_t XEMInput::getNbCriterionName() const{
+inline int64_t XEMInput::getNbCriterion() const{
   return _criterionName.size();
 }
 
@@ -262,8 +266,8 @@ inline XEMPartition * XEMInput::getKnownPartition() const{
   return _knownPartition;
 }
 
-inline const XEMLabelDescription * XEMInput::getLabel() const{
- return _labelDescription; 
+inline const XEMLabelDescription * XEMInput::getKnownLabelDescription() const{
+ return _knownLabelDescription; 
 }
 
 inline const bool XEMInput::isBinaryData() const{
@@ -274,18 +278,6 @@ inline bool XEMInput::isFinalized() const{
   return _finalized;
 }
 
-
-
-inline XEMClusteringStrategy * XEMInput::getStrategy()const{
-  throw errorInXEMInputSelector;
-}
-
-
-inline void XEMInput::setStrategy(XEMClusteringStrategy * strat){
-  throw errorInXEMInputSelector;
-}
-
-
 inline const XEMDataDescription & XEMInput::getDataDescription() const{
   return _dataDescription;
 }
@@ -294,78 +286,9 @@ inline XEMData * XEMInput::getData() const{
   return _dataDescription.getData();
 }
 
-inline vector <XEMCriterionName> XEMInput::getCriterionName() const{
+inline vector<XEMCriterionName> const & XEMInput::getCriterionName() const{
   return _criterionName;
 }
 
-
-/*
-
-
-inline const int64_t & XEMOldInput::getNbSample() const{
-  return _nbSample;
-}
-
-inline const int64_t & XEMOldInput::getPbDimension() const{
-  return _pbDimension;
-}
-
-  inline void  XEMOldInput::setWeight(string & fileNameWeight){
-    	if (fileNameWeight.compare("") == 0){	
-		return _data->setWeightDefault();
-	}else{
-		return _data->setWeight(fileNameWeight);
-	}
-  }
-
-  inline const XEMPartition**  XEMOldInput::getTabPartition() const{
-    return  const_cast<const XEMPartition**>(_tabKnownPartition);
-  }
-
-  inline const XEMPartition*  XEMOldInput::getTabPartitionI(int64_t index) const{
-    return _tabKnownPartition[index];
-  }
-
-  inline const int64_t & XEMOldInput::getNbNbCluster() const{
-    return _nbNbCluster;
-  }
-
-  inline  const int64_t*  XEMOldInput::getTabNbCluster() const{
-    return _tabNbCluster;
-  }
-
-  inline const int64_t XEMOldInput::getTabNbClusterI(int64_t index) const{
-    return _tabNbCluster[index];
-  }
-
-  inline const XEMCriterionName *  XEMOldInput::getTabCriterionName() const{
-    return _tabCriterionName;
-  }
-
-  inline const XEMCriterionName & XEMOldInput::getCriterionName(int64_t index) const{
-    return _tabCriterionName[index];
-  }
-
-
-  inline const XEMModelType**  XEMOldInput::getTabModelType() const{
-    return const_cast<const XEMModelType**>(_tabModelType);
-  }
-
-
-  inline const XEMModelType*  XEMOldInput::getTabModelTypeI(int64_t index) const{
-    return _tabModelType[index];
-  }
-*/
-/*
-  inline int64_t  XEMOldInput::getNbKnownPartition() const{
-    int64_t nbPartition;
-    if (_tabKnownPartition){
-      nbPartition = _nbNbCluster;
-    }
-    else{
-      nbPartition = 0;
-    }
-    return nbPartition;
-  }*/
 
 #endif

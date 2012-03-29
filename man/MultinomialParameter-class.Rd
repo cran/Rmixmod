@@ -7,23 +7,15 @@
   class.
 }
 \details{
-  \describe{
-
-  \item{center}{a numeric vector containing center of each
-  cluster.}
-
-  \item{scatter}{a vector of matrix containing dispersion
-  matrix of each cluster.}
-
+  \describe{ \item{center}{a numeric vector containing
+  center of each cluster.} \item{scatter}{a vector of
+  matrix containing dispersion matrix of each cluster.}
   \item{factor}{a character vector containing the
-  modalities.}
-
-  }
+  modalities.} }
 }
 \examples{
 new("MultinomialParameter")
-}
-\author{
-  Remi Lebret \email{remi.lebret@math.univ-lille1.fr}
+
+  getSlots("MultinomialParameter")
 }
 

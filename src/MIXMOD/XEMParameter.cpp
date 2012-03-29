@@ -25,6 +25,7 @@
 #include "XEMParameter.h"
 #include "XEMRandom.h"
 #include "XEMModel.h"
+#include "XEMData.h"
 
 
 //------------
@@ -106,6 +107,18 @@ XEMParameter::~XEMParameter(){
   }
 }	
 
+//---------------------
+/// Comparison operator
+//---------------------
+bool XEMParameter::operator ==(const XEMParameter & param) const{
+  if ( _pbDimension != param.getPbDimension() ) return false;
+  if ( _nbCluster != param.getNbCluster() ) return false;
+  if ( _freeProportion != param.getFreeProportion() ) return false;
+  for (int64_t  k=0; k<_nbCluster; k++){
+    if ( _tabProportion[k] != param.getTabProportion()[k] ) return false;
+  }
+  return true;
+}
 
 
 //------------------------

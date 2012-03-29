@@ -26,7 +26,6 @@
 #define XEMNECCRITERION_H
 
 #include "XEMCriterion.h"
-#include "XEMModel.h"
 
 
 /**
@@ -39,24 +38,14 @@ class XEMNECCriterion : public XEMCriterion{
 public:
 
 	/// Default constructor
-	XEMNECCriterion();
-
+	XEMNECCriterion(XEMModel * model);
 
 	/// Destructor
 	virtual ~XEMNECCriterion();
 
-  XEMCriterionName getCriterionName() const;
-
 	/// Run method
-	void run(XEMModel * model, double & value, XEMErrorType & error);
-		
-
-private :
+	virtual void run(XEMCriterionOutput & output);
 	     
 };
-
-inline XEMCriterionName XEMNECCriterion::getCriterionName() const{
-  return NEC;
-}
 
 #endif

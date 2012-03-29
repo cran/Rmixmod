@@ -22,8 +22,12 @@
 
     All informations available on : http://www.mixmod.org                                                                                               
 ***************************************************************************/
-#include "XEMModelOutput.h"
 
+#include "XEMModelOutput.h"
+#include "XEMModel.h"
+#include "XEMModelType.h"
+#include "XEMProbaDescription.h"
+#include "XEMLabelDescription.h"
 
 
 //--------------------
@@ -45,16 +49,13 @@ XEMModelOutput::XEMModelOutput(const XEMModelOutput & modelOutput){
 //------------------------------
 //  Initialization constructor 1
 //------------------------------
-XEMModelOutput::XEMModelOutput(XEMEstimation * estimation){
+XEMModelOutput::XEMModelOutput(XEMModel * estimation)
+{
   if (!estimation){
     throw nullPointerError;
   }
-  _estimation = estimation;
-  
   _modelType = *(estimation->getModelType());
   _nbCluster = estimation->getNbCluster();
-  _criterionOutput = estimation->getCriterionOutput();
-
   
   _strategyRunError = estimation->getErrorType();
   if (_strategyRunError == noError){
@@ -68,7 +69,7 @@ XEMModelOutput::XEMModelOutput(XEMEstimation * estimation){
     _parameterDescription = NULL;
   }
   
-  _likelihood = estimation->getModel()->getLogLikelihood(false);
+  _likelihood = estimation->getLogLikelihood(false);
 }
 
 
@@ -77,18 +78,22 @@ XEMModelOutput::XEMModelOutput(XEMEstimation * estimation){
 //------------------------------
 //  Initialization constructor 2
 //------------------------------
-XEMModelOutput::XEMModelOutput(XEMModelType & modelType, int64_t nbCluster, vector<XEMCriterionOutput> & criterionOutput, double likelihood, XEMParameterDescription & parameterDescription, XEMLabelDescription & labelDescription,  XEMProbaDescription & probaDescription){
-  _estimation = NULL;
-  //TODO
-  
+XEMModelOutput::XEMModelOutput( XEMModelType & modelType
+                              , int64_t nbCluster
+                              , vector<XEMCriterionOutput> & criterionOutput
+                              , double likelihood
+                              , XEMParameterDescription & parameterDescription
+                              , XEMLabelDescription & labelDescription
+                              ,  XEMProbaDescription & probaDescription
+                              )
+{
   _modelType = modelType;
   _nbCluster = nbCluster;
-  _criterionOutput = criterionOutput;
   _strategyRunError = noError; // TODO ??
   if (_strategyRunError == noError){
-    _probaDescription = &probaDescription;
-    _labelDescription = &labelDescription;
-    _parameterDescription = &parameterDescription;
+    _probaDescription = new XEMProbaDescription(probaDescription);
+    _labelDescription = new XEMLabelDescription(labelDescription);
+    _parameterDescription = new XEMParameterDescription(parameterDescription);
   }
   else{
     _probaDescription = NULL;
@@ -102,27 +107,53 @@ XEMModelOutput::XEMModelOutput(XEMModelType & modelType, int64_t nbCluster, vect
 //------------------------------
 //  Initialization constructor 3
 //------------------------------
-XEMModelOutput::XEMModelOutput(XEMModelType & modelType, int64_t nbCluster, XEMErrorType error){
-  _estimation = NULL;
-  
+XEMModelOutput::XEMModelOutput(XEMModelType & modelType, int64_t nbCluster, XEMErrorType error)
+{
   _modelType = modelType;
   _nbCluster = nbCluster;
   _strategyRunError = error; 
   _probaDescription = NULL;
   _labelDescription = NULL;
   _parameterDescription = NULL;
-  _criterionOutput.resize(0);
   _likelihood = 0;
 }
 
 //-----------
 // Destructor
 //-----------
-XEMModelOutput::~XEMModelOutput(){
-
+XEMModelOutput::~XEMModelOutput()
+{
+  if (_labelDescription) delete _labelDescription;
+  if (_parameterDescription) delete _parameterDescription;
+  if (_probaDescription) delete _probaDescription;
 }
 
-  
 
+
+//----------------------
+/// Comparison operator
+//----------------------
+bool XEMModelOutput::operator ==(const XEMModelOutput & modelOutput) const{
+  
+  if ( _nbCluster != modelOutput.getNbCluster() ) return false;
+  if ( !(_modelType == modelOutput.getModelType()) ) return false;
+  for (int iCriterion=0; iCriterion<maxNbCriterion; iCriterion++ ){
+    if ( !(_criterionOutput[iCriterion] == modelOutput.getCriterionOutput(iCriterion)) ) return false;
+  }
+  if ( !(_parameterDescription == modelOutput.getParameterDescription()) ) return false;
+  if ( !(_labelDescription == modelOutput.getLabelDescription()) ) return false;
+  if ( !(_probaDescription == modelOutput.getProbaDescription()) ) return false;
+  return true;
+}
+
+// set criterion output
+void XEMModelOutput::setCriterionOutput( XEMCriterionOutput const & criterionOutput )
+{
+  // get criterion name
+  XEMCriterionName criterionName = criterionOutput.getCriterionName();
+  _criterionOutput[criterionName].setCriterionName(criterionName);
+  _criterionOutput[criterionName].setValue(criterionOutput.getValue());
+  _criterionOutput[criterionName].setError(criterionOutput.getError());
+}
 
 

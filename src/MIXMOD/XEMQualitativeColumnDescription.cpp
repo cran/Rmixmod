@@ -55,7 +55,7 @@ XEMColumnDescription * XEMQualitativeColumnDescription::clone()const{
   
   //filling of structure which describes variables
   QCD->_variableDescription.resize(_variableDescription.size());
-  for (int64_t i = 0; i<_variableDescription.size() ; ++i){
+  for (unsigned int i = 0; i<_variableDescription.size() ; ++i){
     VariableDescription varDescription;
     varDescription.name = _variableDescription[i].name;
     varDescription.num = _variableDescription[i].num;
@@ -64,8 +64,8 @@ XEMColumnDescription * XEMQualitativeColumnDescription::clone()const{
   return QCD;  
 }
 
-void XEMQualitativeColumnDescription::setVariableDescription(VariableDescription & variableDescription, int64_t index){
-  if (index>=0 && index<_variableDescription.size()){
+void XEMQualitativeColumnDescription::setVariableDescription(VariableDescription & variableDescription, unsigned int index){
+  if (index<_variableDescription.size()){
     _variableDescription[index].name  = variableDescription.name;
     _variableDescription[index].num  = variableDescription.num;
   }

@@ -23,13 +23,16 @@
     All informations available on : http://www.mixmod.org                                                                                               
 ***************************************************************************/
 #include "XEMICLCriterion.h"
+#include "XEMCriterionOutput.h"
+#include "XEMModel.h"
+
 
 
 //------------
 // Constructor
 //------------
-XEMICLCriterion::XEMICLCriterion(){
-}
+XEMICLCriterion::XEMICLCriterion(XEMModel * model) : XEMCriterion(model)
+{}
 
 
 
@@ -44,20 +47,19 @@ XEMICLCriterion::~XEMICLCriterion(){
 //---
 //run
 //---
-void XEMICLCriterion::run(XEMModel * model, double & value, XEMErrorType & error){
-
+void XEMICLCriterion::run(XEMCriterionOutput & output)
+{
  /* Compute ICL (Integrated Completed Likelihood) Criterion */
-
-  double completedLoglikelihood;
-  //double loglikelihood;
-  int64_t freeParameter;
-  double logN;
   
-  error = noError;
+  // initialize value
+  double value = 0.0;
+  // initialize error
+  XEMErrorType error = noError;
+    
   try{
-    completedLoglikelihood = model->getCompletedLogLikelihood();
-    freeParameter = model->getFreeParameter();
-    logN  = model->getLogN();
+    const double completedLoglikelihood = _model->getCompletedLogLikelihood();
+    const int64_t freeParameter = _model->getFreeParameter();
+    const double logN  = _model->getLogN();
 
     //_value =  -2.0*loglikelihood  -(2.0*completedLoglikelihood) + (freeParameter*logN);
     value =   -2.0*completedLoglikelihood + freeParameter*logN;
@@ -65,5 +67,10 @@ void XEMICLCriterion::run(XEMModel * model, double & value, XEMErrorType & error
   catch(XEMErrorType & e){
     error = e;
   }
+  // add name to criterion output
+  output.setCriterionName(ICL);
+  // add value to criterion output
+  output.setValue(value);
+  // add error to criterion output
+  output.setError(error);
 }
-

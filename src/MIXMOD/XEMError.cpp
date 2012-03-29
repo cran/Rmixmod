@@ -27,17 +27,16 @@
 //-----------
 //Constructor
 //-----------
-XEMError::XEMError(){
-}
+XEMError::XEMError() : _errorType(noError)
+{}
 
 
 
 //-----------
 //Constructor
 //-----------
-XEMError::XEMError(XEMErrorType errorType){
-  _errorType = errorType;
-}
+XEMError::XEMError(XEMErrorType errorType) : _errorType(errorType)
+{}
 
 
 

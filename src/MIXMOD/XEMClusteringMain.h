@@ -25,15 +25,12 @@
 #ifndef XEMCLUSTERINGMMAIN_H
 #define XEMCLUSTERINGMMAIN_H
 
-/*#include <iostream.h>*/
+#include <vector>
+#include "XEMUtil.h"
 
-#include "XEMClusteringInput.h"
-#include "XEMOutput.h"
-#include "XEMEstimation.h"
-#include "XEMSelection.h"
-#include "XEMError.h"
-#include "XEMDCVCriterion.h"
-
+// pre-declaration
+class XEMModel;
+class XEMClusteringInput;
 class XEMClusteringOutput;
 
 class XEMClusteringMain{
@@ -56,36 +53,24 @@ public:
   XEMClusteringOutput * getClusteringOutput() const;
   
   // get Input
-  XEMInput * getInput();
+  XEMClusteringInput * getInput();
   
   /// Run method
   void run();
+  
+  // set output pointer as null
 	void setOutputNull();
 	
-  /// getDCVCriterion
- // XEMDCVCriterion * getDCVCriterion();
-   
 private :
 
-  
+  // Input 
   XEMClusteringInput * _input;
-  
-  XEMClusteringOutput * _output;
-  
-  
+  // Output
+  XEMClusteringOutput * _output; 
 };
 
 inline XEMClusteringOutput * XEMClusteringMain::getClusteringOutput() const{
   return _output;
-}
-  
-inline  XEMInput * XEMClusteringMain::getInput(){
-  if (_input){
-    return _input;
-  }
-  else{
-    throw nullPointerError;
-  }
 }
 
 inline void XEMClusteringMain::setOutputNull()
@@ -93,6 +78,17 @@ inline void XEMClusteringMain::setOutputNull()
   _output = NULL;
 }
 
+//------------------------
+// return pointer to Input
+//------------------------
+inline  XEMClusteringInput * XEMClusteringMain::getInput(){
+  if (_input){
+    return _input;
+  }
+  else{
+    throw nullPointerError;
+  }
+}
 
 
 #endif

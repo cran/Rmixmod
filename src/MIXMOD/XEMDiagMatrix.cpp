@@ -25,7 +25,6 @@
 #include "XEMDiagMatrix.h"
 #include "XEMGeneralMatrix.h"
 #include "XEMSymmetricMatrix.h"
-#include "XEMUtil.h"
 
 //------------
 // Constructor
@@ -343,6 +342,22 @@ void XEMDiagMatrix::input(ifstream & fi){
       }
     }
 
+}
+
+
+void XEMDiagMatrix::input(double ** variances){
+  int64_t p,q;
+  for (p=0; p<_s_pbDimension; p++){
+    // useless because all are 0
+    for (q=0; q<p; q++){}
+    
+    // here i==j so we are in the diagonal
+     _store[p]=variances[p][q];
+    
+    // useless because all are 0
+    for(q=p+1;q<_s_pbDimension;q++){}
+  }
+  
 }
 
 double XEMDiagMatrix::detDiag(XEMErrorType errorType){

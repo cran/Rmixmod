@@ -7,8 +7,8 @@
 
 #include "Conversion.h"
 
-//#include <sstream>
-//#include <iostream>
+#include "MIXMOD/XEMGaussianData.h"
+#include "MIXMOD/XEMBinaryData.h"
 
 namespace Conversion
 {
@@ -27,26 +27,6 @@ Rcpp::NumericMatrix CMatrixToRcppMatrix(int64_t nbSample, int64_t pbDimension, d
     }
   }
   return matrixOutput;
-}
-  
-//To spin off double*** in Rcpp::NumericVector
-Rcpp::GenericVector CMatrixToVectorOfRcppMatrix(int64_t nbCluster, int64_t pdDimension, int64_t* tabNbModality, double*** matrix)
-{
-  //VectorMatrix of NumericMatrix
-  Rcpp::GenericVector vectorOutput(nbCluster);
-  // get maximum number of modality
-  int64_t max = *std::max_element(tabNbModality,tabNbModality+pdDimension);
-  for (int k=0; k<nbCluster; k++) {
-    //NumericMatrix for matrix
-    Rcpp::NumericMatrix matrixOutput(pdDimension,max);
-    for(int j=0; j<pdDimension; j++){
-      for (int h=0; h<tabNbModality[j]; h++) {
-        matrixOutput(j,h) = matrix[k][j][h];
-      }
-      vectorOutput(k) = matrixOutput;
-    }
-  }
-  return vectorOutput;
 }
 
 //To spin off vector of vector in Rcpp::NumericMatrix
@@ -113,7 +93,7 @@ Rcpp::NumericVector VectorToRcppVectorForInt( std::vector<int64_t> const & data)
   std::vector<int64_t>::size_type dim = data.size();
   //
   Rcpp::NumericVector vectorOutput(dim);
-  for(int i=0;i<dim;i++)
+  for(unsigned int i=0;i<dim;i++)
   {
     vectorOutput[i] = (double)data[i];
   }
@@ -172,7 +152,7 @@ XEMGaussianData * DataToXemGaussianData(Rcpp::NumericMatrix& data)
  * @param data the input data set
  * @return a pointer on a XEMBinaryData set
  */
-XEMBinaryData * DataToXemBinaryData(Rcpp::NumericMatrix& data)
+XEMBinaryData * DataToXemBinaryData(Rcpp::NumericMatrix& data, Rcpp::NumericVector& factor)
 {
   // wrap int variables to int64_t variables
   int64_t nbSample64 = data.nrow(), nbVariable64 = data.ncol();
@@ -188,31 +168,10 @@ XEMBinaryData * DataToXemBinaryData(Rcpp::NumericMatrix& data)
   }
 
   // compute the modalities of the data
-  vector<int64_t> nbModality;
+  vector<int64_t> nbModality(nbVariable64);
   for(int j=0;j<nbVariable64;j++)
-  {
-    // vector with all the modalities
-    vector<int64_t> modality;
-    // add modality of the individual 0
-    modality.push_back(matrix[0][j]);
-    for(int i=1;i<nbSample64;i++)
-    {
-      vector<int64_t>::iterator it = modality.begin();
-      bool find = false;
-      int64_t val= matrix[i][j];
-      for ( ;it != modality.end(); ++it)
-      {
-        if (val == *it) { find = true; break;}
-      }
-      if (!find)
-      {
-        modality.push_back(val);
-      }
-    }
-    // add number of modality of the variable j
-    nbModality.push_back(modality.size());
-  }
-
+  { nbModality[j]=factor[j]; }
+  
   // create XEMBinaryData
   XEMBinaryData*  bData = new XEMBinaryData(nbSample64, nbVariable64, nbModality, matrix);
 
@@ -223,6 +182,95 @@ XEMBinaryData * DataToXemBinaryData(Rcpp::NumericMatrix& data)
   matrix = 0;
 
   return bData;
+}
+
+  
+/*
+ * convert a R numeric vector to a C array
+ * @param in the R object
+ * @return a pointer to a double* array
+ */
+double * RcppVectorToCArray(Rcpp::NumericVector& in)
+{
+  // get the vector dimension
+  int size = in.size();
+  // allocate vector
+  double * out = new double[size];
+  for (int i=0; i<size; i++)
+  {
+    out[i] = in[i];
+  }
+  // return C vector
+  return out;
+}
+
+  
+/*
+ * convert a R numeric matrix to a C 2D array
+ * @param in the R object
+ * @return a pointer to a double** array
+ */
+double ** RcppMatrixToC2DArray(Rcpp::NumericMatrix& in)
+{
+  // get the vector dimension
+  int nrow = in.nrow();
+  int ncol = in.ncol();
+  
+  // allocate columns
+  double ** out = new double * [nrow];
+  for (int i=0; i<nrow; i++)
+  {
+    // allocate rows
+    out[i] = new double[ncol];
+    // get values
+    for (int j=0; j<ncol; j++)
+    {
+      out[i][j] = in(i,j);
+    }
+  }
+  // return C matrix
+  return out;
+}
+  
+/*
+ * convert a R numeric matrix to a C 2D array
+ * @param in the R object
+ * @return a pointer to a double** array
+ */
+double *** RcppListOfMatrixToC3DArray(Rcpp::List& in)
+{
+  // get the vector dimension
+  int size = in.size();
+  
+  // allocate first dimension
+  double *** out = new double ** [size];
+  
+  // loop over list
+  for (int k=0; k<size; k++) 
+  {
+    Rcpp::NumericMatrix mat = SEXP(in[k]);
+    
+    // get dimensions
+    int nrow = mat.nrow();
+    int ncol = mat.ncol();
+    
+    // allocate rows
+    out[k] = new double * [nrow];
+    
+    for (int i=0; i<nrow; i++)
+    {
+      // allocate rows
+      out[k][i] = new double[ncol];
+      // get values
+      for (int j=0; j<ncol; j++)
+      {
+        out[k][i][j] = mat(i,j);
+      }
+    }
+  }
+
+  // return C matrix
+  return out;
 }
 
 

@@ -1,0 +1,39 @@
+\name{Strategy-class}
+\alias{Strategy-class}
+\title{Constructor of [\code{\linkS4class{Strategy}}] class}
+\description{
+  This class defines the Mixmod strategies.
+}
+\details{
+  \describe{ \item{name}{list of character string with the
+  estimation algorithm.  Possible values: "EM", "SEM",
+  "CEM", c("EM","SEM"). Default value is "EM".}
+  \item{nbTry}{integer defining the number of tries.
+  Default value: 1.} \item{initMethod}{a character string
+  with the method of initialization of the algorithm
+  specified in the \code{name} argument. Possible values:
+  "random", "smallEM", "CEM", "SEMMax". Default value:
+  "smallEM".} \item{nbTryInInit}{integer defining number of
+  tries in \code{initMethod} algorithm. Default value: 50.}
+  \item{nbIterationInInit}{integer defining the number of
+  "EM" or "SEM" iterations in \code{initMethod}. Default
+  values: 5 if \code{initMethod} is "smallEM" and 100 if
+  \code{initMethod} is "SEMMax".}
+  \item{nbIterationInAlgo}{list of integers defining the
+  number of iterations if user want to use nbIteration as
+  rule to stop the algorithm(s). Default value: 200.}
+  \item{epsilonInInit}{real defining the epsilon value in
+  the initialization step. Only available if
+  \code{initMethod} is "smallEM". Default value: 0.001.}
+  \item{epsilonInAlgo}{list of reals defining the epsilon
+  value for the algorithm. Warning: epsilonInAlgo doesn't
+  have any sens if \code{name} is SEM, so it needs to be
+  set as NaN in that case. Default value: 0.001.} }
+}
+\examples{
+new("Strategy")
+  new("Strategy", name="SEM", initMethod="SEMMax")
+
+  getSlots("Strategy")
+}
+

@@ -25,9 +25,11 @@
 #ifndef XEMSPHERICALMATRIX_H
 #define XEMSPHERICALMATRIX_H
 
-#include "XEMUtil.h"
 #include "XEMMatrix.h"
-#include "XEMGeneralMatrix.h"
+
+// pre-declaration
+class XEMGeneralMatrix;
+class XEMDiagMatrix;
 
 /**
   @brief class XEMSphericalMatrix
@@ -100,7 +102,8 @@ public:
 
   /// read spherical matrix store in file
   void input(ifstream & fi);
-
+  virtual void input( double ** variances );
+  
   /// return store of a spherical matrix
   double putSphericalValueInStore(double & store);
   /// add store of a spherical matrix

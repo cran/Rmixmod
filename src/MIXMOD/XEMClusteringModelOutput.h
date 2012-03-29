@@ -27,10 +27,7 @@
 
 
 #include "XEMModelOutput.h"
-#include "XEMEstimation.h"
 
-
-using namespace std;
 
 class XEMClusteringModelOutput : public XEMModelOutput{
 
@@ -40,10 +37,10 @@ public:
   XEMClusteringModelOutput();
 
   /// Initialization Constructor 1
-  XEMClusteringModelOutput(XEMEstimation * estimation);
+  XEMClusteringModelOutput(XEMModel * estimation);
   
   /// Initialization Constructor 2
-  XEMClusteringModelOutput(XEMModelType & modelType, int64_t nbCluster, vector<XEMCriterionOutput> & criterionOutput, double likelihood, XEMParameterDescription & parameterDescription, XEMLabelDescription & labelDescription,  XEMProbaDescription & probaDescription);
+  XEMClusteringModelOutput(XEMModelType & modelType, int64_t nbCluster, std::vector<XEMCriterionOutput> & criterionOutput, double likelihood, XEMParameterDescription & parameterDescription, XEMLabelDescription & labelDescription,  XEMProbaDescription & probaDescription);
   
   /// Initialization Constructor 3
   XEMClusteringModelOutput(XEMModelType & modelType, int64_t nbCluster, XEMErrorType error);
@@ -51,10 +48,8 @@ public:
   /// Copy Constructor
   XEMClusteringModelOutput(const XEMClusteringModelOutput & cModelOutput);
   
-
   /// Destructor
   virtual ~XEMClusteringModelOutput();
-
 };
 
 

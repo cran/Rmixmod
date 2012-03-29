@@ -51,9 +51,9 @@ class XEMIndividualColumnDescription : public XEMColumnDescription
     
     const vector<IndividualDescription> & getIndividualDescription()const;
     
-    void setIndividualDescription(IndividualDescription & individualDescription, int64_t index);
+    void setIndividualDescription(IndividualDescription & individualDescription, unsigned int index);
     
-    void insertIndividualDescription(IndividualDescription individualDescription, int64_t index);
+    void insertIndividualDescription(IndividualDescription individualDescription, unsigned int index);
     
   private :
     vector<IndividualDescription> _individualDescription;

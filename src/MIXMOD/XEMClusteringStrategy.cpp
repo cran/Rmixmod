@@ -24,11 +24,10 @@
 ***************************************************************************/
 
 #include "XEMClusteringStrategy.h"
-#include "XEMAlgo.h"
+#include "XEMClusteringStrategyInit.h"
 #include "XEMEMAlgo.h"
 #include "XEMCEMAlgo.h"
 #include "XEMSEMAlgo.h"
-#include "XEMUtil.h"
 #include "XEMGaussianParameter.h"
 #include "XEMGaussianSphericalParameter.h"
 #include "XEMGaussianDiagParameter.h"
@@ -36,7 +35,9 @@
 #include "XEMGaussianHDDAParameter.h"
 #include "XEMBinaryEkjhParameter.h"
 #include "XEMBinaryData.h"
-
+#include "XEMModelType.h"
+#include "XEMPartition.h"
+#include "XEMModel.h"
 
 //-----------
 //Constructor
@@ -45,9 +46,10 @@ XEMClusteringStrategy::XEMClusteringStrategy(){
   _nbTry = defaultNbTryInStrategy;
   _strategyInit = new XEMClusteringStrategyInit();
   _nbAlgo  = defaultNbAlgo;
-  _tabAlgo = new XEMAlgo * [_nbAlgo];
+  _tabAlgo.reserve(_nbAlgo);
+//  _tabAlgo = new XEMAlgo * [_nbAlgo];
   for (int64_t i=0; i<_nbAlgo; i++){
-    _tabAlgo[i] = createDefaultAlgo();
+    _tabAlgo.push_back(createDefaultClusteringAlgo());
   }
 }
 
@@ -56,10 +58,12 @@ XEMClusteringStrategy::XEMClusteringStrategy(const XEMClusteringStrategy & strat
   _nbTry = strategy.getNbTry();
   _strategyInit = new XEMClusteringStrategyInit(*(strategy.getStrategyInit()));
   _nbAlgo = strategy.getNbAlgo();
-  _tabAlgo = new XEMAlgo * [_nbAlgo];
-  XEMAlgo ** tabA = strategy.getTabAlgo();
+//  _tabAlgo = new XEMAlgo * [_nbAlgo];
+//  XEMAlgo ** tabA = strategy.getTabAlgo();
+  std::vector<XEMAlgo*> tabA = strategy.getTabAlgo();
   for (int64_t i=0; i<_nbAlgo; i++){
-    _tabAlgo[i] = tabA[i]->clone();
+//    _tabAlgo[i] = tabA[i]->clone();
+    _tabAlgo.push_back(tabA[i]->clone());
   }
   
 }
@@ -71,18 +75,13 @@ XEMClusteringStrategy::XEMClusteringStrategy(const XEMClusteringStrategy & strat
 //----------
 XEMClusteringStrategy::~XEMClusteringStrategy(){
 
-  if (_tabAlgo){
-    for (int64_t i=0; i<_nbAlgo ;i++){
-      delete _tabAlgo[i];
-      _tabAlgo[i] = NULL;
-    }
-    delete [] _tabAlgo;
-    _tabAlgo = NULL;
+  for (unsigned int i=0; i<_tabAlgo.size(); i++) {
+    delete _tabAlgo[i];
   }
+  if (_strategyInit) delete _strategyInit;
 }
 
-
-
+// setAlgoEpsilon
 void XEMClusteringStrategy::setAlgoEpsilon(int64_t position, double epsilonValue){
   _tabAlgo[position]->setEpsilon(epsilonValue);
 }
@@ -117,7 +116,24 @@ void XEMClusteringStrategy::setAlgo(XEMAlgoName algoName, int64_t position){
   }
 }
 
+// setAlgo
+void XEMClusteringStrategy::addAlgo(XEMAlgoName algoName){
 
+  switch (algoName) {
+    case EM :
+      _tabAlgo.push_back(new XEMEMAlgo());
+      break;
+    case CEM :
+      _tabAlgo.push_back(new XEMCEMAlgo());
+      break;
+    case SEM :
+      _tabAlgo.push_back(new XEMSEMAlgo());
+      break;
+    default :
+      throw internalMixmodError;
+  }
+  _nbAlgo++;
+}
 
 // set init parameter
 void XEMClusteringStrategy::setInitParam(string & paramFileName, int64_t position){
@@ -143,19 +159,31 @@ void XEMClusteringStrategy::setTabPartition(XEMPartition ** tabPartition, int64_
   _strategyInit->setTabPartition(tabPartition, nbPartition);
 }
 
-// removeAlgo
-void XEMClusteringStrategy::removeAlgo(int64_t position){
-  XEMAlgo ** tabAlgo = new XEMAlgo*[_nbAlgo-1];
-  recopyTab<XEMAlgo*>(_tabAlgo, tabAlgo, position);
-  for (int64_t i=position ; i<(_nbAlgo-1);i++){
-    tabAlgo[i] = _tabAlgo[i+1];
+// insert algo
+void XEMClusteringStrategy::insertAlgo(XEMAlgoName algoName,int64_t position){
+  switch (algoName) {
+    case EM :
+     _tabAlgo.insert(_tabAlgo.begin()+position,new XEMEMAlgo());
+      break;
+    case CEM :
+      _tabAlgo.insert(_tabAlgo.begin()+position,new XEMCEMAlgo());
+      break;
+    case SEM :
+      _tabAlgo.insert(_tabAlgo.begin()+position,new XEMSEMAlgo());
+      break;
+    default :
+      throw internalMixmodError;
   }
-  _nbAlgo--;
+  _nbAlgo++;
+}
 
-  delete [] _tabAlgo;
-  _tabAlgo = NULL;
-  _tabAlgo = tabAlgo;
 
+// removeAlgo
+void XEMClusteringStrategy::removeAlgo( unsigned int position){
+  if ( position < _tabAlgo.size() ){
+    _tabAlgo.erase(_tabAlgo.begin()+position);
+    _nbAlgo--;
+  }
 }
 
 //--------------------
@@ -244,7 +272,7 @@ void XEMClusteringStrategy::setNbTry(int64_t nbTry){
 //---
 //run
 //---
-void XEMClusteringStrategy::run(XEMModel *& model){ 
+void XEMClusteringStrategy::run(XEMModel * model){ 
   //cout<<"XEMClusteringStrategy Init, nbTry="<<_nbTry<<endl;
   if (_nbTry == 1){
     oneTry(model);
@@ -330,17 +358,20 @@ void XEMClusteringStrategy::oneTry(XEMModel *& model){
       }
       break;
         
-    case SMALL_EM :
-      model->initSMALL_EM(_strategyInit); break;
-        
-    case CEM_INIT :
-      model->initCEM_INIT(_strategyInit); break;
-        
+    case SMALL_EM : 
+      _strategyInit->initSMALL_EM(model); 
+      break;
+    
+    case CEM_INIT : 
+      _strategyInit->initCEM_INIT(model); 
+      break;
+    
     case SEM_MAX :
-      model->initSEM_MAX(_strategyInit); break;
+      _strategyInit->initSEM_MAX(model); 
+      break;
         
     default :
-      cout << "XEMAlgo Error: Strategy Initialization Type Unknown";break;
+      throw wrongStrategyInitName;
   }
     
   model->setAlgoName(UNKNOWN_ALGO_NAME);
@@ -361,25 +392,6 @@ void XEMClusteringStrategy::oneTry(XEMModel *& model){
 
 
 
-// insert algo
-void XEMClusteringStrategy::insertAlgo(XEMAlgo * algo,int64_t position){
-  XEMAlgo ** tabAlgo = new XEMAlgo*[_nbAlgo+1];
-  recopyTab<XEMAlgo*>(_tabAlgo, tabAlgo, position);
-  tabAlgo[position] = algo;
-
-  for (int64_t k=position; k<_nbAlgo;++k){
-    tabAlgo[k+1] = _tabAlgo[k];
-  }
-
-  _nbAlgo++;
-
-  delete [] _tabAlgo;
-  _tabAlgo = NULL;
-  _tabAlgo = tabAlgo;
-}
-
-
-
 
 //-------
 // verify
@@ -391,7 +403,7 @@ bool XEMClusteringStrategy::verify(){
   // Test 
   //-----
   // nbAlogType > 0
-  if (_nbAlgo<1 || _tabAlgo==NULL){
+  if (_nbAlgo<1 || _tabAlgo.empty()){
     res = false;
     throw  nbAlgoTypeTooSmall;
   }
@@ -448,7 +460,7 @@ void XEMClusteringStrategy::input_FLAT_FORMAT(ifstream & fi, XEMData *& data, in
     for (j=0; j<_nbAlgo; j++){
       delete _tabAlgo[j]; 
     }
-    delete[] _tabAlgo;
+//    delete[] _tabAlgo;
       
     fi>>_nbAlgo;
     if (_nbAlgo > maxNbAlgo){
@@ -458,8 +470,9 @@ void XEMClusteringStrategy::input_FLAT_FORMAT(ifstream & fi, XEMData *& data, in
       throw nbAlgoTooSmall;
     }
 
-    _tabAlgo = new XEMAlgo * [_nbAlgo];
-
+//    _tabAlgo = new XEMAlgo * [_nbAlgo];
+    _tabAlgo.resize(_nbAlgo);
+    
     for (j=0; j<_nbAlgo; j++){
       fi>>keyWord;
       ConvertBigtoLowString(keyWord);
@@ -600,7 +613,45 @@ ostream & operator << (ostream & fo, XEMClusteringStrategy & strategy){
       fo<<"Algo n "<<j+1<<" : "<<endl;
       fo<<(*curAlgo);
       fo<<endl;
-    }
+  }
+  return fo;
+}
+
+
+const int64_t XEMClusteringStrategy::getNbTryInInit() const{
+  return _strategyInit->getNbTry();
+}
+
+const int64_t XEMClusteringStrategy::getNbIterationInInit() const{
+  return _strategyInit->getNbIteration();
+}
+
+const double XEMClusteringStrategy::getEpsilonInInit() const{
+  return _strategyInit->getEpsilon();
+}
+
+void XEMClusteringStrategy::setNbTryInInit(int64_t nbTry){
+  _strategyInit->setNbTry(nbTry);
+}
+
+void XEMClusteringStrategy::setStrategyInitName(XEMStrategyInitName initName){
+  _strategyInit->setStrategyInitName(initName);
+}
+
+void XEMClusteringStrategy::setNbIterationInInit(int64_t nbIteration){
+  _strategyInit->setNbIteration(nbIteration);
+}
+
+void XEMClusteringStrategy::setEpsilonInInit(double epsilon){
+  _strategyInit->setEpsilon(epsilon);
+}
+
+const XEMAlgoStopName XEMClusteringStrategy::getStopNameInInit() const{
+  return(_strategyInit->getStopName());
+}
+
+void XEMClusteringStrategy::setStopNameInInit(XEMAlgoStopName stopName){
+  _strategyInit->setStopName(stopName);
 }
 
 

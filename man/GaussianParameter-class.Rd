@@ -7,20 +7,13 @@
   class.
 }
 \details{
-  \describe{
-
-  \item{mean}{a numeric vector containing mean of each
-  cluster.}
-
-  \item{variance}{a vector of matrix containing variance
-  matrix of each cluster.}
-
-  }
+  \describe{ \item{mean}{a numeric vector containing mean
+  of each cluster.} \item{variance}{a vector of matrix
+  containing variance matrix of each cluster.} }
 }
 \examples{
 new("GaussianParameter")
-}
-\author{
-  Remi Lebret \email{remi.lebret@math.univ-lille1.fr}
+
+  getSlots("GaussianParameter")
 }
 

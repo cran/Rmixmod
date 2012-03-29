@@ -1,0 +1,23 @@
+\name{MixmodCluster-class}
+\alias{MixmodCluster-class}
+\title{Constructor of [\code{\linkS4class{MixmodCluster}}] class}
+\description{
+  This is a class to run clustering with mixmod. Inherits
+  the [\code{\linkS4class{Mixmod}}] class.
+}
+\details{
+  \describe{ \item{strategy}{a S4
+  [\code{\linkS4class{Strategy}}] object. Defining the
+  strategy used to run MIXMOD.} \item{bestResult}{a S4
+  [\code{\linkS4class{MixmodResults}}] object containing
+  the best model results.} }
+}
+\examples{
+## A quantitative example with the famous iris data set
+  data(iris)
+  ## with default values
+  new("MixmodCluster", data=iris[1:4], nbCluster=3)
+
+  getSlots("MixmodCluster")
+}
+

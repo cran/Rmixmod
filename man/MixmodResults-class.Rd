@@ -1,0 +1,24 @@
+\name{MixmodResults-class}
+\alias{MixmodResults-class}
+\title{Constructor of [\code{\linkS4class{MixmodResults}}] class}
+\description{
+  This is a class to contain results from MIXMOD library.
+}
+\details{
+  \describe{ \item{nbCluster}{integer. It indicates the
+  number of components.} \item{model}{character. Name of
+  the model.} \item{criterion}{list of character. This
+  option permits to select the criterion giving the best
+  configuration of an execution.}
+  \item{criterionValue}{numeric. Values of the criterion.}
+  \item{parameters}{a S4 [\code{\linkS4class{Parameter}}]
+  object. The best model parameters.}
+  \item{likelihood}{numeric. The model likelihood.}
+  \item{partition}{vector of integers defining the
+  partition.} \item{proba}{a matrix of probabilities.}
+  \item{error}{a character. The mixmod error.} }
+}
+\examples{
+getSlots("MixmodResults")
+}
+

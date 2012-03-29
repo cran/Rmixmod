@@ -1,0 +1,16 @@
+\name{isQualitative}
+\alias{isQualitative}
+\title{Say if a data frame contains only qualitative variables.}
+\usage{
+  isQualitative(x)
+}
+\arguments{
+  \item{x}{a vector or a matrix or a data frame}
+}
+\value{
+  a boolean
+}
+\description{
+  Say if a data frame contains only qualitative variables.
+}
+

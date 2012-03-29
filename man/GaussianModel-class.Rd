@@ -6,17 +6,13 @@
   [\code{\linkS4class{Model}}] class.
 }
 \details{
-  \describe{
-
-  \item{family}{character defining a family of models.}
-
-  }
+  \describe{ \item{family}{character defining a family of
+  models.} }
 }
 \examples{
 new("GaussianModel")
-new("GaussianModel",family="general")
-}
-\author{
-  Remi Lebret \email{remi.lebret@math.univ-lille1.fr}
+  new("GaussianModel",family="general")
+
+  getSlots("GaussianModel")
 }
 

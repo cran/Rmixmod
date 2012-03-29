@@ -27,8 +27,6 @@
 
 
 #include "XEMCriterion.h"
-#include "XEMModel.h"
-
 /**
   @brief Derived class of XEMCriterion for ICL Criterion
   @author F Langrognet & A Echenim
@@ -38,22 +36,15 @@ class XEMICLCriterion : public XEMCriterion{
 public:
 
 	/// Default constructor
-	XEMICLCriterion();
+	XEMICLCriterion(XEMModel * model);
 
 	/// Destructor
 	virtual ~XEMICLCriterion();
-
-  
-  XEMCriterionName getCriterionName() const;
   
 	// Run method
-	void run(XEMModel * model, double & value, XEMErrorType & error);
+	virtual void run(XEMCriterionOutput & output);
 	
 	
 };
-
-inline XEMCriterionName XEMICLCriterion::getCriterionName() const{
-  return ICL;
-}
 
 #endif

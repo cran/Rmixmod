@@ -22,14 +22,15 @@
 
     All informations available on : http://www.mixmod.org                                                                                               
 ***************************************************************************/
+
 #include "XEMClusteringInput.h"
-
-
+#include "XEMClusteringStrategy.h"
 
 //--------------------
 // Default Constructor
 //--------------------
-XEMClusteringInput::XEMClusteringInput(){
+XEMClusteringInput::XEMClusteringInput()
+{
   _strategy = new XEMClusteringStrategy();
 }
 
@@ -37,8 +38,10 @@ XEMClusteringInput::XEMClusteringInput(){
 //-----------------
 //  Copy constructor
 //-----------------
-XEMClusteringInput::XEMClusteringInput(const XEMClusteringInput & cInput ) : XEMInput(cInput){
-  _strategy = new XEMClusteringStrategy(*(cInput.getStrategy())); // copy constructor
+XEMClusteringInput::XEMClusteringInput( const XEMClusteringInput & cInput ) 
+                                      : XEMInput(cInput)
+{
+  _strategy = new XEMClusteringStrategy(*cInput.getStrategy());
 }
 
 
@@ -46,22 +49,112 @@ XEMClusteringInput::XEMClusteringInput(const XEMClusteringInput & cInput ) : XEM
 //---------------------------
 // Initialisation Constructor
 //---------------------------
-XEMClusteringInput::XEMClusteringInput(const vector<int64_t> & iNbCluster, const XEMDataDescription & iDataDescription) : XEMInput(iNbCluster, iDataDescription){
+XEMClusteringInput::XEMClusteringInput( const vector<int64_t> & iNbCluster
+                                      , const XEMDataDescription & iDataDescription
+                                      ) 
+                                      : XEMInput(iNbCluster, iDataDescription)
+{
   _strategy = new XEMClusteringStrategy();
 }
-
-
 
 
 //-----------
 // Destructor
 //-----------
-XEMClusteringInput::~XEMClusteringInput(){
-  if (_strategy){
-    delete _strategy;
-  }
+XEMClusteringInput::~XEMClusteringInput()
+{
+  if ( _strategy ) delete _strategy;
 }
 
+
+//-----------
+// setStrategy
+//-----------
+void XEMClusteringInput::setStrategy(XEMClusteringStrategy * strat)
+{
+  _strategy = new XEMClusteringStrategy(*strat);
+}
+
+//setCriterion
+//----------------
+void XEMClusteringInput::setCriterion(const XEMCriterionName criterionName, unsigned int index){
+  if (index<_criterionName.size()){
+    switch (criterionName) {
+      case BIC : _criterionName[index] = BIC; break;
+      case CV :  throw XEMDAInput;
+      case ICL : _criterionName[index] = ICL; break;
+      case NEC : _criterionName[index] = NEC; break;
+      case UNKNOWN_CRITERION_NAME : throw internalMixmodError;break;
+      default : throw internalMixmodError;
+    }
+  }
+  else{
+    throw wrongCriterionPositionInSet;
+  }
+  _finalized = false;
+}
+
+//setCriterion
+//----------------
+void XEMClusteringInput::setCriterion(std::vector<XEMCriterionName> const & criterionName){
+   
+  // copy vector contents
+  _criterionName = criterionName;
+  
+  // check vector contents
+  for ( unsigned int iCriterion=0; iCriterion<_criterionName.size(); iCriterion++ ){
+    switch (_criterionName[iCriterion]) {
+      case BIC : break;
+      case CV :  throw XEMDAInput;
+      case ICL : break;
+      case NEC : break;
+      case UNKNOWN_CRITERION_NAME : throw internalMixmodError;break;
+      default : throw internalMixmodError;
+    }
+  }
+  _finalized = false;
+}
+
+// insertCriterion
+//-----------------
+void XEMClusteringInput::insertCriterion(const XEMCriterionName criterionName, unsigned int index){
+  if (index<=_criterionName.size()){
+    switch (criterionName) {
+      case BIC : _criterionName.insert (_criterionName.begin()+index , BIC); break;
+      case CV :  throw XEMDAInput;
+      case ICL : _criterionName.insert (_criterionName.begin()+index , ICL); break;
+      case NEC : _criterionName.insert (_criterionName.begin()+index , NEC); break;
+      case UNKNOWN_CRITERION_NAME : throw internalMixmodError;break;
+      default : throw internalMixmodError;
+    }
+  }
+  else{
+    throw wrongCriterionPositionInInsert;
+  }
+  _finalized = false;
+}
+
+
+// add Criterion
+//-----------------
+void XEMClusteringInput::addCriterion(const XEMCriterionName criterionName){
+  
+  bool found=false;
+  for (unsigned int iCriterion=0; iCriterion<_criterionName.size(); iCriterion++ ){
+    if ( _criterionName[iCriterion] == criterionName ) found = true;
+  }
+  if (!found) {
+    switch (criterionName) {
+      case BIC : _criterionName.push_back(BIC); break;
+      case CV :  throw XEMDAInput;
+      case ICL : _criterionName.push_back(ICL); break;
+      case NEC : _criterionName.push_back(NEC); break;
+      case UNKNOWN_CRITERION_NAME : throw internalMixmodError;break;
+      default : throw internalMixmodError;
+    }
+  }
+  _finalized = false;
+}
 
 
 // ----------------
@@ -69,11 +162,6 @@ XEMClusteringInput::~XEMClusteringInput(){
 //-----------------
 bool XEMClusteringInput::verif(){
   bool res = XEMInput::verif();
-  
-  if (res){
-    res = _strategy->verify(); 
-  }
   return res;
 }
-
 

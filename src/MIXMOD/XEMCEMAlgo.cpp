@@ -23,6 +23,7 @@
     All informations available on : http://www.mixmod.org                                                                                               
 ***************************************************************************/
 #include "XEMCEMAlgo.h"
+#include "XEMModel.h"
 
 //-----------
 //Constructor
@@ -59,7 +60,7 @@ XEMAlgo * XEMCEMAlgo::clone(){
 //---
 void XEMCEMAlgo::run(XEMModel *& model){
   _indexIteration = 1;
-  model = model;
+//  model = model;
   model->setAlgoName(CEM);
 
 #if DEBUG > 0

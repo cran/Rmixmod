@@ -3,6 +3,7 @@
 ###################################################################################
 
 ###################################################################################
+##' @include global.R
 ##' @include Parameter.R
 NULL
 ###################################################################################
@@ -13,18 +14,16 @@ NULL
 ##' This class defines parameters of a Multinomial Mixture Model. Inherits the [\code{\linkS4class{Parameter}}] class.
 ##' 
 ##' \describe{
-##'
 ##'   \item{center}{a numeric vector containing center of each cluster.}
-##'
 ##'   \item{scatter}{a vector of matrix containing dispersion matrix of each cluster.}
-##'
 ##'   \item{factor}{a character vector containing the modalities.}
-##'
 ##' }
 ##'
 ##' @examples
 ##'   new("MultinomialParameter")
-##' @author Remi Lebret \email{remi.lebret@@math.univ-lille1.fr}
+##'
+##'   getSlots("MultinomialParameter")
+##' 
 ##' @name MultinomialParameter-class
 ##' @rdname MultinomialParameter-class
 ##' @exportClass MultinomialParameter
@@ -48,57 +47,26 @@ setClass(
 
 
 ###################################################################################
-##' Print the MultinomialParameter class to standard output.
-##'
-##' @param x A \code{MultinomialParameter} object.
-##' @param ... further arguments passed to or from other methods
-##'
-##' @return NULL. Prints to standard out.
-##'
-##' @name print
-##' @aliases print print,MultinomialParameter-method
-##' @docType methods
 ##' @rdname print-methods
-##' @export
-##'
-##' @seealso \code{\link{print}}
-##' @examples
-##' data(birds)
-##' xem <- mixmodClustering(birds)
-##' print(xem@@parameters)
-##' getMethod("print", "MultinomialParameter")
+##' @aliases print print,MultinomialParameter-method
 ##'
 setMethod(
     f="print",
     signature=c("MultinomialParameter"),
     function(x,...){
       if(length(x@proportions)>0){
-        cat("************************************\n")
-        cat("* modalities   = ", x@factor, "\n")
+        cat("****************************************\n")
+        cat("* number of modalities   = ", x@factor, "\n")
         for(i in 1:length(x@proportions)){
           cat("*** Cluster",i,"\n")
           cat("* proportion = ", formatC(x@proportions[i],digits=4,format="f"), "\n")
           cat("* center     = ", formatC(x@center[i,],digits=4,format="f"), "\n")
-          if ( length(x@scatter) > 1 ){            
-            if( length(dim(x@scatter)) == 2 ){
-              cat("* scatter    = ", formatC(x@scatter[i,],digits=4,format="f"), "\n")
-            }else if( length(x@scatter[[i]]) > 1 ){          
-              if ( nrow(x@scatter[[i]])>1 ){
-                cat("* scatter    = |",formatC(x@scatter[[i]][1,],digits=4,width=10,format="f"),"|\n")
-                for ( j in 2:nrow(x@scatter[[i]])){
-                  cat("               |", formatC(x@scatter[[i]][j,],digits=4,width=10,format="f"),"|\n")
-                }
-              }else{
-                cat("* scatter    = ",formatC(x@scatter[[i]],digits=4,format="f"),"\n")
-              }
-            }else{
-              cat("* scatter    = ", formatC(x@scatter[i],digits=4,format="f"), "\n")
-            }
-          }else{
-            cat("* scatter    = ", formatC(x@scatter,digits=4,format="f")," \n")
+          cat("* scatter    = |",formatC(x@scatter[[i]][1,1:x@factor[1]],digits=4,width=10,format="f"),"|\n")
+          for ( j in 2:nrow(x@scatter[[i]])){
+            cat("               |", formatC(x@scatter[[i]][j,1:x@factor[j]],digits=4,width=10,format="f"),"|\n")
           }
         }
-        cat("************************************\n")
+        cat("****************************************\n")
       }
     }
 )
@@ -106,31 +74,15 @@ setMethod(
 
 
 ###################################################################################
-##' Show description of the MultinomialParameter class to standard output.
-##'
-##' @param object A \code{MultinomialParameter} object.
-##'
-##' @return NULL. Prints to standard out.
-##'
-##' @name show
-##' @aliases show show,MultinomialParameter-method
-##' @docType methods
 ##' @rdname show-methods
-##' @export
-##'
-##' @seealso \code{\link{show}}
-##' @examples
-##' data(birds)
-##' xem <- mixmodClustering(birds)
-##' show(xem@@parameters)
-##' getMethod("show", "MultinomialParameter")
+##' @aliases show show,MultinomialParameter-method
 ##'
 setMethod(
     f="show",
     signature=c("MultinomialParameter"),
     function(object){
       if(length(object@proportions)>0){
-        cat("************************************\n")
+        cat("****************************************\n")
         cat("* number of modalities = ", object@factor, "\n")
         for(i in 1:length(object@proportions)){
           cat("*** Cluster",i,"\n")
@@ -155,31 +107,16 @@ setMethod(
             cat("* scatter    = ", formatC(object@scatter,digits=4,format="f")," \n")
           }
         }
-        cat("************************************\n")
+        cat("****************************************\n")
       }
     }
 )
+###################################################################################
+
 
 ###################################################################################
-##' Produce result summaries of a class [\code{\linkS4class{MultinomialParameter}}] 
-##'
-##' @param x A \code{MultinomialParameter} object.
-##' @param ... further arguments passed to or from other methods
-##'
-##' @return NULL. Summaries to standard out.
-##'
-##' @name summary
-##' @aliases summary summary,MultinomialParameter-method
-##' @docType methods
 ##' @rdname summary-methods
-##' @export
-##'
-##' @seealso \code{\link{summary}}
-##' @examples
-##' data(birds)
-##' xem <- mixmodClustering(birds)
-##' summary(xem@@parameters)
-##' getMethod("summary", "MultinomialParameter")
+##' @aliases summary summary,MultinomialParameter-method
 ##'
 setMethod(
   f="summary",
@@ -195,9 +132,9 @@ setMethod(
             cat("                            Scatter = ", formatC(object@scatter[k,],digits=4,format="f"), "\n")
           }else if( length(object@scatter[[k]]) > 1 ){
             if ( nrow(object@scatter[[k]])>1 ){
-              cat("                            Scatter = |",formatC(object@scatter[[k]][1,],digits=4,width=10,format="f"),"|\n")
+              cat("                            Scatter = |",formatC(object@scatter[[k]][1,1:object@factor[1]],digits=4,width=10,format="f"),"|\n")
               for ( j in 2:nrow(object@scatter[[k]])){
-                cat("                                      |", formatC(object@scatter[[k]][j,],digits=4,width=10,format="f"),"|\n")
+                cat("                                      |", formatC(object@scatter[[k]][j,1:object@factor[j]],digits=4,width=10,format="f"),"|\n")
               }
             }else{
               cat("                            Scatter = ",formatC(object@scatter[[k]],digits=4,format="f"),"\n")
@@ -216,16 +153,12 @@ setMethod(
 
 
 ###################################################################################
-##' Extract parts of a [\code{\linkS4class{MultinomialParameter}}] class
-##'
-##' @name [
-##' @aliases [,MultinomialParameter,ANY,numeric-method
-##' @docType methods
 ##' @rdname extract-methods
+##' @aliases [,MultinomialParameter-method
 ##'
 setMethod(
   f="[", 
-  signature(x = "MultinomialParameter", i = "ANY", j="numeric"),
+  signature(x = "MultinomialParameter"),
   definition=function(x,i,j,drop){
     if ( missing(j) ){
       switch(EXPR=i,
@@ -248,17 +181,14 @@ setMethod(
 
 
 ###################################################################################
-##' Replace names of [\code{\linkS4class{MultinomialParameter}}] class
-##'
 ##' @name [
-##' @aliases [<-,MultinomialParameter-method [<-,MultinomialParameter,ANY-method
-##' @docType methods
 ##' @rdname extract-methods
+##' @aliases [<-,MultinomialParameter-method
 ##'
 setReplaceMethod(
   f="[", 
-  signature(x = "MultinomialParameter", value = "ANY"), 
-  definition=function(x,i,j,drop){
+  signature(x = "MultinomialParameter"), 
+  definition=function(x,i,j,value){
     if ( missing(j) ){
       switch(EXPR=i,
       "proportions"={x@proportions<-value},

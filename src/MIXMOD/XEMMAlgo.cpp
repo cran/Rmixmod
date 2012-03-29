@@ -23,7 +23,7 @@
     All informations available on : http://www.mixmod.org                                                                                               
 ***************************************************************************/
 #include "XEMMAlgo.h"
-//#include <fstream.h>
+#include "XEMModel.h"
 
 
 //------------
@@ -65,16 +65,12 @@ XEMAlgo * XEMMAlgo::clone(){
 }
 
 
-void XEMMAlgo::setAlgoStopName(XEMAlgoStopName * algoStopName){
-  throw internalMixmodError;
-}
-
 //---
 //run
 //---
 void XEMMAlgo::run(XEMModel *& model){
   _indexIteration = 0;
-  model = model;
+//  model = model;
   model->setAlgoName(M);
   model->Mstep();   // M Step
   model->Estep(); // E step to update Tik

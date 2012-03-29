@@ -26,10 +26,10 @@
 #define XEMCLUSTERINGINPUT_H
 
 
-#include "XEMUtil.h"
 #include "XEMInput.h"
 
-using namespace std;
+// pre-declaration
+class XEMClusteringStrategy;
 
 class XEMClusteringInput : public XEMInput{
 
@@ -42,11 +42,10 @@ public:
   XEMClusteringInput(const XEMClusteringInput & CInput);
   
   /// Initialisation constructor
-  XEMClusteringInput(const vector<int64_t> & iNbCluster, const XEMDataDescription & iDataDescription);
+  XEMClusteringInput(const std::vector<int64_t> & iNbCluster, const XEMDataDescription & iDataDescription);
 
   /// Destructor
   virtual ~XEMClusteringInput();
-
   
   // getStrategy
   XEMClusteringStrategy * getStrategy() const;
@@ -54,29 +53,29 @@ public:
     // setStrategy
   void setStrategy(XEMClusteringStrategy * strat);
   
-  protected : 
+  
+  /// setCriterionName
+  virtual void setCriterion(std::vector<XEMCriterionName> const & criterionName);
+  
+  /// setCriterionName
+  virtual void setCriterion(const XEMCriterionName criterionName, unsigned int index);
+  
+  ///insertCriterionName[i]
+  virtual void insertCriterion(const XEMCriterionName criterionName, unsigned int index);
+  
+  // add a new criterion
+  void addCriterion(const XEMCriterionName criterionName);
+  
+protected : 
   /// verif
   virtual bool verif();
-  
-
-  
-  
-  
-  //friend class XEMIOStreamInput;
-  
-  // private 
-  private :
-    XEMClusteringStrategy * _strategy;
+  // Clustering strategy
+  XEMClusteringStrategy * _strategy;
 };
 
+// getStrategy
 inline XEMClusteringStrategy * XEMClusteringInput::getStrategy() const{
   return _strategy;
 }
-
-inline void XEMClusteringInput::setStrategy(XEMClusteringStrategy * strat){
-  delete _strategy;
-  _strategy = new XEMClusteringStrategy(*strat);
-}
-
 
 #endif

@@ -26,12 +26,13 @@
 #define XEMParameter_H
 
 #include "XEMUtil.h"
-#include "XEMModelType.h"
-#include "XEMData.h"
-#include "XEMMatrix.h"
-#include "XEMPartition.h"
 
+// pre-declaration
 class XEMModel;
+class XEMModelType;
+class XEMSample;
+class XEMPartition;
+
 
 /**
   @brief Base class for XEMParameter(s)
@@ -61,6 +62,8 @@ public:
   /// Destructor
   virtual ~XEMParameter();
 	
+  /// Comparison operator
+  virtual bool operator ==(const XEMParameter & param) const;
 	
 	/// reset to default values
 	virtual void reset()=0;

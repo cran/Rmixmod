@@ -25,14 +25,16 @@
 #ifndef XEMCriterion_H
 #define XEMCriterion_H
 
-#include "XEMModel.h"
-#include <stdio.h>
-
+#include "XEMUtil.h"
 
 /**
 	@brief Base class for Criterion
 	@author F Langrognet & A Echenim
   */
+
+// pre-declaration
+class XEMModel;
+class XEMCriterionOutput;
 
 //-----------------------------------
 // best value are always the samllest
@@ -43,34 +45,20 @@ class XEMCriterion{
 public:
 
 	/// Default constructor
-	XEMCriterion();
+	XEMCriterion(XEMModel * model);
 
 	/// Destructor
 	virtual ~XEMCriterion();
 
 
-	/**@brief Selector
-		 @return The value of the criterion
-	*/
-	double getValue();
-
-
-  /** @brief Set the error type criterion
-      @param errorType Type of error to set
-  */
-  void setErrorType(XEMErrorType errorType);
-
-  /** @brief Selector
-      @return The type of the error
-  */
-  XEMErrorType getErrorType();
-
-  virtual XEMCriterionName getCriterionName()const=0 ;
-  
   /// Run method
-  virtual void run(XEMModel * model, double & value, XEMErrorType & error)=0;
-
-
+  virtual void run(XEMCriterionOutput & output)=0;
+  
+//------
+protected :
+//------
+  /// a pointer to a model
+  XEMModel * _model;
 };
 
 
