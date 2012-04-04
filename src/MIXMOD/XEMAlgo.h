@@ -59,7 +59,7 @@ class XEMAlgo
    virtual void run(XEMModel *& model) = 0;
 
     
-    void edit(ofstream & oFile);
+    void edit(std::ofstream & oFile);
     
     virtual const XEMAlgoStopName getAlgoStopName() const;
     
@@ -75,7 +75,7 @@ class XEMAlgo
     
     virtual const double getEpsilon() const;
     
-    friend ostream & operator << (ostream & fo, XEMAlgo & algo);
+    friend std::ostream & operator << (std::ostream & fo, XEMAlgo & algo);
 
   protected :
     

@@ -101,7 +101,7 @@ public:
 
 
   /// read spherical matrix store in file
-  void input(ifstream & fi);
+  void input(std::ifstream & fi);
   virtual void input( double ** variances );
   
   /// return store of a spherical matrix

@@ -129,12 +129,12 @@ public:
 
 
   /// edit general matrix
-  void edit(ostream& flux, string before,string sep,int64_t dim);
+  void edit(std::ostream& flux, std::string before,std::string sep,int64_t dim);
 
   /// read general matrix from input file
-  void input(ifstream & fi);
+  void input(std::ifstream & fi);
   /// read general matrix from input file
-  void input(ifstream & fi, int64_t dim);
+  void input(std::ifstream & fi, int64_t dim);
   virtual void input(double ** variances);
   
   /// compute general matrix SVD decomposition

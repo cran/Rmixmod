@@ -41,7 +41,7 @@ XEMDataDescription::XEMDataDescription() : XEMDescription(){
 //------------
 // Constructor by initialization
 //------------
-XEMDataDescription::XEMDataDescription(int64_t nbSample, int64_t nbColumn, vector<XEMColumnDescription *> columnDescription, FormatNumeric::XEMFormatNumericFile format, string filename, string infoName) : XEMDescription(nbSample, nbColumn, columnDescription, format, filename,  infoName){
+XEMDataDescription::XEMDataDescription(int64_t nbSample, int64_t nbColumn, std::vector<XEMColumnDescription *> columnDescription, FormatNumeric::XEMFormatNumericFile format, std::string filename, std::string infoName) : XEMDescription(nbSample, nbColumn, columnDescription, format, filename,  infoName){
   _data = createData();
 }
 
@@ -146,7 +146,7 @@ XEMData * XEMDataDescription::createData() const{
  
   XEMData * data = NULL;
 
-  vector<int64_t> nbModality;
+  std::vector<int64_t> nbModality;
   int64_t nbQualitativeVariable = 0;
   int64_t nbQuantitativeVariable = 0;
   int64_t weightIndex = -1;

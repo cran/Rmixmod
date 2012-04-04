@@ -101,7 +101,7 @@ public:
   XEMParameter * getInitParameter(int64_t index) const;
   
   /// setInitParam
-  void setInitParam(string & paramFileName, int64_t position);
+  void setInitParam(std::string & paramFileName, int64_t position);
   
   /// setTabInitParam
   void setTabInitParameter(XEMParameter ** tabInitParameter, int64_t nbInitParameter);
@@ -122,7 +122,7 @@ public:
   void setPartition(XEMPartition * part, int64_t position);
   
   ///set Init Partition
-  void setPartition(string & paramFileName, int64_t position);
+  void setPartition(std::string & paramFileName, int64_t position);
   
   /// setTabPartition
   void setTabPartition(XEMPartition ** tabPartition, int64_t nbPartition);
@@ -142,13 +142,13 @@ public:
   /* Input / Output */
   //----------------//
   // input
-  void input(ifstream & fi,XEMData *& data, int64_t nbNbCluster, int64_t * tabNbCluster, XEMModelType * modelType, bool & alreadyRead);
+  void input(std::ifstream & fi,XEMData *& data, int64_t nbNbCluster, int64_t * tabNbCluster, XEMModelType * modelType, bool & alreadyRead);
 
   // verification
   bool  verify() const;  
   
   // print out strategy initialization
-  friend ostream & operator << (ostream & fo, XEMClusteringStrategyInit & strategyInit);
+  friend std::ostream & operator << (std::ostream & fo, XEMClusteringStrategyInit & strategyInit);
   
   
   private :  

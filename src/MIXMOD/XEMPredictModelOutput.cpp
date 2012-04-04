@@ -53,7 +53,7 @@ XEMPredictModelOutput::XEMPredictModelOutput(XEMModel * estimation) : XEMModelOu
 //-----------------
 XEMPredictModelOutput::XEMPredictModelOutput( XEMModelType & modelType
                                             , int64_t nbCluster
-                                            , vector< XEMCriterionOutput >& criterionOutput
+                                            , std::vector< XEMCriterionOutput >& criterionOutput
                                             , double likelihood
                                             , XEMParameterDescription& parameterDescription
                                             , XEMLabelDescription& labelDescription

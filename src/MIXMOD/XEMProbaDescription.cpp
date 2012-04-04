@@ -40,7 +40,7 @@ XEMProbaDescription::XEMProbaDescription() : XEMDescription(){
 // ---------------------------
 //constructor by initilization
 // ---------------------------
-XEMProbaDescription::XEMProbaDescription(int64_t nbSample,  int64_t nbCluster, FormatNumeric::XEMFormatNumericFile format, string filename, string infoName){
+XEMProbaDescription::XEMProbaDescription(int64_t nbSample,  int64_t nbCluster, FormatNumeric::XEMFormatNumericFile format, std::string filename, std::string infoName){
   _infoName = "infoName";
   _nbSample = nbSample;
   _nbColumn = nbCluster;
@@ -49,14 +49,14 @@ XEMProbaDescription::XEMProbaDescription(int64_t nbSample,  int64_t nbCluster, F
   _columnDescription.resize(nbCluster);
   for (int64_t i=0; i<nbCluster; i++){
     _columnDescription[i] = new XEMQuantitativeColumnDescription(i);
-    string name("Proba cluster=");
+    std::string name("Proba cluster=");
     std::ostringstream sNum;
     sNum << (i+1);
     name.append(sNum.str());
     _columnDescription[i]->setName(name);
   }
   _proba = new XEMProba(_nbSample, nbCluster);
-  ifstream fi(filename.c_str(), ios::in);
+  std::ifstream fi(filename.c_str(), ios::in);
   if (! fi.is_open()){
     throw wrongLabelFileName;
   }
@@ -77,7 +77,7 @@ XEMProbaDescription::XEMProbaDescription(XEMModel * model) : XEMDescription(){
     _columnDescription.resize(_nbColumn);
     for (int64_t iCol=0; iCol<_nbColumn; iCol++){
       _columnDescription[iCol] = new XEMQuantitativeColumnDescription(iCol);
-      string name("Probability for cluster ");
+      std::string name("Probability for cluster ");
       std::ostringstream sNum;
       sNum << (iCol+1);
       name.append(sNum.str());
@@ -154,9 +154,9 @@ XEMProbaDescription::~XEMProbaDescription(){
 //--------
 // ostream
 //--------
-void XEMProbaDescription::saveNumericValues(string fileName){
+void XEMProbaDescription::saveNumericValues(std::string fileName){
   //if (_fileName==""){
-    ofstream fo(fileName.c_str(), ios::out);
+    std::ofstream fo(fileName.c_str(), ios::out);
     _proba->edit(fo);
     _fileName = fileName;
   //}

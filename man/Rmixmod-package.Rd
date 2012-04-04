@@ -12,8 +12,8 @@
 }
 \details{
   \tabular{ll}{ Package: \tab Rmixmod\cr Type: \tab
-  Package\cr Version: \tab 1.1.0\cr Date: \tab
-  2012-03-29\cr License: \tab GPL-3 + file LICENSE\cr
+  Package\cr Version: \tab 1.1.1\cr Date: \tab
+  2012-04-04\cr License: \tab GPL-3 + file LICENSE\cr
   LazyLoad: \tab yes\cr }
 
   The general purpose of the package is to discover, or

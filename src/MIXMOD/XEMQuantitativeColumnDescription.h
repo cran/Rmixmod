@@ -40,7 +40,7 @@ class XEMQuantitativeColumnDescription : public XEMColumnDescription
     /// Destructor
     virtual ~XEMQuantitativeColumnDescription();
     
-    string editType();
+    std::string editType();
     
     XEMColumnDescription * clone()const;
 };

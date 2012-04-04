@@ -323,7 +323,7 @@ void XEMDiagMatrix::operator=(XEMMatrix* M){
 
 
 
-void XEMDiagMatrix::input(ifstream & fi){
+void XEMDiagMatrix::input(std::ifstream & fi){
   int64_t p,q;
   double garbage;  
     

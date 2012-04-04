@@ -604,7 +604,7 @@ void XEMBinaryParameter::edit(){
 //-----
 // Edit
 //-----
-void XEMBinaryParameter::edit(ofstream & oFile, bool text){
+void XEMBinaryParameter::edit(std::ofstream & oFile, bool text){
   int64_t j,k;
 
   // Write in output text files //
@@ -651,7 +651,7 @@ void XEMBinaryParameter::edit(ofstream & oFile, bool text){
 //------------------------------
 // Read Parameters in input file
 //------------------------------
-void XEMBinaryParameter::input(ifstream & fi){
+void XEMBinaryParameter::input(std::ifstream & fi){
   int64_t j,k;
 
   for (k=0; k<_nbCluster; k++){

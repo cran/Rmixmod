@@ -39,10 +39,10 @@ class XEMLabelDescription : public XEMDescription
     XEMLabelDescription();   
     
     ///constructor by initilization
-    XEMLabelDescription(int64_t nbSample, int64_t nbColumn, std::vector< XEMColumnDescription* > columnDescription, FormatNumeric::XEMFormatNumericFile format, string filename, string infoName = "");
+    XEMLabelDescription(int64_t nbSample, int64_t nbColumn, std::vector< XEMColumnDescription* > columnDescription, FormatNumeric::XEMFormatNumericFile format, std::string filename, std::string infoName = "");
     
 		/// constructor from a vector of int
-		XEMLabelDescription(int64_t nbSample, vector<int64_t> vLabel); 
+		XEMLabelDescription(int64_t nbSample, std::vector<int64_t> vLabel); 
 		
     ///constructor after an estimation->run
     XEMLabelDescription(XEMModel * estimation);
@@ -66,7 +66,7 @@ class XEMLabelDescription : public XEMDescription
   
     const int64_t getNbCluster() const;
   
-    void saveNumericValues(string fileName="");
+    void saveNumericValues(std::string fileName="");
     
   private :
     

@@ -108,7 +108,7 @@ void XEMLearnMain::run(){
     
     XEMData * workingData = inputData; 
     XEMPartition * workingKnownPartition = inputKnownPartition;
-    vector<int64_t> correspondenceOriginDataToReduceData;
+    std::vector<int64_t> correspondenceOriginDataToReduceData;
 #if DATA_REDUCE == 1
     //--------------------------------
     //Reduce Data

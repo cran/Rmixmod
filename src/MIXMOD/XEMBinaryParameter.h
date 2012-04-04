@@ -184,13 +184,13 @@ public :
   virtual void editScatter(int64_t k) = 0;
   
   /// Edit
-  void edit(ofstream & oFile, bool text=false);
+  void edit(std::ofstream & oFile, bool text=false);
   
   /// editScatter 
-  virtual void editScatter(ofstream & oFile, int64_t k, bool text=false) = 0;
+  virtual void editScatter(std::ofstream & oFile, int64_t k, bool text=false) = 0;
 
   // Read Parameters in input file
-  void input(ifstream & fi);
+  void input(std::ifstream & fi);
   
   // Read Parameters in input containers
   void input( double * proportions
@@ -199,7 +199,7 @@ public :
             );
   
   // Read Scatter in input file
-  virtual void inputScatter(ifstream & fi) = 0;
+  virtual void inputScatter(std::ifstream & fi) = 0;
   virtual void inputScatter( double *** scatters ) = 0;
 
   /// recopie sans faire construction / destruction

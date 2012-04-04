@@ -97,7 +97,7 @@ public:
 
   void edit();
 
-  void edit(ofstream & oFile, bool text=false);
+  void edit(std::ofstream & oFile, bool text=false);
 
   void recopy(XEMParameter * otherParameter);
 
@@ -110,7 +110,7 @@ public:
   virtual XEMParameter* clone() const = 0 ;
 	void MStep();
 	void MAPStep();
-	virtual void input(ifstream & fi);
+	virtual void input(std::ifstream & fi);
 	virtual void input( double * proportions
                     , double **  means
                     , double *** variances

@@ -74,7 +74,7 @@ XEMGaussianGeneralParameter::XEMGaussianGeneralParameter(XEMModel * iModel, XEMM
 XEMGaussianGeneralParameter::XEMGaussianGeneralParameter( int64_t  iNbCluster
                                                         , int64_t  iPbDimension
                                                         , XEMModelType * iModelType
-                                                        , string & iFileName
+                                                        , std::string & iFileName
                                                         ) 
                                                         : XEMGaussianEDDAParameter(iNbCluster, iPbDimension, iModelType)
 {
@@ -99,7 +99,7 @@ XEMGaussianGeneralParameter::XEMGaussianGeneralParameter( int64_t  iNbCluster
   
   // read parameters in file iFileName//
   if (iFileName.compare("") != 0){
-    ifstream paramFile(iFileName.c_str(), ios::in);
+    std::ifstream paramFile(iFileName.c_str(), ios::in);
     if (! paramFile.is_open()){
       throw wrongParamFileName;
     }

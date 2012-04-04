@@ -8,6 +8,7 @@
 
 #include "InputHandling.h"
 #include <vector>
+#include <stdint.h>
 
 #include "MIXMOD/XEMInput.h"
 #include "MIXMOD/XEMModelType.h"

@@ -42,7 +42,7 @@ XEMQualitativeColumnDescription::~XEMQualitativeColumnDescription(){
   
 }
 
-string XEMQualitativeColumnDescription::editType(){
+std::string XEMQualitativeColumnDescription::editType(){
   return "Qualitative";
 }
 

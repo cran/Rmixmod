@@ -65,7 +65,7 @@ XEMPartition::XEMPartition(const XEMLabel * label, int64_t nbCluster )
 		_nbSample = label->getNbSample();
 		_nbCluster = nbCluster;
 		_tabValue  = new int64_t*[_nbSample];
-		vector<int64_t> const & vLabel = label->getLabel();
+    std::vector<int64_t> const & vLabel = label->getLabel();
 		for (int64_t i=0; i<_nbSample; i++){
 			_tabValue[i] = new int64_t[_nbCluster];
 			for (int64_t k=0; k<_nbCluster; k++){
@@ -100,7 +100,7 @@ XEMPartition::XEMPartition(int64_t nbSample, int64_t nbCluster, const XEMNumeric
   _partitionFile = partitionFile;
   if ((_partitionFile._fileName).compare("") != 0){
     try{
-      ifstream partitionFileStream((_partitionFile._fileName).c_str(), ios::in);
+      std::ifstream partitionFileStream((_partitionFile._fileName).c_str(), ios::in);
       if (! partitionFileStream.is_open()){
         throw wrongPartitionFileName;
       }
@@ -278,7 +278,7 @@ bool XEMPartition::operator==(XEMPartition & otherPartition){
 //--------------------------
 // Friend method ifstream >>
 //--------------------------
-ifstream & operator >> (ifstream & fi, XEMPartition & partition){
+std::ifstream & operator >> (std::ifstream & fi, XEMPartition & partition){
   int64_t j;/*, nbRows, indice*/;
   int64_t i;
   //int64_t compt = 0;
@@ -339,7 +339,7 @@ ifstream & operator >> (ifstream & fi, XEMPartition & partition){
 //-------------------------
 // Friend method ostream <<
 //-------------------------
-ostream & operator << (ostream & fo, const XEMPartition & partition){
+std::ostream & operator << (std::ostream & fo, const XEMPartition & partition){
   
   fo<<"\n Sample size: "<<partition._nbSample;	
   fo<<"\n Number of Cluster: "<<partition._nbCluster<< endl;	

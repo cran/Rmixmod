@@ -40,7 +40,7 @@ public:
   
   /// Constructor
 	// called by XEMStrategyType if USER partition
-  XEMBinaryEkjhParameter(int64_t iNbCluster, int64_t iPbDimension, XEMModelType *  iModelType, int64_t * tabNbModality, string & iFileName);
+  XEMBinaryEkjhParameter(int64_t iNbCluster, int64_t iPbDimension, XEMModelType *  iModelType, int64_t * tabNbModality, std::string & iFileName);
   
   /// Constructor
   XEMBinaryEkjhParameter( int64_t iNbCluster
@@ -102,10 +102,10 @@ public:
   void editScatter(int64_t k);
   
   /// editScatter 
-  void editScatter(ofstream & oFile, int64_t k, bool text=false);
+  void editScatter(std::ofstream & oFile, int64_t k, bool text=false);
   
   // Read Scatter in input file
-  void inputScatter(ifstream & fi);
+  void inputScatter(std::ifstream & fi);
   
   // Read Scatter in input container
   void inputScatter( double *** scatters );

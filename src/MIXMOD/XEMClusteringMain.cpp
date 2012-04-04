@@ -99,7 +99,7 @@ void XEMClusteringMain::run(){
   // get the number of models
   int64_t nbModelType = _input->getNbModelType();
   // get the list of cluster
-  vector<int64_t> vNbCluster = _input->getNbCluster();
+  std::vector<int64_t> vNbCluster = _input->getNbCluster();
   // get the length of the cluster's list
   int64_t nbNbCluster = vNbCluster.size();
   // compute the number of estimations to run
@@ -151,7 +151,7 @@ void XEMClusteringMain::run(){
     // create model for binary data
     if (_input->isBinaryData()){
     
-      vector<int64_t> correspondenceOriginDataToReduceData;
+      std::vector<int64_t> correspondenceOriginDataToReduceData;
 #if DATA_REDUCE == 1
       //--------------------------------
       //Reduce Data

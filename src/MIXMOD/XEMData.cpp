@@ -106,7 +106,7 @@ void XEMData::setWeightTotal(double weightTotal){
 //----------
 // setWeight
 //----------
-void XEMData::setWeight(string weightFileName){
+void XEMData::setWeight(std::string weightFileName){
   _defaultWeight = true;
   
   if (weightFileName.compare("") == 0){	
@@ -115,7 +115,7 @@ void XEMData::setWeight(string weightFileName){
   
     _weightTotal = 0.0;
 
-    ifstream weightFile(weightFileName.c_str(), ios::in);
+    std::ifstream weightFile(weightFileName.c_str(), ios::in);
     if (! weightFile.is_open()){
       _fileNameWeight="";
       throw wrongWeightFileName;

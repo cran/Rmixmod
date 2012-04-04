@@ -136,7 +136,7 @@ void XEMClusteringStrategy::addAlgo(XEMAlgoName algoName){
 }
 
 // set init parameter
-void XEMClusteringStrategy::setInitParam(string & paramFileName, int64_t position){
+void XEMClusteringStrategy::setInitParam(std::string & paramFileName, int64_t position){
   _strategyInit->setInitParam(paramFileName, position);
 }
 
@@ -145,7 +145,7 @@ void XEMClusteringStrategy::setTabInitParameter(XEMParameter ** tabInitParameter
 }
 
 // set init partition
-void XEMClusteringStrategy::setInitPartition(string & partitionFileName, int64_t position){
+void XEMClusteringStrategy::setInitPartition(std::string & partitionFileName, int64_t position){
   _strategyInit->setPartition(partitionFileName, position);
 }
 
@@ -197,7 +197,7 @@ void XEMClusteringStrategy::setStrategyInit(XEMClusteringStrategyInit * iStrateg
 void XEMClusteringStrategy::setStrategyInit(XEMStrategyInitName initName, XEMData *& data, int64_t nbNbCluster, int64_t * tabNbCluster, XEMModelType * modelType){
   int64_t nbSample    = data->_nbSample;
   int64_t pbDimension  = data->_pbDimension;
-  string fileName = "";
+  std::string fileName = "";
   XEMParameter ** tabInitParameter = NULL;
   XEMPartition ** tabInitPartition = NULL;
 
@@ -431,11 +431,11 @@ bool XEMClusteringStrategy::verify(){
 // Input strategy
 // TODO XEMInput : a enlever
 //---------------
-void XEMClusteringStrategy::input_FLAT_FORMAT(ifstream & fi, XEMData *& data, int64_t nbNbCluster, int64_t * tabNbCluster, XEMModelType * modelType){
+void XEMClusteringStrategy::input_FLAT_FORMAT(std::ifstream & fi, XEMData *& data, int64_t nbNbCluster, int64_t * tabNbCluster, XEMModelType * modelType){
   int64_t j;
-  string keyWord = "";
+  std::string keyWord = "";
   bool alreadyRead = false;
-  string a ="";
+  std::string a ="";
 
   // nbTry
   //------
@@ -573,7 +573,7 @@ void XEMClusteringStrategy::input_FLAT_FORMAT(ifstream & fi, XEMData *& data, in
 //----
 //edit
 //----
-void XEMClusteringStrategy::edit(ofstream & oFile){
+void XEMClusteringStrategy::edit(std::ofstream & oFile){
 
   oFile<<"\tStrategy : "<<endl;
   oFile<<"\t--------"<<endl;
@@ -581,7 +581,7 @@ void XEMClusteringStrategy::edit(ofstream & oFile){
   //oFile<<"\tnumber of tries : "<<_nbTry<<endl;
   
   oFile<<"\tInitial start parameters method : ";
-  string init = XEMStrategyInitNameToString(_strategyInit->getStrategyInitName());
+  std::string init = XEMStrategyInitNameToString(_strategyInit->getStrategyInitName());
   oFile<<init<<endl;
   oFile<<"\tNumber of algorithms in the strategy : "<<_nbAlgo<<endl;
 
@@ -599,7 +599,7 @@ void XEMClusteringStrategy::edit(ofstream & oFile){
 //-----------
 // ostream <<
 //-----------
-ostream & operator << (ostream & fo, XEMClusteringStrategy & strategy){
+std::ostream & operator << (std::ostream & fo, XEMClusteringStrategy & strategy){
     // nbTry
   fo<<"nbTry : "<<strategy._nbTry<<endl;
   

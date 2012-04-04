@@ -86,7 +86,7 @@ XEMBinaryEkjhParameter::XEMBinaryEkjhParameter(const XEMBinaryEkjhParameter * iP
 // Constructor
 // called by XEMStrategyType if USER partition
 //------------
-XEMBinaryEkjhParameter::XEMBinaryEkjhParameter(int64_t iNbCluster, int64_t iPbDimension, XEMModelType * iModelType, int64_t * tabNbModality, string & iFileName):XEMBinaryParameter(iNbCluster,iPbDimension,iModelType,tabNbModality){	
+XEMBinaryEkjhParameter::XEMBinaryEkjhParameter(int64_t iNbCluster, int64_t iPbDimension, XEMModelType * iModelType, int64_t * tabNbModality, std::string & iFileName):XEMBinaryParameter(iNbCluster,iPbDimension,iModelType,tabNbModality){	
   _scatter = new double**[_nbCluster];
   for (int64_t k=0; k<_nbCluster; k++){
     _scatter[k] = new double*[_pbDimension];
@@ -96,7 +96,7 @@ XEMBinaryEkjhParameter::XEMBinaryEkjhParameter(int64_t iNbCluster, int64_t iPbDi
   }
 
   if (iFileName.compare("") != 0){
-    ifstream paramFile(iFileName.c_str(), ios::in);
+    std::ifstream paramFile(iFileName.c_str(), ios::in);
         if (! paramFile.is_open()){
         throw wrongParamFileName;
     }
@@ -469,7 +469,7 @@ void XEMBinaryEkjhParameter::editScatter(int64_t k){
 
 // editScatter 
 //------------
-void XEMBinaryEkjhParameter::editScatter(ofstream & oFile, int64_t k, bool text){
+void XEMBinaryEkjhParameter::editScatter(std::ofstream & oFile, int64_t k, bool text){
   int64_t j,h;
   if(text){
     oFile<<"\t\t\tScattering : \n";
@@ -488,7 +488,7 @@ void XEMBinaryEkjhParameter::editScatter(ofstream & oFile, int64_t k, bool text)
 
 // Read Scatter in input file
 //---------------------------
-void XEMBinaryEkjhParameter::inputScatter(ifstream & fi){
+void XEMBinaryEkjhParameter::inputScatter(std::ifstream & fi){
   //Mise �jour de tabCenter, tabScatter et tabProportion
   int64_t j,k,h;
 

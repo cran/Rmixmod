@@ -128,7 +128,7 @@ public:
 
 
   /// read symmetric matrix store in file
-  void input(ifstream & fi);
+  void input(std::ifstream & fi);
   virtual void input(double ** variances);
   
  /* ///compute SVD decomposition for a symmetric matrix

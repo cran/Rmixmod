@@ -89,7 +89,7 @@ void XEMPredictMain::run(){
     XEMPartition * inputKnownPartition = NULL;
     XEMPartition * workingKnownPartition = NULL;
     
-    vector<int64_t> correspondenceOriginDataToReduceData;
+    std::vector<int64_t> correspondenceOriginDataToReduceData;
 #if DATA_REDUCE == 1
     //--------------------------------
     //Reduce Data

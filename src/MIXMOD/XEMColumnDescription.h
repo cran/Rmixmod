@@ -40,7 +40,7 @@ class XEMColumnDescription
     virtual ~XEMColumnDescription();
     
     //
-    virtual string editType()=0;
+    virtual std::string editType()=0;
     
     
     virtual XEMColumnDescription * clone()const = 0;
@@ -51,10 +51,10 @@ class XEMColumnDescription
     const int64_t & getIndex()const ;
     
     ///get name of column 
-    const string & getName()const;
+    const std::string & getName()const;
     
     ///set name of column
-    void setName(string & strName);
+    void setName(std::string & strName);
     
   protected : 
     
@@ -62,18 +62,18 @@ class XEMColumnDescription
     int64_t _index;
     
     ///name of column (optional)
-    string _name;
+    std::string _name;
 };
 
 inline const int64_t & XEMColumnDescription::getIndex()const{
   return _index;
 }
 
-inline const string & XEMColumnDescription::getName()const{
+inline const std::string & XEMColumnDescription::getName()const{
   return _name; 
 }
 
-inline void XEMColumnDescription::setName(string & strName){
+inline void XEMColumnDescription::setName(std::string & strName){
    _name = strName;
 }
 

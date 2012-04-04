@@ -12,6 +12,7 @@
 #include "InputHandling.h"
 
 #include <Rcpp.h>
+#include <stdint.h>
 
 // pre-declaration
 class XEMClusteringInput;

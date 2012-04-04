@@ -51,7 +51,7 @@ XEMError::~XEMError(){
 //---
 //Run
 //---
-void XEMError::run(ostream & flux){
+void XEMError::run(std::ostream & flux){
 
 
   flux << "MIXMOD ERROR ("<<_errorType<<") :"<<flush;

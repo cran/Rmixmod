@@ -56,7 +56,7 @@ XEMLearnModelOutput::XEMLearnModelOutput(XEMModel * estimation) : XEMModelOutput
 //-----------------
 XEMLearnModelOutput::XEMLearnModelOutput( XEMModelType & modelType
                                         , int64_t nbCluster
-                                        , vector< XEMCriterionOutput >& criterionOutput
+                                        , std::vector< XEMCriterionOutput >& criterionOutput
                                         , double likelihood
                                         , XEMParameterDescription& parameterDescription
                                         , XEMLabelDescription& labelDescription
@@ -90,7 +90,7 @@ void XEMLearnModelOutput::setCVLabel(XEMModel * estimation, std::vector<int64_t>
     // cmake a copy of cvLabel
     std::vector<int64_t> cvLabelCopy(cvLabel);
     
-    const vector<int64_t> & correspondenceOriginDataToReduceData = dynamic_cast<XEMBinaryModel*>(estimation)->getCorrespondenceOriginDataToReduceData();
+    const std::vector<int64_t> & correspondenceOriginDataToReduceData = dynamic_cast<XEMBinaryModel*>(estimation)->getCorrespondenceOriginDataToReduceData();
     // get the true number of sample
     const int64_t nbSample = correspondenceOriginDataToReduceData.size();
     

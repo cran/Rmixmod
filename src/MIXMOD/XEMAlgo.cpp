@@ -127,7 +127,7 @@ bool XEMAlgo::continueAgain(){
 //-----------
 // ostream <<
 //-----------
-ostream & operator << (ostream & fo, XEMAlgo & algo){
+std::ostream & operator << (std::ostream & fo, XEMAlgo & algo){
   XEMAlgoName algoName = algo.getAlgoName();
   fo<<"\t  Type : "<<XEMAlgoNameToString(algoName);
 
@@ -157,7 +157,7 @@ ostream & operator << (ostream & fo, XEMAlgo & algo){
 }
 
 
-void XEMAlgo::edit(ofstream & oFile){
+void XEMAlgo::edit(std::ofstream & oFile){
   XEMAlgoName algoName = getAlgoName();
   oFile<<"\t  Type : "<<XEMAlgoNameToString(algoName)<<endl;
 

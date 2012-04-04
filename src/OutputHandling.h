@@ -10,6 +10,7 @@
 #define Rmixmod_OutputHandling_h
 
 #include <Rcpp.h>
+#include <stdint.h>
 
 // pre-declaration
 class XEMModelOutput;

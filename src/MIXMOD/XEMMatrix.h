@@ -95,9 +95,9 @@ public:
   virtual void operator=(XEMMatrix* M)=0;
 
 
-  void edit(ostream& flux, string before);
+  void edit(std::ostream& flux, std::string before);
   /// read matrix from an input file
-  virtual void input(ifstream & fi) = 0;
+  virtual void input(std::ifstream & fi) = 0;
   virtual void input(double ** variances ) = 0;
   
 // pour ne plus faire de transtypages

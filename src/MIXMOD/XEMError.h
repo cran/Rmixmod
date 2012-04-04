@@ -55,7 +55,7 @@ public:
   
 #ifdef DEBUG
 	/// Run method
-	void run(ostream & flux=std::cout);
+	void run(std::ostream & flux=std::cout);
 #endif
 private :
 

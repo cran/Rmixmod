@@ -228,7 +228,7 @@ void XEMGeneralMatrix::operator+=(XEMMatrix* M){
 }
 
 
-void XEMGeneralMatrix::edit(ostream& flux, string before, string sep,int64_t dim){
+void XEMGeneralMatrix::edit(std::ostream& flux, std::string before, std::string sep,int64_t dim){
 
   for (int64_t p=0;p<_s_pbDimension;p++){
     flux <<before<< (*_value).SubMatrix((p+1),(p+1),1,dim)<<sep;
@@ -282,7 +282,7 @@ void XEMGeneralMatrix::compute_M_as__O_Sinverse_Ot_this(XEMGeneralMatrix & M, XE
 }
 
 
-void XEMGeneralMatrix::input(ifstream & fi){
+void XEMGeneralMatrix::input(std::ifstream & fi){
   int64_t i,j,r = 0;
  
   for (i=0; i<_s_pbDimension; i++){
@@ -302,7 +302,7 @@ void XEMGeneralMatrix::input(double ** variances){
   }
 }
 
-void XEMGeneralMatrix::input(ifstream & fi, int64_t dim){
+void XEMGeneralMatrix::input(std::ifstream & fi, int64_t dim){
   int64_t i,j,r = 0;
  
   for (i=0; i<_s_pbDimension; i++){

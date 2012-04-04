@@ -150,9 +150,9 @@ public:
   virtual void edit() = 0;
 
   /// Edit
-  virtual void edit(ofstream & oFile, bool text=false) = 0;
+  virtual void edit(std::ofstream & oFile, bool text=false) = 0;
   
-  virtual void input(ifstream & fi) = 0;
+  virtual void input(std::ifstream & fi) = 0;
   
   virtual double getLogLikelihoodOne() const = 0;
 

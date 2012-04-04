@@ -115,14 +115,14 @@ const double defaultEpsilonInInit = 0.001;   /* default number of iterations in 
 
 const int64_t maxNbIterationInCEM_INIT = 100;  /* Maximum number of iterations of CEM in CEM_INIT */
 
-const double minOverflow = numeric_limits<double>::min() ;          /* Minimum value for overflow                                */
-const double minUnderflow = numeric_limits<double>::min() ;         /* Minimum value for underflow                               */
+const double minOverflow = std::numeric_limits<double>::min() ;          /* Minimum value for overflow                                */
+const double minUnderflow = std::numeric_limits<double>::min() ;         /* Minimum value for underflow                               */
 const int64_t nbMaxSelection  = 5;               /* Maximum number of selection                               */
 const int64_t maxNbOutputFiles = 52;             /* Maximum number of output Files                            */
 const int64_t nbTestOutputFiles = 25;            /* Number of output files to compare in test                 */
 const double defaultFluryEpsilon = 0.001;    /* default value for espilon in flury algorthm               */
 const int64_t maxFluryIter = 7;                  /* maximum of number of Flury iterations                     */
-const double minDeterminantValue = numeric_limits<double>::min() ;  /* minimum value of determinant of sigma                     */
+const double minDeterminantValue = std::numeric_limits<double>::min() ;  /* minimum value of determinant of sigma                     */
 const double maxRelativeDiffValueTest = 1.0E-5;      /* Maximum difference between 2 value in test                */
 const double maxAbsoluteDiffValueTest = 1.0E-8;      /* Maximum difference between 2 value in test                */
 
@@ -131,7 +131,7 @@ const int64_t defaultCVnumberOfBlocks  = 10 ;   // CV
 
 const double minValueForLLandLLOne = 1.e-10;  // minimum value for LL - LLone    
 
-const int64_t int64_t_max = numeric_limits<int64_t>::max();
+const int64_t int64_t_max = std::numeric_limits<int64_t>::max();
 
 const int64_t nbQualitativeGraphics = 2;
 const int64_t nbQuantitativeGraphics = 3;
@@ -943,7 +943,7 @@ inline void recopyTab(int64_t * source, double * destination, int64_t dim){
 }
 
 
-inline void recopyTabToVector(double ** source, vector<vector<double> > & destination, int64_t dim1, int64_t dim2){
+inline void recopyTabToVector(double ** source, std::vector<std::vector<double> > & destination, int64_t dim1, int64_t dim2){
   destination.resize(dim1); 
    int64_t i,j;
    for(i=0; i<dim1; i++){
@@ -955,7 +955,7 @@ inline void recopyTabToVector(double ** source, vector<vector<double> > & destin
 }
 
 
-inline void recopyTabToVector(int64_t * source, vector<int64_t> & destination, int64_t dim1){
+inline void recopyTabToVector(int64_t * source, std::vector<int64_t> & destination, int64_t dim1){
   destination.resize(dim1); 
   int64_t i;
   for(i=0; i<dim1; i++){
@@ -963,7 +963,7 @@ inline void recopyTabToVector(int64_t * source, vector<int64_t> & destination, i
   }
 }
 
-inline void recopyVectorToTab(vector<vector<double> > source, double **&  destination){
+inline void recopyVectorToTab(std::vector<std::vector<double> > source, double **&  destination){
   int64_t dim1 = source.size();
   int64_t dim2 = source[0].size();
   destination = new double*[dim1];
@@ -977,7 +977,7 @@ inline void recopyVectorToTab(vector<vector<double> > source, double **&  destin
 
 
 
-inline void recopyVectorToTab(vector<int64_t> source, int64_t *&  destination){
+inline void recopyVectorToTab(std::vector<int64_t> source, int64_t *&  destination){
   int64_t dim1 = source.size();
   destination = new int64_t[dim1];
   for (int64_t i=0; i<dim1; i++){
@@ -998,12 +998,12 @@ template<typename T> void recopyTab(T ** source, T ** destination, int64_t dim1,
 }
 
 
-void editSimpleTab(double * tab, int64_t n, ostream & flux, std::string sep = " ",std::string before=" ");
-void editSimpleTab(int64_t    * tab, int64_t n, ostream & flux);
+void editSimpleTab(double * tab, int64_t n, std::ostream & flux, std::string sep = " ",std::string before=" ");
+void editSimpleTab(int64_t    * tab, int64_t n, std::ostream & flux);
 
 
 
-template<typename T> void editTab(T ** tab, int64_t dim1, int64_t dim2, ostream & flux, std::string sep=" ", std::string before=""){
+template<typename T> void editTab(T ** tab, int64_t dim1, int64_t dim2, std::ostream & flux, std::string sep=" ", std::string before=""){
 	T ** p_tab = tab;
 	T *  p_tab_i;
   int64_t i, j ;
@@ -1019,15 +1019,15 @@ template<typename T> void editTab(T ** tab, int64_t dim1, int64_t dim2, ostream 
 }
 
 
-void editMatrix(GeneralMatrix & mat, int64_t nRows, ostream & flux, std::string before = "");
-void editSphericalMatrix(double mat, int64_t nRows, ostream & flux, std::string before = "");
-void editDiagMatrix(double * mat, int64_t nRows, ostream & flux, std::string before="");
+void editMatrix(GeneralMatrix & mat, int64_t nRows, std::ostream & flux, std::string before = "");
+void editSphericalMatrix(double mat, int64_t nRows, std::ostream & flux, std::string before = "");
+void editDiagMatrix(double * mat, int64_t nRows, std::ostream & flux, std::string before="");
 
 // move on a file until *what* is reached
 
-void moveUntilReach(ifstream & fi, std::string  what="datafile");
+void moveUntilReach(std::ifstream & fi, std::string  what="datafile");
 
-void readTabFileName(ifstream & fi, int64_t nbNbCluster, std::string * tabFileName, std::string & keyWord);
+void readTabFileName(std::ifstream & fi, int64_t nbNbCluster, std::string * tabFileName, std::string & keyWord);
 
 void initToZero(double * tab,int64_t n);
 void initToZero(double * tab,int64_t n);
@@ -1044,11 +1044,11 @@ void quickSortWithOrder(double * tabRandom, int64_t * tabOrder, int64_t left, in
 
 int64_t generateRandomIndex(bool * tabIndividualCanBeUsedForInitRandom, double * weight, double totalWeight);
 
-void inputCriterion(ifstream & fi,XEMCriterionName & criterionName);
+void inputCriterion(std::ifstream & fi,XEMCriterionName & criterionName);
 
-void inputCVinitBlocks(ifstream & fi,XEMCVinitBlocks & CVinitBlocks);
+void inputCVinitBlocks(std::ifstream & fi,XEMCVinitBlocks & CVinitBlocks);
 
-void inputDCVinitBlocks(ifstream & fi,XEMDCVinitBlocks & CVinitBlocks);
+void inputDCVinitBlocks(std::ifstream & fi,XEMDCVinitBlocks & CVinitBlocks);
 
 //XEMAlgo * createDefaultAlgo();
 

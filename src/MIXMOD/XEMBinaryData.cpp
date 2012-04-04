@@ -64,7 +64,7 @@ XEMBinaryData::XEMBinaryData(const XEMBinaryData & iData):XEMData(iData){
 //------------
 // Constructor
 //------------
-XEMBinaryData::XEMBinaryData(int64_t nbSample, int64_t pbDimension, vector<int64_t>  nbModality):XEMData(nbSample,pbDimension){
+XEMBinaryData::XEMBinaryData(int64_t nbSample, int64_t pbDimension, std::vector<int64_t>  nbModality):XEMData(nbSample,pbDimension){
   int64_t j;
   int64_t i;
   
@@ -85,7 +85,7 @@ XEMBinaryData::XEMBinaryData(int64_t nbSample, int64_t pbDimension, vector<int64
 //------------
 // Constructor
 //------------
-XEMBinaryData::XEMBinaryData(int64_t nbSample, int64_t pbDimension, vector<int64_t>  nbModality, int64_t ** matrix):XEMData(nbSample,pbDimension){
+XEMBinaryData::XEMBinaryData(int64_t nbSample, int64_t pbDimension, std::vector<int64_t>  nbModality, int64_t ** matrix):XEMData(nbSample,pbDimension){
 
   int64_t j;
   int64_t i;
@@ -106,7 +106,7 @@ XEMBinaryData::XEMBinaryData(int64_t nbSample, int64_t pbDimension, vector<int64
 //------------
 // Constructor
 //------------
-XEMBinaryData::XEMBinaryData(int64_t nbSample, int64_t pbDimension, const string & dataFileName, int64_t * tabNbModality):XEMData(nbSample,pbDimension){
+XEMBinaryData::XEMBinaryData(int64_t nbSample, int64_t pbDimension, const std::string & dataFileName, int64_t * tabNbModality):XEMData(nbSample,pbDimension){
   int64_t j;
   int64_t i;
   
@@ -119,7 +119,7 @@ XEMBinaryData::XEMBinaryData(int64_t nbSample, int64_t pbDimension, const string
   for (j=0; j<_pbDimension; j++)
     _tabNbModality[j] = tabNbModality[j];
 
-  ifstream dataFileStream(dataFileName.c_str(), ios::in);
+  std::ifstream dataFileStream(dataFileName.c_str(), ios::in);
  if (! dataFileStream.is_open()){
     dataFileStream.close();
     throw wrongDataFileName;
@@ -227,7 +227,7 @@ XEMSample ** XEMBinaryData::cloneMatrix(){
 //------
 // input
 //------
-void XEMBinaryData::input(ifstream & fi){
+void XEMBinaryData::input(std::ifstream & fi){
   int64_t i;
   int64_t j;
   int64_t * curSampleValue = new int64_t[_pbDimension];
@@ -268,7 +268,7 @@ void XEMBinaryData::input(const XEMDataDescription & dataDescription){
   _weightTotal = 0;
   
   _fileNameData  = dataDescription.getFileName();
-  ifstream fi((_fileNameData).c_str(), ios::in);
+  std::ifstream fi((_fileNameData).c_str(), ios::in);
   if (! fi.is_open()){
     throw wrongDataFileName;
   }
@@ -294,7 +294,7 @@ void XEMBinaryData::input(const XEMDataDescription & dataDescription){
         }
         else{
           if (typeid(*(dataDescription.getColumnDescription(j)))==typeid(XEMIndividualColumnDescription)){
-            string stringTmp;
+            std::string stringTmp;
             fi>>stringTmp;
            // cout<<stringTmp<<endl;
           }
@@ -317,7 +317,7 @@ void XEMBinaryData::input(const XEMDataDescription & dataDescription){
 //-------
 // output
 //-------
-void XEMBinaryData:: output(ostream & fo){
+void XEMBinaryData:: output(std::ostream & fo){
   fo<<"Sample size: "<<_nbSample;	
   fo<<"  Dimension: "<<_pbDimension;
   fo<<" values : "<<endl;
@@ -338,7 +338,7 @@ void XEMBinaryData:: output(ostream & fo){
 //-------------------
 // Create reduce data
 //--------------------
-XEMData * XEMBinaryData::reduceData(vector<int64_t> & correspondcenceOriginDataToReduceData, XEMPartition * knownPartition, XEMPartition * initPartition, XEMPartition *& oKnownPartition, XEMPartition *& oInitPartition){
+XEMData * XEMBinaryData::reduceData(std::vector<int64_t> & correspondcenceOriginDataToReduceData, XEMPartition * knownPartition, XEMPartition * initPartition, XEMPartition *& oKnownPartition, XEMPartition *& oInitPartition){
   int64_t rOld, value;
   int64_t * tabBaseMj = new int64_t[_nbSample];
   int64_t j, k, sizeTabFactor;

@@ -31,7 +31,7 @@
 //Variable Description
 struct VariableDescription{
   int64_t num;
-  string name;
+  std::string name;
 };
 
 
@@ -47,26 +47,26 @@ class XEMQualitativeColumnDescription : public XEMColumnDescription
     /// Destructor
     virtual ~XEMQualitativeColumnDescription();
     
-    string editType();
+    std::string editType();
     
     XEMColumnDescription * clone()const;
     
     const int64_t & getNbFactor()const;
     
-    const vector<VariableDescription> & getVariableDescription()const;
+    const std::vector<VariableDescription> & getVariableDescription()const;
     
     void setVariableDescription(VariableDescription & variableDescription, unsigned int index);
     
   private :    
     int64_t _nbFactor;
-    vector<VariableDescription> _variableDescription;
+    std::vector<VariableDescription> _variableDescription;
 };
 
 inline const int64_t & XEMQualitativeColumnDescription::getNbFactor()const{
     return _nbFactor;
 }
 
-inline const vector<VariableDescription> & XEMQualitativeColumnDescription::getVariableDescription()const{
+inline const std::vector<VariableDescription> & XEMQualitativeColumnDescription::getVariableDescription()const{
   return _variableDescription;
 }
 

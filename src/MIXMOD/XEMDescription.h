@@ -38,7 +38,7 @@ class XEMDescription
     XEMDescription();   
         
     ///constructor by initilization
-    XEMDescription(int64_t nbSample, int64_t nbColumn, vector<XEMColumnDescription *> columnDescription, FormatNumeric::XEMFormatNumericFile format, string filename, string InfoName="");
+    XEMDescription(int64_t nbSample, int64_t nbColumn, std::vector<XEMColumnDescription *> columnDescription, FormatNumeric::XEMFormatNumericFile format, std::string filename, std::string InfoName="");
     
     ///constructor by copy
     XEMDescription(XEMDescription & description);
@@ -54,13 +54,13 @@ class XEMDescription
     
     /// get
     //get Name
-    string getInfoName()const;
+    std::string getInfoName()const;
     
     //get NbSample
     int64_t getNbSample() const;
     
     //get FileName
-    string getFileName()const ;
+    std::string getFileName()const ;
     
     //get NbColumn
     int64_t getNbColumn()const ;
@@ -71,29 +71,29 @@ class XEMDescription
     //get ColumnDescription
     const XEMColumnDescription * getColumnDescription(int64_t index)const;
     
-    const vector<XEMColumnDescription*> getAllColumnDescription()const;
+    const std::vector<XEMColumnDescription*> getAllColumnDescription()const;
     
     int64_t getPbDimension() const;
     
     ///set
     //set InfoName
-    void setInfoName(string & iInfoName);
+    void setInfoName(std::string & iInfoName);
     
-    virtual void saveNumericValues(string fileName="") = 0;
+    virtual void saveNumericValues(std::string fileName="") = 0;
     
   protected :
     
-    string _infoName;
+    std::string _infoName;
     int64_t _nbSample;
     int64_t _nbColumn;
-    string _fileName; //numeric file name
+    std::string _fileName; //numeric file name
     FormatNumeric::XEMFormatNumericFile _format;//format of  numeric file
-    vector<XEMColumnDescription*> _columnDescription;//each variable has a description
+    std::vector<XEMColumnDescription*> _columnDescription;//each variable has a description
     
     
 };
 
-inline string XEMDescription::getInfoName()const {
+inline std::string XEMDescription::getInfoName()const {
    return _infoName; 
 }
 
@@ -105,7 +105,7 @@ inline int64_t XEMDescription::getNbColumn()const{
    return _nbColumn; 
 }
 
-inline string XEMDescription::getFileName()const{
+inline std::string XEMDescription::getFileName()const{
    return _fileName; 
 }
 
@@ -115,7 +115,7 @@ inline const XEMColumnDescription * XEMDescription::getColumnDescription(int64_t
   else throw wrongIndexInGetMethod;
 }
 
-inline const vector<XEMColumnDescription*> XEMDescription::getAllColumnDescription()const{
+inline const std::vector<XEMColumnDescription*> XEMDescription::getAllColumnDescription()const{
  return _columnDescription; 
 }
 
@@ -123,7 +123,7 @@ inline FormatNumeric::XEMFormatNumericFile XEMDescription::getFormat()const{
    return _format; 
 }
  
-inline void XEMDescription::setInfoName(string & iInfoName){
+inline void XEMDescription::setInfoName(std::string & iInfoName){
   _infoName = iInfoName; 
 }
 

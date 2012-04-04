@@ -49,16 +49,16 @@ class XEMParameterDescription
     /// Constructor
     XEMParameterDescription( int64_t nbCluster
                            , int64_t nbVariable
-                           , vector< int64_t > nbFactor
+                           , std::vector< int64_t > nbFactor
                            , FormatNumeric::XEMFormatNumericFile format
-                           , string filename
-                           , string infoName
+                           , std::string filename
+                           , std::string infoName
                            , XEMModelName & modelName
                            );
     // ---------------------------
     XEMParameterDescription( int64_t nbCluster
                            , int64_t nbVariable
-                           , vector< int64_t > nbFactor
+                           , std::vector< int64_t > nbFactor
                            , XEMModelName& modelName
                            , double * proportions
                            , double **  centers
@@ -70,8 +70,8 @@ class XEMParameterDescription
     XEMParameterDescription( int64_t nbCluster
                            , int64_t nbVariable
                            , FormatNumeric::XEMFormatNumericFile format
-                           , string filename
-                           , string infoName
+                           , std::string filename
+                           , std::string infoName
                            , XEMModelName & modelName
                            );
     // ---------------------------
@@ -93,7 +93,7 @@ class XEMParameterDescription
     XEMParameter * getParameter(); 
     
     ///getInfoName
-    string getInfoName();
+    std::string getInfoName();
     
     ///getPbDimension
     int64_t getNbVariable();
@@ -105,20 +105,20 @@ class XEMParameterDescription
     FormatNumeric::XEMFormatNumericFile getFormat();
     
     ///getFilename
-    string getFilename();
+    std::string getFilename();
     
     ///getModelType
     XEMModelType * getModelType();
     
     ///getTabNbModality
-    vector<int64_t> & getTabNbFactor();
+    std::vector<int64_t> & getTabNbFactor();
     
-    void saveNumericValues(string fileName="");
+    void saveNumericValues(std::string fileName="");
     
     
   private :
     
-    string _infoName;
+   std::string _infoName;
     
    int64_t _nbVariable;
    
@@ -126,9 +126,9 @@ class XEMParameterDescription
    
    FormatNumeric::XEMFormatNumericFile _format;//format of  numeric file
    
-   string _filename;
+   std::string _filename;
    
-   vector<int64_t> _nbFactor;
+   std::vector<int64_t> _nbFactor;
    
    XEMModelType * _modelType;
     
@@ -150,7 +150,7 @@ inline int64_t XEMParameterDescription::getNbCluster()
 }
 
 
-inline string XEMParameterDescription::getInfoName(){
+inline std::string XEMParameterDescription::getInfoName(){
   return _infoName;
 }
 
@@ -163,7 +163,7 @@ inline FormatNumeric::XEMFormatNumericFile XEMParameterDescription::getFormat(){
    return _format; 
 }
 
-inline string XEMParameterDescription::getFilename()
+inline std::string XEMParameterDescription::getFilename()
 {
   return _filename;
 }
@@ -173,7 +173,7 @@ inline XEMModelType * XEMParameterDescription::getModelType()
  return _modelType;
 }
 
-inline vector<int64_t> & XEMParameterDescription::getTabNbFactor()
+inline std::vector<int64_t> & XEMParameterDescription::getTabNbFactor()
 {
   return _nbFactor;
 }

@@ -75,7 +75,7 @@ XEMProba::XEMProba(XEMModel * model){
   else{
   ////
     //binary case
-    const vector<int64_t> & correspondenceOriginDataToReduceData = dynamic_cast<XEMBinaryModel*>(model)->getCorrespondenceOriginDataToReduceData();
+    const std::vector<int64_t> & correspondenceOriginDataToReduceData = dynamic_cast<XEMBinaryModel*>(model)->getCorrespondenceOriginDataToReduceData();
     _nbSample = correspondenceOriginDataToReduceData.size();
     tabProba = new double*[_nbSample];
     for (int64_t i=0; i<_nbSample; i++){
@@ -148,7 +148,7 @@ bool XEMProba::operator ==(const XEMProba & proba) const{
 //----------
 // editProba
 //----------
-void XEMProba::edit(ostream & stream){
+void XEMProba::edit(std::ostream & stream){
     stream.setf(ios::fixed, ios::floatfield);
     for (int64_t i=0; i<_nbSample; i++){
       for (int64_t k=0; k<_nbCluster; k++){
@@ -172,7 +172,7 @@ double ** XEMProba::getTabProba() const{
 // -----------
 //input stream
 // -----------
-void XEMProba::input(ifstream & flux){
+void XEMProba::input(std::ifstream & flux){
   int64_t i = 0;
   int64_t k = 0;
   

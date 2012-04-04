@@ -62,7 +62,7 @@ public:
   void setWeightTotal(double weightTotal);
 
   /// setWeight
-  void setWeight(string weightFileName);
+  void setWeight(std::string weightFileName);
   /// setWeight
   void setWeight(double* weight);
 
@@ -72,7 +72,7 @@ public:
   /** @brief Read data from data file
       @fi Data file to read
   */
-  virtual void input(ifstream & fi)=0;
+  virtual void input(std::ifstream & fi)=0;
 
   
   /** @brief Read data from XEMDataDescription
@@ -83,7 +83,7 @@ public:
   /** @brief Write data in output file
       @f0 Output file to write into
   */
-  virtual void output(ostream & fo)=0;
+  virtual void output(std::ostream & fo)=0;
 
   /** @brief Selector
       @return A copy of data
@@ -94,7 +94,7 @@ public:
 
   virtual bool verify() const;
   
-  const string & getFileName()const;
+  const std::string & getFileName()const;
 
   /// Problem dimension
   int64_t _pbDimension;
@@ -124,7 +124,7 @@ public:
   const double & getWeightI(int64_t index) const;
 
   ///get FilenameWeight
-  const string & getFileNameWeight()const;
+  const std::string & getFileNameWeight()const;
   
     /// get dimension
   int64_t getPbDimension()const;
@@ -139,13 +139,13 @@ protected :
   
   //TODO XEMInput : a enlever
   ///filename of weight
-  string _fileNameWeight;
+  std::string _fileNameWeight;
   
   /// defaultWeight
   bool _defaultWeight;
   
   ///filename of data
-  string _fileNameData;
+  std::string _fileNameData;
   
 };
 
@@ -153,11 +153,11 @@ inline  const XEMSample ** XEMData::getData() const{
   return const_cast<const XEMSample**>(_matrix);
 }
 
-inline  const string & XEMData::getFileNameWeight() const{
+inline  const std::string & XEMData::getFileNameWeight() const{
   return _fileNameWeight;
 }
 
-inline  const string & XEMData::getFileName() const{
+inline  const std::string & XEMData::getFileName() const{
   return _fileNameData;
 }
 

@@ -84,13 +84,13 @@ bool XEMModelType::operator ==(const XEMModelType & modelType) const{
 
 
 
-void XEMModelType::input(ifstream & fi, int64_t nbCluster){
+void XEMModelType::input(std::ifstream & fi, int64_t nbCluster){
 
 
   _nbSubDimensionFree = nbCluster;
-  string keyWord = "";
+  std::string keyWord = "";
   int64_t dim;
-  string a = "";
+  std::string a = "";
 
     fi>>a;
       if (a.compare("Gaussian_p_L_I") == 0){
@@ -432,8 +432,8 @@ void XEMModelType::input(ifstream & fi, int64_t nbCluster){
 }
 
 // <<
-ostream & operator<<(ostream & fo, XEMModelType & modelType){
-  string name = XEMModelNameToString(modelType._nameModel);
+std::ostream & operator<<(std::ostream & fo, XEMModelType & modelType){
+  std::string name = XEMModelNameToString(modelType._nameModel);
   fo<<name<<endl;
   if (modelType._subDimensionEqual !=0){
     fo<<"subDimensionEqual = "<<modelType._subDimensionEqual<<endl;;
@@ -453,7 +453,7 @@ ostream & operator<<(ostream & fo, XEMModelType & modelType){
 //-------------------------
 // printModelType Short Cut
 //-------------------------
-void XEMModelType::printShortcut(ostream & flux){
+void XEMModelType::printShortcut(std::ostream & flux){
   
  switch (_nameModel) {
    case (Gaussian_p_L_B) :
@@ -534,7 +534,7 @@ void XEMModelType::printShortcut(ostream & flux){
 //---------------------
 // print out Model Type
 //---------------------
-void XEMModelType::print(ostream & flux) {
+void XEMModelType::print(std::ostream & flux) {
    
  switch (_nameModel) {
  
@@ -714,7 +714,7 @@ void XEMModelType::print(ostream & flux) {
 //---------------
 /// editModelType
 //----------------
-void XEMModelType::edit(ostream & oFile) {
+void XEMModelType::edit(std::ostream & oFile) {
  
  oFile<<"\t\t\tModel Type : ";
  

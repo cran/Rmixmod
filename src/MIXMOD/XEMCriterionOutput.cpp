@@ -73,7 +73,7 @@ bool XEMCriterionOutput::operator ==(const XEMCriterionOutput & criterionOutput)
 //----------
 // edit Type
 //----------
-void XEMCriterionOutput::editType(ostream & oFile) const {
+void XEMCriterionOutput::editType(std::ostream & oFile) const {
   oFile<<"Criterion Name : ";
   if (_criterionName == BIC){
      oFile<<"BIC";
@@ -98,7 +98,7 @@ void XEMCriterionOutput::editType(ostream & oFile) const {
 //-----------
 // edit Value
 //-----------
-void XEMCriterionOutput::editValue(ostream & oFile, bool text) const{
+void XEMCriterionOutput::editValue(std::ostream & oFile, bool text) const{
   if (text){
     oFile<<"\t\t\tCriterion Value : ";
     if (_error == noError){
@@ -120,7 +120,7 @@ void XEMCriterionOutput::editValue(ostream & oFile, bool text) const{
 //--------------------
 // edit Type And Value
 //--------------------
-void XEMCriterionOutput::editTypeAndValue(ostream & oFile) const{
+void XEMCriterionOutput::editTypeAndValue(std::ostream & oFile) const{
   if (_criterionName == BIC){
     oFile<<"\t\t\tBIC ";
   }

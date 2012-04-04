@@ -122,7 +122,7 @@ public:
   double* getGeneralStore();
 
   /// read general matrix in an input file
-  void input(ifstream & fi);
+  void input(std::ifstream & fi);
   virtual void input(double ** variances);
   
   ///set store

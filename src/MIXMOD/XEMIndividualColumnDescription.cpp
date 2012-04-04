@@ -37,7 +37,7 @@ XEMIndividualColumnDescription::XEMIndividualColumnDescription(int64_t index):XE
 XEMIndividualColumnDescription::~XEMIndividualColumnDescription(){  
 }
 
-string XEMIndividualColumnDescription::editType(){
+std::string XEMIndividualColumnDescription::editType(){
   return "Individual";
 }
 

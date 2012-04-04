@@ -71,13 +71,13 @@ class  XEMClusteringStrategy
   void setStrategyInitName(XEMStrategyInitName initName);
   
   /// setInitParam
-  void setInitParam(string & paramFileName, int64_t position);
+  void setInitParam(std::string & paramFileName, int64_t position);
   
   /// setInitParam
   void setTabInitParameter(XEMParameter ** tabInitParameter, int64_t nbInitParameter);
     
   /// setInitPartition
-  void setInitPartition(string & partitionFileName, int64_t position);
+  void setInitPartition(std::string & partitionFileName, int64_t position);
     
   /// setInitPartition
   void setInitPartition(XEMPartition * part, int64_t position);
@@ -146,16 +146,16 @@ class  XEMClusteringStrategy
     
   /// Input strategy (FLAT FORMAT)
   // TODO XEMInput : a enlever
-  void input_FLAT_FORMAT(ifstream & fi, XEMData *& data, int64_t nbNbCluster, int64_t * tabNbCluster, XEMModelType * modelType);
+  void input_FLAT_FORMAT(std::ifstream & fi, XEMData *& data, int64_t nbNbCluster, int64_t * tabNbCluster, XEMModelType * modelType);
   
 	/// Run method
   void run(XEMModel * model);
         
   bool verify();
     
-  void edit(ofstream & oFile);
+  void edit(std::ofstream & oFile);
         
-  friend ostream & operator << (ostream & fo, XEMClusteringStrategy & strategy);
+  friend std::ostream & operator << (std::ostream & fo, XEMClusteringStrategy & strategy);
     
     
 private :

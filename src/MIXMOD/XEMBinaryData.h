@@ -47,13 +47,13 @@ public:
   XEMBinaryData(const XEMBinaryData & iData);
 
   /// Constructor
-  XEMBinaryData(int64_t nbSample, int64_t pbDimension, const string & dataFileName, int64_t * tabNbModality);
+  XEMBinaryData(int64_t nbSample, int64_t pbDimension, const std::string & dataFileName, int64_t * tabNbModality);
   
   /// Constructor
-  XEMBinaryData(int64_t nbSample, int64_t pbDimension, vector<int64_t>  nbModality);
+  XEMBinaryData(int64_t nbSample, int64_t pbDimension, std::vector<int64_t>  nbModality);
 
   /// Constructor
-  XEMBinaryData(int64_t nbSample, int64_t pbDimension, vector<int64_t>  nbModality, int64_t ** matrix);
+  XEMBinaryData(int64_t nbSample, int64_t pbDimension, std::vector<int64_t>  nbModality, int64_t ** matrix);
 
   /// Constructor for dataReduce
   XEMBinaryData(int64_t nbSample, int64_t pbDimension, int64_t * tabNbModality, double weightTotal, XEMSample **& matrix, double * weight);
@@ -82,12 +82,12 @@ public:
   /** @brief Read data from binary data file
       @param fi Binary Data file to read
   */
-  virtual void input(ifstream & fi);
+  virtual void input(std::ifstream & fi);
 
   /** @brief Write binary data in output file
       @param fo Output file to write into
   */
-  virtual void output(ostream & fo);
+  virtual void output(std::ostream & fo);
 
   
   virtual bool verify()const;
@@ -108,7 +108,7 @@ public:
   */
    int64_t * getTabNbModality() const;
    
-   XEMData * reduceData(vector<int64_t> & correspondcenceOriginDataToReduceData, XEMPartition * knownPartition, XEMPartition * initPartition, XEMPartition *& oKnownPartition, XEMPartition *& oInitPartition);
+   XEMData * reduceData(std::vector<int64_t> & correspondcenceOriginDataToReduceData, XEMPartition * knownPartition, XEMPartition * initPartition, XEMPartition *& oKnownPartition, XEMPartition *& oInitPartition);
   
 
 protected :    

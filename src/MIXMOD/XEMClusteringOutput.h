@@ -70,7 +70,7 @@ public:
   
   std::vector<XEMClusteringModelOutput*> const &  getClusteringModelOutput() const;
   
-  void setClusteringModelOutput(vector<XEMClusteringModelOutput *> & clusteringModelOutput);
+  void setClusteringModelOutput(std::vector<XEMClusteringModelOutput *> & clusteringModelOutput);
   
   const int getCriterionSize() const;
   const XEMCriterionName & getCriterionName(const int index) const;

@@ -39,7 +39,7 @@ class XEMProbaDescription : public XEMDescription
     XEMProbaDescription();   
         
     ///constructor by initilization
-    XEMProbaDescription(int64_t nbSample,  int64_t nbCluster, FormatNumeric::XEMFormatNumericFile format, string filename, string infoName="");
+    XEMProbaDescription(int64_t nbSample,  int64_t nbCluster, FormatNumeric::XEMFormatNumericFile format, std::string filename, std::string infoName="");
     
     ///constructor after an estimation->run
     XEMProbaDescription(XEMModel * model);
@@ -60,7 +60,7 @@ class XEMProbaDescription : public XEMDescription
     
     XEMProba * getProba();
     
-    void saveNumericValues(string fileName="");
+    void saveNumericValues(std::string fileName="");
     
     //void editProba(ostream & f) const;
     

@@ -1,6 +1,6 @@
 Package: Rmixmod
-Version: 1.1.0
-Date: 2012-03-29
+Version: 1.1.1
+Date: 2012-04-04
 Title: MIXture MODelling Package
 Description: High Performance Model-Based Cluster and Discriminant
         Analysis
@@ -29,6 +29,6 @@ Collate: 'global.R' 'Strategy.R' 'Model.R' 'Parameter.R'
         'MultinomialModel.R' 'GaussianModel.R' 'MultinomialParameter.R'
         'Mixmod.R' 'MixmodCluster.R' 'MixmodLearn.R' 'Rmixmod.R'
         'MixmodPredict.R' 'zzz.R'
-Packaged: 2012-03-30 08:24:25 UTC; lebret
+Packaged: 2012-04-03 15:25:40 UTC; lebret
 Repository: CRAN
-Date/Publication: 2012-03-30 10:07:26
+Date/Publication: 2012-04-03 21:21:31

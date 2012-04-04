@@ -34,8 +34,6 @@ class XEMModel;
 class XEMLearnMain;
 class XEMLearnModelOutput;
 
-using namespace std;
-
 class XEMLearnOutput{
   
 public:	
@@ -72,7 +70,7 @@ public:
   
   int64_t getNbLearnModelOutput() const;
   
-  void setLearnModelOutput(vector<XEMLearnModelOutput *> & learnModelOutput);
+  void setLearnModelOutput(std::vector<XEMLearnModelOutput *> & learnModelOutput);
   
 private :
   // Vector containing output for each model

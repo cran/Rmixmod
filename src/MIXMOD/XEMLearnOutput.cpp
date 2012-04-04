@@ -122,7 +122,7 @@ void XEMLearnOutput::editFile() const{
 }
 
 
-void XEMLearnOutput::setLearnModelOutput(vector<XEMLearnModelOutput *> & learnModelOutput){
+void XEMLearnOutput::setLearnModelOutput(std::vector<XEMLearnModelOutput *> & learnModelOutput){
   for (unsigned int i=0; i<_learnModelOutput.size(); i++){
     delete _learnModelOutput[i];
   }

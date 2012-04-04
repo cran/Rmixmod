@@ -30,7 +30,7 @@
 //Individual Description
 struct IndividualDescription{
   int64_t num;
-  string name;
+  std::string name;
 };
 
 class XEMIndividualColumnDescription : public XEMColumnDescription
@@ -45,22 +45,22 @@ class XEMIndividualColumnDescription : public XEMColumnDescription
     /// Destructor
     virtual ~XEMIndividualColumnDescription();
     
-    string editType();
+    std::string editType();
     
     XEMColumnDescription * clone()const;
     
-    const vector<IndividualDescription> & getIndividualDescription()const;
+    const std::vector<IndividualDescription> & getIndividualDescription()const;
     
     void setIndividualDescription(IndividualDescription & individualDescription, unsigned int index);
     
     void insertIndividualDescription(IndividualDescription individualDescription, unsigned int index);
     
   private :
-    vector<IndividualDescription> _individualDescription;
+    std::vector<IndividualDescription> _individualDescription;
     
 };
 
-inline const vector<IndividualDescription> & XEMIndividualColumnDescription::getIndividualDescription()const{
+inline const std::vector<IndividualDescription> & XEMIndividualColumnDescription::getIndividualDescription()const{
  return _individualDescription;
 }
 

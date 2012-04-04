@@ -43,7 +43,7 @@ public:
   XEMGaussianData(const XEMGaussianData & iData);
   
   /// Constructor
-  XEMGaussianData(int64_t nbSample, int64_t pbDimension, const string & dataFileName);
+  XEMGaussianData(int64_t nbSample, int64_t pbDimension, const std::string & dataFileName);
   
   /// Constructor  (without fill matrix)
   XEMGaussianData(int64_t nbSample, int64_t pbDimension);
@@ -77,7 +77,7 @@ public:
   /** @brief Read data from gaussian data file
       @fi Gaussian Data file to read
   */
-  virtual void input(ifstream & fi);
+  virtual void input(std::ifstream & fi);
   
   /** @brief Read data from XEMDataDescription
   */
@@ -86,7 +86,7 @@ public:
   /** @brief Write gaussian data in output file
       @f0 Output file to write into
   */
-  virtual void output(ostream & fo);
+  virtual void output(std::ostream & fo);
 
   virtual bool verify()const; 
   

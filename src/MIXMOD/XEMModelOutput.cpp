@@ -80,7 +80,7 @@ XEMModelOutput::XEMModelOutput(XEMModel * estimation)
 //------------------------------
 XEMModelOutput::XEMModelOutput( XEMModelType & modelType
                               , int64_t nbCluster
-                              , vector<XEMCriterionOutput> & criterionOutput
+                              , std::vector<XEMCriterionOutput> & criterionOutput
                               , double likelihood
                               , XEMParameterDescription & parameterDescription
                               , XEMLabelDescription & labelDescription

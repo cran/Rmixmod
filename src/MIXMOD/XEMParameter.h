@@ -163,10 +163,10 @@ public:
   virtual void edit()=0;
 
   /// edit
-  virtual void edit(ofstream & oFile, bool text=false)=0;
+  virtual void edit(std::ofstream & oFile, bool text=false)=0;
 
   /// input
-  virtual void input(ifstream & fi)=0;
+  virtual void input(std::ifstream & fi)=0;
 
 
   //-------
@@ -195,10 +195,10 @@ public:
   void setModel(XEMModel * iModel);
   
   ///getFilename
-  const string & getFilename() const;
+  const std::string & getFilename() const;
   
   ///setFilename
-  void setFilename(const string & filename);
+  void setFilename(const std::string & filename);
   
   /// recopie sans faire construction / destruction
   // utilisé par SMALL_EM, CEM_INIT
@@ -236,7 +236,7 @@ protected :
 private :
   
   ///filename
-  string _filename;
+  std::string _filename;
 
   FormatNumeric::XEMFormatNumericFile _format;
 };
@@ -274,11 +274,11 @@ inline XEMModelType * XEMParameter::getModelType() const {
   return _modelType;
 }
 
-inline const string & XEMParameter::getFilename() const{
+inline const std::string & XEMParameter::getFilename() const{
   return _filename;
 }
 
-inline void XEMParameter::setFilename(const string & filename){
+inline void XEMParameter::setFilename(const std::string & filename){
   _filename = filename;
 }
 

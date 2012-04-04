@@ -168,8 +168,8 @@ void XEMClusteringStrategyInit::setStrategyInitName(XEMStrategyInitName initName
 //-------------------
 // set init parameter
 //-------------------
-void XEMClusteringStrategyInit::setInitParam(string & paramFileName, int64_t position){
-  ifstream paramFile(paramFileName.c_str(), ios::in);
+void XEMClusteringStrategyInit::setInitParam(std::string & paramFileName, int64_t position){
+  std::ifstream paramFile(paramFileName.c_str(), ios::in);
   if (! paramFile.is_open()){
     throw wrongParamFileName;
   }
@@ -220,8 +220,8 @@ void XEMClusteringStrategyInit::setPartition(XEMPartition * part, int64_t positi
 //------------------
 //set Init Partition
 //----------------
-void XEMClusteringStrategyInit::setPartition(string & partitionFileName, int64_t position){
-  ifstream partitionFile(partitionFileName.c_str(), ios::in);
+void XEMClusteringStrategyInit::setPartition(std::string & partitionFileName, int64_t position){
+  std::ifstream partitionFile(partitionFileName.c_str(), ios::in);
   if (! partitionFile.is_open()){
     throw wrongPartitionFileName;
   }
@@ -352,9 +352,9 @@ bool XEMClusteringStrategyInit::verify() const{
 
 
 // input
-void XEMClusteringStrategyInit::input(ifstream & fi, XEMData *& data, int64_t nbNbCluster, int64_t * tabNbCluster, XEMModelType * modelType, bool & alreadyRead){
-  string keyWord = "";
-  string a ="";
+void XEMClusteringStrategyInit::input(std::ifstream & fi, XEMData *& data, int64_t nbNbCluster, int64_t * tabNbCluster, XEMModelType * modelType, bool & alreadyRead){
+  std::string keyWord = "";
+  std::string a ="";
   int64_t k;
   int64_t pbDimension  = data->_pbDimension;
   int64_t nbSample    = data->_nbSample;
@@ -389,7 +389,7 @@ void XEMClusteringStrategyInit::input(ifstream & fi, XEMData *& data, int64_t nb
       if(keyWord.compare("initfile")==0){
        // _strategyInit->_nbInitParameter  = nbNbCluster;
         XEMParameter ** tabInitParameter = new XEMParameter * [nbNbCluster];
-        string * tabFileName = new string[nbNbCluster];
+        std::string * tabFileName = new std::string[nbNbCluster];
         for (k=0; k<nbNbCluster; k++){
           tabFileName[k] = "";
         }
@@ -429,7 +429,7 @@ void XEMClusteringStrategyInit::input(ifstream & fi, XEMData *& data, int64_t nb
       if(keyWord.compare("initfile")==0){
         //_strategyInit->_nbPartition  = nbNbCluster;
         XEMPartition ** tabPartition = new XEMPartition * [nbNbCluster];
-        string * tabFileName = new string[nbNbCluster];
+        std::string * tabFileName = new std::string[nbNbCluster];
         for (k=0; k<nbNbCluster; k++){
           tabFileName[k] = "";
         }
@@ -552,9 +552,9 @@ void XEMClusteringStrategyInit::input(ifstream & fi, XEMData *& data, int64_t nb
     
 // ostream <<
 //-----------
-ostream & operator << (ostream & fo, XEMClusteringStrategyInit & strategyInit){
+std::ostream & operator << (std::ostream & fo, XEMClusteringStrategyInit & strategyInit){
     //strategyInitType
-  string init = XEMStrategyInitNameToString(strategyInit._strategyInitName);
+  std::string init = XEMStrategyInitNameToString(strategyInit._strategyInitName);
     fo<<"\t strategyInitName : "<<init<<endl;
     
     // nbTryInInit
@@ -562,7 +562,7 @@ ostream & operator << (ostream & fo, XEMClusteringStrategyInit & strategyInit){
     fo<<"\t nbTryInInit : "<<nbTryInInit<<endl;
     
     // stopNameInInit
-    string stopNameInInit = XEMAlgoStopNameToString(strategyInit._stopName);
+    std::string stopNameInInit = XEMAlgoStopNameToString(strategyInit._stopName);
     fo<<"\t stopNameInInit : "<<stopNameInInit<<endl;
     
     // nbIterationInInit

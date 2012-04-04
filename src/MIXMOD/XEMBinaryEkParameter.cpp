@@ -347,7 +347,7 @@ void XEMBinaryEkParameter::editScatter(int64_t k){
 
 // editScatter 
 //------------
-void XEMBinaryEkParameter::editScatter(ofstream & oFile, int64_t k, bool text){
+void XEMBinaryEkParameter::editScatter(std::ofstream & oFile, int64_t k, bool text){
   int64_t j,h;
   if(text){
     oFile<<"\t\t\tScattering : \n";
@@ -371,7 +371,7 @@ void XEMBinaryEkParameter::editScatter(ofstream & oFile, int64_t k, bool text){
 
 // Read Scatter in input file
 //---------------------------
-void XEMBinaryEkParameter::inputScatter(ifstream & fi){
+void XEMBinaryEkParameter::inputScatter(std::ifstream & fi){
   throw internalMixmodError;
 }
 

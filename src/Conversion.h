@@ -12,6 +12,7 @@
 
 #include <Rcpp.h>
 #include <vector>
+#include <stdint.h>
 
 // pre-declaration
 class XEMBinaryData;

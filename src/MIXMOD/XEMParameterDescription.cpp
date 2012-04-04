@@ -99,10 +99,10 @@ XEMParameterDescription::XEMParameterDescription(XEMModelOutput* iEstimation){
 // ---------------------------
 XEMParameterDescription::XEMParameterDescription( int64_t nbCluster
                                                 , int64_t nbVariable
-                                                , vector< int64_t > nbFactor
+                                                , std::vector< int64_t > nbFactor
                                                 , FormatNumeric::XEMFormatNumericFile format
-                                                , string filename
-                                                , string infoName
+                                                , std::string filename
+                                                , std::string infoName
                                                 , XEMModelName& modelName
                                                 )
 {
@@ -113,7 +113,7 @@ XEMParameterDescription::XEMParameterDescription( int64_t nbCluster
   _format = format;
   _nbFactor = nbFactor;
   _modelType = new XEMModelType(modelName);
-  ifstream fi(filename.c_str(), ios::in);
+  std::ifstream fi(filename.c_str(), ios::in);
   if (! fi.is_open()){
     throw wrongLabelFileName;
   }
@@ -129,7 +129,7 @@ XEMParameterDescription::XEMParameterDescription( int64_t nbCluster
 // ---------------------------
 XEMParameterDescription::XEMParameterDescription( int64_t nbCluster
                                                 , int64_t nbVariable
-                                                , vector< int64_t > nbFactor
+                                                , std::vector< int64_t > nbFactor
                                                 , XEMModelName& modelName
                                                 , double * proportions
                                                 , double **  centers
@@ -157,8 +157,8 @@ XEMParameterDescription::XEMParameterDescription( int64_t nbCluster
 XEMParameterDescription::XEMParameterDescription( int64_t nbCluster
                                                 , int64_t nbVariable
                                                 , FormatNumeric::XEMFormatNumericFile format
-                                                , string filename
-                                                , string infoName
+                                                , std::string filename
+                                                , std::string infoName
                                                 , XEMModelName& modelName
                                                 )
 {
@@ -169,7 +169,7 @@ XEMParameterDescription::XEMParameterDescription( int64_t nbCluster
   _format = format;
   //_nbFactor  empty
   _modelType = new XEMModelType(modelName);
-  ifstream fi(filename.c_str(), ios::in);
+  std::ifstream fi(filename.c_str(), ios::in);
   if (! fi.is_open()){
     throw wrongLabelFileName;
   }
@@ -230,9 +230,9 @@ bool XEMParameterDescription::operator==( XEMParameterDescription & paramDescrip
 //--------
 // ostream
 //--------
-void XEMParameterDescription::saveNumericValues(string fileName){
+void XEMParameterDescription::saveNumericValues(std::string fileName){
   //if (_filename==""){
-    ofstream fo(fileName.c_str(), ios::out);
+    std::ofstream fo(fileName.c_str(), ios::out);
     _parameter->edit(fo);
     _filename = fileName;
   //}

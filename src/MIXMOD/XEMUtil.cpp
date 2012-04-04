@@ -1352,7 +1352,7 @@ void edit(const XEMAlgoStopName & algoStopName) {
 
 
 ///printAlgoType
-void printTypeAlgo(ostream & flux, const XEMAlgoName & typeAlgo){
+void printTypeAlgo(std::ostream & flux, const XEMAlgoName & typeAlgo){
  if (typeAlgo == EM)
           flux<<"EM"<<endl;
   else if (typeAlgo == CEM)
@@ -1581,7 +1581,7 @@ bool isDiagonal(Matrix * mat, int64_t n) {
 
 
 
-void editSimpleTab(double * tab, int64_t n, std::string sep, std::string before, ostream & flux) {
+void editSimpleTab(double * tab, int64_t n, std::string sep, std::string before, std::ostream & flux) {
     int64_t i;
     flux << before;
     for (i=0;i<n;i++) {
@@ -1589,7 +1589,7 @@ void editSimpleTab(double * tab, int64_t n, std::string sep, std::string before,
     }
     flux << endl ;
 }
-void editSimpleTab(int64_t    * tab, int64_t n, ostream & flux ) {
+void editSimpleTab(int64_t    * tab, int64_t n, std::ostream & flux ) {
     int64_t i;
     for (i=0;i<n;i++)
         flux << tab[i] << endl ;
@@ -1599,7 +1599,7 @@ void editSimpleTab(int64_t    * tab, int64_t n, ostream & flux ) {
 
 
 
-void editMatrix(GeneralMatrix & mat, int64_t nRows,ostream & flux, std::string before) {
+void editMatrix(GeneralMatrix & mat, int64_t nRows, std::ostream & flux, std::string before) {
 
     int64_t i;
     for (i=1 ; i<=nRows ; i++) {
@@ -1608,7 +1608,7 @@ void editMatrix(GeneralMatrix & mat, int64_t nRows,ostream & flux, std::string b
 
 }
 
-void editSphericalMatrix(double mat, int64_t nRows, ostream & flux, std::string before) {
+void editSphericalMatrix(double mat, int64_t nRows, std::ostream & flux, std::string before) {
     int64_t i;
     int64_t j;
     for (i=0;i<nRows;i++) {
@@ -1624,7 +1624,7 @@ void editSphericalMatrix(double mat, int64_t nRows, ostream & flux, std::string 
     }
 }
 
-void editDiagMatrix(double * mat, int64_t nRows, ostream & flux, std::string before) {
+void editDiagMatrix(double * mat, int64_t nRows, std::ostream & flux, std::string before) {
     int64_t i;
     int64_t j;
     for (i=0;i<nRows;i++) {
@@ -1648,7 +1648,7 @@ void editDiagMatrix(double * mat, int64_t nRows, ostream & flux, std::string bef
 // after using that function fi is just after the first time what appears
 //---------------
 
-void moveUntilReach(ifstream & fi, std::string  what) {
+void moveUntilReach(std::ifstream & fi, std::string  what) {
     std::string keyWord = "";
     ConvertBigtoLowString(what);
     // init reading at the beginning of file //
@@ -1671,7 +1671,7 @@ void moveUntilReach(ifstream & fi, std::string  what) {
 //-------------------
 // read nbNbCluster file names (ex : titi ; toto;tutu)
 
-void readTabFileName(ifstream & fi, int64_t nbNbCluster,std::string* tabFileName, std::string& keyWord) {
+void readTabFileName(std::ifstream & fi, int64_t nbNbCluster,std::string* tabFileName, std::string& keyWord) {
     int64_t k=0;
 
     std::string c = "";
@@ -1832,7 +1832,7 @@ int64_t generateRandomIndex(bool * tabIndividualCanBeUsedForInitRandom, double *
 }
 
 
-void inputCriterion(ifstream & fi,XEMCriterionName & criterionName) {
+void inputCriterion(std::ifstream & fi,XEMCriterionName & criterionName) {
 
     std::string a = "";
     fi>>a;
@@ -1857,7 +1857,7 @@ void inputCriterion(ifstream & fi,XEMCriterionName & criterionName) {
 }
 
 
-void inputCVinitBlocks(ifstream & fi,XEMCVinitBlocks & CVinitBlocks) {
+void inputCVinitBlocks(std::ifstream & fi,XEMCVinitBlocks & CVinitBlocks) {
     std::string a = "";
     fi>>a;
     if (a.compare("CV_RANDOM")==0) {
@@ -1871,7 +1871,7 @@ void inputCVinitBlocks(ifstream & fi,XEMCVinitBlocks & CVinitBlocks) {
     }
 }
 
-void inputDCVinitBlocks(ifstream & fi,XEMDCVinitBlocks & DCVinitBlocks) {
+void inputDCVinitBlocks(std::ifstream & fi,XEMDCVinitBlocks & DCVinitBlocks) {
     std::string a = "";
     fi>>a;
     if (a.compare("DCV_RANDOM")==0) {

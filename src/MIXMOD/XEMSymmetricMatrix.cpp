@@ -601,7 +601,7 @@ void XEMSymmetricMatrix::compute_M_as__O_Sinverse_Ot_this(XEMGeneralMatrix & M, 
 }
 
 
-void XEMSymmetricMatrix::input(ifstream & fi){
+void XEMSymmetricMatrix::input(std::ifstream & fi){
   int64_t i,j, r=0;  
   double garbage; 
     

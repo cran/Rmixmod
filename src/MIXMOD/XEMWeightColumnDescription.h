@@ -41,7 +41,7 @@ class XEMWeightColumnDescription : public XEMColumnDescription
     /// Destructor
     virtual ~XEMWeightColumnDescription();
     
-    string editType();
+    std::string editType();
     
     XEMColumnDescription * clone()const;
 

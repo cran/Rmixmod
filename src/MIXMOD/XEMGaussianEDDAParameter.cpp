@@ -335,7 +335,7 @@ void  XEMGaussianEDDAParameter::initUSER(XEMParameter * iParam){
 
 
 
-void  XEMGaussianEDDAParameter::input(ifstream & fi){
+void  XEMGaussianEDDAParameter::input(std::ifstream & fi){
    // verify paramFile
   double tmp;
   int64_t  cpt=0;
@@ -560,7 +560,7 @@ void XEMGaussianEDDAParameter::edit(){
 //------
 // Edit
 //-------
-void XEMGaussianEDDAParameter::edit(ofstream & oFile, bool text){
+void XEMGaussianEDDAParameter::edit(std::ofstream & oFile, bool text){
   int64_t  k;
   if (text){
     for (k=0; k<_nbCluster; k++){

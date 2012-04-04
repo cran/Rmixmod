@@ -47,7 +47,7 @@ public:
 
   /// Constructor
   // called by XEMStrategyType
-  XEMGaussianHDDAParameter(int64_t  iNbCluster, int64_t  iPbDimension, XEMModelType * iModelType, string & iFileName);
+  XEMGaussianHDDAParameter(int64_t  iNbCluster, int64_t  iPbDimension, XEMModelType * iModelType, std::string & iFileName);
 
   /// Constructor
   XEMGaussianHDDAParameter(const XEMGaussianHDDAParameter * iParameter);
@@ -123,7 +123,7 @@ public:
 
   void edit();
 
-  void edit(ofstream & oFile, bool text=false);
+  void edit(std::ofstream & oFile, bool text=false);
 
   void recopy(XEMParameter * otherParameter);
 
@@ -136,7 +136,7 @@ public:
   double* computeLoglikelihoodK(double** K);
 
 
-  void input(ifstream & fi);
+  void input(std::ifstream & fi);
 
 protected :
   /// Table of shape matrix of each cluster

@@ -107,7 +107,7 @@ XEMGaussianHDDAParameter::XEMGaussianHDDAParameter( XEMModel * iModel, XEMModelT
 //constructeur avec une initialisation USER
 //-------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------
-XEMGaussianHDDAParameter::XEMGaussianHDDAParameter(int64_t  iNbCluster, int64_t  iPbDimension, XEMModelType * iModelType, string & iFileName) : XEMGaussianParameter(iNbCluster, iPbDimension, iModelType){
+XEMGaussianHDDAParameter::XEMGaussianHDDAParameter(int64_t  iNbCluster, int64_t  iPbDimension, XEMModelType * iModelType, std::string & iFileName) : XEMGaussianParameter(iNbCluster, iPbDimension, iModelType){
   int64_t  k;
   _tabAkj               = new double*[_nbCluster];
   _tabBk                = new double[_nbCluster];
@@ -130,7 +130,7 @@ XEMGaussianHDDAParameter::XEMGaussianHDDAParameter(int64_t  iNbCluster, int64_t 
 
   // read parameters in file iFileName//
     if (iFileName.compare("") != 0){
-      ifstream paramFile(iFileName.c_str(), ios::in);
+      std::ifstream paramFile(iFileName.c_str(), ios::in);
         if (! paramFile.is_open()){
           throw wrongParamFileName;
         }
@@ -509,7 +509,7 @@ double XEMGaussianHDDAParameter:: getPdf(XEMSample * x, int64_t  kCluster)const{
 /* input */
 /*********/
 // reads the input data file for HDDA models
-void XEMGaussianHDDAParameter::input(ifstream & fi){
+void XEMGaussianHDDAParameter::input(std::ifstream & fi){
   int64_t  j,k;
 	for (k=0; k<_nbCluster; k++){
   // Proportions //
@@ -1045,7 +1045,7 @@ void XEMGaussianHDDAParameter:: edit(){
 /********/
 /* edit */
 /********/
-void XEMGaussianHDDAParameter:: edit(ofstream & oFile, bool text){
+void XEMGaussianHDDAParameter:: edit(std::ofstream & oFile, bool text){
   int64_t  k;
 
   if (text){

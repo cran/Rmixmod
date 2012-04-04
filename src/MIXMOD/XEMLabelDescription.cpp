@@ -76,7 +76,7 @@ XEMLabelDescription::XEMLabelDescription( int64_t nbSample
   _format = FormatNumeric::txt;
   _columnDescription.resize(1);
   _columnDescription[0] = new XEMQualitativeColumnDescription(0, _nbCluster);
-  string name("Label");
+  std::string name("Label");
   _columnDescription[0]->setName(name);
 
 	_label = new XEMLabel(vLabel.size());
@@ -97,7 +97,7 @@ XEMLabelDescription::XEMLabelDescription(XEMModel * estimation) : XEMDescription
     _format = FormatNumeric::txt;
     _columnDescription.resize(1);
     _columnDescription[0] = new XEMQualitativeColumnDescription(0, estimation->getNbCluster());
-    string name("Label");
+    std::string name("Label");
     _columnDescription[0]->setName(name);
     _label = new XEMLabel(estimation);
     _nbCluster = estimation->getNbCluster();
@@ -165,9 +165,9 @@ XEMLabelDescription::~XEMLabelDescription(){
 //--------
 // ostream
 //--------
-void XEMLabelDescription::saveNumericValues(string fileName){
+void XEMLabelDescription::saveNumericValues(std::string fileName){
   //if (_fileName==""){
-    ofstream fo(fileName.c_str(), ios::out);
+    std::ofstream fo(fileName.c_str(), ios::out);
     _label->edit(fo);
     _fileName = fileName;
   //}

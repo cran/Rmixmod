@@ -115,7 +115,7 @@ XEMGaussianData::XEMGaussianData(int64_t nbSample, int64_t pbDimension,  double 
 //------------
 // Constructor
 //------------
-XEMGaussianData::XEMGaussianData(int64_t nbSample, int64_t pbDimension, const string & dataFileName):XEMData(nbSample,pbDimension){
+XEMGaussianData::XEMGaussianData(int64_t nbSample, int64_t pbDimension, const std::string & dataFileName):XEMData(nbSample,pbDimension){
   int64_t i;
 
   _Inv2PiPow                =  1.0 / pow(2.0 * XEMPI, pbDimension/2.0 );
@@ -132,7 +132,7 @@ XEMGaussianData::XEMGaussianData(int64_t nbSample, int64_t pbDimension, const st
     _yStore[i] = ((XEMGaussianSample *)(_matrix[i]))->getTabValue();
   }
 
-  ifstream dataStream((dataFileName).c_str(), ios::in);
+  std::ifstream dataStream((dataFileName).c_str(), ios::in);
   if (! dataStream.is_open()){
     throw wrongDataFileName;
   }
@@ -261,7 +261,7 @@ XEMSample ** XEMGaussianData::cloneMatrix(){
 //------
 // input
 //------
-void XEMGaussianData:: input(ifstream & fi){
+void XEMGaussianData:: input(std::ifstream & fi){
 
   int64_t j;
   int64_t i;
@@ -293,7 +293,7 @@ void XEMGaussianData::input(const XEMDataDescription & dataDescription){
   _fileNameData  = dataDescription.getFileName();
   
   _weightTotal = 0;
-  ifstream fi((_fileNameData).c_str(), ios::in);
+  std::ifstream fi((_fileNameData).c_str(), ios::in);
   if (! fi.is_open()){
     throw wrongDataFileName;
   }
@@ -324,7 +324,7 @@ void XEMGaussianData::input(const XEMDataDescription & dataDescription){
         }
         else{
           if (typeid(*(dataDescription.getColumnDescription(j)))==typeid(XEMIndividualColumnDescription)){
-            string stringTmp;
+            std::string stringTmp;
             fi>>stringTmp;
             //cout<<stringTmp<<endl;
           }
@@ -343,7 +343,7 @@ void XEMGaussianData::input(const XEMDataDescription & dataDescription){
 
 // output
 //-------
-void XEMGaussianData:: output(ostream & fo){
+void XEMGaussianData:: output(std::ostream & fo){
 #ifdef VERBOSE
  cout<<"Sample size: "<<_nbSample << endl;
  cout<<"  Dimension: "<<_pbDimension << endl ;

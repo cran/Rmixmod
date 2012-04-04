@@ -276,7 +276,7 @@ double* XEMSphericalMatrix::addGeneralValueInStore(double * store){
 
 
 
-void XEMSphericalMatrix::input(ifstream & fi){
+void XEMSphericalMatrix::input(std::ifstream & fi){
   int64_t p,q;
   double garbage;
   

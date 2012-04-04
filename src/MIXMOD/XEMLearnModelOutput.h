@@ -42,7 +42,7 @@ public:
   XEMLearnModelOutput(XEMModel * estimation);
   
   /// Initialization Constructor 2
-  XEMLearnModelOutput(XEMModelType & modelType, int64_t nbCluster, vector<XEMCriterionOutput> & criterionOutput, double likelihood, XEMParameterDescription & parameterDescription, XEMLabelDescription & labelDescription,  XEMProbaDescription & probaDescription);
+  XEMLearnModelOutput(XEMModelType & modelType, int64_t nbCluster, std::vector<XEMCriterionOutput> & criterionOutput, double likelihood, XEMParameterDescription & parameterDescription, XEMLabelDescription & labelDescription,  XEMProbaDescription & probaDescription);
   
   /// Initialization Constructor 3
   XEMLearnModelOutput(XEMModelType & modelType, int64_t nbCluster, XEMErrorType error);

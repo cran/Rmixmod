@@ -185,7 +185,7 @@ void XEMProbaOutput::setCVLabel(int64_t  * CVLabel){
 //--------------
 // editPartition
 //--------------
-void XEMProbaOutput::editPartition(ofstream & oFile){
+void XEMProbaOutput::editPartition(std::ofstream & oFile){
   int64_t  k, i;
 
   int64_t  ** p_tabPartition;
@@ -210,7 +210,7 @@ void XEMProbaOutput::editPartition(ofstream & oFile){
 //----------
 // editLabel
 //----------
-void XEMProbaOutput::editLabel(ofstream & oFile){
+void XEMProbaOutput::editLabel(std::ofstream & oFile){
   int64_t  i;
     for (i=0; i<_nbSample; i++)
       oFile << _tabLabel[i] << endl;
@@ -236,7 +236,7 @@ void XEMProbaOutput::editLabel(){
 //--------------
 // editPostProba
 //--------------
-void XEMProbaOutput::editPostProba(ofstream & oFile){
+void XEMProbaOutput::editPostProba(std::ofstream & oFile){
   
   oFile.setf(ios::fixed, ios::floatfield);
     editTab(_tabPostProba,_nbSample,_nbCluster,oFile,"\t","");
@@ -249,7 +249,7 @@ void XEMProbaOutput::editPostProba(ofstream & oFile){
 //------------
 // editCVLabel
 //------------
-void XEMProbaOutput::editCVLabel(ofstream & oFile){
+void XEMProbaOutput::editCVLabel(std::ofstream & oFile){
   
   if (_CVLabelAvailable){
     int64_t  i;

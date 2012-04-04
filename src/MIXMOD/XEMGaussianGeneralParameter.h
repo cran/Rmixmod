@@ -52,7 +52,7 @@ public:
   XEMGaussianGeneralParameter( int64_t  iNbCluster
                              , int64_t  iPbDimension
                              , XEMModelType * iModelType
-                             , string & iFileName
+                             , std::string & iFileName
                              );
   XEMGaussianGeneralParameter( int64_t  iNbCluster
                              , int64_t  iPbDimension

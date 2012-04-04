@@ -35,7 +35,7 @@ XEMQuantitativeColumnDescription::~XEMQuantitativeColumnDescription(){
   
 }
 
-string XEMQuantitativeColumnDescription::editType(){
+std::string XEMQuantitativeColumnDescription::editType(){
   return "Quantitative";
 }
 

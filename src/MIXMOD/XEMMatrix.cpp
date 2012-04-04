@@ -46,7 +46,7 @@ XEMMatrix::XEMMatrix(XEMMatrix * A){
 XEMMatrix::~XEMMatrix(){
 }
 
-void XEMMatrix::edit(ostream& flux, string before){
+void XEMMatrix::edit(std::ostream& flux, std::string before){
 
   int64_t i;
   int64_t j;

@@ -151,7 +151,7 @@ bool XEMLabel::operator ==(const XEMLabel & label) const{
 //----------
 // editProba
 //----------
-void XEMLabel::edit(ostream & stream) const{
+void XEMLabel::edit(std::ostream & stream) const{
   stream.setf(ios::fixed, ios::floatfield);
   for (int64_t i=0; i<_nbSample; i++){
     stream<<_label[i]<<endl;
@@ -217,7 +217,7 @@ int64_t** XEMLabel::getClassificationTab( std::vector<int64_t> const & label ) c
 //input stream
 // read labels between 1 and nbCluster
 // -----------
-void XEMLabel::input(ifstream & flux, int64_t nbCluster){
+void XEMLabel::input(std::ifstream & flux, int64_t nbCluster){
   int64_t i = 0;
   int64_t read;
   
@@ -246,11 +246,11 @@ void XEMLabel::input(const XEMLabelDescription & labelDescription){
   int64_t i = 0;
   int64_t readLabel;
  
-  string labelFilename  = labelDescription.getFileName();
+  std::string labelFilename  = labelDescription.getFileName();
   
   _nbSample = labelDescription.getNbSample();
   
-  ifstream fi((labelFilename).c_str(), ios::in);
+  std::ifstream fi((labelFilename).c_str(), ios::in);
   if (! fi.is_open()){
     throw wrongDataFileName;
   }
@@ -261,7 +261,7 @@ void XEMLabel::input(const XEMLabelDescription & labelDescription){
 	  throw endDataFileReach; 
 	}
 	if (typeid(*(labelDescription.getColumnDescription(j)))==typeid(XEMIndividualColumnDescription)){
-            string stringTmp;
+            std::string stringTmp;
             fi>>stringTmp;
             //cout<<stringTmp<<endl;
         }else{

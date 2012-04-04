@@ -53,13 +53,13 @@ public:
   bool operator ==(const XEMCriterionOutput & criterionOutput) const;
   
   ///editType
-  void editType(ostream & oFile) const;
+  void editType(std::ostream & oFile) const;
 
   ///editValue
-  void editValue(ostream & oFile, bool text=false) const;
+  void editValue(std::ostream & oFile, bool text=false) const;
 
   /// editTypeAndValue
-  void editTypeAndValue(ostream & oFile) const;
+  void editTypeAndValue(std::ostream & oFile) const;
 
   //--------------
   // get

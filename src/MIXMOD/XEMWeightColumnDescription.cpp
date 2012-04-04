@@ -36,7 +36,7 @@ XEMWeightColumnDescription::~XEMWeightColumnDescription(){
   
 }
 
-string XEMWeightColumnDescription::editType(){
+std::string XEMWeightColumnDescription::editType(){
   return "Weight";
 }
 

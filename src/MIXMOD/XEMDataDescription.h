@@ -40,7 +40,7 @@ class XEMDataDescription : public XEMDescription
     XEMDataDescription();   
         
     ///constructor by initilization
-    XEMDataDescription(int64_t nbSample, int64_t nbColumn, vector<XEMColumnDescription *> columnDescription, FormatNumeric::XEMFormatNumericFile format, string filename, string infoName="");
+    XEMDataDescription(int64_t nbSample, int64_t nbColumn, std::vector<XEMColumnDescription *> columnDescription, FormatNumeric::XEMFormatNumericFile format, std::string filename, std::string infoName="");
     
     /// constructor with a gaussianData
     XEMDataDescription(XEMGaussianData * gData);
@@ -66,7 +66,7 @@ class XEMDataDescription : public XEMDescription
     /// verify data validity
     bool verifyData() const;
     
-    void saveNumericValues(string fileName="");
+    void saveNumericValues(std::string fileName="");
     
   private :
     
@@ -81,7 +81,7 @@ inline XEMData * XEMDataDescription::getData() const{
 }
 
 
-inline void XEMDataDescription::saveNumericValues(string fileName){
+inline void XEMDataDescription::saveNumericValues(std::string fileName){
   throw internalMixmodError;
 }
 

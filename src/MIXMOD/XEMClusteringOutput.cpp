@@ -256,7 +256,7 @@ void XEMClusteringOutput::editFile() const{
 }
 
 
-void XEMClusteringOutput::setClusteringModelOutput(vector<XEMClusteringModelOutput *> & clusteringModelOutput){
+void XEMClusteringOutput::setClusteringModelOutput(std::vector<XEMClusteringModelOutput *> & clusteringModelOutput){
   for (unsigned int i=0; i<_clusteringModelOutput.size(); i++){
     delete _clusteringModelOutput[i];
   }

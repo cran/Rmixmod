@@ -49,7 +49,7 @@ XEMClusteringInput::XEMClusteringInput( const XEMClusteringInput & cInput )
 //---------------------------
 // Initialisation Constructor
 //---------------------------
-XEMClusteringInput::XEMClusteringInput( const vector<int64_t> & iNbCluster
+XEMClusteringInput::XEMClusteringInput( const std::vector<int64_t> & iNbCluster
                                       , const XEMDataDescription & iDataDescription
                                       ) 
                                       : XEMInput(iNbCluster, iDataDescription)

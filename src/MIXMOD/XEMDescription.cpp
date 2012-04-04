@@ -46,7 +46,7 @@ XEMDescription::XEMDescription(){
 //------------
 // Constructor by initialization
 //------------
-XEMDescription::XEMDescription(int64_t nbSample, int64_t nbColumn, vector<XEMColumnDescription *> columnDescription, FormatNumeric::XEMFormatNumericFile format, string filename, string infoName){
+XEMDescription::XEMDescription(int64_t nbSample, int64_t nbColumn, std::vector<XEMColumnDescription *> columnDescription, FormatNumeric::XEMFormatNumericFile format, std::string filename, std::string infoName){
   _fileName = filename;
   _format = format;
   _infoName = infoName;

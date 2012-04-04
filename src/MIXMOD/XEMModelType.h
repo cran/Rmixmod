@@ -53,7 +53,7 @@ public:
   bool operator ==(const XEMModelType & modelType) const;
   
   /// Input model type
-  void input(ifstream & fi, int64_t nbCluster);
+  void input(std::ifstream & fi, int64_t nbCluster);
 
   /// name of the model
   XEMModelName _nameModel;
@@ -93,14 +93,14 @@ public:
   void setSubDimensionEqual(int64_t  iSubDimensionEqual) ;
 
   /// <<
-  friend ostream & operator<<(ostream & fo, XEMModelType & modelType);
+  friend std::ostream & operator<<(std::ostream & fo, XEMModelType & modelType);
 
   // print out model type
-  void print(ostream & flux);
+  void print(std::ostream & flux);
   // print out model type short cut
-  void printShortcut(ostream & flux);
+  void printShortcut(std::ostream & flux);
   /// editModelType
-  void edit(ostream & oFile);
+  void edit(std::ostream & oFile);
   
 };
 

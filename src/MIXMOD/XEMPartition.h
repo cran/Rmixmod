@@ -93,12 +93,12 @@ class XEMPartition{
     /** @brief Friend method
     @return Operator >> overloaded to read Partition from input files
     */	
-    friend ifstream & operator >> (ifstream & fi, XEMPartition & partition);
+    friend std::ifstream & operator >> (std::ifstream & fi, XEMPartition & partition);
     
     /** @brief Friend method
     @return Operator << overloaded to write Partition 
     */
-    friend ostream & operator << (ostream & fo, const XEMPartition & partition);	
+    friend std::ostream & operator << (std::ostream & fo, const XEMPartition & partition);	
     
     /// Number of samples
     int64_t _nbSample;

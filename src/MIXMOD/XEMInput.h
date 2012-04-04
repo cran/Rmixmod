@@ -286,7 +286,7 @@ inline XEMData * XEMInput::getData() const{
   return _dataDescription.getData();
 }
 
-inline vector<XEMCriterionName> const & XEMInput::getCriterionName() const{
+inline std::vector<XEMCriterionName> const & XEMInput::getCriterionName() const{
   return _criterionName;
 }
 

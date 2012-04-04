@@ -89,10 +89,10 @@ public:
   void editScatter(int64_t k);
   
   /// editScatter 
-  void editScatter(ofstream & oFile, int64_t k, bool text=false);
+  void editScatter(std::ofstream & oFile, int64_t k, bool text=false);
   
   // Read Scatter in input file
-  void inputScatter(ifstream & fi);
+  void inputScatter(std::ifstream & fi);
   void inputScatter( double *** scatters );
   
   double *** scatterToArray() const;
