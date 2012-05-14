@@ -28,7 +28,8 @@
 
   For qualitative case, a Multiple Correspondance Analysis
   is performed to get a 2-dimensional representation of the
-  data set. Overlaping means that observations are similar.
+  data set. Bigger symbol means that observations are
+  similar.
 }
 \examples{
 ## for quantitative case
@@ -38,7 +39,7 @@
 
   ## for qualitative case
   data(birds)
-  xem2 <- mixmodCluster(birds,2,factor=c(2,5,6,3,5,4))
+  xem2 <- mixmodCluster(birds,2)
   plot(xem2)
 }
 \seealso{

@@ -113,7 +113,7 @@ BEGIN_RCPP
   // wrap clusters in Rcpp
   Rcpp::NumericVector RnbCluster(mixmodClustering.slot("nbCluster")); // keep a copy (as the classic version does)
   // wrap partition matrix in Rcpp matrix
-  Rcpp::NumericVector RPartition(mixmodClustering.slot("knownPartition"));
+  Rcpp::NumericVector RPartition(mixmodClustering.slot("knownLabels"));
   // wrap list algoOptions
   Rcpp::S4 RalgoOptions(mixmodClustering.slot("strategy"));
   // wrap criterion
@@ -151,7 +151,7 @@ BEGIN_RCPP
 
   /*===============================================*/
   /*  Create XEM cluster array */
-  vector<int64_t> clusterArray;
+  std::vector<int64_t> clusterArray;
   Rcpp::NumericVector::iterator it;
   for( it = RnbCluster.begin(); it != RnbCluster.end(); ++it)
   { clusterArray.push_back((int64_t)(*it));}

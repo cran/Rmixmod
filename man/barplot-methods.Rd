@@ -1,0 +1,31 @@
+\docType{methods}
+\name{barplot}
+\alias{barplot}
+\alias{barplot,Mixmod-method}
+\title{Barplot of a class [\code{\linkS4class{Mixmod}}]}
+\arguments{
+  \item{x}{an object of class
+  [\code{\linkS4class{Mixmod}}]}
+
+  \item{...}{further arguments passed to or from other
+  methods}
+}
+\description{
+  Barplot of qualitative data from a
+  [\code{\linkS4class{Mixmod}}] object using parameters to
+  plot probablities of modalities.
+}
+\details{
+  Each line corresponds to one variable. Barplot is drawn
+  for each cluster with the probabilities for each modality
+  to be in that cluster.
+}
+\examples{
+data(birds)
+  xem2 <- mixmodCluster(birds,2)
+  barplot(xem2)
+}
+\seealso{
+  \code{\link{barplot}}
+}
+

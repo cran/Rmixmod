@@ -11,8 +11,8 @@
   diagonal family, "spherical" for the spherical family and
   "all" for all families. Default is "general".}
 
-  \item{listModels}{a list a character containing a list of
-  models. It is optional.}
+  \item{listModels}{a list of characters containing a list
+  of models. It is optional.}
 
   \item{free.proportions}{logical to include models with
   free proportions. Default is TRUE.}
@@ -23,9 +23,9 @@
 \value{
   an object of [\code{\linkS4class{GaussianModel}}] which
   contains some of the 28 Gaussian Models:
-  \tabular{rlllll}{ Model \tab Family \tab Prop. \tab Voume
-  \tab Shape \tab Orient. \cr Gaussian_p_L_C \tab General
-  \tab Equal \tab Equal \tab Equal \tab Equal \cr
+  \tabular{rlllll}{ Model \tab Family \tab Prop. \tab
+  Volume \tab Shape \tab Orient. \cr Gaussian_p_L_C \tab
+  General \tab Equal \tab Equal \tab Equal \tab Equal \cr
   Gaussian_p_Lk_C \tab \tab \tab Free \tab Equal \tab Equal
   \cr Gaussian_p_L_D_Ak_D \tab \tab \tab Equal \tab Free
   \tab Equal \cr Gaussian_p_Lk_D_Ak_D \tab \tab \tab Free
@@ -61,7 +61,7 @@
   \tab \tab Free \tab Equal \tab NA \cr }
 }
 \description{
-  Define a list of gaussian model to test in MIXMOD.
+  Define a list of Gaussian model to test in MIXMOD.
 }
 \details{
   In the Gaussian mixture model, following Banfield and

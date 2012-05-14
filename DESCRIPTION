@@ -1,9 +1,9 @@
 Package: Rmixmod
-Version: 1.1.1
-Date: 2012-04-04
-Title: MIXture MODelling Package
-Description: High Performance Model-Based Cluster and Discriminant
-        Analysis
+Version: 1.1.2
+Date: 2012-05-14
+Title: An interface of MIXMOD
+Description: Supervised and unsupervised classification with MIXture
+        MODelling
 Authors@R: c(person("Remi", "Lebret", role=c("aut","cre"),
         email="remi.lebret@math.univ-lille1.fr"), person("Serge",
         "Iovleff", role="aut", email="serge.iovleff@univ-lille1.fr"),
@@ -29,6 +29,6 @@ Collate: 'global.R' 'Strategy.R' 'Model.R' 'Parameter.R'
         'MultinomialModel.R' 'GaussianModel.R' 'MultinomialParameter.R'
         'Mixmod.R' 'MixmodCluster.R' 'MixmodLearn.R' 'Rmixmod.R'
         'MixmodPredict.R' 'zzz.R'
-Packaged: 2012-04-03 15:25:40 UTC; lebret
+Packaged: 2012-05-14 17:18:54 UTC; lebret
 Repository: CRAN
-Date/Publication: 2012-04-03 21:21:31
+Date/Publication: 2012-05-14 18:20:27

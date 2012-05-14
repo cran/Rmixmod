@@ -59,19 +59,19 @@ NULL
 ##'        \item Default values are \eqn{200} \code{nbIterationInAlgo} of \code{EM} with an \code{epsilonInAlgo} value of \eqn{10-3}.
 ##'    }
 ##' 
-##' @param name list of character string with the estimation algorithm.  Possible values: "EM", "SEM", "CEM", c("EM","SEM"). Default value is "EM".
+##' @param algo list of character string with the estimation algorithm.  Possible values: "EM", "SEM", "CEM", c("EM","SEM"). Default value is "EM".
 ##' @param nbTry integer defining the number of tries. nbTry must be a positive integer. Option available only if \code{init} is "random" or "smallEM" or "CEM" or "SEMMax". Default value: 1.
-##' @param initMethod a character string with the method of initialization of the algorithm specified in the \code{name} argument. Possible values: "random", "smallEM", "CEM", "SEMMax". Default value: "smallEM".
+##' @param initMethod a character string with the method of initialization of the algorithm specified in the \code{algo} argument. Possible values: "random", "smallEM", "CEM", "SEMMax". Default value: "smallEM".
 ##' @param nbTryInInit integer defining number of tries in \code{initMethod} algorithm. nbTryInInit must be a positive integer. Option available only if \code{init} is "smallEM" or "CEM". Default value: 50.
 ##' @param nbIterationInInit integer defining the number of "EM" or "SEM" iterations in \code{initMethod}. nbIterationInInit must be a positive integer. Only available if \code{initMethod} is "smallEM" or "SEMMax". Default values: 5 if \code{initMethod} is "smallEM" and 100 if \code{initMethod} is "SEMMax".
 ##' @param nbIterationInAlgo list of integers defining the number of iterations if you want to use nbIteration as rule to stop the algorithm(s). Default value: 200. 
 ##' @param epsilonInInit real defining the epsilon value in the initialization step. Only available if \code{initMethod} is "smallEM". Default value: 0.001.
-##' @param epsilonInAlgo list of reals defining the epsilon value for the algorithm. Warning: epsilonInAlgo doesn't have any sens if \code{name} is SEM, so it needs to be set as NaN in that case. Default value: 0.001.
+##' @param epsilonInAlgo list of reals defining the epsilon value for the algorithm. Warning: epsilonInAlgo doesn't have any sens if \code{algo} is SEM, so it needs to be set as NaN in that case. Default value: 0.001.
 ##'
 ##' @examples
 ##'    mixmodStrategy()
-##'    mixmodStrategy(name="CEM",initMethod="random",nbTry=10,epsilonInInit=0.00001)
-##'    mixmodStrategy(name=c("SEM","EM"), nbIterationInAlgo=c(200,100), epsilonInAlgo=c(NA,0.000001))
+##'    mixmodStrategy(algo="CEM",initMethod="random",nbTry=10,epsilonInInit=0.00001)
+##'    mixmodStrategy(algo=c("SEM","EM"), nbIterationInAlgo=c(200,100), epsilonInAlgo=c(NA,0.000001))
 ##'
 ##' @references  Biernacki, C., Celeux, G., Govaert, G., 2003. "Choosing starting values for the EM algorithm for getting the highest likelihood in multivariate gaussian mixture models". Computational Statistics and Data Analysis 41, 561-575.
 ##'
@@ -79,9 +79,9 @@ NULL
 ##' @author Remi Lebret and Serge Iovleff and Florent Langrognet, with contributions from C. Biernacki and G. Celeux and G. Govaert \email{contact@@mixmod.org}
 ##' @export
 ##'
-mixmodStrategy <- function( name="EM", nbTry=1, initMethod="smallEM", nbTryInInit=50, nbIterationInInit=5, nbIterationInAlgo=200, epsilonInInit=0.001, epsilonInAlgo=0.001 ){
+mixmodStrategy <- function( algo="EM", nbTry=1, initMethod="smallEM", nbTryInInit=50, nbIterationInInit=5, nbIterationInAlgo=200, epsilonInInit=0.001, epsilonInAlgo=0.001 ){
   # create a new class Strategy
-  new("Strategy", name=name, nbTry=nbTry, initMethod=initMethod, nbTryInInit=nbTryInInit, nbIterationInInit=nbIterationInInit, nbIterationInAlgo=nbIterationInAlgo, epsilonInInit=epsilonInInit, epsilonInAlgo=epsilonInAlgo)
+  new("Strategy", algo=algo, nbTry=nbTry, initMethod=initMethod, nbTryInInit=nbTryInInit, nbIterationInInit=nbIterationInInit, nbIterationInAlgo=nbIterationInAlgo, epsilonInInit=epsilonInInit, epsilonInAlgo=epsilonInAlgo)
 }
 ###################################################################################
 
@@ -92,19 +92,19 @@ mixmodStrategy <- function( name="EM", nbTry=1, initMethod="smallEM", nbTryInIni
 ##' This class defines the Mixmod strategies.
 ##'
 ##' \describe{
-##'   \item{name}{list of character string with the estimation algorithm.  Possible values: "EM", "SEM", "CEM", c("EM","SEM"). Default value is "EM".}
+##'   \item{algo}{list of character string with the estimation algorithm.  Possible values: "EM", "SEM", "CEM", c("EM","SEM"). Default value is "EM".}
 ##'   \item{nbTry}{integer defining the number of tries. Default value: 1.}
-##'   \item{initMethod}{a character string with the method of initialization of the algorithm specified in the \code{name} argument. Possible values: "random", "smallEM", "CEM", "SEMMax". Default value: "smallEM".}
+##'   \item{initMethod}{a character string with the method of initialization of the algorithm specified in the \code{algo} argument. Possible values: "random", "smallEM", "CEM", "SEMMax". Default value: "smallEM".}
 ##'   \item{nbTryInInit}{integer defining number of tries in \code{initMethod} algorithm. Default value: 50.}
 ##'   \item{nbIterationInInit}{integer defining the number of "EM" or "SEM" iterations in \code{initMethod}. Default values: 5 if \code{initMethod} is "smallEM" and 100 if \code{initMethod} is "SEMMax".}
 ##'   \item{nbIterationInAlgo}{list of integers defining the number of iterations if user want to use nbIteration as rule to stop the algorithm(s). Default value: 200.} 
 ##'   \item{epsilonInInit}{real defining the epsilon value in the initialization step. Only available if \code{initMethod} is "smallEM". Default value: 0.001.}
-##'   \item{epsilonInAlgo}{list of reals defining the epsilon value for the algorithm. Warning: epsilonInAlgo doesn't have any sens if \code{name} is SEM, so it needs to be set as NaN in that case. Default value: 0.001.}
+##'   \item{epsilonInAlgo}{list of reals defining the epsilon value for the algorithm. Warning: epsilonInAlgo doesn't have any sens if \code{algo} is SEM, so it needs to be set as NaN in that case. Default value: 0.001.}
 ##' }
 ##'
 ##' @examples
 ##'   new("Strategy")
-##'   new("Strategy", name="SEM", initMethod="SEMMax")
+##'   new("Strategy", algo="SEM", initMethod="SEMMax")
 ##'
 ##'   getSlots("Strategy")
 ##'
@@ -115,7 +115,7 @@ mixmodStrategy <- function( name="EM", nbTry=1, initMethod="smallEM", nbTryInIni
 setClass(
     Class="Strategy",
     representation=representation(
-        name = "character",
+        algo = "character",
         nbTry = "numeric",
         initMethod = "character",
         nbTryInInit = "numeric",
@@ -125,7 +125,7 @@ setClass(
         epsilonInAlgo = "numeric"
     ),
     prototype=prototype(
-        name = "EM",
+        algo = "EM",
         nbTry = 1,
         initMethod = "smallEM",
         nbTryInInit = 50,
@@ -136,8 +136,8 @@ setClass(
     ),
     # validity function
     validity=function(object){
-      # for name
-      if ( sum(object@name %in% c("EM","SEM","CEM")) != length(object@name) ){
+      # for algo
+      if ( sum(object@algo %in% c("EM","SEM","CEM")) != length(object@algo) ){
         stop("At least one algorithm is not valid. See ?mixmodAlgo for the list of available algorithms.")
       }
       # for 'initMethod'
@@ -187,10 +187,10 @@ setClass(
       }
       
       # for 'epsilonInAlgo'
-      if ( sum(!is.nan(object@epsilonInAlgo[which(object@name=="SEM")])) ){
+      if ( sum(!is.nan(object@epsilonInAlgo[which(object@algo=="SEM")])) ){
         stop("epsilonInAlgo must be NaN for the SEM algorithm.")
       }
-      if (!is.double(object@epsilonInAlgo[which(object@name!="SEM")])){
+      if (!is.double(object@epsilonInAlgo[which(object@algo!="SEM")])){
         stop("epsilonInAlgo must be a real.")
       }
       if ( sum(!is.nan(object@epsilonInAlgo)) ){
@@ -218,16 +218,16 @@ setClass(
 setMethod(
   f="initialize",
   signature=c("Strategy"),
-  definition=function(.Object,name,nbTry,initMethod,nbTryInInit,nbIterationInInit,nbIterationInAlgo,epsilonInInit,epsilonInAlgo
+  definition=function(.Object,algo,nbTry,initMethod,nbTryInInit,nbIterationInInit,nbIterationInAlgo,epsilonInInit,epsilonInAlgo
 ){
-    if(!missing(name)){
-      if(length(name)>1){
+    if(!missing(algo)){
+      if(length(algo)>1){
         # for epsilon in Algo
         if( missing(epsilonInAlgo) ){ 
-          .Object@epsilonInAlgo<-rep(0.001,length(name))
+          .Object@epsilonInAlgo<-rep(0.001,length(algo))
         }
-        else if(length(epsilonInAlgo)!=length(name)){
-          .Object@epsilonInAlgo<-epsilonInAlgo[1:length(name)]
+        else if(length(epsilonInAlgo)!=length(algo)){
+          .Object@epsilonInAlgo<-epsilonInAlgo[1:length(algo)]
           .Object@epsilonInAlgo[is.na(.Object@epsilonInAlgo)]<-0.001
         }
         else{
@@ -235,31 +235,35 @@ setMethod(
         }
         # for nbIteration in Algo
         if( missing(nbIterationInAlgo) ){ 
-          .Object@nbIterationInAlgo<-rep(200,length(name))
+          .Object@nbIterationInAlgo<-rep(200,length(algo))
         }
-        else if(length(nbIterationInAlgo)!=length(name)){
-          .Object@nbIterationInAlgo<-nbIterationInAlgo[1:length(name)]
+        else if(length(nbIterationInAlgo)!=length(algo)){
+          .Object@nbIterationInAlgo<-nbIterationInAlgo[1:length(algo)]
           .Object@nbIterationInAlgo[is.na(.Object@nbIterationInAlgo)]<-200
         }
         else{
           .Object@nbIterationInAlgo<-nbIterationInAlgo
         }
         # check whether SEM algo is in list to set epsilon as NaN
-        if(sum(name=="SEM")){
-          .Object@epsilonInAlgo[which(name=="SEM")]<-NaN
+        if(sum(algo=="SEM")){
+          .Object@epsilonInAlgo[which(algo=="SEM")]<-NaN
         }
       }
       else{
-        if(name=="SEM"){ .Object@epsilonInAlgo<-NaN }
+        if(algo=="SEM"){ .Object@epsilonInAlgo<-NaN }
         else if( missing(epsilonInAlgo) ){ .Object@epsilonInAlgo<-0.001 }
+        else{.Object@epsilonInAlgo<-epsilonInAlgo[1]}
         if(missing(nbIterationInAlgo)){ .Object@nbIterationInAlgo<-200 }
+        else{.Object@nbIterationInAlgo<-nbIterationInAlgo[1]}
       }
-      .Object@name<-name
+      .Object@algo<-algo
     }
     else{
-      .Object@name<-"EM"
+      .Object@algo<-"EM"
       if(missing(epsilonInAlgo)){ .Object@epsilonInAlgo<-0.001 }
+      else{.Object@epsilonInAlgo<-epsilonInAlgo[1]}
       if(missing(nbIterationInAlgo)){ .Object@nbIterationInAlgo<-200 }
+      else{.Object@nbIterationInAlgo<-nbIterationInAlgo[1]}
     }
     
     if(!missing(nbTry)){ .Object@nbTry<-nbTry }
@@ -299,8 +303,8 @@ setMethod(
   signature=c("Strategy"),
   function(x,...){
     cat("****************************************\n")
-    cat("*** MIXMOD Strategy :\n")
-    cat("* algorithm            = ", x@name, "\n")
+    cat("*** MIXMOD Strategy:\n")
+    cat("* algorithm            = ", x@algo, "\n")
     cat("* number of tries      = ", x@nbTry, "\n")
     cat("* number of iterations = ", x@nbIterationInAlgo, "\n")
     cat("* epsilon              = ", x@epsilonInAlgo, "\n")
@@ -324,8 +328,8 @@ setMethod(
   signature=c("Strategy"),
   function(object){
     cat("****************************************\n")
-    cat("*** MIXMOD Strategy :\n")
-    cat("* algorithm            = ", object@name, "\n")
+    cat("*** MIXMOD Strategy:\n")
+    cat("* algorithm            = ", object@algo, "\n")
     cat("* number of tries      = ", object@nbTry, "\n")
     cat("* number of iterations = ", object@nbIterationInAlgo, "\n")
     cat("* epsilon              = ", object@epsilonInAlgo, "\n")
@@ -350,7 +354,7 @@ setMethod(
   definition=function(x,i,j,drop){
     if ( missing(j) ){
       switch(EXPR=i,
-        "name"={return(x@name)},
+        "algo"={return(x@algo)},
         "nbTry"={return(x@nbTry)},
         "nbIterationInAlgo"={return(x@nbIterationInAlgo)},
         "epsilonInAlgo"={return(x@epsilonInAlgo)},
@@ -380,7 +384,7 @@ setReplaceMethod(
   definition=function(x,i,j,value){
     if ( missing(j) ){
       switch(EXPR=i,
-        "name"={x@name<-value},
+        "algo"={x@algo<-value},
         "nbTry"={x@nbTry<-value},
         "nbIterationInAlgo"={x@nbIterationInAlgo<-value},
         "epsilonInAlgo"={x@epsilonInAlgo<-value},

@@ -8,8 +8,8 @@
     component.independency = NULL)
 }
 \arguments{
-  \item{listModels}{a list a character containing a list of
-  models. It is optional.}
+  \item{listModels}{a list of characters containing a list
+  of models. It is optional.}
 
   \item{free.proportions}{logical to include models with
   free proportions. Default is TRUE.}
@@ -39,7 +39,7 @@
   Binary_pk_Ekjh \tab \tab FALSE \tab FALSE \cr }
 }
 \description{
-  Define a list of gaussian model to test in MIXMOD.
+  Define a list of multinomial model to test in MIXMOD.
 }
 \details{
   In the multinomial mixture model, the multinomial

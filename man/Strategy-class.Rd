@@ -5,13 +5,13 @@
   This class defines the Mixmod strategies.
 }
 \details{
-  \describe{ \item{name}{list of character string with the
+  \describe{ \item{algo}{list of character string with the
   estimation algorithm.  Possible values: "EM", "SEM",
   "CEM", c("EM","SEM"). Default value is "EM".}
   \item{nbTry}{integer defining the number of tries.
   Default value: 1.} \item{initMethod}{a character string
   with the method of initialization of the algorithm
-  specified in the \code{name} argument. Possible values:
+  specified in the \code{algo} argument. Possible values:
   "random", "smallEM", "CEM", "SEMMax". Default value:
   "smallEM".} \item{nbTryInInit}{integer defining number of
   tries in \code{initMethod} algorithm. Default value: 50.}
@@ -27,12 +27,12 @@
   \code{initMethod} is "smallEM". Default value: 0.001.}
   \item{epsilonInAlgo}{list of reals defining the epsilon
   value for the algorithm. Warning: epsilonInAlgo doesn't
-  have any sens if \code{name} is SEM, so it needs to be
+  have any sens if \code{algo} is SEM, so it needs to be
   set as NaN in that case. Default value: 0.001.} }
 }
 \examples{
 new("Strategy")
-  new("Strategy", name="SEM", initMethod="SEMMax")
+  new("Strategy", algo="SEM", initMethod="SEMMax")
 
   getSlots("Strategy")
 }

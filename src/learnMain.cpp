@@ -71,7 +71,7 @@ RcppExport SEXP learnMain( SEXP xem )
   // wrap data in Rcpp matrix
   Rcpp::NumericMatrix RData(SEXP(mixmodLearn.slot("data"))); // creates Rcpp matrix from SEXP
   // wrap partition matrix in Rcpp matrix
-  Rcpp::NumericVector RPartition(mixmodLearn.slot("knownPartition"));
+  Rcpp::NumericVector RPartition(mixmodLearn.slot("knownLabels"));
   // wrap criterion
   Rcpp::StringVector Rcriterion(mixmodLearn.slot("criterion"));
   // wrap models

@@ -30,7 +30,7 @@ Rcpp::NumericMatrix CMatrixToRcppMatrix(int64_t nbSample, int64_t pbDimension, d
 }
 
 //To spin off vector of vector in Rcpp::NumericMatrix
-Rcpp::NumericMatrix XEMMatrixToRcppMatrix(vector<vector<double> > const& source)
+Rcpp::NumericMatrix XEMMatrixToRcppMatrix(std::vector<std::vector<double> > const& source)
 {
   int64_t nbSample = source.size();
   int64_t pbDimension = source[0].size();
@@ -168,7 +168,7 @@ XEMBinaryData * DataToXemBinaryData(Rcpp::NumericMatrix& data, Rcpp::NumericVect
   }
 
   // compute the modalities of the data
-  vector<int64_t> nbModality(nbVariable64);
+  std::vector<int64_t> nbModality(nbVariable64);
   for(int j=0;j<nbVariable64;j++)
   { nbModality[j]=factor[j]; }
   

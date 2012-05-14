@@ -12,8 +12,8 @@
 }
 \details{
   \tabular{ll}{ Package: \tab Rmixmod\cr Type: \tab
-  Package\cr Version: \tab 1.1.1\cr Date: \tab
-  2012-04-04\cr License: \tab GPL-3 + file LICENSE\cr
+  Package\cr Version: \tab 1.1.2\cr Date: \tab
+  2012-05-14\cr License: \tab GPL-3 + file LICENSE\cr
   LazyLoad: \tab yes\cr }
 
   The general purpose of the package is to discover, or
@@ -57,7 +57,7 @@
   estimation process. As mixture problems usually have
   multiple relative maxima, the program will produce
   different results, depending on the initial estimates
-  supplied by the user. If the userdoes not input his own
+  supplied by the user. If the user does not input his own
   initial estimates, some initial estimates procedures are
   proposed (random centers for instance).
 
@@ -94,9 +94,9 @@
   # load qualitative data set
   data(birds)
   # Clustering in multinomial case
-  xem2<-mixmodCluster(birds, 2, factor=c(2,5,6,3,5,4))
+  xem2<-mixmodCluster(birds, 2)
   summary(xem2)
-  hist(xem2)
+  barplot(xem2)
 
   ## Discriminant Analysis
   # start by extract 10 observations from iris data set

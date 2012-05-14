@@ -9,12 +9,12 @@
   \describe{ \item{bestResult}{a S4
   [\code{\linkS4class{MixmodDAResults}}] object containing
   the best model results.} \item{nbCVBlocks}{integer which
-  defines the number of observation per block to perform
-  the Cross Validation.} }
+  defines the number of block to perform the Cross
+  Validation.} }
 }
 \examples{
 ## A quantitative example with the famous iris data set
-  new("MixmodLearn", data=iris[1:4], knownPartition=iris$Species)
+  new("MixmodLearn", data=iris[1:4], knownLabels=iris$Species)
 
   getSlots("MixmodLearn")
 }

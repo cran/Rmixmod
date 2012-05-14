@@ -2,23 +2,25 @@
 \name{birds}
 \alias{birds}
 \title{Qualitative data : morphological description of birds}
-\format{A data frame with 69 observations on the following 6 variables.
+\format{A data frame with 69 observations on the following 5 variables.
 
 \describe{
 
   \item{\code{gender}}{a numeric vector defining the gender (2 modalities, male or female).}
 
-  \item{\code{eyebrow}}{a numeric vector describing the eyebrow stripe (5 modalities).}
+  \item{\code{eyebrow}}{a numeric vector describing the eyebrow stripe (4 modalities).}
 
-  \item{\code{breast}}{a numeric vector describing the breast (6 modalities).}
+  \item{\code{collar}}{a numeric vector describing the collar (5 modalities).}
 
-  \item{\code{stripes}}{a numeric vector describing the stripes (3 modalities).}
+  \item{\code{sub-caudal}}{a numeric vector describing the sub-caudal (5 modalities).}
 
-  \item{\code{feathers}}{a numeric vector describing the feathers (5 modalities).}
-
-  \item{\code{edging}}{a numeric vector describing the edging (4 modalities).}
+  \item{\code{border}}{a numeric vector describing the border (3 modalities).}
 
 }}
+\source{
+  Bretagnolle, V., 2007. Personal communication, source:
+  Museum.
+}
 \description{
   The dataset contains details on the morphology of birds
   (puffins). Each individual (bird) is described by 6

@@ -140,16 +140,16 @@ setMethod(
   signature=c("MixmodPredict"),
   definition=function(.Object,data,classificationRule){
     if(!missing(data)){
-      if ( is.factor(data) ) data<-as.interger(data)
+      if ( is.factor(data) ) data<-as.integer(data)
       else if ( !is.vector(data) ){
         # loop over columns to check whether type is factor
-        for ( j in 1: ncol(data) ){
+        for ( j in 1:ncol(data) ){
           if ( is.factor(data[,j]) ) data[,j] <- as.integer(data[,j])
         }
       }
       .Object@data <- as.matrix(data)
-      .Object@nbSample <- nrow(data)
-      .Object@nbVariable <- ncol(data)
+      .Object@nbSample <- nrow(.Object@data)
+      .Object@nbVariable <- ncol(.Object@data)
     }else{
       stop("data is missing !")
     } 

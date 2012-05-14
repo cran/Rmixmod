@@ -51,7 +51,7 @@ setMethod(
   signature=c("Model"),
   function(x,...){
     cat("****************************************\n")
-    cat("*** MIXMOD Models :\n")
+    cat("*** MIXMOD Models:\n")
     cat("* list = ", x@listModels, "\n")
     if ( x@free.proportions  & x@equal.proportions )
       cat("* This list includes models with free and equal proportions.\n")
@@ -74,7 +74,7 @@ setMethod(
   signature=c("Model"),
   function(object){
     cat("****************************************\n")
-    cat("*** MIXMOD Models :\n")
+    cat("*** MIXMOD Models:\n")
     cat("* list = ", object@listModels, "\n")
     if ( object@free.proportions  & object@equal.proportions )
     cat("* This list includes models with free and equal proportions.\n")

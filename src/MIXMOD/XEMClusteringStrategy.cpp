@@ -272,32 +272,59 @@ void XEMClusteringStrategy::setNbTry(int64_t nbTry){
 //---
 //run
 //---
-void XEMClusteringStrategy::run(XEMModel * model){ 
+void XEMClusteringStrategy::run(XEMModel *& model){ 
   //cout<<"XEMClusteringStrategy Init, nbTry="<<_nbTry<<endl;
   if (_nbTry == 1){
     oneTry(model);
   }
   else{ 
-    XEMModel * currentModel = new XEMModel(model);
-    oneTry(currentModel);
-    XEMModel * bestModel = new XEMModel(currentModel);
-    double bestLLorCLL = currentModel->getCompletedLogLikelihoodOrLogLikelihood();
-    // others tries
-    for (int64_t i=1; i<_nbTry; i++){
-      delete currentModel;
-      currentModel = new XEMModel(model);
-      oneTry(currentModel);
-      double lastLLorCLL = currentModel->getCompletedLogLikelihoodOrLogLikelihood();
-      if (lastLLorCLL > bestLLorCLL){
-        delete bestModel;
-        bestModel = new XEMModel(currentModel);
-        bestLLorCLL = currentModel->getCompletedLogLikelihoodOrLogLikelihood();
+    XEMModel * bestModel = new XEMModel(model);
+    oneTry(bestModel);
+    // first tries
+    int iTry=1;
+    while ( (bestModel->getErrorType() != noError) && ( iTry<_nbTry ) ){
+      delete bestModel;
+      bestModel = new XEMModel(model);
+      oneTry(bestModel);
+      ++iTry;
+    }
+    
+    if ( bestModel->getErrorType() == noError ){
+      double bestLLorCLL = bestLLorCLL = bestModel->getCompletedLogLikelihoodOrLogLikelihood();
+      // others tries
+      for (int64_t i=iTry; i<_nbTry; i++){
+        XEMModel * currentModel = new XEMModel(model);
+        oneTry(currentModel);
+        if ( currentModel->getErrorType() == noError ) {
+          double lastLLorCLL = currentModel->getCompletedLogLikelihoodOrLogLikelihood();
+          if (lastLLorCLL > bestLLorCLL){
+            delete bestModel;
+            bestModel = new XEMModel(currentModel);
+            bestLLorCLL = currentModel->getCompletedLogLikelihoodOrLogLikelihood();
+          }
+        }
+        delete currentModel;
       }
     }
-    //cout<<"fin de XEMClusteringStrategy Init, nb d'essais effectues="<<i<<endl<<endl;
-    delete currentModel;
     delete model;
     model = bestModel;
+/*    oneTry(model);
+    XEMModel * bestModel = new XEMModel(model);
+    double bestLLorCLL = model->getCompletedLogLikelihoodOrLogLikelihood();
+    // others tries
+    for (int64_t i=1; i<_nbTry; i++){
+      oneTry(model);
+      double lastLLorCLL = model->getCompletedLogLikelihoodOrLogLikelihood();
+      cout<<"Try n°="<< i << " lastLL=" << lastLLorCLL << " bestLL=" << bestLLorCLL << " nbCluster=" << model->getNbCluster() << " modelName=" << XEMModelNameToString(model->getModelType()->getModelName()) << endl;
+      if (lastLLorCLL > bestLLorCLL){
+        delete bestModel;
+        bestModel = new XEMModel(model);
+        bestLLorCLL = model->getCompletedLogLikelihoodOrLogLikelihood();
+      }
+    }
+    model = bestModel;
+    delete bestModel;
+ */
   }
 }
 
@@ -307,12 +334,13 @@ void XEMClusteringStrategy::run(XEMModel * model){
 //oneTry
 //------
 void XEMClusteringStrategy::oneTry(XEMModel *& model){
- 
-    //init model
+
+  //init model
   switch (_strategyInit->getStrategyInitName()){
-    case RANDOM :
-      model->initRANDOM(_strategyInit->getNbTry()); 
-      break;
+  
+      case RANDOM :
+        model->initRANDOM(_strategyInit->getNbTry()); 
+        break;
         
       case USER :{ // get initPartition
         int64_t nbCluster = model->getNbCluster();
@@ -383,10 +411,24 @@ void XEMClusteringStrategy::oneTry(XEMModel *& model){
   model->editDebugInformation();
 #endif
     
-    // runs algos
-  _tabAlgo[0]->run(model);
-  for (int64_t i=1; i<_nbAlgo ;i++){
-    _tabAlgo[i]->run(model);
+  // runs algos
+  // define a number of errors iterator
+  int nbErrorInAlgo = 0;
+//  _tabAlgo[0]->run(model);
+  for (int64_t i=0; i<_nbAlgo ;i++){
+    try{
+      _tabAlgo[i]->run(model);
+    }
+    catch (XEMErrorType errorType){
+#ifdef VERBOSE
+      XEMError error(errorType);
+      error.run();
+#endif
+      ++nbErrorInAlgo;
+      // set error for that model
+      if ( nbErrorInAlgo==_nbAlgo ) 
+        model->setError(errorType);
+    }
   }
 }
 

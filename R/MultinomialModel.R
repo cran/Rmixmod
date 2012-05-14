@@ -232,11 +232,11 @@ setMethod(
 ###################################################################################
 ##' Create an instance of the [\code{\linkS4class{MultinomialModel}}] class
 ##'
-##' Define a list of gaussian model to test in MIXMOD.
+##' Define a list of multinomial model to test in MIXMOD.
 ##'
 ##' In the multinomial mixture model, the multinomial distribution is associated to the \eqn{j}th variable of the \eqn{k}th component is reparameterized by a center \eqn{a_k^j} and the dispersion \eqn{\varepsilon_k^j} around this center. Thus, it allows us to give an interpretation similar to the center and the variance matrix used for continuous data in the Gaussian mixture context. In the following, this model will be denoted by \eqn{[\varepsilon_k^j]}. In this context, three other models can be easily deduced. We note \eqn{[\varepsilon_k]} the model where \eqn{\varepsilon_k^j} is independent of the variable \eqn{j}, \eqn{[\varepsilon^j]} the model where \eqn{\varepsilon_k^j} is independent of the component \eqn{k} and, finally, \eqn{[\varepsilon]} the model where \eqn{\varepsilon_k^j} is independent of both the variable $j$ and the component \eqn{k}.  In order to maintain some unity in the notation, we will denote also \eqn{[\varepsilon_k^{jh}]} the most general model introduced at the previous section.
 ##' 
-##' @param listModels a list a character containing a list of models. It is optional.
+##' @param listModels a list of characters containing a list of models. It is optional.
 ##' @param free.proportions logical to include models with free proportions. Default is TRUE.
 ##' @param equal.proportions logical to include models with equal proportions. Default is FALSE.
 ##' @param variable.independency logical to include models where \eqn{[\varepsilon_k^j]} is independent of the variable \eqn{j}. Optionnal.

@@ -78,11 +78,13 @@ isQualitative <- function (x) {
       warning("more than 25% of the observations have different modalities")
     return(TRUE)
   }
-  # loop over columns to check whether type is factor
-  for ( j in 1: ncol(x) ){
-    if ( is.double(x[,j]) ) return(FALSE)
-    if ( nlevels(as.factor(x[,j]))/length(x[,j])>.25 ) 
-      warning(paste("more than 25% of the observations have different modalities for variable named",names(x)[j]))
+  else{
+    # loop over columns to check whether type is factor
+    for ( j in 1:ncol(x) ){
+     if ( is.double(x[,j]) ) return(FALSE)
+     if ( nlevels(as.factor(x[,j]))/length(x[,j])>.25 ) 
+       warning(paste("more than 25% of the observations have different modalities for variable named",names(x)[j]))
+    }
   }
   return(TRUE)
 }
@@ -100,7 +102,7 @@ isQualitative <- function (x) {
 asQualitative <- function (x) {
   if ( isQualitative(x) ){
     if ( is.vector(x) ) x<-as.factor(x)
-    else{
+    else if ( is.data.frame(x) | is.matrix(x)  ){
       # loop over columns to check whether type is factor
       for ( j in 1: ncol(x) ){ x[,j] <- as.factor(x[,j]) }
     }

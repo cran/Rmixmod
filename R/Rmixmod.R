@@ -5,8 +5,8 @@
 ##' \tabular{ll}{
 ##'   Package: \tab Rmixmod\cr 
 ##'   Type: \tab Package\cr 
-##'   Version: \tab 1.1.1\cr
-##'   Date: \tab 2012-04-04\cr 
+##'   Version: \tab 1.1.2\cr
+##'   Date: \tab 2012-05-14\cr 
 ##'   License: \tab GPL-3 + file LICENSE\cr 
 ##'   LazyLoad: \tab yes\cr
 ##' }
@@ -24,7 +24,7 @@
 ##'
 ##' In the qualitative case, \eqn{h} is a multinomial distribution and \eqn{\lambda_k=(a_k,\epsilon_k)} is the parameter of the distribution.
 ##'
-##' Estimation of the mixture parameters is performed either through maximum likelihood via the EM (\emph{Expectation Maximization}, Dempster et al. 1977), the SEM (\emph{Stochastic EM}, Celeux and Diebolt 1985) algorithm or through classification maximum likelihood via the CEM  algorithm (\emph{Clustering EM}, Celeux and Govaert 1992). These three algorithms can be chained to obtain original fitting strategies (e.g. CEM then EM with results of CEM) to use advantages of each of them in the estimation process. As mixture problems usually have multiple relative maxima, the program will produce different results, depending on the initial estimates supplied by the user. If the userdoes not input his own initial estimates, some initial estimates procedures are proposed (random centers for instance).
+##' Estimation of the mixture parameters is performed either through maximum likelihood via the EM (\emph{Expectation Maximization}, Dempster et al. 1977), the SEM (\emph{Stochastic EM}, Celeux and Diebolt 1985) algorithm or through classification maximum likelihood via the CEM  algorithm (\emph{Clustering EM}, Celeux and Govaert 1992). These three algorithms can be chained to obtain original fitting strategies (e.g. CEM then EM with results of CEM) to use advantages of each of them in the estimation process. As mixture problems usually have multiple relative maxima, the program will produce different results, depending on the initial estimates supplied by the user. If the user does not input his own initial estimates, some initial estimates procedures are proposed (random centers for instance).
 ##'
 ##' It is possible to constrain some input parameters. For example, dispersions can be equal between classes, etc.
 ##'
@@ -59,9 +59,9 @@
 ##'   # load qualitative data set
 ##'   data(birds)
 ##'   # Clustering in multinomial case
-##'   xem2<-mixmodCluster(birds, 2, factor=c(2,5,6,3,5,4))
+##'   xem2<-mixmodCluster(birds, 2)
 ##'   summary(xem2)
-##'   hist(xem2)
+##'   barplot(xem2)
 ##'
 ##'   ## Discriminant Analysis
 ##'   # start by extract 10 observations from iris data set
@@ -150,23 +150,24 @@ NULL
 ##' 
 ##' The dataset contains details on the morphology of birds (puffins). Each individual (bird) is described by 6 qualitative variables. One variable for the gender and 5 variables giving a morphological description of the birds. There is 69 puffins divided in 2 sub-classes: lherminieri (34) and subalaris (35).
 ##'
-##' @format A data frame with 69 observations on the following 6 variables.
+##' @format A data frame with 69 observations on the following 5 variables.
 ##'
 ##' \describe{
 ##'
 ##'   \item{\code{gender}}{a numeric vector defining the gender (2 modalities, male or female).}
 ##'
-##'   \item{\code{eyebrow}}{a numeric vector describing the eyebrow stripe (5 modalities).}
+##'   \item{\code{eyebrow}}{a numeric vector describing the eyebrow stripe (4 modalities).}
 ##'
-##'   \item{\code{breast}}{a numeric vector describing the breast (6 modalities).}
+##'   \item{\code{collar}}{a numeric vector describing the collar (5 modalities).}
 ##'
-##'   \item{\code{stripes}}{a numeric vector describing the stripes (3 modalities).}
+##'   \item{\code{sub-caudal}}{a numeric vector describing the sub-caudal (5 modalities).}
 ##'
-##'   \item{\code{feathers}}{a numeric vector describing the feathers (5 modalities).}
-##'
-##'   \item{\code{edging}}{a numeric vector describing the edging (4 modalities).}
+##'   \item{\code{border}}{a numeric vector describing the border (3 modalities).}
 ##'
 ##' }
+##'
+##' @source
+##' Bretagnolle, V., 2007. Personal communication, source: Museum.
 ##'
 ##' @name birds
 ##' @docType data

@@ -72,10 +72,14 @@ XEMSymmetricMatrix::~XEMSymmetricMatrix(){
 
 double XEMSymmetricMatrix::determinant(XEMErrorType errorType){
   double det=0;
-  det = LogDeterminant(*_value).Value();
+  try {
+     det = LogDeterminant(*_value).Value();
+  } catch (...) {
+    throw errorType;
+  }
   if (det < minDeterminantValue){
-      throw errorType;
-      }
+    throw errorType;
+  }
   return det;  
 }
 

@@ -213,7 +213,7 @@ setMethod(
 ###################################################################################
 ##' Create an instance of the [\code{\linkS4class{GaussianModel}}] class
 ##'
-##' Define a list of gaussian model to test in MIXMOD.
+##' Define a list of Gaussian model to test in MIXMOD.
 ##' 
 ##' In the Gaussian mixture model, following Banfield and Raftery (1993) and Celeux and Govaert (1995), we consider a parameterization of the variance matrices of the mixture components consisting of expressing the variance matrix \eqn{\Sigma_{k}} in terms of its eigenvalue decomposition \deqn{ \Sigma_{k}= \lambda_{k} D_{k} A_{k}D'_{k}} where \eqn{\lambda_{k}=|\Sigma_{k}|^{1/d}, D_{k}} is the matrix of eigenvectors of \eqn{\Sigma_{k}} and \eqn{A_{k}} is a diagonal matrix, such that \eqn{| A_{k} |=1}, with the normalized eigenvalues of \eqn{\Sigma_{k}} on the diagonal in a decreasing order. The parameter \eqn{\lambda_{k}} determines the \emph{volume} of the \eqn{k}th cluster, \eqn{D_{k}} its \emph{orientation} and \eqn{A_{k}} its \emph{shape}.  By allowing some but not all of these quantities to vary between clusters, we obtain parsimonious and easily interpreted models which are appropriate to describe various clustering situations.
 ##' 
@@ -223,13 +223,13 @@ setMethod(
 ##' In spherical family, we assume spherical shapes, namely \eqn{A_{k}=I}, \eqn{I} denoting the identity matrix. In such a case, two parsimonious models are in competition: \eqn{[\lambda I]} and \eqn{[\lambda_{k}I]}.
 ##'
 ##' @param family character defining a family of models. "general" for the general family, "diagonal" for the diagonal family, "spherical" for the spherical family and "all" for all families. Default is "general".
-##' @param listModels a list a character containing a list of models. It is optional.
+##' @param listModels a list of characters containing a list of models. It is optional.
 ##' @param free.proportions logical to include models with free proportions. Default is TRUE.
 ##' @param equal.proportions logical to include models with equal proportions. Default is TRUE.
 ##'
 ##' @return an object of [\code{\linkS4class{GaussianModel}}] which contains some of the 28 Gaussian Models:
 ##' \tabular{rlllll}{
-##'     Model  \tab Family \tab Prop. \tab Voume \tab Shape \tab Orient. \cr
+##'     Model  \tab Family \tab Prop. \tab Volume \tab Shape \tab Orient. \cr
 ##'     Gaussian_p_L_C         \tab General \tab Equal \tab Equal \tab Equal  \tab Equal \cr
 ##'     Gaussian_p_Lk_C        \tab \tab \tab Free \tab Equal \tab Equal \cr
 ##'     Gaussian_p_L_D_Ak_D    \tab  \tab \tab Equal \tab Free \tab Equal \cr

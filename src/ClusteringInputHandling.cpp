@@ -36,14 +36,14 @@ ClusteringInputHandling::~ClusteringInputHandling()
 void ClusteringInputHandling::setAlgo()
 {
   // check if it is a NULL value
-  if (Rf_isNull( algoOptions_.slot("name") )) return;
+  if (Rf_isNull( algoOptions_.slot("algo") )) return;
   // check if it is a NULL value
   if (Rf_isNull( algoOptions_.slot("epsilonInAlgo") )) return;
   // check if it is a NULL value
   if (Rf_isNull( algoOptions_.slot("nbIterationInAlgo") )) return;
   
   // get algo
-  std::vector<std::string> algo = Rcpp::as< std::vector<std::string> >(algoOptions_.slot("name"));
+  std::vector<std::string> algo = Rcpp::as< std::vector<std::string> >(algoOptions_.slot("algo"));
   // get int value
   std::vector<int> nbIterationInAlgo = Rcpp::as< std::vector<int> >(algoOptions_.slot("nbIterationInAlgo"));
   // get double value

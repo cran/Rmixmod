@@ -10,8 +10,8 @@
   quantitative.} \item{dataType}{character. It defines
   whether data are quantitative or qualitative.}
   \item{nbCluster}{integer. It indicates the number of
-  classes.} \item{knownPartition}{numeric. It contains the
-  known partition.} \item{weight}{numeric vector with n
+  classes.} \item{knownLabels}{numeric. It contains the
+  known labels.} \item{weight}{numeric vector with n
   (number of individuals) rows. Weight is optionnal. This
   option is to be used when weight is associated to the
   data.} \item{nbVariable}{integer. The number of

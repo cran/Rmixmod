@@ -11,7 +11,7 @@
   [\code{\linkS4class{MixmodResults}}]}
 
   \item{data}{a vector, matrix or data frame containing a
-  quantitative or a qualitative data set.}
+  quantitative data set.}
 
   \item{variables}{list of variables names to compute a
   histogram. All variables from data by default.}
@@ -27,30 +27,16 @@
 }
 \description{
   Histograms of data object using parameters from a
-  [\code{\linkS4class{MixmodResults}}] to plot densities in
-  a quantitative case and probablities in a qualitative
-  case.
+  [\code{\linkS4class{MixmodResults}}] to plot densities.
 }
 \details{
-  For quantitative case, data with the density of each
-  cluster and the mixture density are drawn for each
-  variable.
-
-  For qualitative case, each line corresponds to one
-  variable. On the left-hand side is drawn a barplot with
-  data. Then a barplot is drawn for each cluster with the
-  probabilities for each modality to be in that cluster.
+  Data with the density of each cluster and the mixture
+  density are drawn for each variable.
 }
 \examples{
-## for qualitative case
-  data(geyser)
+data(geyser)
   xem1 <- mixmodCluster(geyser,3)
   histCluster(xem1["bestResult"], geyser)
-
-  ## for qualitative case
-  data(birds)
-  xem2 <- mixmodCluster(birds,2,factor=c(2,5,6,3,5,4))
-  histCluster(xem2["bestResult"], birds)
 }
 \seealso{
   \code{\link{hist}}

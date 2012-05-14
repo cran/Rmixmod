@@ -149,7 +149,7 @@ class  XEMClusteringStrategy
   void input_FLAT_FORMAT(std::ifstream & fi, XEMData *& data, int64_t nbNbCluster, int64_t * tabNbCluster, XEMModelType * modelType);
   
 	/// Run method
-  void run(XEMModel * model);
+  void run(XEMModel *& model);
         
   bool verify();
     

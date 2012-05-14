@@ -20,7 +20,7 @@ NULL
 ##'   \item{data}{numeric vector, matrix, or data frame of observations. Either qualitative or quantitative.}
 ##'   \item{dataType}{character. It defines whether data are quantitative or qualitative.}
 ##'   \item{nbCluster}{integer. It indicates the number of classes.}
-##'   \item{knownPartition}{numeric. It contains the known partition.}
+##'   \item{knownLabels}{numeric. It contains the known labels.}
 ##'   \item{weight}{numeric vector with n (number of individuals) rows. Weight is optionnal. This option is to be used when weight is associated to the data.}
 ##'   \item{nbVariable}{integer. The number of variables.}
 ##'   \item{nbSample}{integer. The number of observations.}
@@ -44,7 +44,7 @@ setClass(
     dataType = "character",
     factor = "numeric",
     nbCluster = "numeric",
-    knownPartition = "integer",
+    knownLabels = "integer",
     weight = "numeric",
     nbVariable = "integer",
     nbSample = "integer",
@@ -59,7 +59,7 @@ setClass(
     dataType = character(0),
     factor = numeric(0),
     nbCluster = numeric(0),
-    knownPartition = integer(0),
+    knownLabels = integer(0),
     weight = numeric(0),
     nbVariable = integer(0),
     nbSample = integer(0),
@@ -106,10 +106,10 @@ setClass(
     if ( (object@dataType == "qualitative") & is(object@models, "GaussianModel") ){
       stop("GaussianModel can't suit for qualitative data !\n")
     }    
-    # check dimensions of knownPartition
-    if(length(object@knownPartition)>0){
-      if ( (length(object@knownPartition)!= object@nbSample) ){
-        stop("the length of knownPartition is not similar to the number of observations!")
+    # check dimensions of knownLabels
+    if(length(object@knownLabels)>0){
+      if ( (length(object@knownLabels)!= object@nbSample) ){
+        stop("the length of knownLabels is not similar to the number of observations!")
       }   
     }
     # check if weight isn't null and equal to the number of subjects
@@ -138,13 +138,12 @@ setClass(
 setMethod(
   f="initialize",
   signature=c("Mixmod"),
-  definition=function(.Object,data,dataType,factor,models,weight,knownPartition){
+  definition=function(.Object,data,dataType,models,weight,knownLabels){
     # set missing parameters as NULL
     if (missing(dataType)) dataType<-NULL
-    if (missing(factor)) factor<-NULL
     if (missing(models)) models<-NULL
     if (missing(weight)) weight<-NULL
-    if (missing(knownPartition)) knownPartition<-NULL
+    if (missing(knownLabels)) knownLabels<-NULL
     
     if(!missing(data)){
       if ( is.null(dataType) ){
@@ -154,18 +153,16 @@ setMethod(
       else{
         .Object@dataType <- dataType
       }
-      if ( is.null(factor) ){
-        if ( .Object@dataType == "qualitative" ){ 
-          .Object@factor <- nbFactorFromData(data)
-        }
-      }else{
-        .Object@factor <- factor
+      if ( .Object@dataType == "qualitative" ){ 
+        .Object@factor <- nbFactorFromData(data)
       }
       
-      if ( is.factor(data) ) data<-as.interger(data)
-      else if ( !is.vector(data) ){
+      if ( is.factor(data) ){
+        data<-as.integer(data) 
+      }
+      else if ( is.data.frame(data) | is.matrix(data) ){
         # loop over columns to check whether type is factor
-        for ( j in 1: ncol(data) ){
+        for ( j in 1:ncol(data) ){
           if ( is.factor(data[,j]) ) data[,j] <- as.integer(data[,j])
         }
       }
@@ -187,15 +184,15 @@ setMethod(
         }
       }
       .Object@data <- as.matrix(data)
-      .Object@nbSample <- nrow(data)
-      .Object@nbVariable <- ncol(data)      
+      .Object@nbSample <- nrow(.Object@data)
+      .Object@nbVariable <- ncol(.Object@data)      
       if(!is.null(weight)){
         .Object@weight <- weight
       }
-      if(!is.null(knownPartition)){
-        knownPartition[knownPartition==0]<-NA
-        .Object@knownPartition <- as.integer(as.factor(knownPartition))
-        .Object@knownPartition[which(is.na(.Object@knownPartition))]<-as.integer(0)
+      if(!is.null(knownLabels)){
+        knownLabels[knownLabels==0]<-NA
+        .Object@knownLabels <- as.integer(as.factor(knownLabels))
+        .Object@knownLabels[which(is.na(.Object@knownLabels))]<-as.integer(0)
       }
       # call validity function
       validObject(.Object)
@@ -226,8 +223,8 @@ setMethod(
       print(x@data)
     }
     else{}
-    if ( length(x@knownPartition)>0 ){
-      cat("* knownPartition = ", x@knownPartition, "\n")
+    if ( length(x@knownLabels)>0 ){
+      cat("* knownLabels = ", x@knownLabels, "\n")
     }
   }
 )
@@ -254,11 +251,11 @@ setMethod(
       print(formatC(object@data[1:nrowShow,1:ncolShow]),quote=FALSE)
     }else{}
     cat("* ... ...\n")  
-    if ( length(object@knownPartition)>0 ){
-      if ( length(object@knownPartition)>10 ){
-        cat("* knownPartition = ", object@knownPartition[1:10], " ...\n")
+    if ( length(object@knownLabels)>0 ){
+      if ( length(object@knownLabels)>10 ){
+        cat("* knownLabels = ", object@knownLabels[1:10], " ...\n")
       }else{
-        cat("* knownPartition = ", object@knownPartition, "\n")
+        cat("* knownLabels = ", object@knownLabels, "\n")
       }
     }
   }
@@ -298,7 +295,7 @@ setMethod(
 ##' A 1-dimensional representation of variables with the densities is drawn on the diagonal.
 ##'
 ##' For qualitative case, a Multiple Correspondance Analysis is performed to get a
-##' 2-dimensional representation of the data set. Overlaping means that observations are similar.
+##' 2-dimensional representation of the data set. Bigger symbol means that observations are similar.
 ##'
 ##' @param x an object of class [\code{\linkS4class{Mixmod}}]
 ##' @param ... further arguments passed to or from other methods
@@ -319,7 +316,7 @@ setMethod(
 ##'
 ##'   ## for qualitative case
 ##'   data(birds)
-##'   xem2 <- mixmodCluster(birds,2,factor=c(2,5,6,3,5,4))
+##'   xem2 <- mixmodCluster(birds,2)
 ##'   plot(xem2)
 ##'
 setMethod(
@@ -364,24 +361,38 @@ setMethod(
     }
     # for qualitative data
     else if ( x@dataType == "qualitative" ){
-      # create layout matrix
-      par( mfrow = c(1, 1) )
-      
-      # get binary matrix from x
-      matX <- matrix2binary(as.data.frame(x@data))
-      # get number of observations
-      n <- dim(matX)[1]
-      # get number of variables
-      p <- ncol(x@data)
-      
-      Dc <- drop((rep(1, n)) %*% matX)
-      Y <- t(t(matX)/(sqrt(p * Dc)))
-      Y.svd <- svd(Y)
-      individuals <- Y %*% Y.svd$v[, 2:3]/p
+      # create layout
+      if ( x@nbVariable == 1 ){
+        stop("data has only one variable. Try barplot() function to get a 1D representation of x.")
+      }else{
+        # create layout matrix
+        par( mfrow = c(1, 1))
+        # get binary matrix from x
+        matX <- matrix2binary(as.data.frame(x@data))
+        # get number of observations
+        n <- dim(matX)[1]
+        # get number of variables
+        p <- ncol(x@data)
+        
+        Dc <- drop((rep(1, n)) %*% matX)
+        Y <- t(t(matX)/(sqrt(p * Dc)))
+        Y.svd <- svd(Y)
+        individuals <- Y %*% Y.svd$v[, 2:3]/p
 
-      # plotting the first 2 axes  
-      plot( jitter(individuals[,2], factor=10) ~ jitter(individuals[,1], factor=10), 
-      col=x@bestResult@partition+1, pch=x@bestResult@partition, xlab='Axis 1', ylab='Axis 2', main='Multiple Correspondance Analysis', ... )
+        # get unique points
+        unique.ind<-unique(individuals)
+        # get number of duplication for each individuals
+        point.size<-numeric(nrow(unique.ind))
+        for(i in 1:nrow(unique.ind) ){ 
+          for(j in 1:nrow(individuals)){
+            point.size[i]<-point.size[i]+sum(unique.ind[i,]==individuals[j,])
+          }
+          point.size[i]<-point.size[i]/2
+        }
+        # plotting the first 2 axes  
+        plot( unique.ind[,2] ~ unique.ind[,1], cex=point.size,
+        col=x@bestResult@partition[-which(duplicated(individuals))]+1, pch=x@bestResult@partition[-which(duplicated(individuals))], xlab='Axis 1', ylab='Axis 2', main='Multiple Correspondance Analysis', ... )
+      }
     }
     invisible()
   }
@@ -392,14 +403,10 @@ setMethod(
 ###################################################################################
 ##' Histograms of a class [\code{\linkS4class{Mixmod}}]  
 ##'
-##' Histograms of data from a [\code{\linkS4class{Mixmod}}] object using parameters
-##' to plot densities in a quantitative case and probablities in a qualitative case.
+##' Histograms of quantitative data from a [\code{\linkS4class{Mixmod}}] object using parameters
+##' to plot densities.
 ##'
-##' For quantitative case, data with the density of each cluster and the mixture density are drawn for each variable.
-##'
-##' For qualitative case, each line corresponds to one variable. On the left-hand side is 
-##' drawn a barplot with data. Then a barplot is drawn for each cluster with the probabilities for 
-##' each modality to be in that cluster.
+##' Data with the density of each cluster and the mixture density are drawn for each variable.
 ##'  
 ##' @param x an object of class [\code{\linkS4class{Mixmod}}]
 ##' @param ... further arguments passed to or from other methods
@@ -413,15 +420,9 @@ setMethod(
 ##'
 ##' @seealso \code{\link{hist}}
 ##' @examples
-##'   ## for quantitative case
 ##'   data(geyser)
 ##'   xem1 <- mixmodCluster(geyser,3)
 ##'   hist(xem1)
-##'
-##'   ## for qualitative case
-##'   data(birds)
-##'   xem2 <- mixmodCluster(birds,2,factor=c(2,5,6,3,5,4))
-##'   hist(xem2)
 ##'
 setMethod(
   f="hist",
@@ -430,6 +431,42 @@ setMethod(
     histCluster(x@bestResult, x@data, ...)
     invisible()
   }
+)
+###################################################################################
+
+
+###################################################################################
+##' Barplot of a class [\code{\linkS4class{Mixmod}}]  
+##'
+##' Barplot of qualitative data from a [\code{\linkS4class{Mixmod}}] object using parameters
+##' to plot probablities of modalities.
+##'
+##' Each line corresponds to one variable. Barplot is drawn for each cluster with the probabilities for 
+##' each modality to be in that cluster.
+##'  
+##' @param x an object of class [\code{\linkS4class{Mixmod}}]
+##' @param ... further arguments passed to or from other methods
+##'
+##' @importFrom graphics barplot
+##' @name barplot
+##' @aliases barplot barplot,Mixmod-method
+##' @docType methods
+##' @rdname barplot-methods
+##' @exportMethod barplot
+##'
+##' @seealso \code{\link{barplot}}
+##' @examples
+##'   data(birds)
+##'   xem2 <- mixmodCluster(birds,2)
+##'   barplot(xem2)
+##'
+setMethod(
+  f="barplot",
+  signature=c("Mixmod"),
+  function(height, ...){
+    barplotCluster(height@bestResult, height@data, ...)
+    invisible()
+}
 )
 ###################################################################################
 
@@ -482,6 +519,7 @@ setMethod(
       object@results[[j]] <- x 
     }
     object@bestResult<-object@results[[1]]
+    object@criterion <- c(criterion,object@criterion[which(!(object@criterion %in% criterion))])
     return(object)
   }
 )

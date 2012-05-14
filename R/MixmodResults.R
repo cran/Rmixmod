@@ -211,31 +211,21 @@ plotCluster <- function(x, data, variable1=colnames(data)[1], variable2=colnames
 ##' Histogram of a class [\code{\linkS4class{MixmodResults}}]  
 ##' 
 ##' Histograms of data object using parameters from a [\code{\linkS4class{MixmodResults}}]
-##' to plot densities in a quantitative case and probablities in a qualitative case.
+##' to plot densities.
 ##'
-##' For quantitative case, data with the density of each cluster and the mixture density are drawn for each variable.
-##'
-##' For qualitative case, each line corresponds to one variable. On the left-hand side is 
-##' drawn a barplot with data. Then a barplot is drawn for each cluster with the probabilities for 
-##' each modality to be in that cluster.
+##' Data with the density of each cluster and the mixture density are drawn for each variable.
 ##'
 ##' @param x an object of class [\code{\linkS4class{MixmodResults}}]
-##' @param data a vector, matrix or data frame containing a quantitative or a qualitative data set.
+##' @param data a vector, matrix or data frame containing a quantitative data set.
 ##' @param variables list of variables names to compute a histogram. All variables from data by default.
 ##' @param xlab a list of title for the x axis. xlab must have the same length than variables.
 ##' @param main a list of title for the histogram. main must have the same length than variables.
 ##' @param ... further arguments passed to or from other methods
 ##'
 ##' @examples
-##'   ## for qualitative case
 ##'   data(geyser)
 ##'   xem1 <- mixmodCluster(geyser,3)
 ##'   histCluster(xem1["bestResult"], geyser)
-##'
-##'   ## for qualitative case
-##'   data(birds)
-##'   xem2 <- mixmodCluster(birds,2,factor=c(2,5,6,3,5,4))
-##'   histCluster(xem2["bestResult"], birds)
 ##'
 ##' @seealso \code{\link{hist}}
 ##' @export
@@ -246,7 +236,7 @@ histCluster <- function(x, data, variables=colnames(data), xlab=rep("",length(va
   stop("'x' must be a MixmodResults object!")
   if ( !is.matrix(data) & !is.data.frame(data) & !is.vector(data) )
   stop("'data' must be a vector, a data.frame or a matrix object!")
-  if ( length(variables) == 0 )
+  if ( (length(variables) == 0) & (ncol(data)>1))
   stop("'variables' is empty!")
   if ( length(variables)>ncol(data) )
   stop("List of variables too long!")
@@ -257,10 +247,13 @@ histCluster <- function(x, data, variables=colnames(data), xlab=rep("",length(va
   op <- par(no.readonly = TRUE) # the whole list of settable par's.
   
   # get the indices of variables
-  indices<-which(colnames(data) %in% variables)
+  if ( ncol(data)==1 ){ indices<-1 }
+  else { indices<-which(colnames(data) %in% variables) }
   nvar<-length(indices)
   
   if ( is(x@parameters, "GaussianParameter") ){
+    if ( isQualitative(data) )
+      stop("data must contain only quantitative variables!")
     # split the layout
     if( nvar < 4 & nvar > 1) par( mfrow = c( 1, nvar ) )
     else if ( nvar >= 4 ){
@@ -296,26 +289,125 @@ histCluster <- function(x, data, variables=colnames(data), xlab=rep("",length(va
     }
   }
   else if ( is(x@parameters, "MultinomialParameter") ){
+    stop("x must contain Gaussian parameters. See barplot() to plot multinomial parameters.")
+  }
+  else{
+    stop("Uknown type of parameters!")
+  }
+  par(op)
+}
+###################################################################################
+
+
+
+###################################################################################
+##' Barplot of a class [\code{\linkS4class{MixmodResults}}]  
+##' 
+##' Barplot of qualitative data object using parameters from a [\code{\linkS4class{MixmodResults}}]
+##' to plot probablities of modalities.
+##'
+##' Each line corresponds to one variable. A barplot is drawn for each cluster with the probabilities for 
+##' each modality to be in that cluster.
+##'
+##' @param x an object of class [\code{\linkS4class{MixmodResults}}]
+##' @param data a vector, matrix or data frame containing a qualitative data set.
+##' @param variables list of variables names to compute a barplot. All variables from data by default.
+##' @param main a list of title for the barplot. main must have the same length than variables.
+##' @param ... further arguments passed to or from other methods
+##'
+##' @examples
+##'   data(birds)
+##'   xem2 <- mixmodCluster(birds,2)
+##'   barplotCluster(xem2["bestResult"], birds)
+##'
+##' @seealso \code{\link{barplot}}
+##' @export
+##'
+barplotCluster <- function(x, data, variables=colnames(data), main=paste("Barplot of",variables), ...){
+  # check the options
+  if ( !is(x,"MixmodResults") )
+    stop("'x' must be a MixmodResults object!")
+  if ( !is.matrix(data) & !is.data.frame(data) & !is.vector(data) )
+    stop("'data' must be a vector, a data.frame or a matrix object!")
+  if ( (length(variables)==0) & (ncol(data)>1) )
+    stop("'variables' is empty!")
+  if ( length(variables)>ncol(data) )
+    stop("List of variables too long!")
+  if ( sum(!(variables %in% colnames(data))) )
+    stop("At least one variable is unknown!") 
+  
+  # get old par 
+  op <- par(no.readonly = TRUE) # the whole list of settable par's.
+  
+  # get the indices of variables
+  if ( ncol(data)==1 ){ indices<-1 }
+  else { indices<-which(colnames(data) %in% variables) }
+  nvar<-length(indices)
+  
+  if ( is(x@parameters, "GaussianParameter") ){
+    stop("x must contain multinomial parameters. See hist() to plot Gaussian parameters.")
+  }
+  else if ( is(x@parameters, "MultinomialParameter") ){
+    if ( !isQualitative(data) )
+      stop("data must contain only qualitative variables!")      
+    if ( is.factor(data) ) data<-as.integer(data)
+    else if ( !is.vector(data) ){
+      # loop over columns to check whether type is factor
+      for ( j in 1:ncol(data) ){
+        if ( is.factor(data[,j]) ) data[,j] <- as.integer(data[,j])
+      }
+    }
     # split the layout
-    par( mfrow = c( nvar, x@nbCluster+1 ) )
-    par(mar = par("mar")*.75)
+    #par( mfrow = c( nvar, x@nbCluster+1 ) )
+    #par(mar = par("mar")*.75)
+    # split the layout
+    if( nvar < 4 & nvar > 1) par( mfrow = c( 1, nvar ) )
+    else if ( nvar >= 4 ){
+      nrow<-round(sqrt(nvar))
+      if (is.wholenumber(sqrt(nvar))) ncol<-sqrt(nvar)
+      else ncol<-sqrt(nvar)+1
+      par( mfrow = c( nrow, ncol ) ) 
+    }
+    # get number of observations
+    nobs<-nrow(data)
     i<-1
     # loop over variables
     for (j in indices ){
       f<-x@parameters@factor[j]
       t<-table(data[,j])
-      t[which(is.na(t[1:f]))]<-0
+      if ( f != length(t) ){
+        g<-numeric(f)
+        g[which(1:f %in% names(t))]<-t
+        t<-g
+      }
       names(t)<-1:f
-      freq<-barplot(as.vector(t), names.arg=names(t), xlab=xlab[i], main="", ...)
-      title(main[i],cex.main=1)
+      # freq<-barplot(as.vector(t), names.arg=names(t), xlab=xlab[i], main="", ...)
+      proba<-matrix(0,nrow=x@nbCluster,ncol=f)
       for ( k in 1:x@nbCluster){
         center_k<-x@parameters@center[k,j]
         proba_k<-x@parameters@scatter[[k]][j,]
         proba_k[center_k]<-1-proba_k[center_k]
-        prob<-barplot(proba_k[1:f], names.arg=names(t), main="", col=k+1, ylim=c(0,1), ...)
-        title(paste("Cluster",k),cex.main=1)
-        text(prob,proba_k[1:f]+(max(proba_k)/10),ifelse(proba_k[1:f]<0.01,format(proba_k[1:f],scientific=TRUE,digits=2),round(proba_k[1:f],2)),xpd=TRUE,font=2)
+        proba[k,]<-proba_k[1:f]
+        #prob<-barplot(proba_k[1:f], names.arg=names(t), main="", col=k+1, ylim=c(0,1), ...)
+        #title(paste("Cluster",k),cex.main=1)
+        #text(prob,proba_k[1:f]+(max(proba_k)/10),ifelse(proba_k[1:f]<0.01,format(proba_k[1:f],scientific=TRUE,digits=2),round(proba_k[1:f],2)),xpd=TRUE,font=2)
       }
+      # Do the barplot and save the bar midpoints
+      mp<-barplot(proba, beside = TRUE, axisnames = FALSE, names.arg=names(t), main="", ylab="Conditional frequency", ylim=c(0,1))
+      # add unconditional frequencies
+      for ( k in 1:f){
+        lines(c(min(mp[,k])-1,max(mp[,k])+1),rep(t[k]/nobs,2),lty=2)
+      }
+      # add unconditional frequency legend only for the first variable
+      if ( i == 1 ) text(min(mp[,1])-.5,t[1]/nobs,labels="Unconditional frequency",cex=1, pos=4, adj=c(0,0), font=2) 
+      # add title
+      title(main[i],cex.main=1)
+      # Add the individual bar labels
+      mtext(1, at = mp, text = paste("C",1:x@nbCluster), line = 0, cex = 0.5)
+      # Add the group labels for each pair
+      #mtext(1, at = rbind(mp[1,],colMeans(mp[-1,])), text = rep(c("freq", "proba"), f), line = 1, cex = 0.75)
+      # Add the labels for each group
+      mtext(1, at = colMeans(mp), text = names(t), line = 2)
       i<-i+1
     }
   }
@@ -325,6 +417,7 @@ histCluster <- function(x, data, variables=colnames(data), xlab=rep("",length(va
   par(op)
 }
 ###################################################################################
+
 
 
 ###################################################################################

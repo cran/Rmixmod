@@ -243,7 +243,7 @@ void XEMClusteringMain::run(){
       cout << " (k=" << estimations[iEstimation]->getNbCluster() << ")\r" << flush;
 #endif
     
-
+/*
     try{
       workingStrategy->run(estimations[iEstimation]);
     }
@@ -255,6 +255,8 @@ void XEMClusteringMain::run(){
       // set error for that model
       estimations[iEstimation]->setError(errorType);
     }
+ */
+    workingStrategy->run(estimations[iEstimation]);
     iEstimation++;
     
 #ifdef VERBOSE

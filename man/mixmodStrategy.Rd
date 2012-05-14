@@ -2,13 +2,13 @@
 \alias{mixmodStrategy}
 \title{Create an instance of [\code{\linkS4class{Strategy}}] class}
 \usage{
-  mixmodStrategy(name = "EM", nbTry = 1,
+  mixmodStrategy(algo = "EM", nbTry = 1,
     initMethod = "smallEM", nbTryInInit = 50,
     nbIterationInInit = 5, nbIterationInAlgo = 200,
     epsilonInInit = 0.001, epsilonInAlgo = 0.001)
 }
 \arguments{
-  \item{name}{list of character string with the estimation
+  \item{algo}{list of character string with the estimation
   algorithm.  Possible values: "EM", "SEM", "CEM",
   c("EM","SEM"). Default value is "EM".}
 
@@ -19,7 +19,7 @@
 
   \item{initMethod}{a character string with the method of
   initialization of the algorithm specified in the
-  \code{name} argument. Possible values: "random",
+  \code{algo} argument. Possible values: "random",
   "smallEM", "CEM", "SEMMax". Default value: "smallEM".}
 
   \item{nbTryInInit}{integer defining number of tries in
@@ -44,7 +44,7 @@
 
   \item{epsilonInAlgo}{list of reals defining the epsilon
   value for the algorithm. Warning: epsilonInAlgo doesn't
-  have any sens if \code{name} is SEM, so it needs to be
+  have any sens if \code{algo} is SEM, so it needs to be
   set as NaN in that case. Default value: 0.001.}
 }
 \value{
@@ -109,8 +109,8 @@
 }
 \examples{
 mixmodStrategy()
-   mixmodStrategy(name="CEM",initMethod="random",nbTry=10,epsilonInInit=0.00001)
-   mixmodStrategy(name=c("SEM","EM"), nbIterationInAlgo=c(200,100), epsilonInAlgo=c(NA,0.000001))
+   mixmodStrategy(algo="CEM",initMethod="random",nbTry=10,epsilonInInit=0.00001)
+   mixmodStrategy(algo=c("SEM","EM"), nbIterationInAlgo=c(200,100), epsilonInAlgo=c(NA,0.000001))
 }
 \author{
   Remi Lebret and Serge Iovleff and Florent Langrognet,
