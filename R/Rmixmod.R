@@ -5,8 +5,8 @@
 ##' \tabular{ll}{
 ##'   Package: \tab Rmixmod\cr 
 ##'   Type: \tab Package\cr 
-##'   Version: \tab 1.1.2\cr
-##'   Date: \tab 2012-05-14\cr 
+##'   Version: \tab 1.1.3\cr
+##'   Date: \tab 2012-06-14\cr 
 ##'   License: \tab GPL-3 + file LICENSE\cr 
 ##'   LazyLoad: \tab yes\cr
 ##' }
@@ -212,4 +212,40 @@ NULL
 ##' 
 ##' @examples
 ##'   data(car)
+NULL
+
+
+##' Quantitative data : Financial health of companies
+##' 
+##' This data set is made up of 216 healthy firms and 212 bankruptcy firms (year 2002) and also 241 healthy firms and 220 bankruptcy firms (year 2003). Companies are described by four financial ratios expected to provide some meaningful information about their health: EBITDA/Total Assets, Value Added/Total Sales, Quick Ratio, Accounts Payable/Total Sales. This data set offers the possibility to predict the company's ability to cover its financial obligations and also to study its stability over the years.
+##'
+##' @format A data frame with 889 companies (rows) and 6 variables (columns).
+##'
+##' \describe{
+##'
+##'   \item{\code{Year}}{categorical variable with two modalities (2002 & 2003).}
+##'
+##'   \item{\code{Health}}{categorical variable with two modalities (bankruptcy & healthy).}
+##'
+##'   \item{\code{EBITDA.Total.Assets}}{numeric variable.}
+##'
+##'   \item{\code{Value.Added.Total.Sales}}{numeric variable.}
+##'
+##'   \item{\code{Quick.Ratio}}{numeric variable.}
+##'
+##'   \item{\code{Accounts.Payable.Total.Sales}}{numeric variable.}
+##' }
+##'
+##' @source
+##' Lourme A, Biernacki C (2011). \emph{Simultaneous t-Model-Based Clustering for Data Differing over Time Period: Application for Understanding Companies Financial Health.} Case Studies in Business, Industry and Government Statistics, 4(2), 73-82.
+##'
+##' Du Jardin P, S\'everin E (2010). \emph{Dynamic analysis of the business failure process: a study of bankruptcy trajectories.} In Portuguese Finance Network. Ponte Delgada, Portugual.
+##'
+##' @name finance
+##' @docType data
+##' @keywords datasets
+##' 
+##' @examples
+##' data(finance)
+##' summary(finance)
 NULL

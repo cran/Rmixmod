@@ -55,8 +55,8 @@ setClass(
       stop("nbCluster must contain only integer!")
     }
     # check nbCluster parameter
-    if (sum(object@nbCluster<=1)){
-      stop("nbCluster must greater than 1!")
+    if (sum(object@nbCluster<1)){
+      stop("nbCluster must greater than 0!")
     }
     # check criterion parameter
     if ( sum(object@criterion %in% c("BIC","ICL","NEC")) != length(object@criterion) ){

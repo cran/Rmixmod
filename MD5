@@ -1,10 +1,10 @@
-624a8cd4e5a745922fdc7c97d1428f5d *DESCRIPTION
+683e3f7f2ad4da2a0f16bb3a7b4cd67d *DESCRIPTION
 f0dfa73bb382804aacc2c281b45acc3c *LICENSE
 c6a6286ebe45deebcdcae5ca52a66bd2 *NAMESPACE
 e0538b8c104f93482282e60d3b2a685d *R/GaussianModel.R
 cf44a38af54c9f81d4a848ce01174239 *R/GaussianParameter.R
 6d8f279f99f054cf60020181bce41d7c *R/Mixmod.R
-25c6b4114ace7791403427b4c61b7fb9 *R/MixmodCluster.R
+3fe6661ac073f9463ecf5fe5f9691812 *R/MixmodCluster.R
 c123649ddc3978ff7fe7d358c8f20ee6 *R/MixmodDAResults.R
 51043b1dab4be1f0ac07170e362d2ed6 *R/MixmodLearn.R
 ffcc069fec471007a3de315662245953 *R/MixmodPredict.R
@@ -13,12 +13,13 @@ a1866dbf110ffdf7aaed6dc544833291 *R/Model.R
 82e8af29633d9045391f89bda9a71916 *R/MultinomialModel.R
 aa9e2dde3c6af7260c165f727b25807d *R/MultinomialParameter.R
 fddd055d5d20068d43f249aae217a1af *R/Parameter.R
-d846ea3808d302c86f9b15d9d80c14f9 *R/Rmixmod.R
+dd7c5d2cf9b6b8577bbd08a4835506ce *R/Rmixmod.R
 c14484ddbc635925ecfd5fcf0bb25bd4 *R/Strategy.R
 86b04180457ed3a3e739f448a379ee7f *R/global.R
 b1d8016f4cbda12526ba165d1203a265 *R/zzz.R
 a2924121b4d88109f5fe43fcdb9331bb *data/birds.rda
 dcb2505b6ce6d0b6c1ed371fb530e6bb *data/car.rda
+939e8b7f2b7c7310bbc05b732ebda52f *data/finance.rda
 fdbad659c688e42d82e6c6bd4efd6263 *data/geyser.rda
 137e01956122a28b8b3fb69141c2fe89 *data/titanic.rda
 b46729f7332ec7fbfb7a19a98160751f *man/GaussianModel-class.Rd
@@ -33,7 +34,7 @@ b46729f7332ec7fbfb7a19a98160751f *man/GaussianModel-class.Rd
 51d586700c97dcf47c680bc8f6653ba8 *man/MultinomialModel-class.Rd
 fc43682cda0e855a22aad9d3c2a960a9 *man/MultinomialParameter-class.Rd
 1e3d1936d85b92282af2393fd6f050e3 *man/Parameter-class.Rd
-7d9e702917bcf780bc26773dd3ad4323 *man/Rmixmod-package.Rd
+2e6155b3cfffa7ee203d361fd918b6d7 *man/Rmixmod-package.Rd
 cca86d9fa9b7c825da286c5ab41a6540 *man/Strategy-class.Rd
 66cae79cddd6f06941c91724edd6a4a7 *man/asQualitative.Rd
 02fa208501dd28ff8fa2e7b00ffd7b1f *man/barplot-methods.Rd
@@ -42,6 +43,7 @@ cca86d9fa9b7c825da286c5ab41a6540 *man/Strategy-class.Rd
 f3ffb382446608e92dd958cc1cddb7ac *man/car.Rd
 02d625fcb5f4a1b9ce969df0563483e1 *man/ellipse.Rd
 8cba43e76cd4742e163af17856efbb62 *man/extract-methods.Rd
+450e3119622e882b75df210410f4975f *man/finance.Rd
 3b00af86c5666a5e5b7e0eb26ee4292c *man/geyser.Rd
 61dc8d4639d62ccf563987c01b6c346b *man/hist-methods.Rd
 b48194c31d40640e3d353699ecb08955 *man/histCluster.Rd
