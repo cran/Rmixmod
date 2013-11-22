@@ -11,9 +11,7 @@
 
 #include <Rcpp.h>
 #include <stdint.h>
-
-// pre-declaration
-class XEMModelOutput;
+#include "mixmod/Utilities/Util.h"
 
 /** base class for handling the mixmod outputs and filling them in
  *  a Rcpp list */
@@ -25,7 +23,7 @@ public:
    *  @param cMOutput the model estimated by mixmod
    *  @param output the Rcpp list to fill in
    **/
-  OutputHandling( XEMModelOutput* MOutput, Rcpp::S4& xem, const bool isGaussian);
+  OutputHandling( XEM::ModelOutput* MOutput, Rcpp::S4& xem, const XEM::DataType dataType);
   
   /** destructor */
   ~OutputHandling();
@@ -37,14 +35,17 @@ private:
   /** set multinomial parameters */
   void setMultinomialParameter();
   
+  /** set composite parameters */
+  void setCompositeParameter();
+
 protected:
   /** A pointer on the MIXMOD output */
-  XEMModelOutput* MOutput_;
+  XEM::ModelOutput* MOutput_;
   
   /** A reference on the R output */
   Rcpp::S4& xem_;
   
-  /** Number of variables */
+  /** Number of clusters*/
   int nbCluster_;
   
   /** Number of variables */

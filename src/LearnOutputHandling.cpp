@@ -9,20 +9,21 @@
 #include "Conversion.h"
 #include "LearnOutputHandling.h"
 
-#include "MIXMOD/XEMLearnModelOutput.h"
-#include "MIXMOD/XEMLabelDescription.h"
-#include "MIXMOD/XEMLabel.h"
-#include "MIXMOD/XEMProbaDescription.h"
-#include "MIXMOD/XEMProba.h"
+#include "mixmod/DiscriminantAnalysis/Learn/LearnModelOutput.h"
+#include "mixmod/Kernel/IO/LabelDescription.h"
+#include "mixmod/Kernel/IO/Label.h"
+#include "mixmod/Kernel/IO/ProbaDescription.h"
+#include "mixmod/Kernel/IO/Proba.h"
+#include "mixmod/Utilities/Util.h"
 
 // constructor
-LearnOutputHandling::LearnOutputHandling( XEMLearnModelOutput* lMOutput
+LearnOutputHandling::LearnOutputHandling( XEM::LearnModelOutput* lMOutput
                                         , Rcpp::S4& xem
-                                        , const bool isGaussian
+                                        , const XEM::DataType dataType
                                         , Rcpp::CharacterVector const & Rcriterion
                                         , std::vector<int64_t> labels
                                         )
-                                        : OutputHandling(lMOutput, xem, isGaussian)     
+                                        : OutputHandling(lMOutput, xem, dataType)
 {
   // get criterion
   std::vector<std::string> criterionName = Rcpp::as< std::vector<std::string> >(Rcriterion);
@@ -30,7 +31,7 @@ LearnOutputHandling::LearnOutputHandling( XEMLearnModelOutput* lMOutput
   xem_.slot("criterion") = criterionName;
   
   // fill other slot only if no error
-  if ( lMOutput->getStrategyRunError() == noError ){
+  if ( dynamic_cast<XEM::Exception&>(lMOutput->getStrategyRunError()) == XEM::NOERROR ){
     
     // declare a vector of criterion
     std::vector<double> criterionValue;
@@ -38,11 +39,11 @@ LearnOutputHandling::LearnOutputHandling( XEMLearnModelOutput* lMOutput
     for (unsigned int i=0; i<criterionName.size(); i++){
       // BIC criterion
       if (criterionName[i] == "BIC"){ 
-        criterionValue.push_back(lMOutput->getCriterionOutput(BIC).getValue());
+        criterionValue.push_back(lMOutput->getCriterionOutput(XEM::BIC).getValue());
       }
       // CV Criterion
       else if(criterionName[i] == "CV"){ 
-        criterionValue.push_back(1-lMOutput->getCriterionOutput(CV).getValue());
+        criterionValue.push_back(1-lMOutput->getCriterionOutput(XEM::CV).getValue());
         xem_.slot("CVLabel") = Conversion::VectorToRcppVectorForInt(lMOutput->getCVLabel()->getLabel()->getLabel());
         // define a classification tab
         int64_t** tab = lMOutput->getCVLabel()->getLabel()->getClassificationTab(labels);

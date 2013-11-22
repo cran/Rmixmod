@@ -12,9 +12,9 @@
 }
 \details{
   \tabular{ll}{ Package: \tab Rmixmod\cr Type: \tab
-  Package\cr Version: \tab 1.1.3\cr Date: \tab
-  2012-06-14\cr License: \tab GPL-3 + file LICENSE\cr
-  LazyLoad: \tab yes\cr }
+  Package\cr Version: \tab 2.0\cr Date: \tab 2013-11-22\cr
+  License: \tab GPL-3 + file LICENSE\cr LazyLoad: \tab
+  yes\cr }
 
   The general purpose of the package is to discover, or
   explain, group structures in multivariate data sets with
@@ -82,7 +82,8 @@
   (Entropy Criterion), or Cross-Validation (CV).
 }
 \examples{
-## Clustering Analysis
+\dontrun{
+  ## Clustering Analysis
   # load quantitative data set
   data(geyser)
   # Clustering in gaussian case
@@ -98,6 +99,12 @@
   summary(xem2)
   barplot(xem2)
 
+  # load heterogeneous data set
+  data(finance)
+  # Clustering in composite case
+  xem3<-mixmodCluster(finance,2:6)
+  summary(xem3)
+
   ## Discriminant Analysis
   # start by extract 10 observations from iris data set
   remaining.obs<-sample(1:nrow(iris),10)
@@ -108,7 +115,9 @@
   # show results
   prediction
   # compare prediction with real results
-  as.integer(iris$Species[remaining.obs]) == prediction["partition"]
+  paste("accuracy= ",mean(as.integer(iris$Species[remaining.obs]) == prediction["partition"])*100
+     	,"\%",sep="")
+  }
 }
 \author{
   Author: Remi Lebret and Serge Iovleff and Florent

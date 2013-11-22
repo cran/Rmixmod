@@ -10,11 +10,11 @@
   \item{x}{an object of class
   [\code{\linkS4class{MixmodResults}}]}
 
-  \item{data}{a vector, matrix or data frame containing a
+  \item{data}{a vector or data frame containing a
   quantitative data set.}
 
-  \item{variables}{list of variables names to compute a
-  histogram. All variables from data by default.}
+  \item{variables}{list of variables names (or indices) to
+  compute a histogram. All variables from data by default.}
 
   \item{xlab}{a list of title for the x axis. xlab must
   have the same length than variables.}
@@ -36,7 +36,8 @@
 \examples{
 data(geyser)
   xem1 <- mixmodCluster(geyser,3)
-  histCluster(xem1["bestResult"], geyser)
+  \dontrun{ histCluster(xem1["bestResult"], geyser) }
+  histCluster(xem1["bestResult"], geyser, variables=1)
 }
 \seealso{
   \code{\link{hist}}

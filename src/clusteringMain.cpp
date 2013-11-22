@@ -78,16 +78,17 @@
 #include <vector>
 #include <string>
 
-#include "MIXMOD/XEMUtil.h"
-#include "MIXMOD/XEMClusteringMain.h"
-#include "MIXMOD/XEMClusteringInput.h"
-#include "MIXMOD/XEMClusteringOutput.h"
-#include "MIXMOD/XEMClusteringModelOutput.h"
-#include "MIXMOD/XEMParameterDescription.h"
-#include "MIXMOD/XEMGaussianParameter.h"
-#include "MIXMOD/XEMGaussianData.h"
-#include "MIXMOD/XEMBinaryData.h"
-#include "MIXMOD/XEMMatrix.h"
+#include "mixmod/Utilities/Util.h"
+#include "mixmod/Clustering/ClusteringMain.h"
+#include "mixmod/Clustering/ClusteringInput.h"
+#include "mixmod/Clustering/ClusteringOutput.h"
+#include "mixmod/Clustering/ClusteringModelOutput.h"
+#include "mixmod/Kernel/IO/ParameterDescription.h"
+#include "mixmod/Kernel/Parameter/GaussianParameter.h"
+#include "mixmod/Kernel/IO/GaussianData.h"
+#include "mixmod/Kernel/IO/BinaryData.h"
+#include "mixmod/Kernel/IO/CompositeData.h"
+#include "mixmod/Matrix/Matrix.h"
 
 #include <Rcpp.h>
 
@@ -125,28 +126,42 @@ BEGIN_RCPP
   // wrap weight in Rcpp
   Rcpp::NumericVector Rweight(mixmodClustering.slot("weight")); 
 
-  // gaussian or binary ?
-  bool isGaussian = Rcpp::as<std::string>(Rtype) == std::string("quantitative");
-
-  // data descritor
-  XEMDataDescription* dataDescription;
-  XEMGaussianData* gData(0);
-  XEMBinaryData* bData(0);
-  if (isGaussian)
-  {
-    /*===============================================*/
-    /*  Create XEM gaussian data set and description */
-    gData = Conversion::DataToXemGaussianData(RData);
-    dataDescription = new XEMDataDescription(gData);
-  }
+  // gaussian, binary or heterogeneous ?
+  XEM::DataType dataType;
+  if(Rcpp::as<std::string>(Rtype) == std::string("quantitative"))
+    dataType = XEM::QuantitativeData;
+  else if(Rcpp::as<std::string>(Rtype) == std::string("qualitative"))
+    dataType = XEM::QualitativeData;
   else
-  {
-    // wrap factor in Rcpp
-    Rcpp::NumericVector Rfactor(mixmodClustering.slot("factor")); 
-    /*===============================================*/
-    /* Create XEM binary data set and description */
-     bData = Conversion::DataToXemBinaryData(RData, Rfactor);
-     dataDescription = new XEMDataDescription(bData);
+    dataType = XEM::HeterogeneousData;
+  // data descritor
+  XEM::DataDescription* dataDescription;
+  XEM::GaussianData* gData(0);
+  XEM::BinaryData* bData(0);
+  XEM::CompositeData* cData(0);
+  // wrap factor in Rcpp
+  Rcpp::NumericVector Rfactor(mixmodClustering.slot("factor"));
+  switch (dataType) {
+    case XEM::QuantitativeData:
+      /*===============================================*/
+      /*  Create XEM gaussian data set and description */
+      gData = Conversion::DataToXemGaussianData(RData);
+      dataDescription = new XEM::DataDescription(gData);
+      break;
+    case XEM::QualitativeData:
+      /*===============================================*/
+      /* Create XEM binary data set and description */
+      bData = Conversion::DataToXemBinaryData(RData, Rfactor);
+      dataDescription = new XEM::DataDescription(bData);
+      break;
+    case XEM::HeterogeneousData:
+      /*===============================================*/
+      /* Create XEM binary data set and description */
+      cData = Conversion::DataToXemCompositeData(RData, Rfactor);
+      dataDescription = new XEM::DataDescription(cData);
+      break;
+      default:
+      break;
   }
 
   /*===============================================*/
@@ -159,7 +174,7 @@ BEGIN_RCPP
   /*===============================================*/
   /* Initialize input parameters in MIXMOD         */
   // create XEMClusteringInput
-  XEMClusteringInput * cInput =  new XEMClusteringInput(clusterArray, *dataDescription);
+  XEM::ClusteringInput * cInput =  new XEM::ClusteringInput(clusterArray, *dataDescription);
   
   // initialize the parameters using user defined values (see Algo.R)
   ClusteringInputHandling initInput(cInput, RalgoOptions);
@@ -184,16 +199,24 @@ BEGIN_RCPP
   /*===============================================*/
   /* Computation of the estimates */
   // XEMClusteringMain
-  XEMClusteringMain cMain(cInput);
+  XEM::ClusteringMain cMain(cInput);
+  int seed;
+  // check if it is a NULL value
+  if (Rf_isNull( RalgoOptions.slot("seed") )){
+    seed = -1;
+  }else{
+    seed = (int)Rcpp::as<int>(RalgoOptions.slot("seed"));
+  }
   // xmain run
-  cMain.run();
-//  std::cout << "Run finished" << std::endl;
+  cMain.run(seed);
+
+  //std::cout << "Run finished" << std::endl;
   /*===============================================*/
   // get XEMClusteringOutput object from cMain
-  XEMClusteringOutput * cOutput = cMain.getClusteringOutput();
+  XEM::ClusteringOutput * cOutput = cMain.getOutput();
   // Treatment : sort with the first criterion (there is only one criterion)  
   cOutput->sort(cInput->getCriterionName(0));
-//  std::cout << "Sort finished" << std::endl;
+  //std::cout << "Sort finished" << std::endl;
   
   
   /*===============================================*/
@@ -205,33 +228,32 @@ BEGIN_RCPP
     Rcpp::S4 iResults(mixmodClustering.slot("bestResult"));
     // create a list of results
     Rcpp::List resList(cOutput->getNbClusteringModelOutput());
-    
     // loop over all estimation
     for ( int i=0; i<cOutput->getNbClusteringModelOutput(); i++ )
     {
       // create the output object for R
-      ClusteringOutputHandling(cOutput->getClusteringModelOutput(i), iResults, isGaussian, Rcriterion);
+      ClusteringOutputHandling(cOutput->getClusteringModelOutput(i), iResults,dataType, Rcriterion);
       // add those results to the list
       resList[i] = Rcpp::clone(iResults);
     } 
     // add all results
     mixmodClustering.slot("results") = resList;
-    
     // TODO: if no criterion...
     
     // add the best results
-    ClusteringOutputHandling(cOutput->getClusteringModelOutput().front(), iResults, isGaussian, Rcriterion);
+    ClusteringOutputHandling(cOutput->getClusteringModelOutput().front(), iResults, dataType, Rcriterion);
     mixmodClustering.slot("bestResult") = Rcpp::clone(iResults);
   }
   
   // add error
   mixmodClustering.slot("error") = !cOutput->atLeastOneEstimationNoError();
   
-//  std::cout << "Output finished" << std::endl;
+  //std::cout << "Output finished" << std::endl;
   // release memory
   if (dataDescription) delete dataDescription;
   if (gData) delete gData;
   if (bData) delete bData;
+  if (cData) delete cData;
   
   // return final output
   return mixmodClustering;

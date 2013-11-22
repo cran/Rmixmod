@@ -8,29 +8,7 @@ LIB = ../mixmod.a
 #-----------------------------------------------------------------------
 # Sources files
 #
-SRCS =  bandmat.cpp \
-        cholesky.cpp \
-        evalue.cpp \
-        hholder.cpp \
-        jacobi.cpp \
-        myexcept.cpp \
-        newfft.cpp \
-        newmat1.cpp \
-        newmat2.cpp \
-        newmat3.cpp \
-        newmat4.cpp \
-        newmat5.cpp \
-        newmat6.cpp \
-        newmat7.cpp \
-        newmat8.cpp \
-        newmat9.cpp \
-        newmatex.cpp \
-        newmatnl.cpp \
-        newmatrm.cpp \
-        solution.cpp \
-        sort.cpp \
-        submat.cpp \
-        svd.cpp
+SRCS = $(wildcard *.cpp)
 
 #-------------------------------------------------------------------------
 # generate the variable OBJS containing the names of the object files
@@ -44,7 +22,7 @@ OBJS= $(SRCS:%.cpp=%.o)
 	$(CXX)  $(CXXFLAGS) ${CPICFLAGS} $< -c -o $@
 
 #-----------------------------------------------------------------------
-# The rule lib create the library NEWMAT
+# The rule lib create the library MIXMOD [??!]
 #
 lib: $(LIB)
 

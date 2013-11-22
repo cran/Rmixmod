@@ -28,7 +28,11 @@
   \item{epsilonInAlgo}{list of reals defining the epsilon
   value for the algorithm. Warning: epsilonInAlgo doesn't
   have any sens if \code{algo} is SEM, so it needs to be
-  set as NaN in that case. Default value: 0.001.} }
+  set as NaN in that case. Default value: 0.001.}
+  \item{seed}{integer defining the seed of the random
+  number generator. Setting a particular seed allows the
+  user to (re)-generate a particular serie of random
+  numbers. Default value is NULL, i.e. a random seed.} }
 }
 \examples{
 new("Strategy")

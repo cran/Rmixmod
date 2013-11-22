@@ -1,6 +1,8 @@
 \docType{methods}
 \name{[}
 \alias{[}
+\alias{[,CompositeModel-method}
+\alias{[,CompositeParameter-method}
 \alias{[,GaussianModel-method}
 \alias{[,GaussianParameter-method}
 \alias{[,MixmodCluster-method}
@@ -10,6 +12,8 @@
 \alias{[,MultinomialModel-method}
 \alias{[,MultinomialParameter-method}
 \alias{[,Strategy-method}
+\alias{[<-,CompositeModel-method}
+\alias{[<-,CompositeParameter-method}
 \alias{[<-,GaussianModel-method}
 \alias{[<-,GaussianParameter-method}
 \alias{[<-,MixmodCluster-method}

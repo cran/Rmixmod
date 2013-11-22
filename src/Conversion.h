@@ -14,9 +14,7 @@
 #include <vector>
 #include <stdint.h>
 
-// pre-declaration
-class XEMBinaryData;
-class XEMGaussianData;
+#include "mixmod/Utilities/mixmod.h"
 
 namespace Conversion
 {
@@ -71,14 +69,21 @@ namespace Conversion
    * @param data the input data set
    * @return a pointer on a XEMGaussianData set
    */
-  XEMGaussianData * DataToXemGaussianData(Rcpp::NumericMatrix& data);
+  XEM::GaussianData * DataToXemGaussianData(Rcpp::NumericMatrix& data);
   /**
    *  convert a numeric dataset to a XEM Binary data set
    * @param data the input data set
    * @param factor the input factor
    * @return a pointer on a XEMBinaryData set
    */
-  XEMBinaryData * DataToXemBinaryData(Rcpp::NumericMatrix& data, Rcpp::NumericVector& factor);
+  XEM::BinaryData * DataToXemBinaryData(Rcpp::NumericMatrix& data, Rcpp::NumericVector& factor);
+  /**
+   *  convert a numeric dataset to a XEM composite data set
+   * @param data the input data set
+   * @param factor the input factor
+   * @return a pointer on a XEMCompositeData set
+   */
+  XEM::CompositeData * DataToXemCompositeData(Rcpp::NumericMatrix& data, Rcpp::NumericVector& factor);
   
   /*
    * convert a R numeric vector to a C array

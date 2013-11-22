@@ -1,27 +1,3 @@
-/***************************************************************************
-                             SRC/NEWMAT/myexcept.cpp  description
-                             ------------------------
-    copyright            : (C) MIXMOD Team - 2001-2003-2004-2005-2006-2007-2008-2009
-    email                : mixmod@univ-fcomte.fr
- ***************************************************************************/
-
-/***************************************************************************
-    This file is part of MIXMOD
-    
-    MIXMOD is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    MIXMOD is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with MIXMOD.  If not, see <http://www.gnu.org/licenses/>.     
-                                                                          
- ***************************************************************************/
 //$$myexcept.cpp                        Exception handler
 
 // Copyright (C) 1993,4,6: R B Davies
@@ -123,11 +99,9 @@ void Exception::AddInt(int value)
 
 void Tracer::PrintTrace()
 {
-#ifdef VERBOSE
    cout << "\n";
    for (Tracer* et = last; et; et=et->previous)
       cout << "  * " << et->entry << "\n";
-#endif
 }
 
 void Tracer::AddTrace()
@@ -242,12 +216,10 @@ Tracer* Tracer::last;               // will be set to zero
 
 void Terminate()
 {
-#ifdef DEBUG
    cout << "\n\nThere has been an exception with no handler - exiting";
    const char* what = Exception::what();
    if (what) cout << what << "\n";
    exit(1);
-#endif
 }
 
 
@@ -270,36 +242,24 @@ FreeCheckLink* FreeCheck::next;
 int FreeCheck::BadDelete;
 
 void FCLClass::Report()
-{ 
-#ifdef DEBUG
-    cout << "   " << ClassName << "   " << (unsigned long)ClassStore << "\n"; 
-#endif
-}
+{ cout << "   " << ClassName << "   " << (unsigned long)ClassStore << "\n"; }
 
 void FCLRealArray::Report()
 {
-#ifdef DEBUG
    cout << "   " << Operation << "   " << (unsigned long)ClassStore <<
       "   " << size << "\n";
-#endif
 }
 
 void FCLIntArray::Report()
 {
-  
-#ifdef DEBUG
    cout << "   " << Operation << "   " << (unsigned long)ClassStore <<
       "   " << size << "\n";
-#endif
 }
 
 void FreeCheck::Register(void* t, char* name)
 {
    FCLClass* f = new FCLClass(t,name);
-  
-#ifdef DEBUG
    if (!f) { cout << "Out of memory in FreeCheck\n"; exit(1); }
-#endif
 #ifdef REG_DEREG
    cout << "Registering   " << name << "   " << (unsigned long)t << "\n";
 #endif
@@ -308,10 +268,7 @@ void FreeCheck::Register(void* t, char* name)
 void FreeCheck::RegisterR(void* t, char* o, int s)
 {
    FCLRealArray* f = new FCLRealArray(t,o,s);
-  
-#ifdef DEBUG
    if (!f) { cout << "Out of memory in FreeCheck\n"; exit(1); }
-#endif
 #ifdef REG_DEREG
    cout << o << "   " << s << "   " << (unsigned long)t << "\n";
 #endif
@@ -320,10 +277,7 @@ void FreeCheck::RegisterR(void* t, char* o, int s)
 void FreeCheck::RegisterI(void* t, char* o, int s)
 {
    FCLIntArray* f = new FCLIntArray(t,o,s);
-  
-#ifdef DEBUG
    if (!f) { cout << "Out of memory in FreeCheck\n"; exit(1); }
-#endif
 #ifdef REG_DEREG
    cout << o << "   " << s << "   " << (unsigned long)t << "\n";
 #endif
@@ -344,16 +298,11 @@ void FreeCheck::DeRegister(void* t, char* name)
       }
       last = fcl;
    }
-  
-#ifdef DEBUG
    cout << "\nRequest to delete non-existent object of class and location:\n";
    cout << "   " << name << "   " << (unsigned long)t << "\n";
-#endif
    BadDelete++;
    Tracer::PrintTrace();
-#ifdef DEBUG
    cout << "\n";
-#endif
 }
 
 void FreeCheck::DeRegisterR(void* t, char* o, int s)
@@ -369,28 +318,21 @@ void FreeCheck::DeRegisterR(void* t, char* o, int s)
 	 if (last) last->next = fcl->next; else next = fcl->next;
 	 if (s >= 0 && ((FCLRealArray*)fcl)->size != s)
 	 {
-#ifdef DEBUG
 	    cout << "\nArray sizes do not agree:\n";
 	    cout << "   " << o << "   " << (unsigned long)t
 	       << "   " << ((FCLRealArray*)fcl)->size << "   " << s << "\n";
 	    Tracer::PrintTrace();
 	    cout << "\n";
-#endif
 	 }
 	 delete fcl; return;
       }
       last = fcl;
    }
-  
-#ifdef DEBUG
    cout << "\nRequest to delete non-existent real array:\n";
    cout << "   " << o << "   " << (unsigned long)t << "   " << s << "\n";
-#endif
    BadDelete++;
    Tracer::PrintTrace();
-#ifdef DEBUG
    cout << "\n";
-#endif
 }
 
 void FreeCheck::DeRegisterI(void* t, char* o, int s)
@@ -406,32 +348,25 @@ void FreeCheck::DeRegisterI(void* t, char* o, int s)
 	 if (last) last->next = fcl->next; else next = fcl->next;
 	 if (s >= 0 && ((FCLIntArray*)fcl)->size != s)
 	 {
-#ifdef DEBUG
 	    cout << "\nArray sizes do not agree:\n";
 	    cout << "   " << o << "   " << (unsigned long)t
 	       << "   " << ((FCLIntArray*)fcl)->size << "   " << s << "\n";
 	    Tracer::PrintTrace();
 	    cout << "\n";
-#endif
 	 }
 	 delete fcl; return;
       }
       last = fcl;
    }
-#ifdef DEBUG
    cout << "\nRequest to delete non-existent int array:\n";
    cout << "   " << o << "   " << (unsigned long)t << "   " << s << "\n";
-#endif
    BadDelete++;
    Tracer::PrintTrace();
-#ifdef DEBUG
    cout << "\n";
-#endif
 }
 
 void FreeCheck::Status()
 {
-#ifdef VERBOSE
    if (next)
    {
       cout << "\nObjects of the following classes remain undeleted:\n";
@@ -444,7 +379,6 @@ void FreeCheck::Status()
       cout << "\nThere were " << BadDelete << 
          " requests to delete non-existent items\n\n";
    }
-#endif
 }
 
 #endif                            // end of DO_FREE_CHECK

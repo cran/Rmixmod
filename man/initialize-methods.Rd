@@ -22,8 +22,13 @@
 
   Initialization method. Used internally in the `Rmixmod'
   package.
+
+  Initialization method. Used internally in the `Rmixmod'
+  package.
 }
 \seealso{
+  \code{\link{initialize}}
+
   \code{\link{initialize}}
 
   \code{\link{initialize}}

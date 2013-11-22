@@ -1,6 +1,7 @@
 \docType{methods}
 \name{show}
 \alias{show}
+\alias{show,CompositeParameter-method}
 \alias{show,GaussianParameter-method}
 \alias{show,Mixmod-method}
 \alias{show,MixmodCluster-method}

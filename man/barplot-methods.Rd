@@ -7,6 +7,9 @@
   \item{x}{an object of class
   [\code{\linkS4class{Mixmod}}]}
 
+  \item{variables}{list of variables names (or indices) to
+  compute a histogram. All variables from data by default.}
+
   \item{...}{further arguments passed to or from other
   methods}
 }
@@ -24,6 +27,8 @@
 data(birds)
   xem2 <- mixmodCluster(birds,2)
   barplot(xem2)
+  barplot(xem2,variables=c(2,3,4))
+  barplot(xem2,variables=c("eyebrow","collar"))
 }
 \seealso{
   \code{\link{barplot}}

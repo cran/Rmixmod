@@ -79,7 +79,7 @@ setClass(
 ##'
 ##' This function computes the second step of a discriminant analysis. The aim of this step is to assign remaining observations to one of the groups.
 ##' 
-##' @param data matrix or data frame containing quantitative or qualitative data. Rows correspond to observations and columns correspond to variables.
+##' @param data matrix or data frame containing quantitative,qualitative or composite data. Rows correspond to observations and columns correspond to variables.
 ##' @param classificationRule a [\code{\linkS4class{MixmodResults}}] object which contains the classification rule computed in the mixmodLearn() or mixmodCluster() step.
 ##'
 ##' @examples
@@ -93,7 +93,18 @@ setClass(
 ##'   # show results
 ##'   prediction
 ##'   # compare prediction with real results
-##'   as.integer(iris$Species[remaining.obs]) == prediction["partition"]
+##'   paste("accuracy= ",mean(as.integer(iris$Species[remaining.obs]) == prediction["partition"])*100
+##'         ,"%",sep="")
+##'
+##'   ## A composite example with a heterogeneous data set
+##'   data(heterodatatrain)
+##'   ## Learning with training data
+##'   learn <- mixmodLearn(heterodatatrain[-1],knownLabels=heterodatatrain$V1)
+##'   ## Prediction on the testing data
+##'   data(heterodatatest)
+##'   prediction <- mixmodPredict(heterodatatest[-1],learn["bestResult"])
+##'   # compare prediction with real results
+##'   paste("accuracy= ",mean(heterodatatest$V1 == prediction["partition"])*100,"%",sep="")
 ##'
 ##' @author Remi Lebret and Serge Iovleff and Florent Langrognet, with contributions from C. Biernacki and G. Celeux and G. Govaert \email{contact@@mixmod.org}
 ##' @return Returns an instance of the [\code{\linkS4class{MixmodPredict}}] class which contains predicted partition and probabilities.
@@ -109,6 +120,9 @@ mixmodPredict <- function(data, classificationRule) {
 
   if(missing(data)){
     stop("data is missing !")
+  }
+  if (!is.data.frame(data) & !is.vector(data) & !is.vector(data) ){
+    stop("data must be a data.frame or a vector or a factor")
   }
   
   # create Mixmod object
@@ -170,11 +184,14 @@ setMethod(
     else if ( is(classificationRule@parameters, "GaussianParameter") ){
       .Object@dataType <- "quantitative"
     } 
+    else if ( is(classificationRule@parameters, "CompositeParameter") ){
+      .Object@dataType <- "composite"
+    }
     else{
       stop( "Unknown type of parameters within classificationRule!" )
     }
 
-    validObject(.Object)        
+    validObject(.Object)     
     return(.Object)
   }
 )

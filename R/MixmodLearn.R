@@ -93,6 +93,10 @@ setMethod(
         }else if ( .Object@dataType == "qualitative" ){
           .Object@bestResult = new("MixmodDAResults")
           .Object@bestResult@parameters = new("MultinomialParameter")
+        }else if ( .Object@dataType == "composite" ){
+          .Object@bestResult = new("MixmodDAResults")
+          .Object@bestResult@parameters = new("CompositeParameter")
+          .Object@bestResult@parameters@factor = .Object@factor
         }
         # create nbCluster
         if(length(.Object@knownLabels)){
@@ -106,7 +110,7 @@ setMethod(
         if(!missing(nbCVBlocks)){
           .Object@nbCVBlocks <- nbCVBlocks
         }
-        validObject(.Object)     
+        validObject(.Object)    
       }
       return(.Object)
     }
@@ -119,9 +123,9 @@ setMethod(
 ##'
 ##' This function computes the first step of a discriminant analysis. It will find the best classification rule by running an M step from the training observations.
 ##' 
-##' @param data matrix or data frame containing quantitative or qualitative data. Rows correspond to observations and columns correspond to variables.
-##' @param knownLabels vector of size number of observations. Each cell corresponds to a cluster affectation. So the maximum value is the number of clusters.
-##' @param dataType character. Type of data is either "quantitative" or "qualitative". Set as NULL by default, type will be guessed depending on variables type.
+##' @param data frame containing quantitative,qualitative or heterogeneous data. Rows correspond to observations and columns correspond to variables.
+##' @param knownLabels an integer vector or a factor of size number of observations. Each cell corresponds to a cluster affectation. So the maximum value is the number of clusters.
+##' @param dataType character. Type of data is "quantitative", "qualitative" or "composite". Set as NULL by default, type will be guessed depending on variables type (in case of homogeneous data). 'composite' type must be specified explicitly.
 ##' @param models a [\code{\linkS4class{Model}}] object defining the list of models to run. For quantitative data, the model "Gaussian_pk_Lk_C" is called (see mixmodGaussianModel() to specify other models). For qualitative data, the model "Binary_pk_Ekjh" is called (see mixmodMultinomialModel() to specify other models).
 ##' @param criterion list of character defining the criterion to select the best model. Possible values: "BIC", "CV" or c("CV","BIC"). Default is "CV".
 ##' @param nbCVBlocks integer which defines the number of block to perform the Cross Validation. This value will be ignored if the CV criterion is not choosen. Default value is 10.
@@ -133,12 +137,18 @@ setMethod(
 ##'   ## get summary
 ##'   summary(learn.iris)
 ##'
-##'   ## An example with the famous birds data set
+##'   ## A qualitative example with the famous birds data set
 ##'   data(birds)
 ##'   birds.partition<-c(rep(1,34),rep(2,35))
 ##'   learn.birds<-mixmodLearn(data=birds, knownLabels=birds.partition)
 ##'   ## get summary
 ##'   summary(learn.birds)
+##'
+##'   ## A composite example with a heterogeneous data set
+##'   data(heterodatatrain)
+##'   learn.hetero<-mixmodLearn(heterodatatrain[-1],knownLabels=heterodatatrain$V1)
+##'   ## get summary
+##'   summary(learn.hetero)
 ##'
 ##' @author Remi Lebret and Serge Iovleff and Florent Langrognet, with contributions from C. Biernacki and G. Celeux and G. Govaert \email{contact@@mixmod.org}
 ##' @return Returns an instance of the [\code{\linkS4class{MixmodLearn}}] class. Those two attributes will contain all outputs:
@@ -157,6 +167,14 @@ mixmodLearn <- function(data, knownLabels, dataType=NULL, models=NULL, criterion
   if ( missing(knownLabels) ){
     stop("knownLabels is missing !")
   }
+  if (!is.data.frame(data) & !is.vector(data) & !is.vector(data) ){
+    stop("data must be a data.frame or a vector or a factor")
+  }
+
+  if (!is.vector(knownLabels) & !is.factor(knownLabels) ){
+    stop("knownLabels must be a vector or a factor")
+  }
+
   # create Mixmod object
   xem <- new( "MixmodLearn", data=data, knownLabels=knownLabels, dataType=dataType, models=models, criterion=criterion, nbCVBlocks=nbCVBlocks, weight=weight )
   # call learnMain

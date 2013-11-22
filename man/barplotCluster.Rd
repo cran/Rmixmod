@@ -9,11 +9,11 @@
   \item{x}{an object of class
   [\code{\linkS4class{MixmodResults}}]}
 
-  \item{data}{a vector, matrix or data frame containing a
+  \item{data}{a vector or data frame containing a
   qualitative data set.}
 
-  \item{variables}{list of variables names to compute a
-  barplot. All variables from data by default.}
+  \item{variables}{list of variables names (or indices) to
+  compute a barplot. All variables from data by default.}
 
   \item{main}{a list of title for the barplot. main must
   have the same length than variables.}
@@ -33,8 +33,10 @@
 }
 \examples{
 data(birds)
-  xem2 <- mixmodCluster(birds,2)
-  barplotCluster(xem2["bestResult"], birds)
+  xem <- mixmodCluster(birds,2)
+  barplotCluster(xem["bestResult"], birds)
+  barplotCluster(xem["bestResult"], birds, variables=c(2,3,4))
+  barplotCluster(xem["bestResult"], birds, variables=c("eyebrow","collar"))
 }
 \seealso{
   \code{\link{barplot}}

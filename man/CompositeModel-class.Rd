@@ -1,0 +1,19 @@
+\name{CompositeModel-class}
+\alias{CompositeModel-class}
+\title{Constructor of [\code{\linkS4class{CompositeModel}}] class}
+\description{
+  This class defines a Composite Model. Inherits the
+  [\code{\linkS4class{Model}}] class.
+}
+\details{
+  \describe{ \item{variable.independency}{logical}
+  \item{component.independency}{logical} }
+}
+\examples{
+new("CompositeModel")
+  new("CompositeModel", listModels=c("Heterogeneous_pk_E_L_B","Heterogeneous_pk_Ekj_L_B") )
+  new("CompositeModel", free.proportions=FALSE, variable.independency=TRUE )
+
+  getSlots("CompositeModel")
+}
+

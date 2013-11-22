@@ -1,7 +1,7 @@
 \docType{data}
 \name{finance}
 \alias{finance}
-\title{Quantitative data : Financial health of companies}
+\title{Composite data : Financial health of companies}
 \format{A data frame with 889 companies (rows) and 6 variables (columns).
 
 \describe{

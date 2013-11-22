@@ -4,11 +4,11 @@
 ## NEWMAT and MIXMOD
 ##
 NEWMATDIR    = ./NEWMAT
-MIXMODDIR    = ./MIXMOD
+MIXMODDIR    = ./mixmod
 
 MIXMODLIB    = mixmod.a
 
-PKG_CPPFLAGS = -I.
+PKG_CPPFLAGS = -I. -I./NEWMAT/
 
 ## Use the R_HOME indirection to support installations of multiple R version
 PKG_LIBS = `$(R_HOME)/bin/Rscript -e "Rcpp:::LdFlags()"` -L$(MIXMODDIR) $(MIXMODLIB)

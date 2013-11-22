@@ -1,0 +1,17 @@
+\name{is.dataType}
+\alias{is.dataType}
+\title{Say if a data frame is quantitative, qualitative or composite}
+\usage{
+  is.dataType(x)
+}
+\arguments{
+  \item{x}{a vector, a factor or a data frame}
+}
+\value{
+  a string with the data type
+}
+\description{
+  Say if a data frame is quantitative, qualitative or
+  composite
+}
+

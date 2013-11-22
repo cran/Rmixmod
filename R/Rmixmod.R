@@ -5,8 +5,8 @@
 ##' \tabular{ll}{
 ##'   Package: \tab Rmixmod\cr 
 ##'   Type: \tab Package\cr 
-##'   Version: \tab 1.1.3\cr
-##'   Date: \tab 2012-06-14\cr 
+##'   Version: \tab 2.0\cr
+##'   Date: \tab 2013-11-22\cr 
 ##'   License: \tab GPL-3 + file LICENSE\cr 
 ##'   LazyLoad: \tab yes\cr
 ##' }
@@ -40,6 +40,7 @@
 ##' @rdname Rmixmod-package
 ##' @docType package
 ##' @keywords package
+##' @import Rcpp
 ##'
 ##' @author
 ##' Author: Remi Lebret and Serge Iovleff and Florent Langrognet, with contributions from C. Biernacki and G. Celeux and G. Govaert \email{contact@@mixmod.org}
@@ -47,6 +48,7 @@
 ##' @references Biernacki C., Celeux G., Govaert G., Langrognet F., 2006. "Model-Based Cluster and Discriminant Analysis with the MIXMOD Software". Computational Statistics and Data Analysis, vol. 51/2, pp. 587-600.
 ##'
 ##' @examples
+##'   \dontrun{
 ##'   ## Clustering Analysis
 ##'   # load quantitative data set
 ##'   data(geyser)
@@ -63,6 +65,12 @@
 ##'   summary(xem2)
 ##'   barplot(xem2)
 ##'
+##'   # load heterogeneous data set
+##'   data(finance)
+##'   # Clustering in composite case
+##'   xem3<-mixmodCluster(finance,2:6)
+##'   summary(xem3)
+##'
 ##'   ## Discriminant Analysis
 ##'   # start by extract 10 observations from iris data set
 ##'   remaining.obs<-sample(1:nrow(iris),10)
@@ -73,7 +81,9 @@
 ##'   # show results
 ##'   prediction
 ##'   # compare prediction with real results
-##'   as.integer(iris$Species[remaining.obs]) == prediction["partition"]
+##'   paste("accuracy= ",mean(as.integer(iris$Species[remaining.obs]) == prediction["partition"])*100
+##'      	,"%",sep="")
+##'   }
 ##'
 ##' @useDynLib Rmixmod
 ##' @exportPattern "^[[:alpha:]]+"
@@ -215,7 +225,7 @@ NULL
 NULL
 
 
-##' Quantitative data : Financial health of companies
+##' Composite data : Financial health of companies
 ##' 
 ##' This data set is made up of 216 healthy firms and 212 bankruptcy firms (year 2002) and also 241 healthy firms and 220 bankruptcy firms (year 2003). Companies are described by four financial ratios expected to provide some meaningful information about their health: EBITDA/Total Assets, Value Added/Total Sales, Quick Ratio, Accounts Payable/Total Sales. This data set offers the possibility to predict the company's ability to cover its financial obligations and also to study its stability over the years.
 ##'
@@ -248,4 +258,95 @@ NULL
 ##' @examples
 ##' data(finance)
 ##' summary(finance)
+NULL
+
+##' Composite data with training and testing set
+##' 
+##' The data set is made up of 5 variables: 3 categorical variables and 2 quantitative variables.
+##' The original data set contains 200 individuals. The training data set has 300 individuals while the testing data set has 100 individuals.
+##'
+##' @format A data frame with 200 individuals (rows) and 5 variables (columns).
+##'
+##' \describe{
+##'
+##'   \item{\code{V1}}{categorical variable with two modalities (1 & 2).}
+##'
+##'   \item{\code{V2}}{categorical variable with two modalities (1 & 2).}
+##'
+##'   \item{\code{V3}}{categorical variable with two modalities (1 & 2).}
+##'
+##'   \item{\code{V4}}{numeric variable.}
+##'
+##'   \item{\code{V5}}{numeric variable.}
+##' }
+##'
+##' @name heterodata
+##' @docType data
+##' @keywords datasets
+##' @seealso \code{\link{heterodatatrain}} and \code{\link{heterodatatest}}
+##' 
+##' @examples
+##' data(heterodata)
+##' summary(heterodata)
+NULL
+
+
+##' Composite data: A training set
+##' 
+##' The data set is made up of 5 variables: 3 categorical variables and 2 quantitative variables.
+##' The training data set has 300 individuals.
+##'
+##' @format A data frame with 300 individuals (rows) and 5 variables (columns).
+##'
+##' \describe{
+##'
+##'   \item{\code{V1}}{categorical variable with two modalities (1 & 2).}
+##'
+##'   \item{\code{V2}}{categorical variable with two modalities (1 & 2).}
+##'
+##'   \item{\code{V3}}{categorical variable with two modalities (1 & 2).}
+##'
+##'   \item{\code{V4}}{numeric variable.}
+##'
+##'   \item{\code{V5}}{numeric variable.}
+##' }
+##'
+##' @name heterodatatrain
+##' @docType data
+##' @keywords datasets
+##' @seealso \code{\link{heterodatatest}}
+##' 
+##' @examples
+##' data(heterodatatrain)
+##' summary(heterodatatrain)
+NULL
+
+##' Composite data: A testing set
+##' 
+##' The data set is made up of 5 variables: 3 categorical variables and 2 quantitative variables.
+##' The testing data set has 100 individuals.
+##'
+##' @format A data frame with 100 individuals (rows) and 5 variables (columns).
+##'
+##' \describe{
+##'
+##'   \item{\code{V1}}{categorical variable with two modalities (1 & 2).}
+##'
+##'   \item{\code{V2}}{categorical variable with two modalities (1 & 2).}
+##'
+##'   \item{\code{V3}}{categorical variable with two modalities (1 & 2).}
+##'
+##'   \item{\code{V4}}{numeric variable.}
+##'
+##'   \item{\code{V5}}{numeric variable.}
+##' }
+##'
+##' @name heterodatatest
+##' @docType data
+##' @keywords datasets
+##' @seealso \code{\link{heterodatatrain}}
+##' 
+##' @examples
+##' data(heterodatatest)
+##' summary(heterodatatest)
 NULL

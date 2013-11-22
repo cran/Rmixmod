@@ -260,8 +260,12 @@ setMethod(
 ##' @references C. Biernacki, G. Celeux, G. Govaert, F. Langrognet. "Model-Based Cluster and Discriminant Analysis with the MIXMOD Software". Computational Statistics and Data Analysis, vol. 51/2, pp. 587-600. (2006)
 ##' @examples
 ##'   mixmodMultinomialModel()
-##'   mixmodMultinomialModel(equal.proportions=TRUE)
+##'   # multinomial models with equal proportions
+##'   mixmodMultinomialModel(equal.proportions=TRUE,free.proportions=FALSE)
+##'   # multinomial models with a pre-defined list
 ##'   mixmodMultinomialModel( listModels=c("Binary_pk_E","Binary_p_E") )
+##'   # multinomial models with equal proportions and independent of the variable
+##'   mixmodMultinomialModel(free.proportions=FALSE, variable.independency=TRUE)
 ##'
 ##' @author Remi Lebret and Serge Iovleff and Florent Langrognet, with contributions from C. Biernacki and G. Celeux and G. Govaert \email{contact@@mixmod.org}
 ##' @export

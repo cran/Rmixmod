@@ -10,22 +10,17 @@
 #define Rmixmod_ClusteringInputHandling_h
 
 #include "InputHandling.h"
+#include "mixmod/Utilities/mixmod.h"
 
 #include <Rcpp.h>
 #include <stdint.h>
-
-// pre-declaration
-class XEMClusteringInput;
-class XEMClusteringStrategy;
-class XEMPartition;
-class XEMParameter;
 
 class ClusteringInputHandling : public InputHandling
 {
   
 public:
   /// Default constructor
-  ClusteringInputHandling( XEMClusteringInput* cInput, Rcpp::S4& algoOptions );
+  ClusteringInputHandling( XEM::ClusteringInput* cInput, Rcpp::S4& algoOptions );
  
   /// Destructor
   virtual ~ClusteringInputHandling();
@@ -45,15 +40,15 @@ protected:
    *  SEM = 3,                // Stochastic EM
    *  M = 4                   // Maximization
    *  };
-   *  const XEMAlgoName defaultAlgoName = EM;
-   *  const XEMAlgoName defaultClusteringAlgoName = EM;
+   *  const AlgoName defaultAlgoName = EM;
+   *  const AlgoName defaultClusteringAlgoName = EM;
    *  @endcode
    **/
   void setAlgo();
   
   /** @brief Set the initialization algorithm to use
    *  @code
-   *   enum XEMStrategyInitName {
+   *   enum StrategyInitName {
    *   RANDOM = 0,         // Random centers
    *   USER = 1,           // Initial parameters specified by user
    *   USER_PARTITION = 2, // Partition specified by user
@@ -75,14 +70,14 @@ protected:
   /// setEpsilonInInit
   void setEpsilonInInit();
   ///setInitParameter NOT used
-  void setInitParameter(XEMParameter** parameter);
+  void setInitParameter(XEM::Parameter** parameter);
   ///setInitPartition
-  void setInitPartition( XEMPartition ** tabPartition, int64_t nbPartition);
+  void setInitPartition( XEM::Partition ** tabPartition, int64_t nbPartition);
   
 private:
   
   // pointer to the clustering strategy
-  XEMClusteringStrategy* cStrategy_;
+  XEM::ClusteringStrategy* cStrategy_;
   
   // structure containing algorithm options
   Rcpp::S4& algoOptions_;

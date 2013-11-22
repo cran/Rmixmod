@@ -17,8 +17,8 @@ NULL
 ##' This is a class to run mixmod library.
 ##'
 ##' \describe{
-##'   \item{data}{numeric vector, matrix, or data frame of observations. Either qualitative or quantitative.}
-##'   \item{dataType}{character. It defines whether data are quantitative or qualitative.}
+##'   \item{data}{numeric vector or a data frame of observations. Can be qualitative,quantitative or both(heterogeneous)}
+##'   \item{dataType}{character. Type of data. It defines whether data is quantitative, qualitative or composite}
 ##'   \item{nbCluster}{integer. It indicates the number of classes.}
 ##'   \item{knownLabels}{numeric. It contains the known labels.}
 ##'   \item{weight}{numeric vector with n (number of individuals) rows. Weight is optionnal. This option is to be used when weight is associated to the data.}
@@ -96,16 +96,19 @@ setClass(
       #  stop("At least one modality within 'data' is lower than 1!")
     }
     # check data type
-    if ( (object@dataType != "quantitative") & (object@dataType != "qualitative") ){
-      stop("unknown dataType --> dataType must be 'quantitative' or 'qualitative'!")
+    if ( (object@dataType != "quantitative") & (object@dataType != "qualitative") & (object@dataType != "composite") ){
+      stop("unknown dataType --> dataType must be 'quantitative', 'qualitative' or 'composite'!")
     }
     # check models validity
-    if ( (object@dataType == "quantitative") & is(object@models, "MultinomialModel") ){
-      stop("MultinomialModel can't suit for quantitative data !\n")
+    if ( (object@dataType == "quantitative") & !is(object@models, "GaussianModel") ){
+      stop("Incorrect model specified for quantitative data !\n")
     }
-    if ( (object@dataType == "qualitative") & is(object@models, "GaussianModel") ){
-      stop("GaussianModel can't suit for qualitative data !\n")
-    }    
+    if ( (object@dataType == "qualitative") & !is(object@models, "MultinomialModel")){
+      stop("Incorrect model specified for qualitative data !\n")
+    }
+    if ( (object@dataType == "composite") & !is(object@models, "CompositeModel")){
+      stop("Incorrect model specified for heterogeneous data !\n")
+    }
     # check dimensions of knownLabels
     if(length(object@knownLabels)>0){
       if ( (length(object@knownLabels)!= object@nbSample) ){
@@ -147,26 +150,24 @@ setMethod(
     
     if(!missing(data)){
       if ( is.null(dataType) ){
-        if ( isQualitative(data) ){ .Object@dataType <- "qualitative" }
-        else{ .Object@dataType <- "quantitative" }
+        .Object@dataType <- is.dataType(data)
       }
       else{
         .Object@dataType <- dataType
       }
-      if ( .Object@dataType == "qualitative" ){ 
+      if ( .Object@dataType != "quantitative" ){ 
         .Object@factor <- nbFactorFromData(data)
-      }
       
-      if ( is.factor(data) ){
-        data<-as.integer(data) 
-      }
-      else if ( is.data.frame(data) | is.matrix(data) ){
-        # loop over columns to check whether type is factor
-        for ( j in 1:ncol(data) ){
-          if ( is.factor(data[,j]) ) data[,j] <- as.integer(data[,j])
+        if ( is.factor(data) ){
+          data<-as.integer(data) 
+        }
+        else if ( is.data.frame(data) ){
+          # loop over columns to check whether type is factor
+          for ( j in 1:ncol(data) ){
+            if ( is.factor(data[,j]) ) data[,j] <- as.integer(data[,j])
+          }
         }
       }
-      
       # for quantitative data
       if( .Object@dataType == "quantitative" ){
         if( is.null(models) ){
@@ -179,6 +180,14 @@ setMethod(
       else if ( .Object@dataType == "qualitative" ){
         if( is.null(models) ){
           .Object@models = new("MultinomialModel", listModels="Binary_pk_Ekjh", free.proportions=TRUE, equal.proportions=FALSE)
+        }else{
+          .Object@models <- models
+        }
+      }
+      #for composite data
+      else if ( .Object@dataType == "composite" ){
+        if( is.null(models) ){
+          .Object@models = new("CompositeModel", listModels="Heterogeneous_pk_Ekjh_Lk_Bk", free.proportions=TRUE, equal.proportions=FALSE)
         }else{
           .Object@models <- models
         }
@@ -298,6 +307,7 @@ setMethod(
 ##' 2-dimensional representation of the data set. Bigger symbol means that observations are similar.
 ##'
 ##' @param x an object of class [\code{\linkS4class{Mixmod}}]
+##' @param y a list of variables to plot (subset). Variables names or indices. Only in a quantitive case.
 ##' @param ... further arguments passed to or from other methods
 ##'
 ##' @importFrom graphics plot
@@ -310,14 +320,17 @@ setMethod(
 ##' @seealso \code{\link{plot}}
 ##' @examples
 ##'   ## for quantitative case
-##'   data(geyser)
-##'   xem <- mixmodCluster(geyser,3)
+##'   data(iris)
+##'   xem <- mixmodCluster(iris[1:4],3)
 ##'   plot(xem)
+##'   plot(xem,c(1,3))
+##'   plot(xem,c("Sepal.Length","Sepal.Width"))
 ##'
 ##'   ## for qualitative case
 ##'   data(birds)
 ##'   xem2 <- mixmodCluster(birds,2)
 ##'   plot(xem2)
+##'   legend("bottomleft",c("Cluster1","Cluster2"),col=c(2,3),pch=c(1,2))
 ##'
 setMethod(
   f="plot",
@@ -329,8 +342,48 @@ setMethod(
       if ( x@nbVariable == 1 ){
         stop("data has only one variable. Try hist() function to get a 1D representation of x.")
       }
+      else if (!missing(y)){
+
+        if (is.numeric(y)){
+          if (max(y)>ncol(x@data))
+            stop("y indices mismatch the data frame dimension")
+        }
+        else{
+          if ( sum(y %in% colnames(x@data))!= length(y) ){
+            stop(cat("unknown variable: ", paste(y[which(!(y %in% colnames(x@data)))]),"\n"))
+          }
+        }
+        # get old par 
+        op <- par(no.readonly = TRUE) # the whole list of settable par's.
+        # changing marging
+        par(mar = rep(2.5,4))
+        # decreasing font size
+        par(cex = .75)
+        # create layout matrix
+        #par( mfrow = c(x@nbVariable, x@nbVariable) )
+        split.screen(c(length(y), length(y)))
+        # create histogram on diagonal
+        for ( i in 1:length(y) ){
+          #par(mfg=c(i,i))
+          screen(i+((i-1)*length(y)))
+          histCluster(x@bestResult, x@data, variables=y[i])
+        }
+        if (length(y)>1){
+          # create biplots
+          for ( i in 2:length(y) ){
+            for( j in 1:(i-1) ){
+              #par(mfg=c(i,j))
+              screen(j+((i-1)*length(y)))
+              plotCluster(x@bestResult, x@data, variable1=y[j], variable2=y[i], ...)
+            }
+          }
+        }
+        close.screen(all.screens = TRUE)
+        # restore plotting parameters
+        par(op)
+
+      }
       else{ 
-      
         # get old par 
         op <- par(no.readonly = TRUE) # the whole list of settable par's.
         # changing marging
@@ -354,7 +407,7 @@ setMethod(
             plotCluster(x@bestResult, x@data, variable1=colnames(x@data)[j], variable2=colnames(x@data)[i], ...)
           }
         }
-        close.screen(all = TRUE)
+        close.screen(all.screens = TRUE)
         # restore plotting parameters
         par(op)
       }
@@ -394,10 +447,14 @@ setMethod(
         col=x@bestResult@partition[-which(duplicated(individuals))]+1, pch=x@bestResult@partition[-which(duplicated(individuals))], xlab='Axis 1', ylab='Axis 2', main='Multiple Correspondance Analysis', ... )
       }
     }
+    else if ( x@dataType == "composite" ){
+      stop("visualization for heterogeneous is not available yet")
+    }
     invisible()
   }
 )
 ###################################################################################
+
 
 
 ###################################################################################
@@ -409,6 +466,7 @@ setMethod(
 ##' Data with the density of each cluster and the mixture density are drawn for each variable.
 ##'  
 ##' @param x an object of class [\code{\linkS4class{Mixmod}}]
+##' @param variables list of variables names (or indices) to compute a histogram. All variables from data by default.
 ##' @param ... further arguments passed to or from other methods
 ##'
 ##' @importFrom graphics hist
@@ -420,9 +478,11 @@ setMethod(
 ##'
 ##' @seealso \code{\link{hist}}
 ##' @examples
-##'   data(geyser)
-##'   xem1 <- mixmodCluster(geyser,3)
-##'   hist(xem1)
+##'   data(iris)
+##'   xem <- mixmodCluster(iris[1:4],3)
+##'   hist(xem)
+##'   hist(xem,variables=c(1,3))
+##'   hist(xem,variables=c("Sepal.Length","Sepal.Width"))
 ##'
 setMethod(
   f="hist",
@@ -445,6 +505,7 @@ setMethod(
 ##' each modality to be in that cluster.
 ##'  
 ##' @param x an object of class [\code{\linkS4class{Mixmod}}]
+##' @param variables list of variables names (or indices) to compute a histogram. All variables from data by default.
 ##' @param ... further arguments passed to or from other methods
 ##'
 ##' @importFrom graphics barplot
@@ -459,6 +520,8 @@ setMethod(
 ##'   data(birds)
 ##'   xem2 <- mixmodCluster(birds,2)
 ##'   barplot(xem2)
+##'   barplot(xem2,variables=c(2,3,4))
+##'   barplot(xem2,variables=c("eyebrow","collar"))
 ##'
 setMethod(
   f="barplot",

@@ -5,9 +5,10 @@
   mixmodPredict(data, classificationRule)
 }
 \arguments{
-  \item{data}{matrix or data frame containing quantitative
-  or qualitative data. Rows correspond to observations and
-  columns correspond to variables.}
+  \item{data}{matrix or data frame containing
+  quantitative,qualitative or composite data. Rows
+  correspond to observations and columns correspond to
+  variables.}
 
   \item{classificationRule}{a
   [\code{\linkS4class{MixmodResults}}] object which
@@ -34,7 +35,18 @@
   # show results
   prediction
   # compare prediction with real results
-  as.integer(iris$Species[remaining.obs]) == prediction["partition"]
+  paste("accuracy= ",mean(as.integer(iris$Species[remaining.obs]) == prediction["partition"])*100
+        ,"\%",sep="")
+
+  ## A composite example with a heterogeneous data set
+  data(heterodatatrain)
+  ## Learning with training data
+  learn <- mixmodLearn(heterodatatrain[-1],knownLabels=heterodatatrain$V1)
+  ## Prediction on the testing data
+  data(heterodatatest)
+  prediction <- mixmodPredict(heterodatatest[-1],learn["bestResult"])
+  # compare prediction with real results
+  paste("accuracy= ",mean(heterodatatest$V1 == prediction["partition"])*100,"\%",sep="")
 }
 \author{
   Remi Lebret and Serge Iovleff and Florent Langrognet,

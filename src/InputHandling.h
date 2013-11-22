@@ -13,17 +13,14 @@
 #include <string>
 
 #include <Rcpp.h>
-
-// pre-declaration
-class XEMInput;
-class XEMPartition;
+#include "mixmod/Utilities/mixmod.h"
 
 class InputHandling
 {
 
   public:
     /// Default constructor
-    InputHandling( XEMInput* cInput );
+    InputHandling( XEM::Input* cInput );
     
     /// Destructor
     virtual ~InputHandling();
@@ -45,8 +42,8 @@ class InputHandling
   
   protected:
 
-    // pointer to XEMInput
-    XEMInput* cInput_;
+    // pointer to Input
+    XEM::Input* cInput_;
 
 };
 

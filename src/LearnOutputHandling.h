@@ -10,9 +10,7 @@
 #define Rmixmod_LearnOutputHandling_h
 
 #include "OutputHandling.h"
-
-// pre-declaration
-class XEMLearnModelOutput;
+#include "mixmod/Utilities/mixmod.h"
 
 /** base class for handling the mixmod outputs and filling them in
  *  a Rcpp list 
@@ -25,9 +23,9 @@ public:
    *  @param cMOutput the model estimated by mixmod
    *  @param output the Rcpp list to fill in
    **/
-  LearnOutputHandling( XEMLearnModelOutput* lMOutput
+  LearnOutputHandling( XEM::LearnModelOutput* lMOutput
                      , Rcpp::S4& xem
-                     , const bool isGaussian
+                     , const XEM::DataType dataType
                      , Rcpp::CharacterVector const & Rcriterion
                      , std::vector<int64_t> labels
                      );

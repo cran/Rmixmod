@@ -1,6 +1,7 @@
 \docType{methods}
 \name{summary}
 \alias{summary}
+\alias{summary,CompositeParameter-method}
 \alias{summary,GaussianParameter-method}
 \alias{summary,Mixmod-method}
 \alias{summary,MixmodPredict-method}

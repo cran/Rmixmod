@@ -61,6 +61,35 @@ matrix2binary <- function (x) {
 ###################################################################################
 
 ###################################################################################
+##' Say if a data frame is quantitative, qualitative or composite
+##'
+##' @param x a vector, a factor or a data frame
+##'
+##' @return a string with the data type
+##' 
+##' @export
+##'
+is.dataType <- function (x) {
+  # loof after missing values
+  if ( sum(is.na(x)) ) stop("data set contains missing values")
+  if ( is.vector(x) | is.factor(x) ){
+    if ( is.double(x) ) return("quantitative")
+    if ( nlevels(as.factor(x))/length(x)>.25 ) 
+      warning("more than 25% of the observations have different modalities")
+    return("qualitative")
+  }
+  else{
+    if (sum(sapply(x,is.numeric))==ncol(x))
+      return("quantitative")
+    if (sum(sapply(x,is.factor))==ncol(x))
+      return("qualitative")
+    else
+      return ("composite")
+  }
+}
+###################################################################################
+
+###################################################################################
 ##' Say if a data frame contains only qualitative variables.
 ##'
 ##' @param x a vector or a matrix or a data frame
@@ -81,7 +110,7 @@ isQualitative <- function (x) {
   else{
     # loop over columns to check whether type is factor
     for ( j in 1:ncol(x) ){
-     if ( is.double(x[,j]) ) return(FALSE)
+     if ( is.double(x[,j]) ) {return(FALSE)}
      if ( nlevels(as.factor(x[,j]))/length(x[,j])>.25 ) 
        warning(paste("more than 25% of the observations have different modalities for variable named",names(x)[j]))
     }
@@ -130,6 +159,7 @@ nbFactorFromData <- function (x) {
     return(sapply(x,nlevels))
   }
 }
+
 ###################################################################################
 
 

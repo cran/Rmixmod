@@ -1,6 +1,7 @@
 \docType{methods}
 \name{print}
 \alias{print}
+\alias{print,CompositeParameter-method}
 \alias{print,GaussianParameter-method}
 \alias{print,Mixmod-method}
 \alias{print,MixmodCluster-method}

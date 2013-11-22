@@ -7,17 +7,20 @@
     weight = NULL)
 }
 \arguments{
-  \item{data}{matrix or data frame containing quantitative
-  or qualitative data. Rows correspond to observations and
+  \item{data}{frame containing quantitative,qualitative or
+  heterogeneous data. Rows correspond to observations and
   columns correspond to variables.}
 
-  \item{knownLabels}{vector of size number of observations.
-  Each cell corresponds to a cluster affectation. So the
-  maximum value is the number of clusters.}
+  \item{knownLabels}{an integer vector or a factor of size
+  number of observations. Each cell corresponds to a
+  cluster affectation. So the maximum value is the number
+  of clusters.}
 
-  \item{dataType}{character. Type of data is either
-  "quantitative" or "qualitative". Set as NULL by default,
-  type will be guessed depending on variables type.}
+  \item{dataType}{character. Type of data is
+  "quantitative", "qualitative" or "composite". Set as NULL
+  by default, type will be guessed depending on variables
+  type (in case of homogeneous data). 'composite' type must
+  be specified explicitly.}
 
   \item{models}{a [\code{\linkS4class{Model}}] object
   defining the list of models to run. For quantitative
@@ -61,12 +64,18 @@
   ## get summary
   summary(learn.iris)
 
-  ## An example with the famous birds data set
+  ## A qualitative example with the famous birds data set
   data(birds)
   birds.partition<-c(rep(1,34),rep(2,35))
   learn.birds<-mixmodLearn(data=birds, knownLabels=birds.partition)
   ## get summary
   summary(learn.birds)
+
+  ## A composite example with a heterogeneous data set
+  data(heterodatatrain)
+  learn.hetero<-mixmodLearn(heterodatatrain[-1],knownLabels=heterodatatrain$V1)
+  ## get summary
+  summary(learn.hetero)
 }
 \author{
   Remi Lebret and Serge Iovleff and Florent Langrognet,

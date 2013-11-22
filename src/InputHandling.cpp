@@ -10,14 +10,14 @@
 #include <vector>
 #include <stdint.h>
 
-#include "MIXMOD/XEMInput.h"
-#include "MIXMOD/XEMModelType.h"
-#include "MIXMOD/XEMLabelDescription.h"
-#include "MIXMOD/XEMUtil.h"
+#include "mixmod/Kernel/IO/Input.h"
+#include "mixmod/Kernel/Model/ModelType.h"
+#include "mixmod/Kernel/IO/LabelDescription.h"
+#include "mixmod/Utilities/Util.h"
 
 
 //default constructor
-InputHandling::InputHandling( XEMInput* cInput )
+InputHandling::InputHandling( XEM::Input* cInput )
                             : cInput_(cInput)
 {}
 
@@ -35,13 +35,13 @@ void InputHandling::setModel( Rcpp::S4& model)
   Rcpp::CharacterVector modelList(model.slot("listModels"));
   
   // create vector of XEMModelName
-  std::vector<XEMModelName> modelName;
+    std::vector<XEM::ModelName> modelName;
   
   for (int i=0; i < modelList.size(); ++i)
   {
     // get string value
-    XEMModelName name = StringToXEMModelName(Rcpp::as<std::string>(Rcpp::StringVector(modelList[i].get())));
-    if (name != UNKNOWN_MODEL_NAME)
+    XEM::ModelName name = XEM::StringToModelName(Rcpp::as<std::string>(Rcpp::StringVector(modelList[i].get())));
+    if (name != XEM::UNKNOWN_MODEL_NAME)
     { modelName.push_back(name); }
     else
       throw (std::runtime_error("Invalid modelName in setModel : "));
@@ -66,7 +66,7 @@ void InputHandling::setKnownPartition(Rcpp::NumericVector & Rpartition)
     std::vector<int64_t> labels(Rpartition.size());
     for (unsigned int i=0; i<labels.size(); i++ ) labels[i]=Rpartition[i];
     // create XEMLabelDescription
-    XEMLabelDescription partition( labels.size(), labels );
+    XEM::LabelDescription partition( labels.size(), labels );
     cInput_->setKnownLabelDescription(partition);
   }
 }
@@ -87,16 +87,16 @@ void InputHandling::setCriterionName(Rcpp::CharacterVector & criterion)
   for (unsigned int i=0; i<criterionName.size(); i++){
     // BIC criterion
     if (criterionName[i] == "BIC")
-    { cInput_->addCriterion(BIC);}
+    { cInput_->addCriterion(XEM::BIC);}
     // ICL Criterion
     else if(criterionName[i] == "ICL")
-    { cInput_->addCriterion(ICL); }
+    { cInput_->addCriterion(XEM::ICL); }
     else if(criterionName[i] == "NEC")
     // NEC Criterion
-    { cInput_->addCriterion(NEC); }
+    { cInput_->addCriterion(XEM::NEC); }
     // CV criterion
     else if (criterionName[i] == "CV")
-    { cInput_->addCriterion(CV); }
+    { cInput_->addCriterion(XEM::CV); }
     //exception because wrong criterionName
     else 
     { throw(std::runtime_error("In InputHandling::setCriterionName invalid criterion name")); }

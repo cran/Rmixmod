@@ -9,19 +9,20 @@
 #include "Conversion.h"
 #include "ClusteringOutputHandling.h"
 
-#include "MIXMOD/XEMClusteringModelOutput.h"
-#include "MIXMOD/XEMLabelDescription.h"
-#include "MIXMOD/XEMLabel.h"
-#include "MIXMOD/XEMProbaDescription.h"
-#include "MIXMOD/XEMProba.h"
+#include "mixmod/Clustering/ClusteringModelOutput.h"
+#include "mixmod/Kernel/IO/LabelDescription.h"
+#include "mixmod/Kernel/IO/Label.h"
+#include "mixmod/Kernel/IO/ProbaDescription.h"
+#include "mixmod/Kernel/IO/Proba.h"
 
 // constructor
-ClusteringOutputHandling::ClusteringOutputHandling( XEMClusteringModelOutput* cMOutput
+
+ClusteringOutputHandling::ClusteringOutputHandling( XEM::ClusteringModelOutput* cMOutput
                                                   , Rcpp::S4& xem
-                                                  , const bool isGaussian
+                                                  , const XEM::DataType dataType
                                                   , Rcpp::CharacterVector const & Rcriterion
                                                   )
-                                                  : OutputHandling(cMOutput, xem, isGaussian)    
+                                                  : OutputHandling(cMOutput, xem, dataType)
 {  
   // get criterion
   std::vector<std::string> criterionName = Rcpp::as< std::vector<std::string> >(Rcriterion);
@@ -29,7 +30,7 @@ ClusteringOutputHandling::ClusteringOutputHandling( XEMClusteringModelOutput* cM
   xem_.slot("criterion") = criterionName;
   
   // fill other slot only if no error
-  if ( cMOutput->getStrategyRunError() == noError ){
+  if ( dynamic_cast<XEM::Exception&>(cMOutput->getStrategyRunError()) == XEM::NOERROR ){
     
     // declare a vector of criterion
     std::vector<double> criterionValue;
@@ -37,15 +38,15 @@ ClusteringOutputHandling::ClusteringOutputHandling( XEMClusteringModelOutput* cM
     for (unsigned int i=0; i<criterionName.size(); i++){
       // BIC criterion
       if (criterionName[i] == "BIC"){ 
-        criterionValue.push_back(cMOutput->getCriterionOutput(BIC).getValue());
+        criterionValue.push_back(cMOutput->getCriterionOutput(XEM::BIC).getValue());
       }
       // ICL Criterion
       else if(criterionName[i] == "ICL"){ 
-        criterionValue.push_back(cMOutput->getCriterionOutput(ICL).getValue());
+        criterionValue.push_back(cMOutput->getCriterionOutput(XEM::ICL).getValue());
       }
         // NEC Criterion
       else if(criterionName[i] == "NEC"){ 
-        criterionValue.push_back(cMOutput->getCriterionOutput(NEC).getValue());
+        criterionValue.push_back(cMOutput->getCriterionOutput(XEM::NEC).getValue());
       }
     }
   

@@ -9,28 +9,24 @@
 #include "Conversion.h"
 #include "OutputHandling.h"
 
-#include "MIXMOD/XEMModelOutput.h"
+#include "mixmod/Kernel/IO/ModelOutput.h"
 
-#include "MIXMOD/XEMLabelDescription.h"
-#include "MIXMOD/XEMLabel.h"
+#include "mixmod/Kernel/IO/LabelDescription.h"
+#include "mixmod/Kernel/IO/Label.h"
 
-#include "MIXMOD/XEMProbaDescription.h"
-#include "MIXMOD/XEMProba.h"
+#include "mixmod/Kernel/IO/ProbaDescription.h"
+#include "mixmod/Kernel/IO/Proba.h"
+#include "mixmod/Kernel/Parameter/BinaryParameter.h"
+#include "mixmod/Kernel/Parameter/GaussianEDDAParameter.h"
+#include "mixmod/Kernel/Parameter/CompositeParameter.h"
+#include "mixmod/Kernel/IO/ParameterDescription.h"
 
-#include "MIXMOD/XEMBinaryEParameter.h"
-#include "MIXMOD/XEMBinaryEkParameter.h"
-#include "MIXMOD/XEMBinaryEjParameter.h"
-#include "MIXMOD/XEMBinaryEkjParameter.h"
-#include "MIXMOD/XEMBinaryEkjhParameter.h"
-#include "MIXMOD/XEMGaussianEDDAParameter.h"
-#include "MIXMOD/XEMParameterDescription.h"
-
-#include "MIXMOD/XEMMatrix.h"
+#include "mixmod/Matrix/Matrix.h"
 
 #include <algorithm>
 
 // constructor
-OutputHandling::OutputHandling( XEMModelOutput* MOutput, Rcpp::S4& xem, const bool isGaussian )
+OutputHandling::OutputHandling( XEM::ModelOutput* MOutput, Rcpp::S4& xem, const XEM::DataType dataType )
                               : MOutput_(MOutput)
                               , xem_(xem)
                               , nbCluster_((int)MOutput_->getNbCluster())       
@@ -39,17 +35,29 @@ OutputHandling::OutputHandling( XEMModelOutput* MOutput, Rcpp::S4& xem, const bo
   // add nbCluster value
   xem_.slot("nbCluster") = nbCluster_;
   // add model selected
-  xem_.slot("model") = XEMModelNameToString(MOutput->getModelType().getModelName());  
+  xem_.slot("model") = XEM::ModelNameToString(MOutput->getModelType().getModelName());
   // add the error
-  xem_.slot("error") = XEMErrorTypeToString(MOutput->getStrategyRunError());
+  xem_.slot("error") = (MOutput->getStrategyRunError()).what();
   
   // fill other slot only if no error
-  if ( MOutput->getStrategyRunError() == noError ){
+  if ( dynamic_cast<XEM::Exception&>(MOutput->getStrategyRunError()) == XEM::NOERROR ){
     // add likelihood value
     xem_.slot("likelihood") = MOutput_->getLikelihood();
     
     // add parameters
-    ( isGaussian ) ? setGaussianParameter() : setMultinomialParameter() ;
+    switch (dataType) {
+      case XEM::QuantitativeData:
+        setGaussianParameter();
+        break;
+      case XEM::QualitativeData:
+        setMultinomialParameter();
+        break;
+      case XEM::HeterogeneousData:
+        setCompositeParameter();
+        break;
+      default:
+        break;
+    }
   }
 }
 
@@ -62,7 +70,7 @@ OutputHandling::~OutputHandling()
 void OutputHandling::setGaussianParameter()
 {
   // get pointer to gaussian parameters
-  const XEMGaussianEDDAParameter * gParam = dynamic_cast<XEMGaussianEDDAParameter const *>(MOutput_->getParameterDescription()->getParameter());
+  const XEM::GaussianEDDAParameter * gParam = dynamic_cast<XEM::GaussianEDDAParameter const *>(MOutput_->getParameterDescription()->getParameter());
   // get the number of variables
   nbVariable_ = gParam->getPbDimension();
   
@@ -79,7 +87,7 @@ void OutputHandling::setGaussianParameter()
   // define list of variance matrix
   Rcpp::GenericVector varianceMatrices(nbCluster_);
   /** Array with matrix variance for each class*/
-  XEMMatrix** matrixVariance = gParam->getTabSigma();
+  XEM::Matrix** matrixVariance = gParam->getTabSigma();
   // loop over clusters
   for (int i=0; i<nbCluster_; i++)
   {
@@ -96,7 +104,7 @@ void OutputHandling::setGaussianParameter()
 void OutputHandling::setMultinomialParameter()
 {
   // get pointer to multinomial parameters
-  const XEMBinaryParameter * bParam = static_cast<XEMBinaryParameter const *>(MOutput_->getParameterDescription()->getParameter());
+  const XEM::BinaryParameter * bParam = static_cast<XEM::BinaryParameter const *>(MOutput_->getParameterDescription()->getParameter());
   
   // get the number of variables
   nbVariable_ = bParam->getPbDimension();
@@ -143,5 +151,91 @@ void OutputHandling::setMultinomialParameter()
   param.slot("scatter") = vectorOutput;
   
   // add parameters to the output list
+  xem_.slot("parameters") = param;
+}
+
+// set composite parameters
+void OutputHandling::setCompositeParameter()
+{
+  // get pointer to gaussian parameters
+  const XEM::GaussianEDDAParameter * gParam = dynamic_cast<XEM::GaussianEDDAParameter const *>(MOutput_->getParameterDescription()->getParameter()->getGaussianParameter());
+  // get pointer to multinomial parameters
+  const XEM::BinaryParameter * bParam = static_cast<XEM::BinaryParameter const *>(MOutput_->getParameterDescription()->getParameter()->getBinaryParameter());
+
+  // get the number of variables
+  int64_t nbVariable_Gaussian = gParam->getPbDimension();
+  int64_t nbVariable_Binary = bParam->getPbDimension();
+
+  // create parameter object
+  Rcpp::S4 param(xem_.slot("parameters"));
+  //create gaussian parameter object
+  Rcpp::S4 g_param(param.slot("g_parameter"));
+  //create binary parameter object
+  Rcpp::S4 b_param(param.slot("m_parameter"));
+
+  //Fill Gaussian parameters slot
+  // add proportions values
+  g_param.slot("proportions") = Conversion::CVectorToRcppVector(nbCluster_,gParam->getTabProportion());
+
+  // add proportions values
+  g_param.slot("mean") = Conversion::CMatrixToRcppMatrix(nbCluster_,nbVariable_Gaussian,gParam->getTabMean());
+
+  // add variances
+  // define list of variance matrix
+  Rcpp::GenericVector varianceMatrices(nbCluster_);
+  /** Array with matrix variance for each class*/
+  XEM::Matrix** matrixVariance = gParam->getTabSigma();
+  // loop over clusters
+  for (int i=0; i<nbCluster_; i++)
+  {
+    varianceMatrices[i] = Conversion::CMatrixToRcppMatrix(nbVariable_Gaussian,nbVariable_Gaussian,matrixVariance[i]->storeToArray());
+  }
+  // add variances to S4 object
+  g_param.slot("variance") = varianceMatrices;
+
+  //Fill Binary Parameter slots
+  // add proportions values
+  b_param.slot("proportions") = Conversion::CVectorToRcppVector(nbCluster_,bParam->getTabProportion());
+
+  // add means values
+  b_param.slot("center") = Conversion::CMatrixToRcppMatrixForInt(nbCluster_,nbVariable_Binary,bParam->getTabCenter());
+
+  //add factor
+  b_param.slot("factor") = Conversion::CVectorToRcppVectorForInt(nbVariable_Binary,bParam->getTabNbModality());
+
+
+  //-------------------
+  // get scatter
+  //-------------------
+  // get pointer to scatter
+  double *** scatter = bParam->scatterToArray();
+  // get tab of modalities
+  int64_t* tabNbModality = bParam->getTabNbModality();
+  // get maximum number of modality
+  int64_t max = *max_element(tabNbModality,tabNbModality+nbVariable_Binary);
+
+  //VectorMatrix of NumericMatrix
+  Rcpp::GenericVector vectorOutput(nbCluster_);
+
+  // loop over clusters
+  for (int k=0; k<nbCluster_; k++){
+    //NumericMatrix for matrix
+    Rcpp::NumericMatrix matrixOutput(nbVariable_Binary,max);
+    // loop over variables
+    for(int j=0; j<nbVariable_Binary; j++){
+      // loop over modalities
+      for (int h=0; h<tabNbModality[j]; h++) {
+        matrixOutput(j,h) = scatter[k][j][h];
+      }
+    }
+    vectorOutput(k) = matrixOutput;
+  }
+  // add scatters
+  b_param.slot("scatter") = vectorOutput;
+
+
+  param.slot("proportions") = g_param.slot("proportions");
+  param.slot("g_parameter") = g_param;
+  param.slot("m_parameter") = b_param;
   xem_.slot("parameters") = param;
 }

@@ -8,8 +8,10 @@
 ##' @include MixmodResults.R
 ##' @include GaussianParameter.R
 ##' @include MultinomialParameter.R
+##' @include CompositeParameter.R
 ##' @include GaussianModel.R
 ##' @include MultinomialModel.R
+##' @include CompositeModel.R
 ##' @include Strategy.R
 NULL
 ###################################################################################
@@ -81,9 +83,9 @@ setClass(
 ##' This function computes an optimal mixture model according to the criteria furnished, 
 ##' and the list of model defined in [\code{\linkS4class{Model}}], using the algorithm specified in [\code{\linkS4class{Strategy}}].
 ##' 
-##' @param data matrix or data frame containing quantitative or qualitative data. Rows correspond to observations and columns correspond to variables.
+##' @param data frame containing quantitative,qualitative or heterogeneous data. Rows correspond to observations and columns correspond to variables.
 ##' @param nbCluster numeric listing the number of clusters.
-##' @param dataType character. Type of data is either "quantitative" or "qualitative". Set as NULL by default, type will be guessed depending on variables type.
+##' @param dataType character. Type of data is "quantitative", "qualitative" or "composite". Set as NULL by default, type will be guessed depending on variables type. 
 ##' @param models a [\code{\linkS4class{Model}}] object defining the list of models to run. For quantitative data, the model "Gaussian_pk_Lk_C" is called (see mixmodGaussianModel() to specify other models). For qualitative data, the model "Binary_pk_Ekjh" is called (see mixmodMultinomialModel() to specify other models).
 ##' @param strategy a [\code{\linkS4class{Strategy}}] object containing the strategy to run. Call mixmodStrategy() method by default.
 ##' @param criterion list of character defining the criterion to select the best model. The best model is the one with the lowest criterion value. Possible values: "BIC", "ICL", "NEC", c("BIC", "ICL", "NEC"). Default is "BIC".
@@ -96,17 +98,24 @@ setClass(
 ##'   ## with default values
 ##'   mixmodCluster(geyser, nbCluster=2:6)
 ##'
-##'   ## An example with the birds data set
+##'   ## A qualitative example with the birds data set
 ##'   data(birds)
-##'   mixmodCluster(data=birds, nbCluster = 2:5, criterion= c("BIC","ICL","NEC"), model = mixmodMultinomialModel())
+##'   mixmodCluster(data=birds, nbCluster = 2:5, criterion= c("BIC","ICL","NEC"), 
+##'                 model = mixmodMultinomialModel())
 ##'
 ##'   ## use graphics functions
 ##'   xem <- mixmodCluster(data=geyser, nbCluster=3)
+##'   \dontrun{ 
 ##'   plot(xem)
 ##'   hist(xem)
+##'   }
 ##'
 ##'   ## get summary
 ##'   summary(xem)
+##'
+##'   ## A composite example with a heterogeneous data set
+##'   data(heterodata)
+##'   mixmodCluster(heterodata,2)
 ##'
 ##' @author Remi Lebret and Serge Iovleff and Florent Langrognet, with contributions from C. Biernacki and G. Celeux and G. Govaert \email{contact@@mixmod.org}
 ##' @return Returns an instance of the [\code{\linkS4class{MixmodCluster}}] class. Those two attributes will contain all outputs:
@@ -124,7 +133,10 @@ mixmodCluster <- function(data, nbCluster, dataType=NULL, models=NULL, strategy=
   if(missing(nbCluster)){
     stop("nbCluster is missing!")
   }
-  
+  if (!is.data.frame(data) & !is.vector(data) & !is.vector(data) ){
+    stop("data must be a data.frame or a vector or a factor")
+  }
+
   # create Mixmod object
   xem <- new( "MixmodCluster", data=data, nbCluster=nbCluster, dataType=dataType, models=models, strategy=strategy, criterion=criterion, weight=weight, knownLabels=knownLabels)
   
@@ -169,6 +181,10 @@ setMethod(
       }else if ( .Object@dataType == "qualitative" ){
         .Object@bestResult = new("MixmodResults")
         .Object@bestResult@parameters = new("MultinomialParameter")
+      }else if ( .Object@dataType == "composite" ){
+        .Object@bestResult = new("MixmodResults")
+        .Object@bestResult@parameters = new("CompositeParameter")
+        .Object@bestResult@parameters@factor = as.factor(.Object@factor)
       }
       # create strategy
       if(missing(strategy)){

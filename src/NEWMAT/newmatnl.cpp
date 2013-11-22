@@ -1,27 +1,3 @@
-/***************************************************************************
-                             SRC/NEWMAT/newmatnl.cpp  description
-                             ------------------------
-    copyright            : (C) MIXMOD Team - 2001-2003-2004-2005-2006-2007-2008-2009
-    email                : mixmod@univ-fcomte.fr
- ***************************************************************************/
-
-/***************************************************************************
-    This file is part of MIXMOD
-    
-    MIXMOD is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    MIXMOD is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with MIXMOD.  If not, see <http://www.gnu.org/licenses/>.     
-                                                                          
- ***************************************************************************/
 //$$ newmatnl.cpp         Non-linear optimisation
 
 // Copyright (C) 1993,4,5,6: R B Davies
@@ -166,9 +142,7 @@ void NonLinearLeastSquares::Value
    if (!Pred.IsValid()) { oorg=true; return; }  // check afterwards as well
    Y = *DataPointer - Y; Real ssq = Y.SumSquare();
    errorvar =  ssq / (n_obs - n_param);
-#ifdef VERBOSE
    cout << "\n" << setw(15) << setprecision(10) << " " << errorvar;
-#endif
    Derivs = Y.t() * X;          // get the derivative and stash it
    oorg = false; v = -0.5 * ssq;
 }
@@ -178,10 +152,8 @@ bool NonLinearLeastSquares::NextPoint(ColumnVector& Adj, Real& test)
    Tracer tr("NonLinearLeastSquares::NextPoint");
    QRZ(X, U); QRZ(X, Y, M);     // do the QR decomposition
    test = M.SumSquare();
-#ifdef VERBOSE
    cout << " " << setw(15) << setprecision(10)
       << test << " " << Y.SumSquare() / (n_obs - n_param);
-#endif
    Adj = U.i() * M;
    if (test < errorvar * criterion) return true;
    else return false;
@@ -197,9 +169,7 @@ void NonLinearLeastSquares::Fit(const ColumnVector& Data,
    n_param = Parameters.Nrows(); n_obs = Data.Nrows();
    DataPointer = &Data;
    FindMaximum2::Fit(Parameters, Lim);
-#ifdef VERBOSE
    cout << "\nConverged\n";
-#endif
 }
 
 void NonLinearLeastSquares::MakeCovariance()
@@ -235,9 +205,7 @@ void MLE_D_FI::Value
    if (!LL.IsValid(Parameters,wg)) { oorg=true; return; }
    v = LL.LogLikelihood();
    if (!LL.IsValid()) { oorg=true; return; }     // check validity again
-#ifdef VERBOSE
    cout << "\n" << setw(20) << setprecision(10) << v;
-#endif
    oorg = false;
    Derivs = LL.Derivatives();                    // Get derivatives
 }
@@ -250,9 +218,7 @@ bool MLE_D_FI::NextPoint(ColumnVector& Adj, Real& test)
    ColumnVector Adj1 = LT.i() * Derivs;
    Adj = LT.t().i() * Adj1;
    test = SumSquare(Adj1);
-#ifdef VERBOSE
    cout << "   " << setw(20) << setprecision(10) << test;
-#endif
    return (test < Criterion);
 }
 
@@ -263,9 +229,7 @@ void MLE_D_FI::Fit(ColumnVector& Parameters)
 {
    Tracer tr("MLE_D_FI::Fit");
    FindMaximum2::Fit(Parameters,Lim);
-#ifdef VERBOSE
    cout << "\nConverged\n";
-#endif
 }
   
 void MLE_D_FI::MakeCovariance()

@@ -11,14 +11,15 @@
   \item{x}{an object of class
   [\code{\linkS4class{MixmodResults}}]}
 
-  \item{data}{a matrix or a data frame containing a
-  quantitative data set.}
+  \item{data}{a data frame containing a quantitative data
+  set.}
 
-  \item{variable1}{character containing the name of the
-  first variable. First column of data by default.}
+  \item{variable1}{index or character containing the name
+  of the first variable. First column of data by default.}
 
-  \item{variable2}{character containing the name of the
-  second variable. Second column of data by default.}
+  \item{variable2}{index or character containing the name
+  of the second variable. Second column of data by
+  default.}
 
   \item{col}{a specification for the default plotting
   color. By default partition is used to separate clusters
@@ -58,8 +59,13 @@
 }
 \examples{
 data(geyser)
-  xem <- mixmodCluster(geyser,3)
-  plotCluster(xem["bestResult"], geyser)
+  xem1 <- mixmodCluster(geyser,3)
+  plotCluster(xem1["bestResult"], geyser)
+
+  data(iris)
+  xem2 <- mixmodCluster(iris[1:4],2:6)
+  plotCluster(xem2["bestResult"], iris, variable1="Sepal.Length", variable2="Sepal.Width")
+  plotCluster(xem2["bestResult"], iris, variable1=1, variable2=4)
 }
 \seealso{
   \code{\link{plot}}

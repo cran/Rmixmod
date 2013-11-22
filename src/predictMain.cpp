@@ -9,7 +9,7 @@
 /***************************************************************************
  predictMain.cpp  description
  ------------------------
- copyright            : (C) MIXMOD Team - 2001-2012
+ copyright            : (C) MIXMOD Team - 2001-2013
  email                : contact@mixmod.org
  ***************************************************************************/
 
@@ -37,20 +37,20 @@
 #include <vector>
 #include <string>
 
-#include "MIXMOD/XEMUtil.h"
-#include "MIXMOD/XEMPredictMain.h"
-#include "MIXMOD/XEMPredictInput.h"
-#include "MIXMOD/XEMPredictOutput.h"
-#include "MIXMOD/XEMPredictModelOutput.h"
-#include "MIXMOD/XEMParameterDescription.h"
-#include "MIXMOD/XEMLabelDescription.h"
-#include "MIXMOD/XEMLabel.h"
-#include "MIXMOD/XEMProbaDescription.h"
-#include "MIXMOD/XEMProba.h"
-#include "MIXMOD/XEMGaussianParameter.h"
-#include "MIXMOD/XEMGaussianData.h"
-#include "MIXMOD/XEMBinaryData.h"
-#include "MIXMOD/XEMMatrix.h"
+#include "mixmod/Utilities/Util.h"
+#include "mixmod/DiscriminantAnalysis/Predict/PredictMain.h"
+#include "mixmod/DiscriminantAnalysis/Predict/PredictInput.h"
+#include "mixmod/DiscriminantAnalysis/Predict/PredictOutput.h"
+#include "mixmod/DiscriminantAnalysis/Predict/PredictModelOutput.h"
+#include "mixmod/Kernel/IO/ParameterDescription.h"
+#include "mixmod/Kernel/IO/LabelDescription.h"
+#include "mixmod/Kernel/IO/Label.h"
+#include "mixmod/Kernel/IO/ProbaDescription.h"
+#include "mixmod/Kernel/IO/Proba.h"
+#include "mixmod/Kernel/Parameter/GaussianParameter.h"
+#include "mixmod/Kernel/IO/GaussianData.h"
+#include "mixmod/Kernel/IO/BinaryData.h"
+#include "mixmod/Matrix/Matrix.h"
 
 #include <Rcpp.h>
 
@@ -67,7 +67,6 @@
 RcppExport SEXP predictMain( SEXP xem )
 {
   BEGIN_RCPP
-  
   // wrap S4 object
   Rcpp::S4 mixmodPredict(xem);
   // wrap data in Rcpp matrix
@@ -83,97 +82,178 @@ RcppExport SEXP predictMain( SEXP xem )
   // get nbVariable
   int nbVariable = mixmodPredict.slot("nbVariable");
   // wrap model name
-  XEMModelName modelName = StringToXEMModelName(Rcpp::as<std::string>(RDAResult.slot("model")));
+  XEM::ModelName modelName = XEM::StringToModelName(Rcpp::as<std::string>(RDAResult.slot("model")));
   
-  // gaussian or binary ?
-  bool isGaussian = Rcpp::as<std::string>(Rtype) == std::string("quantitative");
-
-  // data descritor
-  XEMDataDescription * dataDescription;
-  XEMGaussianData * gData(0);
-  XEMBinaryData * bData(0);
-  XEMParameterDescription * paramDescription(0);
-  
-  if (isGaussian)
-  {
-    /*===============================================*/
-    /*  Create XEM gaussian data set and description */
-    gData = Conversion::DataToXemGaussianData(RData);
-    dataDescription = new XEMDataDescription(gData);
-    
-    /*===============================================*/
-    /* Initialize input parameters in MIXMOD         */
-    // wrap proportions
-    Rcpp::NumericVector Rproportions(RParameter.slot("proportions"));
-    // create proportions from R parameter
-    double * proportions = Conversion::RcppVectorToCArray(Rproportions);
-    // wrap means
-    Rcpp::NumericMatrix Rmean(SEXP(RParameter.slot("mean")));
-    // create means from R parameter
-    double ** means = Conversion::RcppMatrixToC2DArray(Rmean);
-    // create variances from R parameter
-    Rcpp::List Rvariance(RParameter.slot("variance"));
-    // wrap variances
-    double *** variances = Conversion::RcppListOfMatrixToC3DArray(Rvariance);
-
-    // create new instance of XEMParameterDescription
-    paramDescription = new XEMParameterDescription((int64_t)nbCluster, (int64_t)nbVariable, modelName , proportions, means, variances);
-  }
+  // gaussian, binary or heterogeneous ?
+  XEM::DataType dataType;
+  if(Rcpp::as<std::string>(Rtype) == std::string("quantitative"))
+    dataType = XEM::QuantitativeData;
+  else if(Rcpp::as<std::string>(Rtype) == std::string("qualitative"))
+    dataType = XEM::QualitativeData;
   else
-  {
-    
-    /*===============================================*/
-    /* Initialize input parameters in MIXMOD         */
-    // wrap proportions
-    Rcpp::NumericVector Rproportions(RParameter.slot("proportions"));
-    // create proportions from R parameter
-    double * proportions = Conversion::RcppVectorToCArray(Rproportions);
-    // wrap centers
-    Rcpp::NumericMatrix Rcenters(SEXP(RParameter.slot("center")));
-    // create centers from R parameter
-    double ** centers = Conversion::RcppMatrixToC2DArray(Rcenters);
-    // wrap factors
-    Rcpp::NumericVector Rfactors(SEXP(RParameter.slot("factor")));
-    // create factors from R parameter
-    std::vector<int64_t> factors(Rfactors.size());
-    for (unsigned int i=0; i<factors.size(); i++) factors[i] = Rfactors[i];
-    // create scatters from R parameter
-    Rcpp::List Rscatters(RParameter.slot("scatter"));
-    // wrap scatters
-    double *** scatters = Conversion::RcppListOfMatrixToC3DArray(Rscatters);
-    
-    /*===============================================*/
-    /* Create XEM binary data set and description */
-    bData = Conversion::DataToXemBinaryData(RData, Rfactors);
-    dataDescription = new XEMDataDescription(bData);
-    // create new instance of XEMParameterDescription
-    paramDescription = new XEMParameterDescription((int64_t)nbCluster, (int64_t)nbVariable, factors, modelName , proportions, centers, scatters);
-  }
+    dataType = XEM::HeterogeneousData;
+  // data descritor
+  XEM::DataDescription * dataDescription;
+  XEM::GaussianData * gData(0);
+  XEM::BinaryData * bData(0);
+  XEM::CompositeData * cData(0);
+  XEM::ParameterDescription * paramDescription(0);
+  
+  switch (dataType) {
+    case XEM::QuantitativeData:
+    {
+      /*===============================================*/
+      /*  Create XEM gaussian data set and description */
+      gData = Conversion::DataToXemGaussianData(RData);
+      dataDescription = new XEM::DataDescription(gData);
 
+      /*===============================================*/
+      /* Initialize input parameters in MIXMOD         */
+      // wrap proportions
+      Rcpp::NumericVector Rproportions(RParameter.slot("proportions"));
+      // create proportions from R parameter
+      double * proportions = Conversion::RcppVectorToCArray(Rproportions);
+      // wrap means
+      Rcpp::NumericMatrix Rmean(SEXP(RParameter.slot("mean")));
+      // create means from R parameter
+      double ** means = Conversion::RcppMatrixToC2DArray(Rmean);
+      // create variances from R parameter
+      Rcpp::List Rvariance(RParameter.slot("variance"));
+      // wrap variances
+      double *** variances = Conversion::RcppListOfMatrixToC3DArray(Rvariance);
+
+      // create new instance of ParameterDescription
+      paramDescription = new XEM::ParameterDescription((int64_t)nbCluster, (int64_t)nbVariable, modelName , proportions, means, variances);
+      break;
+    }
+    case XEM::QualitativeData:
+    {
+
+      /*===============================================*/
+      /* Initialize input parameters in MIXMOD         */
+      // wrap proportions
+      Rcpp::NumericVector Rproportions(RParameter.slot("proportions"));
+      // create proportions from R parameter
+      double * proportions = Conversion::RcppVectorToCArray(Rproportions);
+      // wrap centers
+      Rcpp::NumericMatrix Rcenters(SEXP(RParameter.slot("center")));
+      // create centers from R parameter
+      double ** centers = Conversion::RcppMatrixToC2DArray(Rcenters);
+      // wrap factors
+      Rcpp::NumericVector Rfactors(SEXP(RParameter.slot("factor")));
+      // create factors from R parameter
+      std::vector<int64_t> factors(Rfactors.size());
+      for (unsigned int i=0; i<factors.size(); i++) factors[i] = Rfactors[i];
+      // create scatters from R parameter
+      Rcpp::List Rscatters(RParameter.slot("scatter"));
+      // wrap scatters
+      double *** scatters = Conversion::RcppListOfMatrixToC3DArray(Rscatters);
+
+      /*===============================================*/
+      /* Create XEM binary data set and description */
+      bData = Conversion::DataToXemBinaryData(RData, Rfactors);
+      dataDescription = new XEM::DataDescription(bData);
+      // create new instance of ParameterDescription
+      paramDescription = new XEM::ParameterDescription((int64_t)nbCluster, (int64_t)nbVariable, modelName , proportions, centers, scatters, factors);
+
+      break;
+    }
+    case XEM::HeterogeneousData:{
+      /*===============================================*/
+      /*  Create XEM heterogeneous data set and description */
+      Rcpp::NumericVector Rfactors(SEXP(RParameter.slot("factor")));
+      // create factors from R parameter
+
+      std::vector<int64_t> factors(Rfactors.size());
+      for (unsigned int i=0; i<factors.size(); i++) factors[i] = Rfactors[i];
+      cData = Conversion::DataToXemCompositeData(RData,Rfactors);
+      dataDescription = new XEM::DataDescription(cData);
+      // wrap proportions
+      Rcpp::NumericVector Rproportions(RParameter.slot("proportions"));
+      // create proportions from R parameter
+      double * proportions = Conversion::RcppVectorToCArray(Rproportions);
+      /*===============================================*/
+      /* Initialize input parameters in MIXMOD for gaussian parameters        */
+      // wrap gaussian parameters object
+      Rcpp::S4 RParameterg(RParameter.slot("g_parameter"));
+      // wrap means
+      Rcpp::NumericMatrix Rmean(SEXP(RParameterg.slot("mean")));
+      // create means from R parameter
+      double ** means = Conversion::RcppMatrixToC2DArray(Rmean);
+      // create variances from R parameter
+      Rcpp::List Rvariance(RParameterg.slot("variance"));
+      // wrap variances
+      double *** variances = Conversion::RcppListOfMatrixToC3DArray(Rvariance);
+
+      /*===============================================*/
+      /* Initialize input parameters in MIXMOD         */
+      // wrap binary parameters object
+      Rcpp::S4 RParameterb(RParameter.slot("m_parameter"));
+      // wrap centers
+      Rcpp::NumericMatrix Rcenters(SEXP(RParameterb.slot("center")));
+      // create centers from R parameter
+      double ** centers = Conversion::RcppMatrixToC2DArray(Rcenters);
+      // wrap factors
+      Rcpp::NumericVector Rfactorsb(SEXP(RParameterb.slot("factor")));
+      // create factors from R parameter
+      std::vector<int64_t> factorsb(Rfactorsb.size());
+      for (unsigned int i=0; i<factorsb.size(); i++) factorsb[i] = Rfactorsb[i];
+      // create scatters from R parameter
+      Rcpp::List Rscatters(RParameterb.slot("scatter"));
+      // wrap scatters
+      double *** scatters = Conversion::RcppListOfMatrixToC3DArray(Rscatters);
+      paramDescription = new XEM::ParameterDescription(int64_t(nbCluster)
+                                                     , int64_t(factorsb.size())
+                                                     , int64_t(factors.size()-factorsb.size())
+                                                     , modelName
+                                                     , proportions
+                                                     , centers
+                                                     , scatters
+                                                     , means
+                                                     , variances
+                                                     , factorsb);
+      break;
+    }
+    default:
+      break;
+  }
   // create predict input
-  XEMPredictInput * pInput =  new XEMPredictInput( dataDescription, paramDescription );
+  XEM::PredictInput * pInput =  new XEM::PredictInput( dataDescription, paramDescription );
  
   /* XEM will check if the option are corrects (should be the case) */
   pInput->finalize();
   
   /*===============================================*/
   /* Computation of the estimates */
-  // XEMMPredictMain
-  XEMPredictMain pMain(pInput);
+  // PredictMain
+  XEM::PredictMain pMain(pInput);
   // pmain run
-  pMain.run();
+  try {
+    pMain.run();
+  } catch (XEM::Exception & e) {
+    // add error
+     mixmodPredict.slot("error") = e.what();
+     if (dataDescription) delete dataDescription;
+     if (gData) delete gData;
+     if (bData) delete bData;
+     if (cData) delete cData;
+
+     // return final output
+     return mixmodPredict;
+  }
+
   /*===============================================*/
   // get XEMPredictModelOutput object from cMain
-  XEMPredictModelOutput * pMOutput = pMain.getPredictOutput()->getPredictModelOutput().front();
+  XEM::PredictModelOutput * pMOutput = pMain.getPredictOutput()->getPredictModelOutput().front();
   
-  if ( pMOutput->getStrategyRunError() == noError ){
+  if ( dynamic_cast<XEM::Exception&>(pMOutput->getStrategyRunError()) == XEM::NOERROR ){
     // add labels
     mixmodPredict.slot("partition") = Conversion::VectorToRcppVectorForInt(pMOutput->getLabelDescription()->getLabel()->getLabel());
     // add proba
     mixmodPredict.slot("proba") = Conversion::XEMMatrixToRcppMatrix(pMOutput->getProbaDescription()->getProba()->getProba());
   }
   // add error
-  mixmodPredict.slot("error") = XEMErrorTypeToString(pMOutput->getStrategyRunError());
+  mixmodPredict.slot("error") = (pMOutput->getStrategyRunError()).what();
   
   // release memory
   if (dataDescription) delete dataDescription;

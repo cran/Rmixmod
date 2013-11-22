@@ -13,9 +13,7 @@
 #define Rmixmod_ClusteringOUTPUTHANDLING_H_
 
 #include "OutputHandling.h"
-
-// pre-declaration
-class XEMClusteringModelOutput;
+#include "mixmod/Utilities/mixmod.h"
 
 /** base class for handling the mixmod outputs and filling them in
  *  a Rcpp list */
@@ -26,9 +24,9 @@ class ClusteringOutputHandling : public OutputHandling
      *  @param cMOutput the model estimated by mixmod
      *  @param output the Rcpp list to fill in
      **/
-    ClusteringOutputHandling( XEMClusteringModelOutput* cMOutput
+    ClusteringOutputHandling( XEM::ClusteringModelOutput* cMOutput
                              , Rcpp::S4& xem
-                             , const bool isGaussian
+                             , const XEM::DataType dataType
                              , Rcpp::CharacterVector const & Rcriterion
                              );
 

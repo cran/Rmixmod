@@ -5,20 +5,21 @@
   This is a class to run mixmod library.
 }
 \details{
-  \describe{ \item{data}{numeric vector, matrix, or data
-  frame of observations. Either qualitative or
-  quantitative.} \item{dataType}{character. It defines
-  whether data are quantitative or qualitative.}
-  \item{nbCluster}{integer. It indicates the number of
-  classes.} \item{knownLabels}{numeric. It contains the
-  known labels.} \item{weight}{numeric vector with n
-  (number of individuals) rows. Weight is optionnal. This
-  option is to be used when weight is associated to the
-  data.} \item{nbVariable}{integer. The number of
-  variables.} \item{nbSample}{integer. The number of
-  observations.} \item{criterion}{list of character. This
-  option permits to select the criterion giving the best
-  configuration of an execution.} \item{models}{a S4
+  \describe{ \item{data}{numeric vector or a data frame of
+  observations. Can be qualitative,quantitative or
+  both(heterogeneous)} \item{dataType}{character. Type of
+  data. It defines whether data is quantitative,
+  qualitative or composite} \item{nbCluster}{integer. It
+  indicates the number of classes.}
+  \item{knownLabels}{numeric. It contains the known
+  labels.} \item{weight}{numeric vector with n (number of
+  individuals) rows. Weight is optionnal. This option is to
+  be used when weight is associated to the data.}
+  \item{nbVariable}{integer. The number of variables.}
+  \item{nbSample}{integer. The number of observations.}
+  \item{criterion}{list of character. This option permits
+  to select the criterion giving the best configuration of
+  an execution.} \item{models}{a S4
   [\code{\linkS4class{Model}}] object. Defining the list of
   models to be tested.} \item{error}{logical. Say if at
   least one model finished with no error in MIXMOD.}

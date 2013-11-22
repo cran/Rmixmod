@@ -67,6 +67,7 @@ NULL
 ##' @param nbIterationInAlgo list of integers defining the number of iterations if you want to use nbIteration as rule to stop the algorithm(s). Default value: 200. 
 ##' @param epsilonInInit real defining the epsilon value in the initialization step. Only available if \code{initMethod} is "smallEM". Default value: 0.001.
 ##' @param epsilonInAlgo list of reals defining the epsilon value for the algorithm. Warning: epsilonInAlgo doesn't have any sens if \code{algo} is SEM, so it needs to be set as NaN in that case. Default value: 0.001.
+##' @param seed a positive integer defining the seed of the random number generator. Setting a particular seed allows the user to (re)-generate a particular serie of random numbers. NULL or negative value for a random seed.
 ##'
 ##' @examples
 ##'    mixmodStrategy()
@@ -79,9 +80,9 @@ NULL
 ##' @author Remi Lebret and Serge Iovleff and Florent Langrognet, with contributions from C. Biernacki and G. Celeux and G. Govaert \email{contact@@mixmod.org}
 ##' @export
 ##'
-mixmodStrategy <- function( algo="EM", nbTry=1, initMethod="smallEM", nbTryInInit=50, nbIterationInInit=5, nbIterationInAlgo=200, epsilonInInit=0.001, epsilonInAlgo=0.001 ){
+mixmodStrategy <- function( algo="EM", nbTry=1, initMethod="smallEM", nbTryInInit=50, nbIterationInInit=5, nbIterationInAlgo=200, epsilonInInit=0.001, epsilonInAlgo=0.001, seed=NULL ){
   # create a new class Strategy
-  new("Strategy", algo=algo, nbTry=nbTry, initMethod=initMethod, nbTryInInit=nbTryInInit, nbIterationInInit=nbIterationInInit, nbIterationInAlgo=nbIterationInAlgo, epsilonInInit=epsilonInInit, epsilonInAlgo=epsilonInAlgo)
+  new("Strategy", algo=algo, nbTry=nbTry, initMethod=initMethod, nbTryInInit=nbTryInInit, nbIterationInInit=nbIterationInInit, nbIterationInAlgo=nbIterationInAlgo, epsilonInInit=epsilonInInit, epsilonInAlgo=epsilonInAlgo, seed=seed)
 }
 ###################################################################################
 
@@ -100,6 +101,7 @@ mixmodStrategy <- function( algo="EM", nbTry=1, initMethod="smallEM", nbTryInIni
 ##'   \item{nbIterationInAlgo}{list of integers defining the number of iterations if user want to use nbIteration as rule to stop the algorithm(s). Default value: 200.} 
 ##'   \item{epsilonInInit}{real defining the epsilon value in the initialization step. Only available if \code{initMethod} is "smallEM". Default value: 0.001.}
 ##'   \item{epsilonInAlgo}{list of reals defining the epsilon value for the algorithm. Warning: epsilonInAlgo doesn't have any sens if \code{algo} is SEM, so it needs to be set as NaN in that case. Default value: 0.001.}
+##'   \item{seed}{integer defining the seed of the random number generator. Setting a particular seed allows the user to (re)-generate a particular serie of random numbers. Default value is NULL, i.e. a random seed.}
 ##' }
 ##'
 ##' @examples
@@ -122,7 +124,8 @@ setClass(
         nbIterationInInit = "numeric",
         nbIterationInAlgo = "numeric",
         epsilonInInit = "numeric",
-        epsilonInAlgo = "numeric"
+        epsilonInAlgo = "numeric",
+        seed = "numeric"
     ),
     prototype=prototype(
         algo = "EM",
@@ -132,7 +135,8 @@ setClass(
         nbIterationInInit = 5,
         nbIterationInAlgo = 200,
         epsilonInInit = 0.001,
-        epsilonInAlgo = 0.001
+        epsilonInAlgo = 0.001,
+        seed = -1
     ),
     # validity function
     validity=function(object){
@@ -218,7 +222,7 @@ setClass(
 setMethod(
   f="initialize",
   signature=c("Strategy"),
-  definition=function(.Object,algo,nbTry,initMethod,nbTryInInit,nbIterationInInit,nbIterationInAlgo,epsilonInInit,epsilonInAlgo
+  definition=function(.Object,algo,nbTry,initMethod,nbTryInInit,nbIterationInInit,nbIterationInAlgo,epsilonInInit,epsilonInAlgo,seed
 ){
     if(!missing(algo)){
       if(length(algo)>1){
@@ -266,6 +270,15 @@ setMethod(
       else{.Object@nbIterationInAlgo<-nbIterationInAlgo[1]}
     }
     
+    if(!missing(seed)){ 
+      if(is.null(seed)){
+        .Object@seed<-(-1)
+      }else{
+        .Object@seed<-seed 
+      }
+    }
+    else{.Object@seed<-(-1)}
+
     if(!missing(nbTry)){ .Object@nbTry<-nbTry }
     else{.Object@nbTry<-1}
 
@@ -313,6 +326,7 @@ setMethod(
     cat("* number of tries      = ", x@nbTryInInit, "\n")
     cat("* number of iterations = ", x@nbIterationInInit, "\n")
     cat("* epsilon              = ", x@epsilonInInit, "\n")
+    cat("* seed                 = ", ifelse(x@seed<0,"NULL",x@seed), "\n")
     cat("****************************************\n")
   }
 )
@@ -338,6 +352,7 @@ setMethod(
     cat("* number of tries      = ", object@nbTryInInit, "\n")
     cat("* number of iterations = ", object@nbIterationInInit, "\n")
     cat("* epsilon              = ", object@epsilonInInit, "\n")
+    cat("* seed                 = ", ifelse(object@seed<0,"NULL",object@seed), "\n")
     cat("****************************************\n")
   }
 )
@@ -362,6 +377,7 @@ setMethod(
         "nbTryInInit"={return(x@nbTryInInit)},
         "nbIterationInInit"={return(x@nbIterationInInit)},
         "epsilonInInit"={return(x@epsilonInInit)},
+        "seed"={return(x@seed)},
         stop("This attribute doesn't exist !")
       )
     }else{
@@ -392,6 +408,7 @@ setReplaceMethod(
         "nbTryInInit"={x@nbTryInInit<-value},
         "nbIterationInInit"={x@nbIterationInInit<-value},
         "epsilonInInit"={x@epsilonInInit<-value},
+        "seed"={x@seed<-value},
         stop("This attribute doesn't exist !")
       )
     }else{

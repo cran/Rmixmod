@@ -5,7 +5,8 @@
   mixmodStrategy(algo = "EM", nbTry = 1,
     initMethod = "smallEM", nbTryInInit = 50,
     nbIterationInInit = 5, nbIterationInAlgo = 200,
-    epsilonInInit = 0.001, epsilonInAlgo = 0.001)
+    epsilonInInit = 0.001, epsilonInAlgo = 0.001,
+    seed = NULL)
 }
 \arguments{
   \item{algo}{list of character string with the estimation
@@ -46,6 +47,11 @@
   value for the algorithm. Warning: epsilonInAlgo doesn't
   have any sens if \code{algo} is SEM, so it needs to be
   set as NaN in that case. Default value: 0.001.}
+
+  \item{seed}{a positive integer defining the seed of the
+  random number generator. Setting a particular seed allows
+  the user to (re)-generate a particular serie of random
+  numbers. NULL or negative value for a random seed.}
 }
 \value{
   a [\code{\linkS4class{Strategy}}] object

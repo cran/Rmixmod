@@ -263,7 +263,13 @@ setMethod(
 ##' @references C. Biernacki, G. Celeux, G. Govaert, F. Langrognet. "Model-Based Cluster and Discriminant Analysis with the MIXMOD Software". Computational Statistics and Data Analysis, vol. 51/2, pp. 587-600. (2006)
 ##' @examples
 ##'   mixmodGaussianModel()
+##'   # all Gaussian models with equal proportions
 ##'   mixmodGaussianModel(family="all",free.proportions=FALSE)
+##'   # Diagonal and Spherical Gaussian models
+##'   mixmodGaussianModel(family=c("diagonal","spherical"))
+##'   # Gaussian models with a pre-defined list
+##'   mixmodGaussianModel(listModels=c("Gaussian_p_L_C","Gaussian_p_L_Ck","Gaussian_pk_L_I"))
+##'
 ##' @author Remi Lebret and Serge Iovleff and Florent Langrognet, with contributions from C. Biernacki and G. Celeux and G. Govaert \email{contact@@mixmod.org}
 ##' @export
 ##'

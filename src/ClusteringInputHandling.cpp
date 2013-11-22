@@ -9,17 +9,17 @@
 #include "ClusteringInputHandling.h"
 #include <vector>
 
-#include "MIXMOD/XEMClusteringInput.h"
-#include "MIXMOD/XEMClusteringStrategy.h"
-#include "MIXMOD/XEMClusteringStrategyInit.h"
-#include "MIXMOD/XEMModelType.h"
-#include "MIXMOD/XEMAlgo.h"
+#include "mixmod/Clustering/ClusteringInput.h"
+#include "mixmod/Clustering/ClusteringStrategy.h"
+#include "mixmod/Clustering/ClusteringStrategyInit.h"
+#include "mixmod/Kernel/Model/ModelType.h"
+#include "mixmod/Kernel/Algo/Algo.h"
 
-#include "MIXMOD/XEMUtil.h"
+#include "mixmod/Utilities/Util.h"
 
 
 //default constructor
-ClusteringInputHandling::ClusteringInputHandling( XEMClusteringInput* cInput
+ClusteringInputHandling::ClusteringInputHandling( XEM::ClusteringInput* cInput
                                                 , Rcpp::S4& algoOptions
                                                 ) 
                                                 : InputHandling(cInput)
@@ -57,18 +57,18 @@ void ClusteringInputHandling::setAlgo()
     // EM Algo
     if (algo[i] == "EM")
     { 
-      cStrategy_->addAlgo(EM); 
+      cStrategy_->addAlgo(XEM::EM);
       // set epsilon value
       if ( (epsilonInAlgo[i]>0) & (epsilonInAlgo[i]<1) )
       { cStrategy_->setAlgoEpsilon(i, epsilonInAlgo[i]); }
     }
     // SEM Algo
     else if (algo[i] == "SEM")
-    { cStrategy_->addAlgo(SEM); }
+    { cStrategy_->addAlgo(XEM::SEM); }
     // CEM Algo
     else if (algo[i] == "CEM")
     { 
-      cStrategy_->addAlgo(CEM); 
+      cStrategy_->addAlgo(XEM::CEM);
       // set epsilon value
       if ( (epsilonInAlgo[i]>0) & (epsilonInAlgo[i]<1) )
       { cStrategy_->setAlgoEpsilon(i, epsilonInAlgo[i]); }
@@ -148,17 +148,17 @@ void ClusteringInputHandling::setNbTry()
 }
 
 /// setInitParameter
-void ClusteringInputHandling::setInitParameter(XEMParameter** parameter)
+void ClusteringInputHandling::setInitParameter(XEM::Parameter** parameter)
 {
   //get initName
-  XEMStrategyInitName initName = cStrategy_->getStrategyInit()->getStrategyInitName();
+  XEM::StrategyInitName initName = cStrategy_->getStrategyInit()->getStrategyInitName();
   //get nbInitParameter value
   int64_t nbInitParameter = cStrategy_->getStrategyInit()->getNbInitParameter();
   //get parameter
   //XEMParameter** parameter = cInput_->getStrategy()->getStrategyInit()->getTabInitParameter();
   //get nbCluster value
   int64_t nbCluster = cInput_->getNbCluster(0);
-  if (initName == USER)
+  if (initName == XEM::USER)
   {
     if (nbCluster == 1)
     {
@@ -168,7 +168,7 @@ void ClusteringInputHandling::setInitParameter(XEMParameter** parameter)
 }
 
 /// setInitPartition
-void ClusteringInputHandling::setInitPartition( XEMPartition ** tabPartition
+void ClusteringInputHandling::setInitPartition( XEM::Partition ** tabPartition
                                      , int64_t nbPartition
                                      )
 { cStrategy_->setTabPartition(tabPartition, nbPartition);}

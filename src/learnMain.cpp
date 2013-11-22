@@ -9,7 +9,7 @@
 /***************************************************************************
  learnMain.cpp  description
  ------------------------
- copyright            : (C) MIXMOD Team - 2001-2012
+ copyright            : (C) MIXMOD Team - 2001-2013
  email                : contact@mixmod.org
  ***************************************************************************/
 
@@ -37,17 +37,18 @@
 #include <vector>
 #include <string>
 
-#include "MIXMOD/XEMUtil.h"
-#include "MIXMOD/XEMLearnMain.h"
-#include "MIXMOD/XEMLearnInput.h"
-#include "MIXMOD/XEMLearnOutput.h"
-#include "MIXMOD/XEMLearnModelOutput.h"
-#include "MIXMOD/XEMParameterDescription.h"
-#include "MIXMOD/XEMLabelDescription.h"
-#include "MIXMOD/XEMGaussianParameter.h"
-#include "MIXMOD/XEMGaussianData.h"
-#include "MIXMOD/XEMBinaryData.h"
-#include "MIXMOD/XEMMatrix.h"
+#include "mixmod/Utilities/Util.h"
+#include "mixmod/DiscriminantAnalysis/Learn/LearnMain.h"
+#include "mixmod/DiscriminantAnalysis/Learn/LearnInput.h"
+#include "mixmod/DiscriminantAnalysis/Learn/LearnOutput.h"
+#include "mixmod/DiscriminantAnalysis/Learn/LearnModelOutput.h"
+#include "mixmod/Kernel/IO/ParameterDescription.h"
+#include "mixmod/Kernel/IO/LabelDescription.h"
+#include "mixmod/Kernel/Parameter/GaussianParameter.h"
+#include "mixmod/Kernel/IO/GaussianData.h"
+#include "mixmod/Kernel/IO/BinaryData.h"
+#include "mixmod/Kernel/IO/CompositeData.h"
+#include "mixmod/Matrix/Matrix.h"
 
 #include <Rcpp.h>
 
@@ -82,28 +83,42 @@ RcppExport SEXP learnMain( SEXP xem )
   Rcpp::NumericVector Rweight(mixmodLearn.slot("weight")); 
   // wrap nbCVBlock
   Rcpp::NumericVector RnbCVBlock(mixmodLearn.slot("nbCVBlocks"));
-  // gaussian or binary ?
-  bool isGaussian = Rcpp::as<std::string>(Rtype) == std::string("quantitative");
-
-  // data descritor
-  XEMDataDescription* dataDescription;
-  XEMGaussianData* gData(0);
-  XEMBinaryData* bData(0);
-  if (isGaussian)
-  {
-    /*===============================================*/
-    /*  Create XEM gaussian data set and description */
-    gData = Conversion::DataToXemGaussianData(RData);
-    dataDescription = new XEMDataDescription(gData);
-  }
+  // gaussian, binary or heterogeneous ?
+  XEM::DataType dataType;
+  if(Rcpp::as<std::string>(Rtype) == std::string("quantitative"))
+    dataType = XEM::QuantitativeData;
+  else if(Rcpp::as<std::string>(Rtype) == std::string("qualitative"))
+    dataType = XEM::QualitativeData;
   else
-  {
-    // wrap factor in Rcpp
-    Rcpp::NumericVector Rfactor(mixmodLearn.slot("factor")); 
-    /*===============================================*/
-    /* Create XEM binary data set and description */
-    bData = Conversion::DataToXemBinaryData(RData, Rfactor);
-    dataDescription = new XEMDataDescription(bData);
+    dataType = XEM::HeterogeneousData;
+  // data descritor
+  XEM::DataDescription* dataDescription;
+  XEM::GaussianData* gData(0);
+  XEM::BinaryData* bData(0);
+  XEM::CompositeData* cData(0);
+  // wrap factor in Rcpp
+  Rcpp::NumericVector Rfactor(mixmodLearn.slot("factor"));
+  switch (dataType) {
+    case XEM::QuantitativeData:
+      /*===============================================*/
+      /*  Create XEM gaussian data set and description */
+      gData = Conversion::DataToXemGaussianData(RData);
+      dataDescription = new XEM::DataDescription(gData);
+      break;
+    case XEM::QualitativeData:
+      /*===============================================*/
+      /* Create XEM binary data set and description */
+      bData = Conversion::DataToXemBinaryData(RData, Rfactor);
+      dataDescription = new XEM::DataDescription(bData);
+      break;
+    case XEM::HeterogeneousData:
+      /*===============================================*/
+      /* Create XEM binary data set and description */
+      cData = Conversion::DataToXemCompositeData(RData, Rfactor);
+      dataDescription = new XEM::DataDescription(cData);
+      break;
+    default:
+      break;
   }
   
   /*===============================================*/
@@ -111,10 +126,10 @@ RcppExport SEXP learnMain( SEXP xem )
   // create labels from R parameter
   std::vector<int64_t> labels(RPartition.size());
   for (unsigned int i=0; i<labels.size(); i++ ) labels[i]=RPartition[i];
-  XEMLabelDescription * labelDescription = new XEMLabelDescription( labels.size(), labels );
+  XEM::LabelDescription * labelDescription = new XEM::LabelDescription( labels.size(), labels );
   
-  // create XEMMLearnInput
-  XEMLearnInput * lInput =  new XEMLearnInput( dataDescription, labelDescription );
+  // create LearnInput
+  XEM::LearnInput * lInput =  new XEM::LearnInput( dataDescription, labelDescription );
   // initialize the parameters using user defined values (see Algo.R)
   InputHandling initInput(lInput);
   
@@ -136,14 +151,15 @@ RcppExport SEXP learnMain( SEXP xem )
   //std::cout << "Input finished" << std::endl;
   /*===============================================*/
   /* Computation of the estimates */
-  // XEMMLearnMain
-  XEMLearnMain lMain(lInput);
+  // LearnMain
+  XEM::LearnMain lMain(lInput);
   // lmain run
-  lMain.run();
+  lMain.run(-1);
+
   //std::cout << "Run finished" << std::endl;
   /*===============================================*/
-  // get XEMLearnOutput object from cMain
-  XEMLearnOutput * lOutput = lMain.getLearnOutput();
+  // get LearnOutput object from cMain
+  XEM::LearnOutput * lOutput = lMain.getLearnOutput();
   // Treatment : sort with the first criterion (there is only one criterion)
   lOutput->sort(lInput->getCriterionName(0));
   //std::cout << "Sort finished" << std::endl;
@@ -161,7 +177,7 @@ RcppExport SEXP learnMain( SEXP xem )
     for ( int i=0; i<lOutput->getNbLearnModelOutput(); i++ )
     {
       // create the output object for R
-      LearnOutputHandling(lOutput->getLearnModelOutput(i), iResults, isGaussian, Rcriterion, labels);
+      LearnOutputHandling(lOutput->getLearnModelOutput(i), iResults, dataType, Rcriterion, labels);
       // add those results to the list
       resList[i] = Rcpp::clone(iResults);
     } 
@@ -169,7 +185,7 @@ RcppExport SEXP learnMain( SEXP xem )
     mixmodLearn.slot("results") = resList;
     
     // add the best results
-    LearnOutputHandling(lOutput->getLearnModelOutput().front(), iResults, isGaussian, Rcriterion, labels);
+    LearnOutputHandling(lOutput->getLearnModelOutput().front(), iResults, dataType, Rcriterion, labels);
     mixmodLearn.slot("bestResult") = Rcpp::clone(iResults);
   }
   
@@ -182,6 +198,7 @@ RcppExport SEXP learnMain( SEXP xem )
   if (dataDescription) delete dataDescription;
   if (gData) delete gData;
   if (bData) delete bData;
+  if (cData) delete cData;
   
   // return final output
   return mixmodLearn;

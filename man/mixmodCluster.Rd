@@ -7,15 +7,16 @@
     criterion = "BIC", weight = NULL, knownLabels = NULL)
 }
 \arguments{
-  \item{data}{matrix or data frame containing quantitative
-  or qualitative data. Rows correspond to observations and
+  \item{data}{frame containing quantitative,qualitative or
+  heterogeneous data. Rows correspond to observations and
   columns correspond to variables.}
 
   \item{nbCluster}{numeric listing the number of clusters.}
 
-  \item{dataType}{character. Type of data is either
-  "quantitative" or "qualitative". Set as NULL by default,
-  type will be guessed depending on variables type.}
+  \item{dataType}{character. Type of data is
+  "quantitative", "qualitative" or "composite". Set as NULL
+  by default, type will be guessed depending on variables
+  type.}
 
   \item{models}{a [\code{\linkS4class{Model}}] object
   defining the list of models to run. For quantitative
@@ -64,17 +65,24 @@
   ## with default values
   mixmodCluster(geyser, nbCluster=2:6)
 
-  ## An example with the birds data set
+  ## A qualitative example with the birds data set
   data(birds)
-  mixmodCluster(data=birds, nbCluster = 2:5, criterion= c("BIC","ICL","NEC"), model = mixmodMultinomialModel())
+  mixmodCluster(data=birds, nbCluster = 2:5, criterion= c("BIC","ICL","NEC"),
+                model = mixmodMultinomialModel())
 
   ## use graphics functions
   xem <- mixmodCluster(data=geyser, nbCluster=3)
+  \dontrun{
   plot(xem)
   hist(xem)
+  }
 
   ## get summary
   summary(xem)
+
+  ## A composite example with a heterogeneous data set
+  data(heterodata)
+  mixmodCluster(heterodata,2)
 }
 \author{
   Remi Lebret and Serge Iovleff and Florent Langrognet,

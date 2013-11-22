@@ -7,8 +7,9 @@
 
 #include "Conversion.h"
 
-#include "MIXMOD/XEMGaussianData.h"
-#include "MIXMOD/XEMBinaryData.h"
+#include "mixmod/Kernel/IO/GaussianData.h"
+#include "mixmod/Kernel/IO/BinaryData.h"
+#include "mixmod/Kernel/IO/CompositeData.h"
 
 namespace Conversion
 {
@@ -101,7 +102,7 @@ Rcpp::NumericVector VectorToRcppVectorForInt( std::vector<int64_t> const & data)
 }
 
 /*To spin off information for partition */
-  Rcpp::NumericMatrix LabelToPartition( int64_t nbCluster, std::vector<int64_t> const & labels)
+Rcpp::NumericMatrix LabelToPartition( int64_t nbCluster, std::vector<int64_t> const & labels)
 {
   int nbSample = labels.size() ;
 
@@ -121,9 +122,9 @@ Rcpp::NumericVector VectorToRcppVectorForInt( std::vector<int64_t> const & data)
 /*
  *  convert a gaussian dataset to a Xem gaussian data set
  * @param data the input data set
- * @return a pointer on a XEMGaussianData set
+ * @return a pointer on a GaussianData set
  */
-XEMGaussianData * DataToXemGaussianData(Rcpp::NumericMatrix& data)
+XEM::GaussianData * DataToXemGaussianData(Rcpp::NumericMatrix& data)
 {
   // wrap int variables to int64_t variables
   int64_t nbSample64 = data.nrow(), nbVariable64 = data.ncol();
@@ -136,7 +137,7 @@ XEMGaussianData * DataToXemGaussianData(Rcpp::NumericMatrix& data)
      matrix[i][j] = data(i,j);
   }
   // create XEMGaussianData
-  XEMGaussianData*  gData = new XEMGaussianData(nbSample64, nbVariable64, matrix);
+  XEM::GaussianData*  gData = new XEM::GaussianData(nbSample64, nbVariable64, matrix);
 
   // release memory
   for (int64_t i=0; i<nbSample64; i++)
@@ -152,7 +153,7 @@ XEMGaussianData * DataToXemGaussianData(Rcpp::NumericMatrix& data)
  * @param data the input data set
  * @return a pointer on a XEMBinaryData set
  */
-XEMBinaryData * DataToXemBinaryData(Rcpp::NumericMatrix& data, Rcpp::NumericVector& factor)
+XEM::BinaryData * DataToXemBinaryData(Rcpp::NumericMatrix& data, Rcpp::NumericVector& factor)
 {
   // wrap int variables to int64_t variables
   int64_t nbSample64 = data.nrow(), nbVariable64 = data.ncol();
@@ -173,7 +174,7 @@ XEMBinaryData * DataToXemBinaryData(Rcpp::NumericMatrix& data, Rcpp::NumericVect
   { nbModality[j]=factor[j]; }
   
   // create XEMBinaryData
-  XEMBinaryData*  bData = new XEMBinaryData(nbSample64, nbVariable64, nbModality, matrix);
+  XEM::BinaryData*  bData = new XEM::BinaryData(nbSample64, nbVariable64, nbModality, matrix);
 
   // release memory
   for (int64_t i=0; i<nbSample64; i++)
@@ -182,6 +183,59 @@ XEMBinaryData * DataToXemBinaryData(Rcpp::NumericMatrix& data, Rcpp::NumericVect
   matrix = 0;
 
   return bData;
+}
+
+XEM::CompositeData * DataToXemCompositeData(Rcpp::NumericMatrix& data, Rcpp::NumericVector& factor)
+{
+  int64_t nbSample = data.nrow();
+  int64_t totalColumns = data.ncol();
+  int64_t nbcolbinary =0,nbcolgaussian=0;
+  for (int i = 0; i < totalColumns; ++i) {
+    if(factor(i)>0)
+      nbcolbinary++;
+    else
+      nbcolgaussian++;
+  }
+
+  int64_t ** bmatrix = new int64_t * [nbSample];
+  double ** gmatrix = new double * [nbSample];
+  std::vector<int64_t> nbModality(nbcolbinary);
+  int64_t bcols=0,gcols=0;
+  for (int i=0; i<nbSample; i++)
+  {
+   bmatrix[i] = new int64_t[nbcolbinary];
+   gmatrix[i] = new double[nbcolgaussian];
+   for (int j=0; j<totalColumns; j++)
+   {
+     if(factor(j)>0)
+     {
+       bmatrix[i][bcols] = (int64_t)data(i,j);
+       nbModality[bcols++] = factor(j);
+     }
+     else
+       gmatrix[i][gcols++] = (double)data(i,j);
+   }
+   bcols=0;gcols=0;
+  }
+
+  XEM::BinaryData*  bData = new XEM::BinaryData(nbSample, nbcolbinary, nbModality, bmatrix);
+  XEM::GaussianData*  gData = new XEM::GaussianData(nbSample, nbcolgaussian, gmatrix);
+  XEM::CompositeData * cData = new XEM::CompositeData(bData,gData);
+
+  // release memory
+  for (int64_t i=0; i<nbSample; i++)
+  {
+    delete [] gmatrix[i];
+    delete [] bmatrix[i];
+
+  }
+  delete [] gmatrix;
+  delete [] bmatrix;
+  gmatrix = NULL;
+  bmatrix = NULL;
+
+  return cData;
+
 }
 
   

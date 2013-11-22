@@ -167,9 +167,9 @@ ellipse<-function(x, i, j){
 ##' The squared relative lengths of the principal axes are given by the corresponding eigenvalues.
 ##'
 ##' @param x an object of class [\code{\linkS4class{MixmodResults}}]
-##' @param data a matrix or a data frame containing a quantitative data set.
-##' @param variable1 character containing the name of the first variable. First column of data by default.
-##' @param variable2 character containing the name of the second variable. Second column of data by default.
+##' @param data a data frame containing a quantitative data set.
+##' @param variable1 index or character containing the name of the first variable. First column of data by default.
+##' @param variable2 index or character containing the name of the second variable. Second column of data by default.
 ##' @param col a specification for the default plotting color. By default partition is used to separate clusters with different colors.
 ##' @param pch either an integer specifying a symbol or a single character to be used as the default in plotting points. By default partition is used to seperate clusters with different symbols.
 ##' @param xlab a title for the x axis. Variable1 by default.
@@ -179,8 +179,13 @@ ellipse<-function(x, i, j){
 ##'
 ##' @examples
 ##'   data(geyser)
-##'   xem <- mixmodCluster(geyser,3)
-##'   plotCluster(xem["bestResult"], geyser)
+##'   xem1 <- mixmodCluster(geyser,3)
+##'   plotCluster(xem1["bestResult"], geyser)
+##'
+##'   data(iris)
+##'   xem2 <- mixmodCluster(iris[1:4],2:6)
+##'   plotCluster(xem2["bestResult"], iris, variable1="Sepal.Length", variable2="Sepal.Width")
+##'   plotCluster(xem2["bestResult"], iris, variable1=1, variable2=4)
 ##'
 ##' @seealso \code{\link{plot}}
 ##' @export
@@ -192,15 +197,39 @@ plotCluster <- function(x, data, variable1=colnames(data)[1], variable2=colnames
     stop("x must contains Gaussian parameters!")
   if ( !is.matrix(data) & !is.data.frame(data) )
     stop("data must be a data.frame or a matrix object!")
-  if ( !(variable1 %in% colnames(data)) )
-    stop("variable1 is unknown!")
-  if ( !(variable2 %in% colnames(data)) )
-    stop("variable2 is unknown!")
+
   
-  # get variables indices
-  index1<-which(colnames(data) == variable1)
-  index2<-which(colnames(data) == variable2)
-  
+  # get variable1 index
+  if (is.numeric(variable1)){
+    if (variable1>ncol(data))
+      stop("variable1 index mismatch the data frame dimension")
+    else{
+      index1<-variable1
+      xlab<-colnames(data)[variable1]
+    }
+  }
+  else{
+    if ( !(variable1 %in% colnames(data)) )
+      stop("variable1 is unknown!")
+    else
+      index1<-which(colnames(data) == variable1)
+  }
+  # get variable2 index
+  if (is.numeric(variable2)){
+    if (variable2>ncol(data))
+      stop("variable2 index mismatch the data frame dimension")
+    else{
+      index2<-variable2
+      ylab<-colnames(data)[variable2]
+    }
+  }
+  else{
+    if ( !(variable2 %in% colnames(data)) )
+      stop("variable2 is unknown!")
+    else
+      index2<-which(colnames(data) == variable2)
+  }
+
   plot(data[,index1],data[,index2],col=col,pch=pch, xlab=xlab, ylab=ylab, ...)
   if ( add.ellipse ) ellipse(x,index1,index2)
 }
@@ -216,8 +245,8 @@ plotCluster <- function(x, data, variable1=colnames(data)[1], variable2=colnames
 ##' Data with the density of each cluster and the mixture density are drawn for each variable.
 ##'
 ##' @param x an object of class [\code{\linkS4class{MixmodResults}}]
-##' @param data a vector, matrix or data frame containing a quantitative data set.
-##' @param variables list of variables names to compute a histogram. All variables from data by default.
+##' @param data a vector or data frame containing a quantitative data set.
+##' @param variables list of variables names (or indices) to compute a histogram. All variables from data by default.
 ##' @param xlab a list of title for the x axis. xlab must have the same length than variables.
 ##' @param main a list of title for the histogram. main must have the same length than variables.
 ##' @param ... further arguments passed to or from other methods
@@ -225,7 +254,8 @@ plotCluster <- function(x, data, variable1=colnames(data)[1], variable2=colnames
 ##' @examples
 ##'   data(geyser)
 ##'   xem1 <- mixmodCluster(geyser,3)
-##'   histCluster(xem1["bestResult"], geyser)
+##'   \dontrun{ histCluster(xem1["bestResult"], geyser) }
+##'   histCluster(xem1["bestResult"], geyser, variables=1)
 ##'
 ##' @seealso \code{\link{hist}}
 ##' @export
@@ -235,21 +265,33 @@ histCluster <- function(x, data, variables=colnames(data), xlab=rep("",length(va
   if ( !is(x,"MixmodResults") )
   stop("'x' must be a MixmodResults object!")
   if ( !is.matrix(data) & !is.data.frame(data) & !is.vector(data) )
-  stop("'data' must be a vector, a data.frame or a matrix object!")
+  stop("'data' must be a vector or a data.frame or a matrix object!")
   if ( (length(variables) == 0) & (ncol(data)>1))
   stop("'variables' is empty!")
   if ( length(variables)>ncol(data) )
   stop("List of variables too long!")
-  if ( sum(!(variables %in% colnames(data))) )
-  stop("At least one variable is unknown!") 
+
+  # get the indices of variables
+  if (is.numeric(variables)){
+    if (max(variables)>ncol(data))
+      stop("At least one variable index mismatch the data frame dimension")
+    else{
+      indices<-variables
+      main=paste("Histogram of",colnames(data)[variables])
+    }
+  }
+  else{
+    if ( sum(!(variables %in% colnames(data))) )
+      stop("At least one variable is unknown!") 
+    else{
+      if ( ncol(data)==1 ){ indices<-1 }
+      else { indices<-which(colnames(data) %in% variables) }
+    }
+  }
+  nvar<-length(indices)
   
   # get old par 
   op <- par(no.readonly = TRUE) # the whole list of settable par's.
-  
-  # get the indices of variables
-  if ( ncol(data)==1 ){ indices<-1 }
-  else { indices<-which(colnames(data) %in% variables) }
-  nvar<-length(indices)
   
   if ( is(x@parameters, "GaussianParameter") ){
     if ( isQualitative(data) )
@@ -291,6 +333,9 @@ histCluster <- function(x, data, variables=colnames(data), xlab=rep("",length(va
   else if ( is(x@parameters, "MultinomialParameter") ){
     stop("x must contain Gaussian parameters. See barplot() to plot multinomial parameters.")
   }
+  else if ( is(x@parameters, "CompositeParameter") ){
+    stop("x must contain Gaussian parameters. No plot device for composite parameters.")
+  }
   else{
     stop("Uknown type of parameters!")
   }
@@ -310,15 +355,17 @@ histCluster <- function(x, data, variables=colnames(data), xlab=rep("",length(va
 ##' each modality to be in that cluster.
 ##'
 ##' @param x an object of class [\code{\linkS4class{MixmodResults}}]
-##' @param data a vector, matrix or data frame containing a qualitative data set.
-##' @param variables list of variables names to compute a barplot. All variables from data by default.
+##' @param data a vector or data frame containing a qualitative data set.
+##' @param variables list of variables names (or indices) to compute a barplot. All variables from data by default.
 ##' @param main a list of title for the barplot. main must have the same length than variables.
 ##' @param ... further arguments passed to or from other methods
 ##'
 ##' @examples
 ##'   data(birds)
-##'   xem2 <- mixmodCluster(birds,2)
-##'   barplotCluster(xem2["bestResult"], birds)
+##'   xem <- mixmodCluster(birds,2)
+##'   barplotCluster(xem["bestResult"], birds)
+##'   barplotCluster(xem["bestResult"], birds, variables=c(2,3,4))
+##'   barplotCluster(xem["bestResult"], birds, variables=c("eyebrow","collar"))
 ##'
 ##' @seealso \code{\link{barplot}}
 ##' @export
@@ -333,16 +380,29 @@ barplotCluster <- function(x, data, variables=colnames(data), main=paste("Barplo
     stop("'variables' is empty!")
   if ( length(variables)>ncol(data) )
     stop("List of variables too long!")
-  if ( sum(!(variables %in% colnames(data))) )
-    stop("At least one variable is unknown!") 
-  
+
+  # get the indices of variables
+  if (is.numeric(variables)){
+    if (max(variables)>ncol(data))
+      stop("At least one variable index mismatch the data frame dimension")
+    else{
+      indices<-variables
+      main=paste("Barplot of",colnames(data)[variables])
+    }
+  }
+  else{
+    if ( sum(!(variables %in% colnames(data))) )
+      stop("At least one variable is unknown!") 
+    else{
+      if ( ncol(data)==1 ){ indices<-1 }
+      else { indices<-which(colnames(data) %in% variables) }
+    }
+  }
+  nvar<-length(indices)
+
   # get old par 
   op <- par(no.readonly = TRUE) # the whole list of settable par's.
   
-  # get the indices of variables
-  if ( ncol(data)==1 ){ indices<-1 }
-  else { indices<-which(colnames(data) %in% variables) }
-  nvar<-length(indices)
   
   if ( is(x@parameters, "GaussianParameter") ){
     stop("x must contain multinomial parameters. See hist() to plot Gaussian parameters.")
@@ -410,6 +470,9 @@ barplotCluster <- function(x, data, variables=colnames(data), main=paste("Barplo
       mtext(1, at = colMeans(mp), text = names(t), line = 2)
       i<-i+1
     }
+  }
+  else if ( is(x@parameters, "CompositeParameter") ){
+    stop("x must contain multinomial parameters. No plot device for composite parameters.")
   }
   else{
     stop("Uknown type of parameters!")
