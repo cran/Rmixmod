@@ -1,4 +1,4 @@
-97a49859873ec5cc0cfac70f8ce91b60 *DESCRIPTION
+1eb93aa1bb73a757687310b91cb27114 *DESCRIPTION
 f66c6a0e79a26b4ecc78099ae714f97c *NAMESPACE
 231a1520eae53b59e7cbb937b8f7a722 *R/CompositeModel.R
 3d82696e912d7b2120c60f6329552735 *R/CompositeParameter.R
@@ -14,7 +14,7 @@ a1866dbf110ffdf7aaed6dc544833291 *R/Model.R
 78a009c751b2ff50023c9550bb306d0d *R/MultinomialModel.R
 aa9e2dde3c6af7260c165f727b25807d *R/MultinomialParameter.R
 fddd055d5d20068d43f249aae217a1af *R/Parameter.R
-757840884afe06dfe0ffdaf8bb61e447 *R/Rmixmod.R
+b281ad3ed2cabdde6a98926c216756cf *R/Rmixmod.R
 b92f4aaba2a1b9eedaeb4fa08e75f026 *R/Strategy.R
 79597ae0d41aad175c93232b208c0521 *R/global.R
 1b931e5104acc29d750bae49916b131d *R/zzz.R
@@ -41,7 +41,7 @@ b46729f7332ec7fbfb7a19a98160751f *man/GaussianModel-class.Rd
 51d586700c97dcf47c680bc8f6653ba8 *man/MultinomialModel-class.Rd
 fc43682cda0e855a22aad9d3c2a960a9 *man/MultinomialParameter-class.Rd
 1e3d1936d85b92282af2393fd6f050e3 *man/Parameter-class.Rd
-9cd327ea4807dc847179b80299bd535e *man/Rmixmod-package.Rd
+a924806c1f52afb58d747bab04d5042d *man/Rmixmod-package.Rd
 3914f547c5ce6237be56d4f9e45d8d8f *man/Strategy-class.Rd
 66cae79cddd6f06941c91724edd6a4a7 *man/asQualitative.Rd
 01e522fc9a9e36a36a1a470a009c6a60 *man/barplot-methods.Rd
@@ -221,7 +221,7 @@ d102c76f3576f226b24bb77c3440270f *src/mixmod/Kernel/IO/LabelDescription.h
 91a892c4288f9243dacd64ca6661e96a *src/mixmod/Kernel/IO/ModelOutput.h
 fedcd57d0ddaba6b215c6cacbc9e2275 *src/mixmod/Kernel/IO/ParameterDescription.cpp
 bcaa4a8e7e7f3b93eeffa330b915c21a *src/mixmod/Kernel/IO/ParameterDescription.h
-f1786b539da1190b55286c3b2284b019 *src/mixmod/Kernel/IO/Partition.cpp
+2a22c050a8f41653eddb42f7968d8b84 *src/mixmod/Kernel/IO/Partition.cpp
 e05a1971438941de043b9a5ca3a16029 *src/mixmod/Kernel/IO/Partition.h
 34ca26406489f018e8303b54d5941566 *src/mixmod/Kernel/IO/Proba.cpp
 81c3905eda65f6027098e8d7ec3f2a8a *src/mixmod/Kernel/IO/Proba.h

@@ -74,7 +74,9 @@ Partition::Partition(const Label * label, int64_t nbCluster) {
 				THROW(InputException, badValueInLabelInput);
 			}
 			else {
-				_tabValue[i][vLabel[i] - 1] = 1;
+				if (vLabel[i] > 0){
+					_tabValue[i][vLabel[i] - 1] = 1;
+				}// if vLabel[i] ==0 : unknown label => _tabValue = 0
 			}
 		}
 		_deleteValues = false; //TODO ??

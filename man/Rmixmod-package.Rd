@@ -12,9 +12,9 @@
 }
 \details{
   \tabular{ll}{ Package: \tab Rmixmod\cr Type: \tab
-  Package\cr Version: \tab 2.0\cr Date: \tab 2013-11-22\cr
-  License: \tab GPL-3 + file LICENSE\cr LazyLoad: \tab
-  yes\cr }
+  Package\cr Version: \tab 2.0.1\cr Date: \tab
+  2013-12-05\cr License: \tab GPL-3 + file LICENSE\cr
+  LazyLoad: \tab yes\cr }
 
   The general purpose of the package is to discover, or
   explain, group structures in multivariate data sets with
