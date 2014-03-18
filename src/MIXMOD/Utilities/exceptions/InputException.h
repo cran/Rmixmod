@@ -1,3 +1,27 @@
+/***************************************************************************
+                             SRC/mixmod/Utilities/exceptions/InputException.h  description
+    copyright            : (C) MIXMOD Team - 2001-2014
+    email                : contact@mixmod.org
+ ***************************************************************************/
+
+/***************************************************************************
+    This file is part of MIXMOD
+
+    MIXMOD is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    MIXMOD is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with MIXMOD.  If not, see <http://www.gnu.org/licenses/>.
+
+    All informations available on : http://www.mixmod.org
+***************************************************************************/
 /** @file XEMInputException.h
  *  @brief Exception class for Input error handling.
  *  @author Parmeet Bhatia
@@ -14,7 +38,7 @@ namespace XEM {
 class InputException : public Exception {
 
 public:
-	
+
 	Exception * clone() throw ();
 	InputException(std::string, int, InputError) throw ();
 	InputException(InputError) throw ();
@@ -110,7 +134,7 @@ public:
 		m.insert(std::make_pair(notAvailableForPrediction, "Not available for prediction"));
 		m.insert(std::make_pair(wrongValueInMultinomialCase, "wrong value in data set : use 1,2...nbModality"));
 		m.insert(std::make_pair(errorInPartitionInput, "Error in partition file : there is not enough lines in the file (nbSample is required)"));
-		m.insert(std::make_pair(notEnoughValuesInLabelInput, "Error in label file : there is not enough values in the file (nbSample is required)"));
+		m.insert(std::make_pair(badNumberOfValuesInLabelInput, "Error in label file : the number of values bust be nbSample"));
 		m.insert(std::make_pair(notEnoughValuesInProbaInput, "Error in proba file : there is not enough values in the file (nbSample*nbCluster is required)"));
 		m.insert(std::make_pair(badValueInLabelInput, "Error in label file : label must be between 1 and nbCluster"));
 		m.insert(std::make_pair(ColumnTypeNotValid, "Bad Format"));
@@ -129,6 +153,8 @@ public:
 		m.insert(std::make_pair(wrongModelPositionInRemove, "Wrong model position in remove"));
 		m.insert(std::make_pair(wrongModelPositionInSetSubDimensionEqual, "Wrong model position in set sub dimension equal"));
 		m.insert(std::make_pair(wrongModelPositionInSetSubDimensionFree, "Wrong model position in set sub dimension free"));
+		m.insert(std::make_pair(wrongModelInSetSubDimensionEqual, "SetSubDimensionEqual could not be called with this model"));
+		m.insert(std::make_pair(wrongModelInSetSubDimensionFree, "SetSubDimensionFree could not be called with this model"));
 		m.insert(std::make_pair(badSetKnownPartition, "Error in setKnownPartition (impossible if nbNbCluster>1)"));
 		m.insert(std::make_pair(wrongStrategyPositionInSetOrGetMethod, "Wrong strategy position in set or get method"));
 		m.insert(std::make_pair(badInitPart, "Bad Initialization Partition"));
@@ -161,6 +187,7 @@ public:
 		m.insert(std::make_pair(badInputType, "Bad Input type"));
 		m.insert(std::make_pair(wrongKnownPartitionPositionInSet, "wrong known partition position in set"));
 		m.insert(std::make_pair(wrongKnownPartitionPositionInRemove, "wrong known partition position in remove"));
+		m.insert(std::make_pair(HDModelsAreNotAvailableInClusteringContext, "HD Models Are Not Available In Clustering Context"));
 
 		return m;
 	}
@@ -168,7 +195,7 @@ public:
 	static std::map<InputError, const char*> mapErrorMsg;
 
 protected:
-	
+
 	InputError _errorType;
 };
 

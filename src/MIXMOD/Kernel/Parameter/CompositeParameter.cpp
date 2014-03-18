@@ -1,3 +1,27 @@
+/***************************************************************************
+                             SRC/mixmod/Kernel/Parameter/CompositeParameter.cpp  description
+    copyright            : (C) MIXMOD Team - 2001-2014
+    email                : contact@mixmod.org
+ ***************************************************************************/
+
+/***************************************************************************
+    This file is part of MIXMOD
+    
+    MIXMOD is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    MIXMOD is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with MIXMOD.  If not, see <http://www.gnu.org/licenses/>.
+
+    All informations available on : http://www.mixmod.org                                                                                               
+***************************************************************************/
 #include "mixmod/Utilities/Util.h"
 #include "mixmod/Kernel/Model/Model.h"
 #include "mixmod/Kernel/Parameter/CompositeParameter.h"
@@ -19,14 +43,14 @@ CompositeParameter::CompositeParameter() {
 	// TODO Auto-generated constructor stub
 }
 
-CompositeParameter::CompositeParameter(const CompositeParameter * param) 
-: Parameter(param->getModel(), param->getModelType()) 
+CompositeParameter::CompositeParameter(const CompositeParameter * param)
+: Parameter(param->getModel(), param->getModelType())
 {
 	_parameterComponent.resize(2);
 	_parameterModelType.resize(2);
-	_parameterComponent[0] = 
+	_parameterComponent[0] =
 			(const_cast<CompositeParameter*> (param)->getBinaryParameter())->clone();
-	_parameterComponent[1] = 
+	_parameterComponent[1] =
 			((const_cast<CompositeParameter*> (param)->getGaussianParameter()))->clone();
 	_parameterModelType[0] = new ModelType(_parameterComponent[0]->getModelType()->_nameModel);
 	_parameterComponent[0]->setModelType(_parameterModelType[0]);
@@ -36,13 +60,13 @@ CompositeParameter::CompositeParameter(const CompositeParameter * param)
 
 CompositeParameter::CompositeParameter(const Parameter * igaussian, const Parameter * ibinary,
 		ModelType * imodelType) : Parameter(ibinary->getNbCluster(),
-		ibinary->getPbDimension() + igaussian->getPbDimension(), imodelType) 
+		ibinary->getPbDimension() + igaussian->getPbDimension(), imodelType)
 {
 	_parameterComponent.resize(2);
 	_parameterModelType.resize(2);
-	_parameterComponent[0] = 
+	_parameterComponent[0] =
 			(const_cast<Parameter*> (ibinary)->getBinaryParameter())->clone();
-	_parameterComponent[1] = 
+	_parameterComponent[1] =
 			((const_cast<Parameter*> (igaussian)->getGaussianParameter()))->clone();
 	_parameterModelType[0] = new ModelType(_parameterComponent[0]->getModelType()->_nameModel);
 	_parameterComponent[0]->setModelType(_parameterModelType[0]);
@@ -50,8 +74,8 @@ CompositeParameter::CompositeParameter(const Parameter * igaussian, const Parame
 	_parameterComponent[1]->setModelType(_parameterModelType[1]);
 }
 
-CompositeParameter::CompositeParameter(Model* iModel, ModelType* iModelType, 
-		int64_t * tabNbModality) : Parameter(iModel, iModelType) 
+CompositeParameter::CompositeParameter(Model* iModel, ModelType* iModelType,
+		int64_t * tabNbModality) : Parameter(iModel, iModelType)
 {
 	_parameterComponent.resize(2);
 	_parameterModelType.resize(2);
@@ -60,7 +84,7 @@ CompositeParameter::CompositeParameter(Model* iModel, ModelType* iModelType,
 }
 
 CompositeParameter::~CompositeParameter() {
-	for (int i = 0; i < _parameterComponent.size(); ++i) {
+	for (unsigned int i = 0; i < _parameterComponent.size(); ++i) {
 		if (_parameterComponent[i]) delete _parameterComponent[i];
 		if (_parameterModelType[i]) delete _parameterModelType[i];
 	}
@@ -74,7 +98,7 @@ double CompositeParameter::getLogLikelihoodOne() const
 }
 
 void CompositeParameter::InstantiateBinaryandGaussianParamter(
-		ModelType* modeltype, int64_t * tabNbModality) 
+		ModelType* modeltype, int64_t * tabNbModality)
 {
 	ModelName modelname = modeltype->getModelName();
 	switch (modelname) {
@@ -82,7 +106,7 @@ void CompositeParameter::InstantiateBinaryandGaussianParamter(
 	{
 		_parameterModelType[0] = new ModelType(Binary_p_E);
 		_parameterModelType[1] = new ModelType(Gaussian_p_L_B);
-		_parameterComponent[0] = 
+		_parameterComponent[0] =
 				new BinaryEParameter(_model, _parameterModelType[0], tabNbModality);
 		_parameterComponent[1] = new GaussianDiagParameter(_model, _parameterModelType[1]);
 		break;
@@ -91,7 +115,7 @@ void CompositeParameter::InstantiateBinaryandGaussianParamter(
 	{
 		_parameterModelType[0] = new ModelType(Binary_p_E);
 		_parameterModelType[1] = new ModelType(Gaussian_p_Lk_B);
-		_parameterComponent[0] = 
+		_parameterComponent[0] =
 				new BinaryEParameter(_model, _parameterModelType[0], tabNbModality);
 		_parameterComponent[1] = new GaussianDiagParameter(_model, _parameterModelType[1]);
 		break;
@@ -100,7 +124,7 @@ void CompositeParameter::InstantiateBinaryandGaussianParamter(
 	{
 		_parameterModelType[0] = new ModelType(Binary_p_E);
 		_parameterModelType[1] = new ModelType(Gaussian_p_L_Bk);
-		_parameterComponent[0] = 
+		_parameterComponent[0] =
 				new BinaryEParameter(_model, _parameterModelType[0], tabNbModality);
 		_parameterComponent[1] = new GaussianDiagParameter(_model, _parameterModelType[1]);
 		break;
@@ -109,7 +133,7 @@ void CompositeParameter::InstantiateBinaryandGaussianParamter(
 	{
 		_parameterModelType[0] = new ModelType(Binary_p_E);
 		_parameterModelType[1] = new ModelType(Gaussian_p_Lk_Bk);
-		_parameterComponent[0] = 
+		_parameterComponent[0] =
 				new BinaryEParameter(_model, _parameterModelType[0], tabNbModality);
 		_parameterComponent[1] = new GaussianDiagParameter(_model, _parameterModelType[1]);
 		break;
@@ -118,7 +142,7 @@ void CompositeParameter::InstantiateBinaryandGaussianParamter(
 	{
 		_parameterModelType[0] = new ModelType(Binary_p_E);
 		_parameterModelType[1] = new ModelType(Gaussian_p_L_B);
-		_parameterComponent[0] = 
+		_parameterComponent[0] =
 				new BinaryEkParameter(_model, _parameterModelType[0], tabNbModality);
 		_parameterComponent[1] = new GaussianDiagParameter(_model, _parameterModelType[1]);
 		break;
@@ -127,7 +151,7 @@ void CompositeParameter::InstantiateBinaryandGaussianParamter(
 	{
 		_parameterModelType[0] = new ModelType(Binary_p_E);
 		_parameterModelType[1] = new ModelType(Gaussian_p_Lk_B);
-		_parameterComponent[0] = 
+		_parameterComponent[0] =
 				new BinaryEkParameter(_model, _parameterModelType[0], tabNbModality);
 		_parameterComponent[1] = new GaussianDiagParameter(_model, _parameterModelType[1]);
 		break;
@@ -136,7 +160,7 @@ void CompositeParameter::InstantiateBinaryandGaussianParamter(
 	{
 		_parameterModelType[0] = new ModelType(Binary_p_E);
 		_parameterModelType[1] = new ModelType(Gaussian_p_L_Bk);
-		_parameterComponent[0] = 
+		_parameterComponent[0] =
 				new BinaryEkParameter(_model, _parameterModelType[0], tabNbModality);
 		_parameterComponent[1] = new GaussianDiagParameter(_model, _parameterModelType[1]);
 		break;
@@ -145,7 +169,7 @@ void CompositeParameter::InstantiateBinaryandGaussianParamter(
 	{
 		_parameterModelType[0] = new ModelType(Binary_p_E);
 		_parameterModelType[1] = new ModelType(Gaussian_p_Lk_Bk);
-		_parameterComponent[0] = 
+		_parameterComponent[0] =
 				new BinaryEkParameter(_model, _parameterModelType[0], tabNbModality);
 		_parameterComponent[1] = new GaussianDiagParameter(_model, _parameterModelType[1]);
 		break;
@@ -154,7 +178,7 @@ void CompositeParameter::InstantiateBinaryandGaussianParamter(
 	{
 		_parameterModelType[0] = new ModelType(Binary_p_E);
 		_parameterModelType[1] = new ModelType(Gaussian_p_L_B);
-		_parameterComponent[0] = 
+		_parameterComponent[0] =
 				new BinaryEjParameter(_model, _parameterModelType[0], tabNbModality);
 		_parameterComponent[1] = new GaussianDiagParameter(_model, _parameterModelType[1]);
 		break;
@@ -163,7 +187,7 @@ void CompositeParameter::InstantiateBinaryandGaussianParamter(
 	{
 		_parameterModelType[0] = new ModelType(Binary_p_E);
 		_parameterModelType[1] = new ModelType(Gaussian_p_Lk_B);
-		_parameterComponent[0] = 
+		_parameterComponent[0] =
 				new BinaryEjParameter(_model, _parameterModelType[0], tabNbModality);
 		_parameterComponent[1] = new GaussianDiagParameter(_model, _parameterModelType[1]);
 		break;
@@ -172,7 +196,7 @@ void CompositeParameter::InstantiateBinaryandGaussianParamter(
 	{
 		_parameterModelType[0] = new ModelType(Binary_p_E);
 		_parameterModelType[1] = new ModelType(Gaussian_p_L_Bk);
-		_parameterComponent[0] = 
+		_parameterComponent[0] =
 				new BinaryEjParameter(_model, _parameterModelType[0], tabNbModality);
 		_parameterComponent[1] = new GaussianDiagParameter(_model, _parameterModelType[1]);
 		break;
@@ -181,7 +205,7 @@ void CompositeParameter::InstantiateBinaryandGaussianParamter(
 	{
 		_parameterModelType[0] = new ModelType(Binary_p_E);
 		_parameterModelType[1] = new ModelType(Gaussian_p_Lk_Bk);
-		_parameterComponent[0] = 
+		_parameterComponent[0] =
 				new BinaryEjParameter(_model, _parameterModelType[0], tabNbModality);
 		_parameterComponent[1] = new GaussianDiagParameter(_model, _parameterModelType[1]);
 		break;
@@ -190,7 +214,7 @@ void CompositeParameter::InstantiateBinaryandGaussianParamter(
 	{
 		_parameterModelType[0] = new ModelType(Binary_p_E);
 		_parameterModelType[1] = new ModelType(Gaussian_p_L_B);
-		_parameterComponent[0] = 
+		_parameterComponent[0] =
 				new BinaryEkjParameter(_model, _parameterModelType[0], tabNbModality);
 		_parameterComponent[1] = new GaussianDiagParameter(_model, _parameterModelType[1]);
 		break;
@@ -199,7 +223,7 @@ void CompositeParameter::InstantiateBinaryandGaussianParamter(
 	{
 		_parameterModelType[0] = new ModelType(Binary_p_E);
 		_parameterModelType[1] = new ModelType(Gaussian_p_Lk_B);
-		_parameterComponent[0] = 
+		_parameterComponent[0] =
 				new BinaryEkjParameter(_model, _parameterModelType[0], tabNbModality);
 		_parameterComponent[1] = new GaussianDiagParameter(_model, _parameterModelType[1]);
 		break;
@@ -208,7 +232,7 @@ void CompositeParameter::InstantiateBinaryandGaussianParamter(
 	{
 		_parameterModelType[0] = new ModelType(Binary_p_E);
 		_parameterModelType[1] = new ModelType(Gaussian_p_L_Bk);
-		_parameterComponent[0] = 
+		_parameterComponent[0] =
 				new BinaryEkjParameter(_model, _parameterModelType[0], tabNbModality);
 		_parameterComponent[1] = new GaussianDiagParameter(_model, _parameterModelType[1]);
 		break;
@@ -217,7 +241,7 @@ void CompositeParameter::InstantiateBinaryandGaussianParamter(
 	{
 		_parameterModelType[0] = new ModelType(Binary_p_E);
 		_parameterModelType[1] = new ModelType(Gaussian_p_Lk_Bk);
-		_parameterComponent[0] = 
+		_parameterComponent[0] =
 				new BinaryEkjParameter(_model, _parameterModelType[0], tabNbModality);
 		_parameterComponent[1] = new GaussianDiagParameter(_model, _parameterModelType[1]);
 		break;
@@ -226,7 +250,7 @@ void CompositeParameter::InstantiateBinaryandGaussianParamter(
 	{
 		_parameterModelType[0] = new ModelType(Binary_p_E);
 		_parameterModelType[1] = new ModelType(Gaussian_p_L_B);
-		_parameterComponent[0] = 
+		_parameterComponent[0] =
 				new BinaryEkjhParameter(_model, _parameterModelType[0], tabNbModality);
 		_parameterComponent[1] = new GaussianDiagParameter(_model, _parameterModelType[1]);
 		break;
@@ -235,7 +259,7 @@ void CompositeParameter::InstantiateBinaryandGaussianParamter(
 	{
 		_parameterModelType[0] = new ModelType(Binary_p_E);
 		_parameterModelType[1] = new ModelType(Gaussian_p_Lk_B);
-		_parameterComponent[0] = 
+		_parameterComponent[0] =
 				new BinaryEkjhParameter(_model, _parameterModelType[0], tabNbModality);
 		_parameterComponent[1] = new GaussianDiagParameter(_model, _parameterModelType[1]);
 		break;
@@ -244,7 +268,7 @@ void CompositeParameter::InstantiateBinaryandGaussianParamter(
 	{
 		_parameterModelType[0] = new ModelType(Binary_p_E);
 		_parameterModelType[1] = new ModelType(Gaussian_p_L_Bk);
-		_parameterComponent[0] = 
+		_parameterComponent[0] =
 				new BinaryEkjhParameter(_model, _parameterModelType[0], tabNbModality);
 		_parameterComponent[1] = new GaussianDiagParameter(_model, _parameterModelType[1]);
 		break;
@@ -253,7 +277,7 @@ void CompositeParameter::InstantiateBinaryandGaussianParamter(
 	{
 		_parameterModelType[0] = new ModelType(Binary_p_E);
 		_parameterModelType[1] = new ModelType(Gaussian_p_Lk_Bk);
-		_parameterComponent[0] = 
+		_parameterComponent[0] =
 				new BinaryEkjhParameter(_model, _parameterModelType[0], tabNbModality);
 		_parameterComponent[1] = new GaussianDiagParameter(_model, _parameterModelType[1]);
 		break;
@@ -262,7 +286,7 @@ void CompositeParameter::InstantiateBinaryandGaussianParamter(
 	{
 		_parameterModelType[0] = new ModelType(Binary_pk_E);
 		_parameterModelType[1] = new ModelType(Gaussian_pk_L_B);
-		_parameterComponent[0] = 
+		_parameterComponent[0] =
 				new BinaryEParameter(_model, _parameterModelType[0], tabNbModality);
 		_parameterComponent[1] = new GaussianDiagParameter(_model, _parameterModelType[1]);
 		break;
@@ -271,7 +295,7 @@ void CompositeParameter::InstantiateBinaryandGaussianParamter(
 	{
 		_parameterModelType[0] = new ModelType(Binary_pk_E);
 		_parameterModelType[1] = new ModelType(Gaussian_pk_Lk_B);
-		_parameterComponent[0] = 
+		_parameterComponent[0] =
 				new BinaryEParameter(_model, _parameterModelType[0], tabNbModality);
 		_parameterComponent[1] = new GaussianDiagParameter(_model, _parameterModelType[1]);
 		break;
@@ -280,7 +304,7 @@ void CompositeParameter::InstantiateBinaryandGaussianParamter(
 	{
 		_parameterModelType[0] = new ModelType(Binary_pk_E);
 		_parameterModelType[1] = new ModelType(Gaussian_pk_L_Bk);
-		_parameterComponent[0] = 
+		_parameterComponent[0] =
 				new BinaryEParameter(_model, _parameterModelType[0], tabNbModality);
 		_parameterComponent[1] = new GaussianDiagParameter(_model, _parameterModelType[1]);
 		break;
@@ -289,7 +313,7 @@ void CompositeParameter::InstantiateBinaryandGaussianParamter(
 	{
 		_parameterModelType[0] = new ModelType(Binary_pk_E);
 		_parameterModelType[1] = new ModelType(Gaussian_pk_Lk_Bk);
-		_parameterComponent[0] = 
+		_parameterComponent[0] =
 				new BinaryEParameter(_model, _parameterModelType[0], tabNbModality);
 		_parameterComponent[1] = new GaussianDiagParameter(_model, _parameterModelType[1]);
 		break;
@@ -298,7 +322,7 @@ void CompositeParameter::InstantiateBinaryandGaussianParamter(
 	{
 		_parameterModelType[0] = new ModelType(Binary_pk_E);
 		_parameterModelType[1] = new ModelType(Gaussian_pk_L_B);
-		_parameterComponent[0] = 
+		_parameterComponent[0] =
 				new BinaryEkParameter(_model, _parameterModelType[0], tabNbModality);
 		_parameterComponent[1] = new GaussianDiagParameter(_model, _parameterModelType[1]);
 		break;
@@ -307,7 +331,7 @@ void CompositeParameter::InstantiateBinaryandGaussianParamter(
 	{
 		_parameterModelType[0] = new ModelType(Binary_pk_E);
 		_parameterModelType[1] = new ModelType(Gaussian_pk_Lk_B);
-		_parameterComponent[0] = 
+		_parameterComponent[0] =
 				new BinaryEkParameter(_model, _parameterModelType[0], tabNbModality);
 		_parameterComponent[1] = new GaussianDiagParameter(_model, _parameterModelType[1]);
 		break;
@@ -316,7 +340,7 @@ void CompositeParameter::InstantiateBinaryandGaussianParamter(
 	{
 		_parameterModelType[0] = new ModelType(Binary_pk_E);
 		_parameterModelType[1] = new ModelType(Gaussian_pk_L_Bk);
-		_parameterComponent[0] = 
+		_parameterComponent[0] =
 				new BinaryEkParameter(_model, _parameterModelType[0], tabNbModality);
 		_parameterComponent[1] = new GaussianDiagParameter(_model, _parameterModelType[1]);
 		break;
@@ -325,7 +349,7 @@ void CompositeParameter::InstantiateBinaryandGaussianParamter(
 	{
 		_parameterModelType[0] = new ModelType(Binary_pk_E);
 		_parameterModelType[1] = new ModelType(Gaussian_pk_Lk_Bk);
-		_parameterComponent[0] = new 
+		_parameterComponent[0] = new
 				BinaryEkParameter(_model, _parameterModelType[0], tabNbModality);
 		_parameterComponent[1] = new GaussianDiagParameter(_model, _parameterModelType[1]);
 		break;
@@ -334,7 +358,7 @@ void CompositeParameter::InstantiateBinaryandGaussianParamter(
 	{
 		_parameterModelType[0] = new ModelType(Binary_pk_E);
 		_parameterModelType[1] = new ModelType(Gaussian_pk_L_B);
-		_parameterComponent[0] = 
+		_parameterComponent[0] =
 				new BinaryEjParameter(_model, _parameterModelType[0], tabNbModality);
 		_parameterComponent[1] = new GaussianDiagParameter(_model, _parameterModelType[1]);
 		break;
@@ -343,7 +367,7 @@ void CompositeParameter::InstantiateBinaryandGaussianParamter(
 	{
 		_parameterModelType[0] = new ModelType(Binary_pk_E);
 		_parameterModelType[1] = new ModelType(Gaussian_pk_Lk_B);
-		_parameterComponent[0] = 
+		_parameterComponent[0] =
 				new BinaryEjParameter(_model, _parameterModelType[0], tabNbModality);
 		_parameterComponent[1] = new GaussianDiagParameter(_model, _parameterModelType[1]);
 		break;
@@ -352,7 +376,7 @@ void CompositeParameter::InstantiateBinaryandGaussianParamter(
 	{
 		_parameterModelType[0] = new ModelType(Binary_pk_E);
 		_parameterModelType[1] = new ModelType(Gaussian_pk_L_Bk);
-		_parameterComponent[0] = 
+		_parameterComponent[0] =
 				new BinaryEjParameter(_model, _parameterModelType[0], tabNbModality);
 		_parameterComponent[1] = new GaussianDiagParameter(_model, _parameterModelType[1]);
 		break;
@@ -361,7 +385,7 @@ void CompositeParameter::InstantiateBinaryandGaussianParamter(
 	{
 		_parameterModelType[0] = new ModelType(Binary_pk_E);
 		_parameterModelType[1] = new ModelType(Gaussian_pk_Lk_Bk);
-		_parameterComponent[0] = 
+		_parameterComponent[0] =
 				new BinaryEjParameter(_model, _parameterModelType[0], tabNbModality);
 		_parameterComponent[1] = new GaussianDiagParameter(_model, _parameterModelType[1]);
 		break;
@@ -370,7 +394,7 @@ void CompositeParameter::InstantiateBinaryandGaussianParamter(
 	{
 		_parameterModelType[0] = new ModelType(Binary_pk_E);
 		_parameterModelType[1] = new ModelType(Gaussian_pk_L_B);
-		_parameterComponent[0] = 
+		_parameterComponent[0] =
 				new BinaryEkjParameter(_model, _parameterModelType[0], tabNbModality);
 		_parameterComponent[1] = new GaussianDiagParameter(_model, _parameterModelType[1]);
 		break;
@@ -379,7 +403,7 @@ void CompositeParameter::InstantiateBinaryandGaussianParamter(
 	{
 		_parameterModelType[0] = new ModelType(Binary_pk_E);
 		_parameterModelType[1] = new ModelType(Gaussian_pk_Lk_B);
-		_parameterComponent[0] = 
+		_parameterComponent[0] =
 				new BinaryEkjParameter(_model, _parameterModelType[0], tabNbModality);
 		_parameterComponent[1] = new GaussianDiagParameter(_model, _parameterModelType[1]);
 		break;
@@ -388,7 +412,7 @@ void CompositeParameter::InstantiateBinaryandGaussianParamter(
 	{
 		_parameterModelType[0] = new ModelType(Binary_pk_E);
 		_parameterModelType[1] = new ModelType(Gaussian_pk_L_Bk);
-		_parameterComponent[0] = 
+		_parameterComponent[0] =
 				new BinaryEkjParameter(_model, _parameterModelType[0], tabNbModality);
 		_parameterComponent[1] = new GaussianDiagParameter(_model, _parameterModelType[1]);
 		break;
@@ -397,7 +421,7 @@ void CompositeParameter::InstantiateBinaryandGaussianParamter(
 	{
 		_parameterModelType[0] = new ModelType(Binary_pk_E);
 		_parameterModelType[1] = new ModelType(Gaussian_pk_Lk_Bk);
-		_parameterComponent[0] = 
+		_parameterComponent[0] =
 				new BinaryEkjParameter(_model, _parameterModelType[0], tabNbModality);
 		_parameterComponent[1] = new GaussianDiagParameter(_model, _parameterModelType[1]);
 		break;
@@ -406,7 +430,7 @@ void CompositeParameter::InstantiateBinaryandGaussianParamter(
 	{
 		_parameterModelType[0] = new ModelType(Binary_pk_E);
 		_parameterModelType[1] = new ModelType(Gaussian_pk_L_B);
-		_parameterComponent[0] = 
+		_parameterComponent[0] =
 				new BinaryEkjhParameter(_model, _parameterModelType[0], tabNbModality);
 		_parameterComponent[1] = new GaussianDiagParameter(_model, _parameterModelType[1]);
 		break;
@@ -415,7 +439,7 @@ void CompositeParameter::InstantiateBinaryandGaussianParamter(
 	{
 		_parameterModelType[0] = new ModelType(Binary_pk_E);
 		_parameterModelType[1] = new ModelType(Gaussian_pk_Lk_B);
-		_parameterComponent[0] = 
+		_parameterComponent[0] =
 				new BinaryEkjhParameter(_model, _parameterModelType[0], tabNbModality);
 		_parameterComponent[1] = new GaussianDiagParameter(_model, _parameterModelType[1]);
 		break;
@@ -424,7 +448,7 @@ void CompositeParameter::InstantiateBinaryandGaussianParamter(
 	{
 		_parameterModelType[0] = new ModelType(Binary_pk_E);
 		_parameterModelType[1] = new ModelType(Gaussian_pk_L_Bk);
-		_parameterComponent[0] = 
+		_parameterComponent[0] =
 				new BinaryEkjhParameter(_model, _parameterModelType[0], tabNbModality);
 		_parameterComponent[1] = new GaussianDiagParameter(_model, _parameterModelType[1]);
 		break;
@@ -433,7 +457,7 @@ void CompositeParameter::InstantiateBinaryandGaussianParamter(
 	{
 		_parameterModelType[0] = new ModelType(Binary_pk_E);
 		_parameterModelType[1] = new ModelType(Gaussian_pk_Lk_Bk);
-		_parameterComponent[0] = 
+		_parameterComponent[0] =
 				new BinaryEkjhParameter(_model, _parameterModelType[0], tabNbModality);
 		_parameterComponent[1] = new GaussianDiagParameter(_model, _parameterModelType[1]);
 		break;
@@ -456,7 +480,7 @@ void CompositeParameter::getAllPdf(double** tabFik, double* tabProportion)const 
 }
 
 double CompositeParameter::getPdf(int64_t iSample, int64_t Kcluster) const {
-	return _parameterComponent[1]->getPdf(iSample, Kcluster) 
+	return _parameterComponent[1]->getPdf(iSample, Kcluster)
 			* _parameterComponent[0]->getPdf(iSample, Kcluster);
 }
 
@@ -492,7 +516,7 @@ CompositeParameter * CompositeParameter::clone() const {
 }
 
 int64_t CompositeParameter::getFreeParameter() const {
-	int64_t freeparam = _parameterComponent[1]->getFreeParameter() 
+	int64_t freeparam = _parameterComponent[1]->getFreeParameter()
 			+ _parameterComponent[0]->getFreeParameter()-(_nbCluster - 1);
 	return freeparam;
 }
@@ -503,7 +527,7 @@ void CompositeParameter::initForInitRANDOM() {
 }
 
 void CompositeParameter::updateForInitRANDOMorUSER_PARTITION(
-		Sample**tabSampleForInit, bool*tabClusterToInitialize) 
+		Sample**tabSampleForInit, bool*tabClusterToInitialize)
 {
 	_parameterComponent[0]->updateForInitRANDOMorUSER_PARTITION(
 			tabSampleForInit, tabClusterToInitialize);

@@ -1,27 +1,27 @@
 /***************************************************************************
-							 SRC/MIXMOD/Kernel/Model/XEMModelType.cpp  description
-	copyright            : (C) MIXMOD Team - 2001-2013
-	email                : contact@mixmod.org
+                             SRC/mixmod/Kernel/Model/ModelType.cpp  description
+    copyright            : (C) MIXMOD Team - 2001-2014
+    email                : contact@mixmod.org
  ***************************************************************************/
 
 /***************************************************************************
-	This file is part of MIXMOD
+    This file is part of MIXMOD
     
-	MIXMOD is free software: you can redistribute it and/or modify
-	it under the terms of the GNU General Public License as published by
-	the Free Software Foundation, either version 3 of the License, or
-	(at your option) any later version.
+    MIXMOD is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-	MIXMOD is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
+    MIXMOD is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
 
-	You should have received a copy of the GNU General Public License
-	along with MIXMOD.  If not, see <http://www.gnu.org/licenses/>.
+    You should have received a copy of the GNU General Public License
+    along with MIXMOD.  If not, see <http://www.gnu.org/licenses/>.
 
-	All informations available on : http://www.mixmod.org                                                                                               
- ***************************************************************************/
+    All informations available on : http://www.mixmod.org                                                                                               
+***************************************************************************/
 #include "mixmod/Kernel/Model/ModelType.h"
 
 namespace XEM {
@@ -59,7 +59,10 @@ ModelType::ModelType(const ModelType & iModelType) {
 
 ModelType::~ModelType() {
 	if (_tabSubDimensionFree) {
-		delete [] _tabSubDimensionFree;
+		//delete [] _tabSubDimensionFree; //TODO [bauder]: there is something wrong with this variable, 
+		                                  //maybe reaffected to something already deleted.
+		                                  //Should be fixed cleanly by tracking its affectations.
+		                                  //Test after debug by running example da3.
 		_tabSubDimensionFree = NULL;
 	}
 }
@@ -935,5 +938,25 @@ void ModelType::edit(std::ostream & oFile) {
 	oFile << endl;
 	oFile << "\t\t\t----------" << endl << endl;
 }
+
+void ModelType::setTabSubDimensionFree(int64_t iTabSubDimensionFree, int64_t position) {
+	if (!isHD(_nameModel) || !isFreeSubDimension(_nameModel)) THROW(InputException,wrongModelInSetSubDimensionFree);	if (position>=0 && position<_nbSubDimensionFree){
+    if (_tabSubDimensionFree == NULL) {
+      _tabSubDimensionFree = new int64_t[_nbSubDimensionFree];
+    }
+    _tabSubDimensionFree[position] = iTabSubDimensionFree;
+	}
+	else{
+	  THROW(InputException, wrongModelPositionInSetSubDimensionFree);
+	}
+}
+
+void ModelType::setSubDimensionEqual(int64_t iSubDimensionEqual) {
+  if (!isHD(_nameModel) || isFreeSubDimension(_nameModel)) THROW (InputException,wrongModelInSetSubDimensionEqual);
+	_subDimensionEqual = iSubDimensionEqual;
+}
+
+
+
 
 }

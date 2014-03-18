@@ -1,27 +1,27 @@
 /***************************************************************************
-							 SRC/MIXMOD/Kernel/IO/XEMLabelDescription.cpp  description
-	copyright            : (C) MIXMOD Team - 2001-2013
-	email                : contact@mixmod.org
+                             SRC/mixmod/Kernel/IO/LabelDescription.cpp  description
+    copyright            : (C) MIXMOD Team - 2001-2014
+    email                : contact@mixmod.org
  ***************************************************************************/
 
 /***************************************************************************
-	This file is part of MIXMOD
-    
-	MIXMOD is free software: you can redistribute it and/or modify
-	it under the terms of the GNU General Public License as published by
-	the Free Software Foundation, either version 3 of the License, or
-	(at your option) any later version.
+    This file is part of MIXMOD
 
-	MIXMOD is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
+    MIXMOD is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-	You should have received a copy of the GNU General Public License
-	along with MIXMOD.  If not, see <http://www.gnu.org/licenses/>.
+    MIXMOD is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
 
-	All informations available on : http://www.mixmod.org                                                                                               
- ***************************************************************************/
+    You should have received a copy of the GNU General Public License
+    along with MIXMOD.  If not, see <http://www.gnu.org/licenses/>.
+
+    All informations available on : http://www.mixmod.org
+***************************************************************************/
 
 #include "mixmod/Kernel/IO/LabelDescription.h"
 #include "mixmod/Kernel/IO/Label.h"
@@ -46,13 +46,13 @@ LabelDescription::LabelDescription() : Description() {
 //constructor by initilization
 // ---------------------------
 LabelDescription::LabelDescription(
-		int64_t nbSample, 
-		int64_t nbColumn, 
-		std::vector< ColumnDescription* > columnDescription, 
-		FormatNumeric::FormatNumericFile format, 
-		std::string filename, 
+		int64_t nbSample,
+		int64_t nbColumn,
+		std::vector< ColumnDescription* > columnDescription,
+		FormatNumeric::FormatNumericFile format,
+		std::string filename,
 		std::string infoName)
-: Description(nbSample, nbColumn, columnDescription, format, filename, infoName) 
+: Description(nbSample, nbColumn, columnDescription, format, filename, infoName)
 {
 	_label = createLabel();
 	// get the number of cluster
@@ -63,7 +63,7 @@ LabelDescription::LabelDescription(
 // constructor from a vector of int
 //----------------------------------
 LabelDescription::LabelDescription(int64_t nbSample, std::vector<int64_t> vLabel)
-: Description() 
+: Description()
 {
 	// get the number of cluster
 	_nbCluster = *max_element(vLabel.begin(), vLabel.end());
@@ -77,8 +77,11 @@ LabelDescription::LabelDescription(int64_t nbSample, std::vector<int64_t> vLabel
 	std::string name("Label");
 	_columnDescription[0]->setName(name);
 
-	_label = new Label(vLabel.size());
-	_label->setLabel(vLabel, vLabel.size());
+  if (_nbSample != vLabel.size())
+    THROW (InputException, badNumberOfValuesInLabelInput);
+
+	_label = new Label(_nbSample);
+	_label->setLabel(vLabel, _nbSample);
 }
 
 //-------------------------------------
@@ -135,8 +138,8 @@ bool LabelDescription::operator ==(const LabelDescription & labelDescription) co
 	if (_nbSample != labelDescription._nbSample) return false;
 	if (_nbColumn != labelDescription._nbColumn) return false;
 	for (int64_t i = 0; i < _nbColumn; ++i) {
-		if (_columnDescription[i]->getName() 
-				!= labelDescription.getColumnDescription(i)->getName()) 
+		if (_columnDescription[i]->getName()
+				!= labelDescription.getColumnDescription(i)->getName())
 		{
 			return false;
 		}
@@ -163,7 +166,7 @@ void LabelDescription::saveNumericValues(std::string fileName) {
 	_fileName = fileName;
 	//}
 	/* else : if _fileName!="", labelDescription has been created by a XML file.
-	In this case, the numeric file already exists. 
+	In this case, the numeric file already exists.
 	 */
 }
 

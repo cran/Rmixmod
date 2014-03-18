@@ -32,7 +32,7 @@ LearnOutputHandling::LearnOutputHandling( XEM::LearnModelOutput* lMOutput
   
   // fill other slot only if no error
   if ( dynamic_cast<XEM::Exception&>(lMOutput->getStrategyRunError()) == XEM::NOERROR ){
-    
+	
     // declare a vector of criterion
     std::vector<double> criterionValue;
     // loop over criterion names
@@ -46,7 +46,7 @@ LearnOutputHandling::LearnOutputHandling( XEM::LearnModelOutput* lMOutput
         criterionValue.push_back(1-lMOutput->getCriterionOutput(XEM::CV).getValue());
         xem_.slot("CVLabel") = Conversion::VectorToRcppVectorForInt(lMOutput->getCVLabel()->getLabel()->getLabel());
         // define a classification tab
-        int64_t** tab = lMOutput->getCVLabel()->getLabel()->getClassificationTab(labels);
+        int64_t** tab = lMOutput->getCVLabel()->getLabel()->getClassificationTab(labels, nbCluster_);
         xem_.slot("CVClassification") = Conversion::CMatrixToRcppMatrixForInt(nbCluster_, nbCluster_, tab);
         // release memory
         for ( int i=0; i<nbCluster_; i++ ) delete [] tab[i];
@@ -66,7 +66,7 @@ LearnOutputHandling::LearnOutputHandling( XEM::LearnModelOutput* lMOutput
     
     // add MAP values
     // define a classification tab
-    int64_t** tab = lMOutput->getLabelDescription()->getLabel()->getClassificationTab(labels);
+    int64_t** tab = lMOutput->getLabelDescription()->getLabel()->getClassificationTab(labels, nbCluster_);
     xem_.slot("MAPClassification") = Conversion::CMatrixToRcppMatrixForInt(nbCluster_, nbCluster_, tab);
     // release memory
     for ( int i=0; i<nbCluster_; i++ ) delete [] tab[i];

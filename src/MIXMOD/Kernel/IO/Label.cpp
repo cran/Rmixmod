@@ -1,27 +1,27 @@
 /***************************************************************************
-							 SRC/MIXMOD/Kernel/IO/XEMLabel.cpp  description
-	copyright            : (C) MIXMOD Team - 2001-2013
-	email                : contact@mixmod.org
+                             SRC/mixmod/Kernel/IO/Label.cpp  description
+    copyright            : (C) MIXMOD Team - 2001-2014
+    email                : contact@mixmod.org
  ***************************************************************************/
 
 /***************************************************************************
-	This file is part of MIXMOD
-    
-	MIXMOD is free software: you can redistribute it and/or modify
-	it under the terms of the GNU General Public License as published by
-	the Free Software Foundation, either version 3 of the License, or
-	(at your option) any later version.
+    This file is part of MIXMOD
 
-	MIXMOD is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
+    MIXMOD is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-	You should have received a copy of the GNU General Public License
-	along with MIXMOD.  If not, see <http://www.gnu.org/licenses/>.
+    MIXMOD is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
 
-	All informations available on : http://www.mixmod.org                                                                                               
- ***************************************************************************/
+    You should have received a copy of the GNU General Public License
+    along with MIXMOD.  If not, see <http://www.gnu.org/licenses/>.
+
+    All informations available on : http://www.mixmod.org
+***************************************************************************/
 #include "mixmod/Kernel/IO/Label.h"
 #include "mixmod/Kernel/IO/LabelDescription.h"
 #include "mixmod/Kernel/Model/Model.h"
@@ -63,8 +63,8 @@ Label::Label(Model * model) {
 
 	ModelType * modelType = model->getModelType();
 	bool binary = isBinary(modelType->_nameModel);
-	
-	if (!binary) {
+
+	if (!binary || (binary && !DATA_REDUCE)) {
 		_nbSample = model->getNbSample();
 		int64_t ** tabPartition = new int64_t*[_nbSample];
 		for (int64_t i = 0; i < _nbSample; i++) {
@@ -77,10 +77,10 @@ Label::Label(Model * model) {
 		}
 		delete [] tabPartition;
 	}
-	
+
 	else {
 		//binary case
-		const vector<int64_t> & correspondenceOriginDataToReduceData = 
+		const vector<int64_t> & correspondenceOriginDataToReduceData =
 				dynamic_cast<BinaryModel*> (model)->getCorrespondenceOriginDataToReduceData();
 		_nbSample = correspondenceOriginDataToReduceData.size();
 		tabLabel = new int64_t[_nbSample];
@@ -95,7 +95,7 @@ Label::Label(Model * model) {
 		model->getLabelAndPartitionByMAPOrKnownPartition(tabLabelReduce, tabPartitionReduce);
 
 		//  double ** tabPostProbaReduce = NULL;
-		//  tabPostProbaReduce = copyTab(estimation->getModel()->getPostProba(), 
+		//  tabPostProbaReduce = copyTab(estimation->getModel()->getPostProba(),
 		//  nbSampleOfDataReduce, nbCluster); // copy
 
 		// convert labelReduce, partitionReduce, postProbaReduce to label, partition, postProba
@@ -165,7 +165,7 @@ int64_t * Label::getTabLabel() const {
 //---------
 const double Label::getErrorRate(std::vector<int64_t> const & label) const {
 	if (_nbSample != (int64_t) label.size()) {
-		THROW(InputException, notEnoughValuesInLabelInput);
+		THROW(InputException, badNumberOfValuesInLabelInput);
 	}
 
 	double missClass = 0.0;
@@ -178,13 +178,11 @@ const double Label::getErrorRate(std::vector<int64_t> const & label) const {
 //---------
 // get getClassificationTab
 //---------
-int64_t** Label::getClassificationTab(std::vector<int64_t> const & label) const {
+int64_t** Label::getClassificationTab(std::vector<int64_t> const & label, int64_t nbCluster) const {
 	if (_nbSample != (int64_t) label.size()) {
-		THROW(InputException, notEnoughValuesInLabelInput);
+		THROW(InputException, badNumberOfValuesInLabelInput);
 	}
 
-	// get the number of cluster
-	const unsigned int nbCluster = *max_element(_label.begin(), _label.end());
 	// memory allocation
 	int64_t** classTab = new int64_t*[nbCluster];
 	for (unsigned int i = 0; i < nbCluster; i++) {
@@ -197,6 +195,7 @@ int64_t** Label::getClassificationTab(std::vector<int64_t> const & label) const 
 
 	// loop over labels
 	for (int64_t i = 0; i < _nbSample; i++) {
+	  //cout<<_label[i]<<endl;
 		++classTab[_label[i] - 1][label[i] - 1];
 	}
 
@@ -223,7 +222,7 @@ void Label::input(std::ifstream & flux, int64_t nbCluster) {
 	}
 
 	if (!flux.eof() && i != _nbSample) {
-		THROW(InputException, notEnoughValuesInLabelInput);
+		THROW(InputException, badNumberOfValuesInLabelInput);
 	}
 }
 
@@ -249,8 +248,8 @@ void Label::input(const LabelDescription & labelDescription) {
 			if (fi.eof()) {
 				THROW(InputException, endDataFileReach);
 			}
-			if (typeid (*(labelDescription.getColumnDescription(j))) 
-					== typeid (IndividualColumnDescription)) 
+			if (typeid (*(labelDescription.getColumnDescription(j)))
+					== typeid (IndividualColumnDescription))
 			{
 				std::string stringTmp;
 				fi >> stringTmp;
@@ -264,7 +263,7 @@ void Label::input(const LabelDescription & labelDescription) {
 		++i;
 	}
 	if (!fi.eof() && i != _nbSample) {
-		THROW(InputException, notEnoughValuesInLabelInput);
+		THROW(InputException, badNumberOfValuesInLabelInput);
 	}
 }
 

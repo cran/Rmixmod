@@ -1,30 +1,31 @@
 /***************************************************************************
-							 SRC/MIXMOD/Clustering/XEMClusteringInput.cpp  description
-	copyright            : (C) MIXMOD Team - 2001-2013
-	email                : contact@mixmod.org
+                             SRC/mixmod/Clustering/ClusteringInput.cpp  description
+    copyright            : (C) MIXMOD Team - 2001-2014
+    email                : contact@mixmod.org
  ***************************************************************************/
 
 /***************************************************************************
-	This file is part of MIXMOD
-    
-	MIXMOD is free software: you can redistribute it and/or modify
-	it under the terms of the GNU General Public License as published by
-	the Free Software Foundation, either version 3 of the License, or
-	(at your option) any later version.
+    This file is part of MIXMOD
 
-	MIXMOD is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
+    MIXMOD is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-	You should have received a copy of the GNU General Public License
-	along with MIXMOD.  If not, see <http://www.gnu.org/licenses/>.
+    MIXMOD is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
 
-	All informations available on : http://www.mixmod.org                                                                                               
- ***************************************************************************/
+    You should have received a copy of the GNU General Public License
+    along with MIXMOD.  If not, see <http://www.gnu.org/licenses/>.
+
+    All informations available on : http://www.mixmod.org
+***************************************************************************/
 
 #include "mixmod/Clustering/ClusteringInput.h"
 #include "mixmod/Clustering/ClusteringStrategy.h"
+#include "mixmod/Kernel/Model/ModelType.h"
 
 namespace XEM {
 
@@ -39,7 +40,7 @@ ClusteringInput::ClusteringInput() {
 //  Copy constructor
 //-----------------
 ClusteringInput::ClusteringInput( const ClusteringInput & cInput )
-: Input(cInput) 
+: Input(cInput)
 {
 	_strategy = new ClusteringStrategy(*cInput.getStrategy());
 }
@@ -49,7 +50,7 @@ ClusteringInput::ClusteringInput( const ClusteringInput & cInput )
 //---------------------------
 ClusteringInput::ClusteringInput( const std::vector<int64_t> & iNbCluster,
 		const DataDescription & iDataDescription)
-: Input(iNbCluster, iDataDescription) 
+: Input(iNbCluster, iDataDescription)
 {
 	_strategy = new ClusteringStrategy();
 }
@@ -130,23 +131,23 @@ A new task 5290 has been created to try to do only a insert
 void ClusteringInput::insertCriterion(const CriterionName criterionName, unsigned int index) {
 	if (index >= 0 && index <= _criterionName.size()) {
 		switch (criterionName) {
-		case BIC: 
+		case BIC:
 			_criterionName.insert(_criterionName.begin() + index , BIC);
 			break;
 		case CV:
 			THROW(InputException, DAInput);
-		case ICL: 
+		case ICL:
 			_criterionName.insert(_criterionName.begin() + index , ICL);
 			break;
-		case NEC: 
+		case NEC:
 			_criterionName.insert(_criterionName.begin() + index , NEC);
 			break;
 			/*Correction bug 15361
 			case UNKNOWN_CRITERION_NAME : THROW(XEMOtherException,internalMixmodError);break;*/
-		case UNKNOWN_CRITERION_NAME: 
+		case UNKNOWN_CRITERION_NAME:
 			_criterionName.insert(_criterionName.begin() + index , UNKNOWN_CRITERION_NAME);
 			break;
-		default: 
+		default:
 			THROW(OtherException, internalMixmodError);
 		}
 	}
@@ -189,6 +190,7 @@ void ClusteringInput::edit(std::ostream & out ) const {
 	_strategy->edit(out);
 }
 
+
 // ----------------
 // Verif
 //-----------------
@@ -199,5 +201,55 @@ bool ClusteringInput::verif() {
 	}
 	return res;
 }
+
+/// setModelType
+void ClusteringInput::setModelType(const ModelType * modelType, unsigned int index){
+	if (isHD(modelType->getModelName())){
+		THROW(InputException, HDModelsAreNotAvailableInClusteringContext);
+	}
+	else
+		Input::setModelType(modelType, index);
+}
+
+
+/// insertModelType
+void ClusteringInput::insertModelType(const ModelType * modelType, unsigned int index){
+	if (isHD(modelType->getModelName())){
+		THROW(InputException, HDModelsAreNotAvailableInClusteringContext);
+	}
+	else
+		Input::insertModelType(modelType, index);
+}
+
+
+/// add new model type (at the end)
+void ClusteringInput::addModelType(const ModelType * modelType){
+	if (isHD(modelType->getModelName())){
+		THROW(InputException, HDModelsAreNotAvailableInClusteringContext);
+	}
+	else
+		Input::addModelType(modelType);
+}
+
+/// add new model (modelName -> modelType)
+void ClusteringInput::addModel(ModelName const modelName){
+	if (isHD(modelName)){
+		THROW(InputException, HDModelsAreNotAvailableInClusteringContext);
+	}
+	else
+		Input::addModel(modelName);
+}
+
+/// setModel (modelName -> modelType)
+void ClusteringInput::setModel(std::vector<ModelName> const & modelName){
+	for (unsigned int iModel = 0; iModel < modelName.size(); iModel++) {
+		if (isHD(modelName[iModel])){
+			THROW(InputException, HDModelsAreNotAvailableInClusteringContext);
+		}
+	}
+	Input::setModel(modelName);
+}
+
+
 
 }

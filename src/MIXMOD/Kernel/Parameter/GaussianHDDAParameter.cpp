@@ -1,27 +1,27 @@
 /***************************************************************************
-							 SRC/MIXMOD/Kernel/Parameter/XEMGaussianHDDAParameter.cpp  description
-	copyright            : (C) MIXMOD Team - 2001-2013
-	email                : contact@mixmod.org
+                             SRC/mixmod/Kernel/Parameter/GaussianHDDAParameter.cpp  description
+    copyright            : (C) MIXMOD Team - 2001-2014
+    email                : contact@mixmod.org
  ***************************************************************************/
 
 /***************************************************************************
-	This file is part of MIXMOD
-    
-	MIXMOD is free software: you can redistribute it and/or modify
-	it under the terms of the GNU General Public License as published by
-	the Free Software Foundation, either version 3 of the License, or
-	(at your option) any later version.
+    This file is part of MIXMOD
 
-	MIXMOD is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
+    MIXMOD is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-	You should have received a copy of the GNU General Public License
-	along with MIXMOD.  If not, see <http://www.gnu.org/licenses/>.
+    MIXMOD is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
 
-	All informations available on : http://www.mixmod.org                                                                                               
- ***************************************************************************/
+    You should have received a copy of the GNU General Public License
+    along with MIXMOD.  If not, see <http://www.gnu.org/licenses/>.
+
+    All informations available on : http://www.mixmod.org
+***************************************************************************/
 #include "mixmod/Kernel/Parameter/GaussianHDDAParameter.h"
 #include "mixmod/Kernel/Parameter/GaussianParameter.h"
 #include "mixmod/Kernel/IO/GaussianData.h"
@@ -51,8 +51,8 @@ GaussianHDDAParameter::GaussianHDDAParameter() : GaussianParameter() {
 //-------------------------------------------------------------------------------------
 // constructor called by XEMModel
 //-------------------------------------------------------------------------------------
-GaussianHDDAParameter::GaussianHDDAParameter(Model * iModel, ModelType * iModelType) 
-: GaussianParameter(iModel, iModelType) 
+GaussianHDDAParameter::GaussianHDDAParameter(Model * iModel, ModelType * iModelType)
+: GaussianParameter(iModel, iModelType)
 {
 	int64_t k;
 
@@ -60,7 +60,7 @@ GaussianHDDAParameter::GaussianHDDAParameter(Model * iModel, ModelType * iModelT
 	_tabBk = new double[_nbCluster];
 	_tabShape = new DiagMatrix*[_nbCluster];
 	_tabQk = new GeneralMatrix*[_nbCluster];
-	_W = new SymmetricMatrix(_pbDimension); //Id	
+	_W = new SymmetricMatrix(_pbDimension); //Id
 	_tabDk = new int64_t [_nbCluster];
 	_tabGammak = NULL;
 	_Gammak = NULL;
@@ -98,9 +98,9 @@ GaussianHDDAParameter::GaussianHDDAParameter(Model * iModel, ModelType * iModelT
 //constructeur avec une initialisation USER
 //-------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------
-GaussianHDDAParameter::GaussianHDDAParameter(int64_t iNbCluster, int64_t iPbDimension, 
-		ModelType * iModelType, std::string & iFileName) 
-: GaussianParameter(iNbCluster, iPbDimension, iModelType) 
+GaussianHDDAParameter::GaussianHDDAParameter(int64_t iNbCluster, int64_t iPbDimension,
+		ModelType * iModelType, std::string & iFileName)
+: GaussianParameter(iNbCluster, iPbDimension, iModelType)
 {
 	int64_t k;
 	_tabAkj = new double*[_nbCluster];
@@ -135,8 +135,8 @@ GaussianHDDAParameter::GaussianHDDAParameter(int64_t iNbCluster, int64_t iPbDime
 //constructeur par copie
 //-------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------
-GaussianHDDAParameter::GaussianHDDAParameter(const GaussianHDDAParameter * iParameter) 
-: GaussianParameter(iParameter) 
+GaussianHDDAParameter::GaussianHDDAParameter(const GaussianHDDAParameter * iParameter)
+: GaussianParameter(iParameter)
 {
 	int64_t k;
 	__storeDim = _pbDimension * (_pbDimension + 1) / 2;
@@ -166,7 +166,7 @@ GaussianHDDAParameter::GaussianHDDAParameter(const GaussianHDDAParameter * iPara
 		_tabAkj[k] = new double[_tabDk[k]];
 		recopyTab(iTabA[k], _tabAkj[k], _tabDk[k]);
 		_tabShape[k] = new DiagMatrix(iTabShape[k]);
-		_tabQk[k] = new GeneralMatrix(iTabQ[k]); // copy constructor   
+		_tabQk[k] = new GeneralMatrix(iTabQ[k]); // copy constructor
 		_tabWk[k] = new SymmetricMatrix(_pbDimension); //Id
 		(* _tabWk[k]) = iTabWk[k];
 	}
@@ -326,7 +326,7 @@ double GaussianHDDAParameter::getPdf(int64_t iSample, int64_t kCluster)const {
 	}
 	A->compute_as_O_S_O(_tabQk[kCluster], tabShapek_store);
 
-	double constante = sum_lambda + (_pbDimension - _tabDk[kCluster]) * log(_tabBk[kCluster]) 
+	double constante = sum_lambda + (_pbDimension - _tabDk[kCluster]) * log(_tabBk[kCluster])
 			- 2 * log(tabProportion[kCluster]) + _pbDimension * log(2 * XEMPI);
 
 	//-----------soustraction des moyennes
@@ -351,7 +351,9 @@ double GaussianHDDAParameter::getPdf(int64_t iSample, int64_t kCluster)const {
 
 	//----------------calcul de normPdf---------
 	K = normeA + 1.0 / _tabBk[kCluster] * norme + constante;
-	normPdf = exp(-1 / 2 * K);
+	//normPdf = exp(-1 / 2 * K);
+	normPdf = exp(-0.5 * K);
+
 
 	delete Pk;
 	delete A;
@@ -424,7 +426,7 @@ double GaussianHDDAParameter::getPdf(Sample * x, int64_t kCluster)const {
 
 	A->compute_as_O_S_O(_tabQk[kCluster], tabShapek_store);
 
-	double constante = sum_lambda + (_pbDimension - _tabDk[kCluster]) * log(_tabBk[kCluster]) 
+	double constante = sum_lambda + (_pbDimension - _tabDk[kCluster]) * log(_tabBk[kCluster])
 			- 2 * log(tabProportion[kCluster]) + _pbDimension * log(2 * XEMPI);
 
 	//-----------soustraction des moyennes
@@ -449,7 +451,8 @@ double GaussianHDDAParameter::getPdf(Sample * x, int64_t kCluster)const {
 
 	//----------------calcul de normPdf---------
 	K = normeA + 1.0 / _tabBk[kCluster] * norme + constante;
-	normPdf = exp(-1 / 2 * K);
+	//normPdf = exp(-1 / 2 * K);
+	normPdf = exp(-0.5*K);
 
 	delete Pk;
 	delete A;
@@ -557,7 +560,7 @@ void GaussianHDDAParameter::computeTabWkW() {
 }
 
 //-------------------------------------------
-// initialize attributes before an InitRandom 
+// initialize attributes before an InitRandom
 //-------------------------------------------
 void GaussianHDDAParameter::initForInitRANDOM() {
 	THROW(OtherException, internalMixmodError);
@@ -566,12 +569,12 @@ void GaussianHDDAParameter::initForInitRANDOM() {
 //---------------------------
 // initForInitUSER_PARTITION
 //--------------------------
-void GaussianHDDAParameter::initForInitUSER_PARTITION(int64_t & nbInitializedCluster, 
-		bool * tabNotInitializedCluster, Partition * initPartition) 
+void GaussianHDDAParameter::initForInitUSER_PARTITION(int64_t & nbInitializedCluster,
+		bool * tabNotInitializedCluster, Partition * initPartition)
 {
 	computeTabMeanInitUSER_PARTITION(
 			nbInitializedCluster, tabNotInitializedCluster, initPartition);
-	// initialization of _tabAkj, ;... : 
+	// initialization of _tabAkj, ;... :
 
 	DiagMatrix * matrixDataVar = new DiagMatrix(_pbDimension, 0.0);
 	computeGlobalDiagDataVariance(matrixDataVar);
@@ -602,8 +605,8 @@ void GaussianHDDAParameter::initForInitUSER_PARTITION(int64_t & nbInitializedClu
 
 	if (nbInitializedCluster != _nbCluster) {
 		/* ca ne devrait pas arriver puisque on a verifie dans XEMOldInput que :
-		- la partition doit etre 'complete' (y compris que toutes les classes 
-		  sont representees) quand on a l'algo M 
+		- la partition doit etre 'complete' (y compris que toutes les classes
+		  sont representees) quand on a l'algo M
 		- que l'on autorise que M ou MAP pour les modeles HD
 		- que MAP => USER (et donc pas 'USER_PARTITION' avec MAP)
 		 */
@@ -637,7 +640,7 @@ void GaussianHDDAParameter::initForInitUSER_PARTITION(int64_t & nbInitializedClu
 	 case (Gaussian_HD_pk_AkBkQkD) :
 	 case (Gaussian_HD_p_AkBkQkD) :
 	   computeAkBkQk();
-	   break;  
+	   break;
 
 	 case (Gaussian_HD_p_AkjBQkD):
 	 case (Gaussian_HD_pk_AkjBQkD):
@@ -712,7 +715,7 @@ void GaussianHDDAParameter::recopy(Parameter * otherParameter) {
 	int64_t k;
 	Matrix ** iTabWk = iParameter->getTabWk();
 	for (k = 0; k < _nbCluster; k++) {
-		//_tabWk[k]->recopy(iTabWk[k]);  
+		//_tabWk[k]->recopy(iTabWk[k]);
 		(* _tabWk[k]) = iTabWk[k];
 	}
 }
@@ -735,15 +738,15 @@ double GaussianHDDAParameter::getLogLikelihoodOne()const {
 	double * yi;
    // XEMGeneralMatrix * Sigma = new XEMGeneralMatrix(_pbDimension);
 	XEMSymmetricMatrix * W     = new XEMSymmetricMatrix(_pbDimension);
-	 *W = 0.0;   
-	double norme, logDet, detDiagW ;       
+	 *W = 0.0;
+	double norme, logDet, detDiagW ;
 	double * weight = data->_weight;
 
 	//  Mean Estimator (empirical estimator)
 	double totalWeight = data->_weightTotal;
 	computeMeanOne(Mean,weight,y,nbSample,totalWeight);
 	weight = data->_weight;
-	  // Compute the Cluster Scattering Matrix W 
+	  // Compute the Cluster Scattering Matrix W
 	int64_tp; // parcours
 	double * xiMoinsMuk = data->getTmpTabOfSizePbDimension();
 	double tmp;
@@ -753,18 +756,18 @@ double GaussianHDDAParameter::getLogLikelihoodOne()const {
 			xiMoinsMuk[p] = yi[p] - Mean[p];
 		 }
 		 W->add(xiMoinsMuk, weight[i]);
-	  }  
+	  }
 
-	//Compute determinant of diag(W) 
+	//Compute determinant of diag(W)
    // logDet   = W->detDiag(minDeterminantDiagWValueError);  // virtual
 	detDiagW = powAndCheckIfNotNull(logDet ,1.0/_pbDimension);
-  
+
 	Sigma->divise(W, totalWeight); // virtual
-  
+
 	// inverse of Sigma
 	XEMGeneralMatrix * SigmaMoins1 = new XEMGeneralMatrix(_pbDimension);
 	SigmaMoins1->inverse(Sigma);// virtual
-  
+
 	double detSigma  = Sigma->determinant(minDeterminantSigmaValueError); // virtual
 
 	// Compute the log-likelihood for one cluster (k=1)
@@ -774,25 +777,25 @@ double GaussianHDDAParameter::getLogLikelihoodOne()const {
 	  for(p=0; p<_pbDimension; p++){
 		xiMoinsMuk[p] = yi[p] - Mean[p];
 	  }
-  
+
 	  norme             = SigmaMoins1->norme(xiMoinsMuk);   // virtual
 	  logLikelihoodOne += norme * weight[i];
 	}
 
    logLikelihoodOne += totalWeight * ( data->getPbDimensionLog2Pi() + log(detSigma)) ;
    logLikelihoodOne *= -0.5 ;
- 
+
    delete W;
    delete Sigma;
    delete SigmaMoins1;
-  
+
    delete[] Mean;
- 
+
    return logLikelihoodOne;*/
 	return 0.0;
 }
 
-//Calcule la log-vraismeblance avec la fonction de coût 
+//Calcule la log-vraismeblance avec la fonction de coût
 /*************************/
 /* computeLoglikelihoodK */
 /*************************/
@@ -853,7 +856,7 @@ int64_t GaussianHDDAParameter::getFreeParameter()const {
 		dMean /= k;
 		nbParameter = roF + k * (toFree + 3);
 		break;
-		
+
 	case (Gaussian_HD_pk_AkjBkQkD):
 		toEqual = _tabDk[0]*(p - (_tabDk[0] + 1) / 2);
 		nbParameter = roF + k * (toEqual + _tabDk[0] + 1) + 1;
@@ -1083,10 +1086,10 @@ void GaussianHDDAParameter::computeTabDk() {
   int64_tnbSample = _model->getNbSample();
   int64_tk;
 
-  for (k=0;k<_nbCluster;k++){ 
+  for (k=0;k<_nbCluster;k++){
 	_tabDk[k] = 1;
   }
- 
+
   double nbFreeParameter;// = getFreeParameter();
 
    switch (_modelType){
@@ -1124,12 +1127,12 @@ void GaussianHDDAParameter::computeTabDk() {
   double* Lk_min = computeLoglikelihoodK(Cost1);
   double * BIC_min = new double[_nbCluster];
   double* BIC = new double[_nbCluster];
-  int64_t* tabD_min = new int[_nbCluster]; 
+  int64_t* tabD_min = new int[_nbCluster];
   double* Lk;
   double** Cost;
 
   for (int64_tk=0;k<_nbCluster;k++){
-	nbFreeParameter = (_pbDimension+1.0-1.0/_nbCluster) 
+	nbFreeParameter = (_pbDimension+1.0-1.0/_nbCluster)
              + _tabDk[k]*(_pbDimension-(_tabDk[k]+1.0)/2.0)+_tabDk[k]+2.0;
 	BIC_min[k] =  (-2*Lk_min[k] + nbFreeParameter * log(tabNk[k])) / (tabNk[k]);
    // cout<<"d  :  "<<1<<"  BIC_min["<<k<<"] :  "<<BIC_min[k]<<endl;
@@ -1176,7 +1179,7 @@ for (int64_ti=2;i<_pbDimension;i++){
 	Cost = computeCost(_tabQk);
 	Lk = computeLoglikelihoodK(Cost);
 	for (int64_tk=0;k<_nbCluster;k++){
-	 nbFreeParameter = (_pbDimension+1.0-1.0/_nbCluster) 
+	 nbFreeParameter = (_pbDimension+1.0-1.0/_nbCluster)
            + _tabDk[k]*(_pbDimension-(_tabDk[k]+1.0)/2.0)+_tabDk[k]+2.0;
 	 BIC[k] = (-2*Lk[k] + nbFreeParameter * log(tabNk[k])) / (tabNk[k]);
 	 //cout<<"d  : "<<i<<"  BIC["<<k<<"] :  "<<BIC[k]<<endl;
@@ -1267,7 +1270,7 @@ double** GaussianHDDAParameter::computeCost(GeneralMatrix ** tabQ)const {
 			tabShapek_store[j] = 0.0;
 		}
 		A->compute_as_O_S_O(tabQ[classe], tabShapek_store);
-		double constante = sum_lambda + (_pbDimension - _tabDk[classe]) * log(_tabBk[classe]) 
+		double constante = sum_lambda + (_pbDimension - _tabDk[classe]) * log(_tabBk[classe])
 				- 2 * log(tabProportion[classe]) + _pbDimension * log(2 * XEMPI);
 
 		for (int64_t sample = 0; sample < nbSample; sample++) {
@@ -1293,7 +1296,7 @@ double** GaussianHDDAParameter::computeCost(GeneralMatrix ** tabQ)const {
 
 			//----------------calcul de K(x)---------
 			K[classe][sample] = normeA + 1.0 / _tabBk[classe] * norme + constante;
-		}//fin sample 
+		}//fin sample
 
 		delete[] tabShapek_store;
 		tabShapek_store = NULL;
@@ -1307,7 +1310,7 @@ double** GaussianHDDAParameter::computeCost(GeneralMatrix ** tabQ)const {
 
 	delete[] xiMoinsMuk;
 	xiMoinsMuk = NULL;
-	
+
 	return K;
 }
 
@@ -1316,7 +1319,7 @@ double** GaussianHDDAParameter::computeCost(GeneralMatrix ** tabQ)const {
 /*****************/
 // Dans mixmod, les matrices Wk ne sont pas divisees par nk alors que dans
 //le these de Charles elles le sont. L'expression des parametres dans le code
-//est differente de celle de la these car elle rectifie cette difference 
+//est differente de celle de la these car elle rectifie cette difference
 void GaussianHDDAParameter::computeAkjBkQk() {
 	Matrix* W_k;
 	double* tabNk = _model->getTabNk();

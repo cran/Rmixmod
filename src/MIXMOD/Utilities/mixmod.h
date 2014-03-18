@@ -1,6 +1,6 @@
 /***************************************************************************
-                             SRC/MIXMOD/Utilities/mixmod.h  description
-    copyright            : (C) MIXMOD Team - 2001-2013
+                             SRC/mixmod/Utilities/mixmod.h  description
+    copyright            : (C) MIXMOD Team - 2001-2014
     email                : contact@mixmod.org
  ***************************************************************************/
 
@@ -35,8 +35,8 @@
 #endif
 
 // newmat includes
-#include "newmatap.h"
-#include "newmatio.h"
+#include "NEWMAT/newmatap.h"
+#include "NEWMAT/newmatio.h"
 
 // mixmod includes
 #include "mixmod/Clustering/ClusteringInput.h"

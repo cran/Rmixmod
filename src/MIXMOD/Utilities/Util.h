@@ -1,3 +1,27 @@
+/***************************************************************************
+                             SRC/mixmod/Utilities/Util.h  description
+    copyright            : (C) MIXMOD Team - 2001-2014
+    email                : contact@mixmod.org
+ ***************************************************************************/
+
+/***************************************************************************
+    This file is part of MIXMOD
+
+    MIXMOD is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    MIXMOD is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with MIXMOD.  If not, see <http://www.gnu.org/licenses/>.
+
+    All informations available on : http://www.mixmod.org
+***************************************************************************/
 /** @file Util.h
  *  @brief Constants definitions, various utilities to describe models, and others...
  **/
@@ -38,7 +62,7 @@
 
 // Need matrix applications
 #include "mixmod/Utilities/maths/SelectLibrary.h"
- 
+
 namespace XEM {
 
 //Macro for throw
@@ -62,7 +86,7 @@ const int DEBUG = 0; // >0 for debug information
                      // 0 : no debug
                      // 1 : param debug
                      // 2 : param and fik, tik, zik debug
-const bool DATA_REDUCE = true; // do not reduce binary data (bug with weights, I don't want to try to fix it.....)
+const bool DATA_REDUCE = false; // do not reduce binary data (bug with weights, I don't want to try to fix it.....)
 const bool VERBOSE = false;    // print various execution traces (labels, errors...)
 
 /// Define number of maximum samples
@@ -121,7 +145,7 @@ const double maxAbsoluteDiffValueTest = 1.0E-8; // Maximum difference between 2 
 const int64_t  defaultDCVnumberOfBlocks = 10;   // DCV
 const int64_t defaultCVnumberOfBlocks  = 10;    // CV
 
-const double minValueForLLandLLOne = 1.e-10;    // minimum value for LL - LLone    
+const double minValueForLLandLLOne = 1.e-10;    // minimum value for LL - LLone
 
 const int64_t int64_t_max = std::numeric_limits<int64_t>::max();
 
@@ -155,9 +179,9 @@ enum CVinitBlocks {
 	...
 	ind V -> blockV
 	ind V+1->block1
-	...  
+	...
 
-	Ex 2 : 
+	Ex 2 :
 	//-----
 	ind weight
 	1     2
@@ -204,9 +228,9 @@ enum DCVinitBlocks {
 	...
 	ind V -> blockTestV
 	ind V+1->blockTest1
-	...  
+	...
 
-	Ex 2 : 
+	Ex 2 :
 	//-----
 	ind weight
 	1     10
@@ -214,7 +238,7 @@ enum DCVinitBlocks {
 	3     10
 	4     10
 	5     10
-	
+
 	if V=4:
 	ind 1 -> blockTest1
 	ind 1 -> blockTest2
@@ -357,7 +381,7 @@ enum ModelGenre {
 bool isKeyword(std::string& name);
 
 /** @struct TWeightedIndividual
-	@brief Structure for chain list of differents sample 
+	@brief Structure for chain list of differents sample
  */
 struct TWeightedIndividual {
 
@@ -370,10 +394,10 @@ struct CVBlock {
 
 	int64_t   _nbSample;                          // number of samples in this CV Block
 	double _weightTotal;                          // weight Total of this CV Block
-	TWeightedIndividual * _tabWeightedIndividual; // array (size=nbSample) of weighted individual 
+	TWeightedIndividual * _tabWeightedIndividual; // array (size=nbSample) of weighted individual
 };
 
-/** @enum ModelName 
+/** @enum ModelName
 @brief Enumeration of model name
  */
 enum ModelName {
@@ -722,7 +746,7 @@ inline void recopyTab(int64_t * source, double * destination, int64_t dim) {
 	}
 }
 
-inline void recopyTabToVector(double ** source, 
+inline void recopyTabToVector(double ** source,
 		std::vector<std::vector<double> > & destination, int64_t dim1, int64_t dim2)
 {
 	destination.resize(dim1);
@@ -776,7 +800,7 @@ template<typename T> void recopyTab(T ** source, T ** destination, int64_t dim1,
 void editSimpleTab(double * tab, int64_t n, std::ostream & flux, std::string sep = " ", std::string before = " ");
 void editSimpleTab(int64_t    * tab, int64_t n, std::ostream & flux);
 
-template<typename T> void editTab(T ** tab, int64_t dim1, int64_t dim2, 
+template<typename T> void editTab(T ** tab, int64_t dim1, int64_t dim2,
 		std::ostream & flux, std::string sep = " ", std::string before = "")
 {
 	T ** p_tab = tab;

@@ -1,27 +1,27 @@
 /***************************************************************************
-							 SRC/MIXMOD/Kernel/IO/XEMLabel.h  description
-	copyright            : (C) MIXMOD Team - 2001-2013
-	email                : contact@mixmod.org
+                             SRC/mixmod/Kernel/IO/Label.h  description
+    copyright            : (C) MIXMOD Team - 2001-2014
+    email                : contact@mixmod.org
  ***************************************************************************/
 
 /***************************************************************************
-	This file is part of MIXMOD
-    
-	MIXMOD is free software: you can redistribute it and/or modify
-	it under the terms of the GNU General Public License as published by
-	the Free Software Foundation, either version 3 of the License, or
-	(at your option) any later version.
+    This file is part of MIXMOD
 
-	MIXMOD is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
+    MIXMOD is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-	You should have received a copy of the GNU General Public License
-	along with MIXMOD.  If not, see <http://www.gnu.org/licenses/>.
+    MIXMOD is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
 
-	All informations available on : http://www.mixmod.org                                                                                               
- ***************************************************************************/
+    You should have received a copy of the GNU General Public License
+    along with MIXMOD.  If not, see <http://www.gnu.org/licenses/>.
+
+    All informations available on : http://www.mixmod.org
+***************************************************************************/
 #ifndef XEMLabel_H
 #define XEMLabel_H
 
@@ -39,7 +39,7 @@ namespace XEM {
 class Model;
 class LabelDescription;
 
-/** 
+/**
  \class XEMLabel
  @author F. Langrognet
 		@date 2010
@@ -86,7 +86,7 @@ public:
 	const double getErrorRate(std::vector<int64_t> const & label) const;
 
 	// get getClassificationTab
-	int64_t** getClassificationTab(std::vector<int64_t> const & label) const;
+	int64_t** getClassificationTab(std::vector<int64_t> const & label, int64_t nbCluster) const;
 
 	///input stream
 	void input(std::ifstream & flux, int64_t nbCluster);
@@ -97,7 +97,6 @@ private:
 	/// Number of samples
 	int64_t _nbSample;
 
-	/// dim : _nbSample *_nbCluster
 	std::vector<int64_t> _label;
 
 };

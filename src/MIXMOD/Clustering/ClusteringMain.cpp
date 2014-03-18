@@ -1,27 +1,27 @@
 /***************************************************************************
-							 SRC/MIXMOD/Clustering/XEMClusteringMain.cpp  description
-	copyright            : (C) MIXMOD Team - 2001-2013
-	email                : contact@mixmod.org
+                             SRC/mixmod/Clustering/ClusteringMain.cpp  description
+    copyright            : (C) MIXMOD Team - 2001-2014
+    email                : contact@mixmod.org
  ***************************************************************************/
 
 /***************************************************************************
-	This file is part of MIXMOD
+    This file is part of MIXMOD
     
-	MIXMOD is free software: you can redistribute it and/or modify
-	it under the terms of the GNU General Public License as published by
-	the Free Software Foundation, either version 3 of the License, or
-	(at your option) any later version.
+    MIXMOD is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-	MIXMOD is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
+    MIXMOD is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
 
-	You should have received a copy of the GNU General Public License
-	along with MIXMOD.  If not, see <http://www.gnu.org/licenses/>.
+    You should have received a copy of the GNU General Public License
+    along with MIXMOD.  If not, see <http://www.gnu.org/licenses/>.
 
-	All informations available on : http://www.mixmod.org                                                                                               
- ***************************************************************************/
+    All informations available on : http://www.mixmod.org                                                                                               
+***************************************************************************/
 
 #include "mixmod/Clustering/ClusteringMain.h"
 #include "mixmod/Clustering/ClusteringInput.h"
@@ -57,7 +57,7 @@ ClusteringMain::~ClusteringMain() {
 	delete _output;
 }
 
-void ClusteringMain::run(int seed = -1) {
+void ClusteringMain::run(int seed) {
 
 	// Call randomize() function to use a random seed, or antiRandomize() for deterministic seed.
 	initRandomize(seed);
@@ -92,14 +92,14 @@ void ClusteringMain::run(int seed = -1) {
 	std::vector<int64_t> correspondenceOriginDataToReduceData;
 	if (_input->getDataType() == QualitativeData && DATA_REDUCE) {
 		BinaryData * bData = dynamic_cast<BinaryData*> (_input->getDataDescription().getData());
-		
+
 		// initPartition
 		Partition* inputInitPartition = NULL;
 		Partition* workingInitPartition = NULL;
 		if (_input->getStrategy()->getStrategyInit()->getStrategyInitName() == USER_PARTITION) {
 			inputInitPartition = _input->getStrategy()->getStrategyInit()->getPartition(0);
 		}
-		
+
 		try {
 			// NOTE: workingInitPartition is always NULL
 			workingData = bData->reduceData(
@@ -115,27 +115,27 @@ void ClusteringMain::run(int seed = -1) {
 	// Initialize output [HACK: using pointer because of an error when retrieving CriterionOutput later]
 	std::vector<CriterionName>* vCriterion = new std::vector<CriterionName>();
 	const int nbCriterion = _input->getCriterionName().size();
-	for (unsigned int iCriterion = 0; iCriterion<nbCriterion; iCriterion++)
+	for (int iCriterion = 0; iCriterion<nbCriterion; iCriterion++)
 		vCriterion->push_back(_input->getCriterionName()[iCriterion]);
 	_output = new ClusteringOutput(*vCriterion);
 
 	// Main loop : build and run every model, and incrementally fill output
 	// NOTE: potential parallelization here (OpenMP at least)
 	const int nbnbCluster = _input->getNbCluster().size();
-	for (unsigned int nbCluster_i= 0; nbCluster_i<nbnbCluster; nbCluster_i++) {
+	for (int nbCluster_i= 0; nbCluster_i<nbnbCluster; nbCluster_i++) {
 		int64_t nbCluster = _input->getNbCluster()[nbCluster_i];
 		const int nbModel = _input->getModelType().size();
-		for (unsigned int nbModel_i=0; nbModel_i<nbModel; nbModel_i++) {
+		for (int nbModel_i=0; nbModel_i<nbModel; nbModel_i++) {
 			ModelType* modelType = _input->getModelType()[nbModel_i];
-			
+
 			//-----------------
 			// 1. Create model
 			//-----------------
 
 			if (VERBOSE)
-				std::cout << "Model name : " 
+				std::cout << "Model name : "
 					<< ModelNameToString(modelType->getModelName()) << std::endl;
-			
+
 			Model* model = NULL;
 			switch (_input->getDataType()) {
 			case QualitativeData:
@@ -155,7 +155,7 @@ void ClusteringMain::run(int seed = -1) {
 			//-----------------------------
 			// 2. run parameters estimation
 			//-----------------------------
-			
+
 			try {
 				workingStrategy->run(model);
 			}
@@ -175,7 +175,7 @@ void ClusteringMain::run(int seed = -1) {
 			//--------------------
 			// 3. compute criteria
 			//--------------------
-			
+
 			ClusteringModelOutput* cmoutput = new ClusteringModelOutput(model);
 			_output->addEstimation(cmoutput);
 			if (model->getErrorType() == NOERROR) {

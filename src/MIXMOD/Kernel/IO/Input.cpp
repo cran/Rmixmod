@@ -1,27 +1,27 @@
 /***************************************************************************
-							 SRC/MIXMOD/Kernel/IO/XEMInput.cpp  description
-	copyright            : (C) MIXMOD Team - 2001-2013
-	email                : contact@mixmod.org
+                             SRC/mixmod/Kernel/IO/Input.cpp  description
+    copyright            : (C) MIXMOD Team - 2001-2014
+    email                : contact@mixmod.org
  ***************************************************************************/
 
 /***************************************************************************
-	This file is part of MIXMOD
+    This file is part of MIXMOD
     
-	MIXMOD is free software: you can redistribute it and/or modify
-	it under the terms of the GNU General Public License as published by
-	the Free Software Foundation, either version 3 of the License, or
-	(at your option) any later version.
+    MIXMOD is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-	MIXMOD is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
+    MIXMOD is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
 
-	You should have received a copy of the GNU General Public License
-	along with MIXMOD.  If not, see <http://www.gnu.org/licenses/>.
+    You should have received a copy of the GNU General Public License
+    along with MIXMOD.  If not, see <http://www.gnu.org/licenses/>.
 
-	All informations available on : http://www.mixmod.org                                                                                               
- ***************************************************************************/
+    All informations available on : http://www.mixmod.org                                                                                               
+***************************************************************************/
 
 #include "mixmod/Kernel/IO/Input.h"
 #include "mixmod/Kernel/IO/Data.h"
@@ -107,7 +107,7 @@ void Input::cloneInitialisation(const std::vector<int64_t> & iNbCluster,
 	else{
 	  _modelType.push_back(new ModelType(defaultBinaryModelName));
 	}*/
-
+	//cout<<_dataDescription.getDataType()<<endl;
 	switch (_dataDescription.getDataType()) {
 	case QualitativeData:
 		_modelType.push_back(new ModelType(defaultBinaryModelName));
@@ -199,7 +199,7 @@ void Input::setModelType(const ModelType * modelType, unsigned int index) {
 		if (_modelType[index]) delete _modelType[index];
 		_modelType[index] = new ModelType(*modelType);
 	}
-	else {
+	else {  
 		THROW(InputException, wrongModelPositionInSet);
 	}
 	_finalized = false;
@@ -217,7 +217,27 @@ void Input::insertModelType(const ModelType * modelType, unsigned int index) {
 	_finalized = false;
 }
 
-// add new model type
+
+// add new model type 
+void Input::addModelType(const ModelType * modelType) {
+	if (getDataType() == QualitativeData)
+  	if (getModelGenre(modelType->getModelName()) != QualitativeModel) return;
+
+
+	if (getDataType() == QuantitativeData)
+		if (getModelGenre(modelType->getModelName()) != QuantitativeModel) return;
+
+	if (getDataType() == HeterogeneousData)
+		if (getModelGenre(modelType->getModelName()) != HeterogeneousModel) return;
+
+	bool found = false;
+	for (unsigned int iModel = 0; iModel < _modelType.size(); iModel++) {
+		if (_modelType[iModel]->getModelName() == modelType->getModelName()) found = true;
+	}
+	if (!found) _modelType.push_back(new ModelType(*modelType));
+}
+
+// add new model (modelName -> modelType)
 void Input::addModel(ModelName const modelName) {
 
 	if (getDataType() == QualitativeData)
@@ -378,7 +398,8 @@ bool Input::verif() {
 void Input::edit(std::ostream & out) const {
 	out << "Models : ";
 	for (unsigned int iModel = 0; iModel < _modelType.size(); iModel++)
-		out << endl << "  " << ModelNameToString(_modelType[iModel]->getModelName());
+		//out << endl << "  " << ModelNameToString(_modelType[iModel]->getModelName());
+		out << endl <<*(_modelType[iModel]);
 	out << std::endl;
 
 	out << "Criterions : ";

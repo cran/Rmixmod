@@ -1,27 +1,27 @@
 /***************************************************************************
-							 SRC/MIXMOD/Kernel/Criterion/CVCriterion.cpp  description
-	copyright            : (C) MIXMOD Team - 2001-2013
-	email                : contact@mixmod.org
+                             SRC/mixmod/Kernel/Criterion/CVCriterion.cpp  description
+    copyright            : (C) MIXMOD Team - 2001-2014
+    email                : contact@mixmod.org
  ***************************************************************************/
 
 /***************************************************************************
-	This file is part of MIXMOD
-    
-	MIXMOD is free software: you can redistribute it and/or modify
-	it under the terms of the GNU General Public License as published by
-	the Free Software Foundation, either version 3 of the License, or
-	(at your option) any later version.
+    This file is part of MIXMOD
 
-	MIXMOD is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
+    MIXMOD is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-	You should have received a copy of the GNU General Public License
-	along with MIXMOD.  If not, see <http://www.gnu.org/licenses/>.
+    MIXMOD is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
 
-	All informations available on : http://www.mixmod.org                                                                                               
- ***************************************************************************/
+    You should have received a copy of the GNU General Public License
+    along with MIXMOD.  If not, see <http://www.gnu.org/licenses/>.
+
+    All informations available on : http://www.mixmod.org
+***************************************************************************/
 #include "mixmod/Kernel/Criterion/CVCriterion.h"
 #include "mixmod/Kernel/Criterion/CriterionOutput.h"
 #include "mixmod/Kernel/IO/LabelDescription.h"
@@ -36,7 +36,7 @@ namespace XEM {
 // Constructor
 //------------
 CVCriterion::CVCriterion(Model * model, const int64_t nbCVBlock)
-: Criterion(model), _tabCVBlock(0), _cvLabel(model->getNbSample()), _nbCVBlock(nbCVBlock) 
+: Criterion(model), _tabCVBlock(0), _cvLabel(model->getNbSample()), _nbCVBlock(nbCVBlock)
 {
 	_CVinitBlocks = defaultCVinitBlocks;
 }
@@ -69,8 +69,9 @@ void CVCriterion::run(CriterionOutput & output) {
 		createCVBlocks();
 		// loop over the blocks
 		for (int64_t v = 0; v < _nbCVBlock; v++) {
-
+      //cout<<"CV block n°"<<v<<endl<<"---------"<<endl;
 			CVModel->updateForCV(_model, _tabCVBlock[v]);
+			//CVModel->getParameter()->edit();
 			// loop over samples
 			for (int64_t ii = 0; ii < _tabCVBlock[v]._nbSample; ii++) {
 				i = _tabCVBlock[v]._tabWeightedIndividual[ii].val;
@@ -78,6 +79,7 @@ void CVCriterion::run(CriterionOutput & output) {
 				known_ki = _model->getKnownLabel(i);
 				x = data->_matrix[i];
 				_cvLabel[i] = CVModel->computeLabel(x);
+				//cout<<"individu : "<<i<<" - knownLabel : "<<known_ki<<" - computeLabel : "<<_cvLabel[i]<<endl;
 				if (_cvLabel[i] != known_ki) {
 					/*cout<<"labels differents dans CV pour l'individu : "<<i<<" de poids : "
 					<<_tabCVBlock[v]._tabWeightedIndividual[ii].weight<<endl;*/
@@ -125,7 +127,7 @@ void CVCriterion::createCVBlocks() {
 
 	// creation of blocks
 	if (_nbCVBlock == weightTotal) {
-		
+
 		v = 0;
 		for (i = 0; i < nbSample; i++) {
 			sumWeight = 0.0;
@@ -144,12 +146,12 @@ void CVCriterion::createCVBlocks() {
 			THROW(OtherException, internalMixmodError);
 		}
 	}
-	
+
 	else { // weightTotal > _nbCVBlocks
-		
+
 		if (_CVinitBlocks == CV_RANDOM) {
 			//cout<<"CVCriterion CV_RANDOM"<<endl;
-			// random 
+			// random
 			double * tabRandom = new double[weightTotal];
 			int64_t * tabIndex = new int64_t[weightTotal];
 			index = 0;
@@ -198,7 +200,7 @@ void CVCriterion::createCVBlocks() {
 					while ((listIterator != listEnd) && (value > (*listIterator)->val)) {
 						listIterator++;
 					}
-					// list empty //  
+					// list empty //
 					if (listBegin == listEnd) {
 						TWeightedIndividual * elem = new TWeightedIndividual;
 						elem->val = value;
@@ -245,7 +247,7 @@ void CVCriterion::createCVBlocks() {
 				// update _tabCVBlock
 				_tabCVBlock[v]._nbSample = sizeList;
 				_tabCVBlock[v]._weightTotal = weightTotalInCVBlock;
-				_tabCVBlock[v]._tabWeightedIndividual = 
+				_tabCVBlock[v]._tabWeightedIndividual =
 						new TWeightedIndividual[_tabCVBlock[v]._nbSample];
 
 				listBegin = listCVBlock.begin();
@@ -295,7 +297,7 @@ void CVCriterion::createCVBlocks() {
 					while ((listIterator != listEnd) && (i > (*listIterator)->val)) {
 						listIterator++;
 					}
-					// list empty //  
+					// list empty //
 					if (listBegin == listEnd) {
 						TWeightedIndividual * elem = new TWeightedIndividual;
 						elem->val = i;
@@ -348,7 +350,7 @@ void CVCriterion::createCVBlocks() {
 			// update _tabCVBlock
 			for (v = 0; v < _nbCVBlock; v++) {
 				_tabCVBlock[v]._nbSample = listCVBlock[v].size();
-				_tabCVBlock[v]._tabWeightedIndividual = 
+				_tabCVBlock[v]._tabWeightedIndividual =
 						new TWeightedIndividual[_tabCVBlock[v]._nbSample];
 				double weightTotalBlockV = 0;
 
@@ -386,8 +388,8 @@ void CVCriterion::createCVBlocks() {
 			THROW(OtherException, internalMixmodError);
 		}
 	}// end of else (weightTotal > _nbCVBlocks)
-
-	/* for (v=0; v<_nbCVBlock; v++){
+/*
+	 for (v=0; v<_nbCVBlock; v++){
 	   cout<<endl<<"bloc "<<v<<" taille : "<<_tabCVBlock[v]._nbSample<<endl;
 	   cout<<"bloc "<<v<<" poids total : "<<_tabCVBlock[v]._weightTotal<<endl;
 	   for (int64_t i=0; i<_tabCVBlock[v]._nbSample; i++){

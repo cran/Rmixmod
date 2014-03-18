@@ -1,27 +1,27 @@
 /***************************************************************************
-							 SRC/MIXMOD/Kernel/Model/XEMModel.cpp  description
-	copyright            : (C) MIXMOD Team - 2001-2013
-	email                : contact@mixmod.org
+                             SRC/mixmod/Kernel/Model/Model.cpp  description
+    copyright            : (C) MIXMOD Team - 2001-2014
+    email                : contact@mixmod.org
  ***************************************************************************/
 
 /***************************************************************************
-	This file is part of MIXMOD
-    
-	MIXMOD is free software: you can redistribute it and/or modify
-	it under the terms of the GNU General Public License as published by
-	the Free Software Foundation, either version 3 of the License, or
-	(at your option) any later version.
+    This file is part of MIXMOD
 
-	MIXMOD is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
+    MIXMOD is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-	You should have received a copy of the GNU General Public License
-	along with MIXMOD.  If not, see <http://www.gnu.org/licenses/>.
+    MIXMOD is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
 
-	All informations available on : http://www.mixmod.org                                                                                               
- ***************************************************************************/
+    You should have received a copy of the GNU General Public License
+    along with MIXMOD.  If not, see <http://www.gnu.org/licenses/>.
+
+    All informations available on : http://www.mixmod.org
+***************************************************************************/
 
 #include "mixmod/Kernel/Model/Model.h"
 #include "mixmod/Kernel/Model/ModelType.h"
@@ -67,7 +67,7 @@ Model::Model(Model * iModel)
   _nbSample, _nbCluster)), _tabZikKnown(copyTab(iModel->getTabZikKnown(), _nbSample,
   _nbCluster)), _tabCik(copyTab(iModel->getTabCik(), _nbSample, _nbCluster)),
   _tabZiKnown(copyTab(iModel->getTabZiKnown(), _nbSample)), _tabNk(copyTab(iModel->getTabNk(),
-  _nbCluster)), _algoName(iModel->getAlgoName()) 
+  _nbCluster)), _algoName(iModel->getAlgoName())
 {
 	if (isHeterogeneous(_modelType->_nameModel)) {
 		CompositeData * cD = (CompositeData *) iModel->getData();
@@ -92,7 +92,7 @@ Model::Model(Model * iModel)
 //------------
 Model::Model(ModelType * modelType, int64_t nbCluster, Data *& data, Partition * knownPartition)
 : _modelType(modelType), _nbCluster(nbCluster), _nbSample(data->_nbSample),
-  _data(data), _deleteData(false), _parameter(0), _algoName(UNKNOWN_ALGO_NAME) 
+  _data(data), _deleteData(false), _parameter(0), _algoName(UNKNOWN_ALGO_NAME)
 {
 	// initialize probabilities
 	int64_t k, i;
@@ -128,7 +128,7 @@ Model::Model(ModelType * modelType, int64_t nbCluster, Data *& data, Partition *
 	// save the partition
 	FixKnownPartition(knownPartition);
 
-	// set the parameters 
+	// set the parameters
 	ModelName modelName = _modelType->_nameModel;
 	// create Param
 	if (isSpherical(modelName)) {
@@ -293,7 +293,7 @@ void Model::updateForCV(Model * originalModel, CVBlock & CVBlock) {
 	recopyTab(originalModel->_tabCik, _tabCik, _nbSample, _nbCluster);
 
 	// already done : (with the copy constructor
-	//  recopyTab(originalModel->_tabZikKnown, _tabZik, _nbSample);   
+	//  recopyTab(originalModel->_tabZikKnown, _tabZik, _nbSample);
 
 	//--------------
 	// update _tabNk
@@ -312,7 +312,7 @@ void Model::updateForCV(Model * originalModel, CVBlock & CVBlock) {
 }
 
 //--------------
-// getKnownLabel 
+// getKnownLabel
 //--------------
 // return a value in : 0, ..., K-1
 // i = 0 ... nbSample-1
@@ -337,7 +337,7 @@ int64_t Model::getKnownLabel(int64_t i) {
 // label[i] = 1 ... nbSample
 //------------------------------------------
 void Model::getLabelAndPartitionByMAPOrKnownPartition(int64_t * label, int64_t ** partition) {
-	//if (!_isCikEqualToMapOrKnownPartition){ 
+	//if (!_isCikEqualToMapOrKnownPartition){
 	if (_algoName == UNKNOWN_ALGO_NAME)
 		throw;
 
@@ -403,7 +403,7 @@ int64_t Model::getLabelByMAPOrKnownPartition(int64_t i) {
 
 	if (_algoName == UNKNOWN_ALGO_NAME)
 		throw;
-	//   
+	//
 	if (_algoName == CEM || _algoName == MAP || _algoName == M) {
 		//_tabCik[i] gives to result
 		for (k = 0; k < _nbCluster; k++) {
@@ -416,8 +416,8 @@ int64_t Model::getLabelByMAPOrKnownPartition(int64_t i) {
 	else {
 		// must be computed
 		// This method is called by getCompletedLogLikelihood
-		// In this case (!_isCikEqualToMapOrKnownPartition), it's called 
-		// by ICLCriterion or LikelihoodOutput, so an Estep have been done before 
+		// In this case (!_isCikEqualToMapOrKnownPartition), it's called
+		// by ICLCriterion or LikelihoodOutput, so an Estep have been done before
 		// to update fik and tik used in this section
 		if (_tabZiKnown[i]) {
 			for (k = 0; k < _nbCluster; k++) {
@@ -440,11 +440,11 @@ int64_t Model::getLabelByMAPOrKnownPartition(int64_t i) {
 	}
 
 	if (res == -1) {
-		
+
 		if (VERBOSE)
 			// label couldn't be found
 			cout << "internalMixmodError ds Model::getLabelByMAPOrKnownPartition, i=" << i << endl;
-		
+
 		THROW(OtherException, internalMixmodError);
 	}
 
@@ -605,7 +605,7 @@ void Model::computeNk() {
 	int64_t i;
 	double ** p_tabCik = _tabCik; // parcours le tableau _tabCik
 	double * w = _data->_weight; // parcours des poids
-	double wi; // poids courant  
+	double wi; // poids courant
 	double * p_tabCik_i;
 
 	// initialisation
@@ -648,7 +648,7 @@ int64_t Model::computeLabel(Sample * x) {
 
 	// Compute the probabilities _tabFik
 	for (k = 0; k < _nbCluster; k++) {
-		tmp = tabProportion[k] * _parameter->getPdf(x, k);
+	  tmp = tabProportion[k] * _parameter->getPdf(x, k);
 		fk[k] = tmp;
 		// Compute the sum of probabilities sumfk
 		sumfk += tmp;
@@ -738,15 +738,15 @@ void Model::FixKnownPartition(Partition *& knownPartition) {
 //----------------------------------------------------------------------------------
 
 /*-------------------------------------------
-		initRANDOM   
+		initRANDOM
 		----------
- 		
-  updated in this method : 
+
+  updated in this method :
 	- _parameter
-	- _tabFik and _tabSumF (because bestParameter is choose 
+	- _tabFik and _tabSumF (because bestParameter is choose
       with the best LL which is computed with fik (and sumF)
 	Note : _tabFik and sumF wil be 're'computed in the following EStep
-	So only _parameter have to be updated in this method	
+	So only _parameter have to be updated in this method
 -------------------------------------------*/
 void Model::initRANDOM(int64_t nbTry) {
 	// cout<<"init RANDOM, nbTryInInit="<<nbTry<<endl;
@@ -771,7 +771,7 @@ void Model::initRANDOM(int64_t nbTry) {
 	//-------------
 	randomForInitRANDOMorUSER_PARTITION(
 			tabIndividualCanBeUsedForInitRandom, tabClusterToInitialize);
-	// Compute log-likelihood 
+	// Compute log-likelihood
 	logLikelihood = getLogLikelihood(true); // true : to compute fik
 	bestLogLikelihood = logLikelihood;
 	bestParameter->recopy(_parameter);
@@ -784,7 +784,7 @@ void Model::initRANDOM(int64_t nbTry) {
 	for (i = 1; i < nbTry; i++) {
 		randomForInitRANDOMorUSER_PARTITION(
 				tabIndividualCanBeUsedForInitRandom, tabClusterToInitialize);
-		// Compute log-likelihood 
+		// Compute log-likelihood
 		logLikelihood = getLogLikelihood(true); // true : to compute fik
 		if (logLikelihood > bestLogLikelihood) {
 			bestLogLikelihood = logLikelihood;
@@ -812,7 +812,7 @@ void Model::initRANDOM(int64_t nbTry) {
 // random step for init RANDOM or USER_PARTITION
 //----------------------------------------------
 void Model::randomForInitRANDOMorUSER_PARTITION(
-		bool * tabIndividualCanBeUsedForInitRandom, bool * tabClusterToInitialize) 
+		bool * tabIndividualCanBeUsedForInitRandom, bool * tabClusterToInitialize)
 {
 	int64_t * tabIdxSampleForInit = new int64_t [_nbCluster];
 	Sample ** tabSampleForInit = new Sample*[_nbCluster];
@@ -860,23 +860,23 @@ void Model::initUSER(Parameter * initParameter) {
 /*----------------------------------------
 			initUSER_PARTITION
 			------------------
- 
+
     updated in this method :
         - _parameter
- 		
-    Note : this method is only called in Classification context 
+
+    Note : this method is only called in Classification context
            (not in Discriminant context). So, an Estep follows
- 
+
 -----------------------------------------*/
 /*
-Les partitions donnees servent a calculer 
+Les partitions donnees servent a calculer
 - les cik, les nk (dans fixKnownLabel) appele dans le constructeur
-- les centres lorsque l'on a au moins un representant de la classe dans la initPartition 
+- les centres lorsque l'on a au moins un representant de la classe dans la initPartition
   (sinon on tire au hasard)
 En revanche, on ne les utilise pas pour les dispersions.
-On pourrait le faire si on a beaucoup d'information mais dans ce le cas ou l'on a peu d'information 
+On pourrait le faire si on a beaucoup d'information mais dans ce le cas ou l'on a peu d'information
 (ex : un seul individu pour une des classes), on ne peut pas calculer de disperion.
-On calcule donc la dispersion autour du centre (comme s'il y avait une seule classe) 
+On calcule donc la dispersion autour du centre (comme s'il y avait une seule classe)
 dans le cas gaussien et on tire la dispersion au hasard dans le cas binaire.
  */
 void Model::initUSER_PARTITION(Partition * initPartition, int64_t nbTryInInit) {
@@ -910,7 +910,7 @@ void Model::initUSER_PARTITION(Partition * initPartition, int64_t nbTryInInit) {
 			}
 		}
 		if (nbSampleCanBeUsedForInitRandom < (_nbCluster - nbInitializedCluster)) {
-			THROW(InputException, 
+			THROW(InputException,
 					tooManySampleInInitPartitionAndTooManyClusterNotRepresented);
 		}
 
@@ -922,7 +922,7 @@ void Model::initUSER_PARTITION(Partition * initPartition, int64_t nbTryInInit) {
 		//cout<<"1rst random"<<endl;
 		randomForInitRANDOMorUSER_PARTITION(
 				tabIndividualCanBeUsedForInitRandom, tabNotInitializedCluster);
-		// Compute log-likelihood 
+		// Compute log-likelihood
 		logLikelihood = getLogLikelihood(true); // true : to compute fik
 		bestLogLikelihood = logLikelihood;
 		bestParameter->recopy(_parameter);
@@ -936,7 +936,7 @@ void Model::initUSER_PARTITION(Partition * initPartition, int64_t nbTryInInit) {
 			//		cout<<i+1<<" random"<<endl;
 			randomForInitRANDOMorUSER_PARTITION(
 					tabIndividualCanBeUsedForInitRandom, tabNotInitializedCluster);
-			// Compute log-likelihood 
+			// Compute log-likelihood
 			logLikelihood = getLogLikelihood(true); // true : to compute fik
 			if (logLikelihood > bestLogLikelihood) {
 				bestLogLikelihood = logLikelihood;
@@ -964,10 +964,10 @@ void Model::initUSER_PARTITION(Partition * initPartition, int64_t nbTryInInit) {
 /*------------------------------------------------------
 					initSMALL_EM
 					------------
- 
-  updated in this method : 
+
+  updated in this method :
 	- _parameter
-	- _tabFik, _tabSumF, _tabCik, _tabTik, _tabNk 
+	- _tabFik, _tabSumF, _tabCik, _tabTik, _tabNk
       (because an Estep is called to choose the bestParameter)
 	Note : _tabFik, _tabSumF, _tabCik, _tabTik, _tabNk wil be 're'computed in the following EStep
 	So only _parameter have to be updated in this method
@@ -980,7 +980,7 @@ void Model::initSMALL_EM(ClusteringStrategyInit * clusteringStrategyInit){
   _algoName = EM;
   double logLikelihood, bestLogLikelihood;
   Parameter * bestParameter = _parameter->clone();
-  int64_t  i, nbRunOfSmallEMOk = 0; 
+  int64_t  i, nbRunOfSmallEMOk = 0;
   bestLogLikelihood = 0.0;
   for (i=0; i<clusteringStrategyInit->getNbTry(); i++){
 	nbRunOfSmallEMOk++;
@@ -999,7 +999,7 @@ void Model::initSMALL_EM(ClusteringStrategyInit * clusteringStrategyInit){
 	  nbRunOfSmallEMOk--;
 	}
   }
-  
+
   if (nbRunOfSmallEMOk == 0){
 	THROW(InputException,SMALL_EM_error);
   }
@@ -1031,7 +1031,7 @@ void Model::oneRunOfSmallEM(ClusteringStrategyInit * clusteringStrategyInit, dou
 	lastLogLikelihood = logLikelihood;
 	Estep();
 	Mstep();
-	nbIteration++; 
+	nbIteration++;
 	// update continueAgain
 	switch (clusteringStrategyInit->getStopName()) {
 	  case NBITERATION :
@@ -1063,7 +1063,7 @@ void Model::oneRunOfSmallEM(ClusteringStrategyInit * clusteringStrategyInit, dou
 /*---------------------------------------------------
  initCEM_INIT
  ---------------------------------------------------
-  updated in this method : 
+  updated in this method :
 	- _parameter
 	- _tabFik, _tabSumF, _tabCik, _tabTik, _tabNk (because an Estep and a CStep are called to choose the bestParameter)
 	Note : _tabFik, _tabSumF, _tabCik, _tabTik, _tabNk wil be 're'computed in the following EStep
@@ -1079,7 +1079,7 @@ void Model::initCEM_INIT(ClusteringStrategyInit * clusteringStrategyInit){
   Parameter * bestParameter = _parameter->clone();
   int64_t  nbRunOfCEMOk = 0;
   bestCLogLikelihood = 0.0;
-  
+
   for (i=0; i<clusteringStrategyInit->getNbTry(); i++){
 	nbRunOfCEMOk++;
 	try{
@@ -1107,9 +1107,9 @@ void Model::initCEM_INIT(ClusteringStrategyInit * clusteringStrategyInit){
 		}
 	  }
 	  //cout<<"dans init CEM, nb d'iterations effectuées : "<<nbIter<<endl;
-	// Compute log-likelihood 
+	// Compute log-likelihood
 	  cLogLikelihood = getCompletedLogLikelihood();
-	// Comparaison of log-likelihood between step p and p-1 
+	// Comparaison of log-likelihood between step p and p-1
 	  if ((nbRunOfCEMOk==1) || (cLogLikelihood > bestCLogLikelihood)){
 		bestCLogLikelihood = cLogLikelihood;
 		bestParameter->recopy(_parameter);
@@ -1127,7 +1127,7 @@ void Model::initCEM_INIT(ClusteringStrategyInit * clusteringStrategyInit){
 	_parameter->setModel(this);
 	THROW(InputException,CEM_INIT_error);
   }
-  
+
   //cout<<"fin de init CEM, nb d'essais effectues="<<i<<endl;
   // set Best parameter
   delete _parameter;
@@ -1139,13 +1139,13 @@ void Model::initCEM_INIT(ClusteringStrategyInit * clusteringStrategyInit){
 /*---------------------------------------------------------
 					Initialization by SEM
 					---------------------
- 					
-  updated in this method : 
+
+  updated in this method :
 		- _parameter
 		- _tabFik, _tabSumF, _tabCik, _tabTik, _tabNk (because an Estep and a SStep are called to choose the bestParameter)
 	Note : _tabFik, _tabSumF, _tabCik, _tabTik, _tabNk wil be 're'computed in the following EStep
 	So, only _parameter have to be updated in this method
-	
+
 -------------------------------------------------------*//*
 void Model::initSEM_MAX(ClusteringStrategyInit * clusteringStrategyInit){
   //cout<<"init SEM_MAX, nbTryInInit="<<strategyInit->getNbIteration()<<endl;
@@ -1156,7 +1156,7 @@ void Model::initSEM_MAX(ClusteringStrategyInit * clusteringStrategyInit){
   int64_t  nbRunOfSEMMAXOk = 0;
   bestLogLikelihood = 0.0;
 //  int64_t  bestIndex=0;
-  
+
   for (j=0; j<clusteringStrategyInit->getNbIteration(); j++){
     nbRunOfSEMMAXOk++;
     try{
@@ -1165,7 +1165,7 @@ void Model::initSEM_MAX(ClusteringStrategyInit * clusteringStrategyInit){
       Estep();
       Sstep();
       Mstep();
-      // Compute log-likelihood 
+      // Compute log-likelihood
       logLikelihood = getLogLikelihood(true);  // true : to compute fik
       if ((nbRunOfSEMMAXOk==1) || (logLikelihood > bestLogLikelihood)){
         bestLogLikelihood = logLikelihood;
@@ -1177,11 +1177,11 @@ void Model::initSEM_MAX(ClusteringStrategyInit * clusteringStrategyInit){
       nbRunOfSEMMAXOk--;
     }
   }
-  
+
   if (nbRunOfSEMMAXOk==0){
     THROW(InputException,SEM_MAX_error);
   }
-  
+
   //cout<<"fin de init SEM_MAX, nb d'iterations effectuees="<<j<<" meilleure solution : "<<bestIndex<<endl;
   // set best parameter
   delete _parameter;
@@ -1200,21 +1200,21 @@ void Model::initSEM_MAX(ClusteringStrategyInit * clusteringStrategyInit){
 /*--------------------------------------------------------------------------------------------
 	MAP step : Maximum a Posteriori procedure
 	---------
-  MAP procedure consists in assigning a point to the group maximing this conditional probabiliy  
-	 
+  MAP procedure consists in assigning a point to the group maximing this conditional probabiliy
+
 	Note : MAP follows an USER initialisation
 	----
 
-	already updated : 
+	already updated :
 	- _parameter (by USER initialisation)
-	
+
 	updated in this method :
 	- _tabFik, _tabCik, _tabTik, _tabNk (in Estep called in this method)
 	- _tabCik, _tabNk (called by Cstep in this method)
 ----------------------------------------------------------------------------------------------*/
 void Model::MAPstep() {
 	Estep(); // to compute _tabFik, _tabTik, _tabCik, _tabNk
-	Cstep(); // to compute _tabCik (by MAP procedure) and _tabNk 	
+	Cstep(); // to compute _tabCik (by MAP procedure) and _tabNk
 }
 
 /*--------------------------------------------------------------------------------------------
@@ -1223,10 +1223,10 @@ void Model::MAPstep() {
 
 	Note : Estep follows a Mstep or an initialsation (so _parameter is updated)
 	----
-	
+
 	already updated :
 	- _parameter
-	
+
 	updated in this method :
 	- _tabFik, _tabCik, _tabTik, _tabNk
 
@@ -1237,7 +1237,7 @@ void Model::Estep() {
 	//---------------
 	computeFik();
 
-	//2. compute tik (conditional probabilities (posteriori probabilities)) 
+	//2. compute tik (conditional probabilities (posteriori probabilities))
 	//---------------
 	int64_t k;
 	int64_t i;
@@ -1270,10 +1270,10 @@ void Model::Estep() {
 
 	Note : Mstep follows an Estep, Cstep, Step, or USER_PARTITION initialisation
 	----
-	
+
 	already updated :
-	- _tabFik, _tabCik, _tabTik, _tabNk  
-	
+	- _tabFik, _tabCik, _tabTik, _tabNk
+
 	updated in this method :
 	- _parameter
 --------------------------------------------------------------------------------------------*/
@@ -1288,10 +1288,10 @@ void Model::Mstep() {
 
 	Note : Sstep follows an Estep
 	----
-	
+
 	already updated :
-	- _tabFik, _tabCik, _tabTik, _tabNk, _parameter  
-	
+	- _tabFik, _tabCik, _tabTik, _tabNk, _parameter
+
 	updated in this method :
 	- _tabCik, _tabNk
 --------------------------------------------------------------------------------------------*/
@@ -1347,13 +1347,13 @@ void Model::Sstep() {
 	C step
 	------
   Classification Step
-	
+
 	Note : Cstep follows an Estep
 	----
-	
+
 	already updated :
-	- _tabFik, _tabCik, _tabTik, _tabNk, _parameter  
-	
+	- _tabFik, _tabCik, _tabTik, _tabNk, _parameter
+
 	updated in this method :
 	- _tabCik, _tabNk
 --------------------------------------------------------------------------------------------*/

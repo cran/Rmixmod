@@ -1,27 +1,27 @@
 /***************************************************************************
-							 SRC/MIXMOD/Kernel/Model/XEMModelType.h  description
-	copyright            : (C) MIXMOD Team - 2001-2013
-	email                : contact@mixmod.org
+                             SRC/mixmod/Kernel/Model/ModelType.h  description
+    copyright            : (C) MIXMOD Team - 2001-2014
+    email                : contact@mixmod.org
  ***************************************************************************/
 
 /***************************************************************************
-	This file is part of MIXMOD
-    
-	MIXMOD is free software: you can redistribute it and/or modify
-	it under the terms of the GNU General Public License as published by
-	the Free Software Foundation, either version 3 of the License, or
-	(at your option) any later version.
+    This file is part of MIXMOD
 
-	MIXMOD is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
+    MIXMOD is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-	You should have received a copy of the GNU General Public License
-	along with MIXMOD.  If not, see <http://www.gnu.org/licenses/>.
+    MIXMOD is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
 
-	All informations available on : http://www.mixmod.org                                                                                               
- ***************************************************************************/
+    You should have received a copy of the GNU General Public License
+    along with MIXMOD.  If not, see <http://www.gnu.org/licenses/>.
+
+    All informations available on : http://www.mixmod.org
+***************************************************************************/
 #ifndef XEMMODELTYPE_H
 #define XEMMODELTYPE_H
 
@@ -120,16 +120,6 @@ inline const int64_t & ModelType::getTabSubDimensionFreeI(int64_t index) const {
 	return _tabSubDimensionFree[index];
 }
 
-inline void ModelType::setTabSubDimensionFree(int64_t iTabSubDimensionFree, int64_t position) {
-	if (_tabSubDimensionFree == NULL) {
-		_tabSubDimensionFree = new int64_t[_nbSubDimensionFree];
-	}
-	_tabSubDimensionFree[position] = iTabSubDimensionFree;
-}
-
-inline void ModelType::setSubDimensionEqual(int64_t iSubDimensionEqual) {
-	_subDimensionEqual = iSubDimensionEqual;
-}
 
 }
 
