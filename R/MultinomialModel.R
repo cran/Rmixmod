@@ -257,7 +257,8 @@ setMethod(
 ##'     Binary_pk_Ekjh \tab \tab FALSE \tab FALSE \cr
 ##' }
 ##'
-##' @references C. Biernacki, G. Celeux, G. Govaert, F. Langrognet. "Model-Based Cluster and Discriminant Analysis with the MIXMOD Software". Computational Statistics and Data Analysis, vol. 51/2, pp. 587-600. (2006)
+##' @references 
+##'   R. Lebret, S. Iovleff, F. Langrognet, C. Biernacki, G. Celeux, G. Govaert (2015), "Rmixmod: The R Package of the Model-Based Unsupervised, Supervised, and Semi-Supervised Classification Mixmod Library", Journal of Statistical Software, 67(6), 1-29, doi:10.18637/jss.v067.i06
 ##' @examples
 ##'   mixmodMultinomialModel()
 ##'   # multinomial models with equal proportions

@@ -5,8 +5,8 @@
 ##' \tabular{ll}{
 ##'   Package: \tab Rmixmod\cr 
 ##'   Type: \tab Package\cr 
-##'   Version: \tab 2.0.1\cr
-##'   Date: \tab 2013-12-05\cr 
+##'   Version: \tab 2.0.3\cr
+##'   Date: \tab 2015-10-07\cr 
 ##'   License: \tab GPL-3 + file LICENSE\cr 
 ##'   LazyLoad: \tab yes\cr
 ##' }
@@ -45,7 +45,8 @@
 ##' @author
 ##' Author: Remi Lebret and Serge Iovleff and Florent Langrognet, with contributions from C. Biernacki and G. Celeux and G. Govaert \email{contact@@mixmod.org}
 ##'
-##' @references Biernacki C., Celeux G., Govaert G., Langrognet F., 2006. "Model-Based Cluster and Discriminant Analysis with the MIXMOD Software". Computational Statistics and Data Analysis, vol. 51/2, pp. 587-600.
+##' @references 
+##'   R. Lebret, S. Iovleff, F. Langrognet, C. Biernacki, G. Celeux, G. Govaert (2015), "Rmixmod: The R Package of the Model-Based Unsupervised, Supervised, and Semi-Supervised Classification Mixmod Library", Journal of Statistical Software, 67(6), 1-29, doi:10.18637/jss.v067.i06
 ##'
 ##' @examples
 ##'   \dontrun{

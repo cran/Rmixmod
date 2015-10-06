@@ -216,11 +216,6 @@ void GeneralMatrix::operator+=(Matrix* M) {
 }
 
 void GeneralMatrix::edit(std::ostream& flux, std::string before, std::string sep, int64_t dim) {
-	if (dim <= 0) {
-		//ugly fix [bauder]: TODO = understand why dim can be 0 
-		//(it shouldn't... but it does on example da2), and fix in upper classes.
-		return;
-	}
 	for (int64_t p = 0; p < _s_pbDimension; p++) {
 		flux << before;
 		// TODO: << operator for double*

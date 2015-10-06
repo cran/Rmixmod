@@ -59,10 +59,7 @@ ModelType::ModelType(const ModelType & iModelType) {
 
 ModelType::~ModelType() {
 	if (_tabSubDimensionFree) {
-		//delete [] _tabSubDimensionFree; //TODO [bauder]: there is something wrong with this variable, 
-		                                  //maybe reaffected to something already deleted.
-		                                  //Should be fixed cleanly by tracking its affectations.
-		                                  //Test after debug by running example da3.
+		delete [] _tabSubDimensionFree;
 		_tabSubDimensionFree = NULL;
 	}
 }

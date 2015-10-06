@@ -28,7 +28,7 @@ data("geyser")
 xem.geyser <- mixmodCluster(data = geyser, nbCluster = 2:8,criterion = c("BIC", "ICL", "NEC"), models = mixmodGaussianModel(),strategy = strategy2)
 xem.geyser
 summary(xem.geyser)
-##plot(xem.geyser) #commented out because of a "CRAN exclusive" error (cannot observe it locally)
+plot(xem.geyser)
 icl <- sortByCriterion(xem.geyser, "ICL")
 icl["bestResult"]
 #xem.geyser["results"]

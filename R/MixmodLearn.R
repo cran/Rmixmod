@@ -131,6 +131,8 @@ setMethod(
 ##' @param nbCVBlocks integer which defines the number of block to perform the Cross Validation. This value will be ignored if the CV criterion is not choosen. Default value is 10.
 ##' @param weight numeric vector with n (number of individuals) rows. Weight is optionnal. This option is to be used when weight is associated to the data.
 ##'
+##' @references 
+##'   R. Lebret, S. Iovleff, F. Langrognet, C. Biernacki, G. Celeux, G. Govaert (2015), "Rmixmod: The R Package of the Model-Based Unsupervised, Supervised, and Semi-Supervised Classification Mixmod Library", Journal of Statistical Software, 67(6), 1-29, doi:10.18637/jss.v067.i06
 ##' @examples
 ##'   ## A quantitative example with the famous iris data set
 ##'   learn.iris<-mixmodLearn(iris[1:4], iris$Species)

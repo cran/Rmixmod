@@ -177,6 +177,7 @@ nbFactorFromData <- function (x) {
 ##' 
 ##' @exportMethod sortByCriterion
 ##' @docType methods
+##' @name sortByCriterion
 ##' @rdname sortByCriterion-methods
 ##' @examples
 ##'   x<-mixmodCluster(iris[1:4],2:10,criterion=c("BIC","ICL"))

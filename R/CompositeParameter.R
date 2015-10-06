@@ -5,6 +5,8 @@
 ###################################################################################
 ##' @include global.R
 ##' @include Parameter.R
+##' @include GaussianParameter.R
+##' @include MultinomialParameter.R
 
 NULL
 ###################################################################################
@@ -15,8 +17,9 @@ NULL
 ##' This class defines parameters of a Heterogeneous Mixture Model. Inherits the [\code{\linkS4class{Parameter}}] class.
 ##' 
 ##' \describe{
-##'   \item{g_parameter}{an object of class CompositeParameter}
-##'   \item{m_parameter}{an object of class MultinomialParameter}
+##'   \item{g_parameter}{an object of class [\code{\linkS4class{GaussianParameter}}] }
+##'   \item{m_parameter}{an object of class [\code{\linkS4class{MultinomialParameter}}] }
+##'   \item{factor}{numeric for factor}
 ##' }
 ##'
 ##' @examples

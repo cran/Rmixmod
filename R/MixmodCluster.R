@@ -92,6 +92,8 @@ setClass(
 ##' @param weight numeric vector with n (number of individuals) rows. Weight is optionnal. This option is to be used when weight is associated to the data.
 ##' @param knownLabels vector of size nbSample. it will be used for semi-supervised classification when labels are known. Each cell corresponds to a cluster affectation.
 ##'
+##' @references 
+##'   R. Lebret, S. Iovleff, F. Langrognet, C. Biernacki, G. Celeux, G. Govaert (2015), "Rmixmod: The R Package of the Model-Based Unsupervised, Supervised, and Semi-Supervised Classification Mixmod Library", Journal of Statistical Software, 67(6), 1-29, doi:10.18637/jss.v067.i06
 ##' @examples
 ##'   ## A quantitative example with the famous geyser data set
 ##'   data(geyser)

@@ -177,6 +177,8 @@ ellipse<-function(x, i, j){
 ##' @param add.ellipse a boolean. Add ellipses to graph. TRUE by default.
 ##' @param ... further arguments passed to or from other methods
 ##'
+##' @references 
+##'   R. Lebret, S. Iovleff, F. Langrognet, C. Biernacki, G. Celeux, G. Govaert (2015), "Rmixmod: The R Package of the Model-Based Unsupervised, Supervised, and Semi-Supervised Classification Mixmod Library", Journal of Statistical Software, 67(6), 1-29, doi:10.18637/jss.v067.i06
 ##' @examples
 ##'   data(geyser)
 ##'   xem1 <- mixmodCluster(geyser,3)
@@ -251,6 +253,8 @@ plotCluster <- function(x, data, variable1=colnames(data)[1], variable2=colnames
 ##' @param main a list of title for the histogram. main must have the same length than variables.
 ##' @param ... further arguments passed to or from other methods
 ##'
+##' @references 
+##'   R. Lebret, S. Iovleff, F. Langrognet, C. Biernacki, G. Celeux, G. Govaert (2015), "Rmixmod: The R Package of the Model-Based Unsupervised, Supervised, and Semi-Supervised Classification Mixmod Library", Journal of Statistical Software, 67(6), 1-29, doi:10.18637/jss.v067.i06
 ##' @examples
 ##'   data(geyser)
 ##'   xem1 <- mixmodCluster(geyser,3)
@@ -360,6 +364,8 @@ histCluster <- function(x, data, variables=colnames(data), xlab=rep("",length(va
 ##' @param main a list of title for the barplot. main must have the same length than variables.
 ##' @param ... further arguments passed to or from other methods
 ##'
+##' @references 
+##'   R. Lebret, S. Iovleff, F. Langrognet, C. Biernacki, G. Celeux, G. Govaert (2015), "Rmixmod: The R Package of the Model-Based Unsupervised, Supervised, and Semi-Supervised Classification Mixmod Library", Journal of Statistical Software, 67(6), 1-29, doi:10.18637/jss.v067.i06
 ##' @examples
 ##'   data(birds)
 ##'   xem <- mixmodCluster(birds,2)
