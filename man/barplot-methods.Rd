@@ -3,13 +3,11 @@
 \alias{barplot}
 \alias{barplot,Mixmod-method}
 \title{Barplot of a class [\code{\linkS4class{Mixmod}}]}
+\usage{
+  barplot(height, ...)
+}
 \arguments{
-  \item{x}{an object of class
-  [\code{\linkS4class{Mixmod}}]}
-
-  \item{variables}{list of variables names (or indices) to
-  compute a histogram. All variables from data by default.}
-
+  \item{height}{see examples below}
   \item{...}{further arguments passed to or from other
   methods}
 }

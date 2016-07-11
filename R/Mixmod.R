@@ -37,6 +37,42 @@ NULL
 ##' @rdname Mixmod-class
 ##' @exportClass Mixmod
 ##'
+
+setClass(
+  Class="MixmodXmlInput",
+  representation=representation(
+    file = "character",
+    numFormat = "character",
+    conversionOnly="logical"
+    ),
+  prototype=prototype(
+    file = character(0),
+    numFormat = "humanReadable",
+    conversionOnly=FALSE
+    ),
+  validity=function(object){
+    if(!file.exists(object@file)) {
+      stop(cat(object@file, "file does not exist!"))
+    } 
+    if(object@numFormat!="humanReadable" && object@numFormat!="hexBinary"){
+      stop(cat("numFormat must be 'humanReadable' or 'hexBinary'"))
+    }
+  }
+  )
+setMethod(
+  f="initialize",
+  signature=c("MixmodXmlInput"),
+  definition=function(.Object,file, numFormat="humanReadable", conversionOnly=FALSE){
+    .Object@file <- file
+    .Object@numFormat <- numFormat
+    .Object@conversionOnly <- conversionOnly
+    validObject(.Object)
+    return(.Object)
+    }
+  )
+mixmodXmlInput <- function(...){
+  return(new("MixmodXmlInput", ...))
+}
 setClass(
   Class="Mixmod",
   representation=representation(
@@ -52,6 +88,11 @@ setClass(
     models = "Model",
     error = "logical",
     results = "list",
+    xmlIn = "MixmodXmlInput",
+    xmlOut = "character",
+    seed = "numeric",
+    trace = "numeric",
+    massiccc = "numeric",    
     "VIRTUAL"
   ),
   prototype=prototype(
@@ -65,7 +106,12 @@ setClass(
     nbSample = integer(0),
     criterion = character(0),
     error = TRUE,
-    results = list()
+    results = list(),
+    #xmlIn = MixmodXmlInput,
+    xmlOut = character(0),
+    seed = numeric(0),
+    trace = numeric(0),
+    massiccc = numeric(0)    
   ),
   # define validity function
   validity=function(object){
@@ -141,14 +187,26 @@ setClass(
 setMethod(
   f="initialize",
   signature=c("Mixmod"),
-  definition=function(.Object,data,dataType,models,weight,knownLabels){
+  definition=function(.Object,data,dataType,models,weight,knownLabels, xmlIn, xmlOut, seed, trace, massiccc){
+      if(!is.null(xmlIn)){
+        if(!is.null(data)||!is.null(dataType)||!is.null(models)||!is.null(weight)||!is.null(knownLabels)){
+          stop("xmlIn argument is mutually exclusive with all other arguments but xmlOut, seed and trace");
+        }
+    } 
     # set missing parameters as NULL
-    if (missing(dataType)) dataType<-NULL
-    if (missing(models)) models<-NULL
-    if (missing(weight)) weight<-NULL
-    if (missing(knownLabels)) knownLabels<-NULL
-    
-    if(!missing(data)){
+    #if (missing(dataType)) dataType<-NULL
+    #if (missing(models)) models<-NULL
+    #if (missing(weight)) weight<-NULL
+    #if (missing(knownLabels)) knownLabels<-NULL
+    #if (missing(seed)) seed<- (-1)
+    .Object@seed <- seed 
+    #if (missing(trace)) trace<-0
+    .Object@trace = trace
+    .Object@massiccc = massiccc    
+    if(!missing(data)&& !is.null(data)){
+      if (!is.data.frame(data) & !is.vector(data) & !is.factor(data) ){
+        stop("data must be a data.frame or a vector or a factor")
+      }  
       if ( is.null(dataType) ){
         .Object@dataType <- is.dataType(data)
       }
@@ -205,6 +263,23 @@ setMethod(
       }
       # call validity function
       validObject(.Object)
+    } else {
+      if(is.null(xmlIn)){
+        stop("data is missing !")
+      } else {
+        
+        #xmlInput <- toString(xmlIn);
+        #if(!file.exists(xmlInput)) {
+        #  stop("xmlIn must be a file!")
+        #} else {
+        #.Object@xmlIn <- xmlInput
+        .Object@xmlIn <- xmlIn        
+        #}
+      }
+    }
+    if(!missing(xmlOut)){
+        xmlOutput <- toString(xmlOut);
+        .Object@xmlOut <- xmlOutput
     }
     return(.Object)
   }
@@ -335,7 +410,7 @@ setMethod(
 setMethod(
   f="plot",
   signature=c("Mixmod"),
-  function(x, y, ...){
+  function(x, y, hist_x_dim=10000, ...){
     # for quantitative data
     if ( x@dataType == "quantitative" ){
       # create layout
@@ -366,7 +441,7 @@ setMethod(
         for ( i in 1:length(y) ){
           #par(mfg=c(i,i))
           screen(i+((i-1)*length(y)))
-          histCluster(x@bestResult, x@data, variables=y[i])
+          histCluster(x@bestResult, x@data, variables=y[i], hist_x_dim=hist_x_dim, ...)
         }
         if (length(y)>1){
           # create biplots
@@ -397,7 +472,7 @@ setMethod(
         for ( i in 1:x@nbVariable ){
           #par(mfg=c(i,i))
           screen(i+((i-1)*x@nbVariable))
-          histCluster(x@bestResult, x@data, variables=colnames(x@data)[i])
+          histCluster(x@bestResult, x@data, variables=colnames(x@data)[i], hist_x_dim=hist_x_dim, ...)
         }
         # create biplots
         for ( i in 2:x@nbVariable ){
@@ -426,22 +501,91 @@ setMethod(
         n <- dim(matX)[1]
         # get number of variables
         p <- ncol(x@data)
-        
         Dc <- drop((rep(1, n)) %*% matX)
         Y <- t(t(matX)/(sqrt(p * Dc)))
         Y.svd <- svd(Y)
         individuals <- Y %*% Y.svd$v[, 2:3]/p
-
-        # get unique points
-        unique.ind<-unique(individuals)
-        # get number of duplication for each individuals
-        point.size<-numeric(nrow(unique.ind))
-        for(i in 1:nrow(unique.ind) ){ 
-          for(j in 1:nrow(individuals)){
-            point.size[i]<-point.size[i]+sum(unique.ind[i,]==individuals[j,])
-          }
-          point.size[i]<-point.size[i]/2
+	## too slow
+#	if(exists("rmixmod_cex")&&(rmixmod_cex == "old"||rmixmod_cex == "both")){
+#           # get unique points
+#           unique.ind<-unique(individuals)
+#           # get number of duplication for each individuals
+#           point.size<-numeric(nrow(unique.ind))
+#           for(i in 1:nrow(unique.ind) ){ 
+#             for(j in 1:nrow(individuals)){
+#               point.size[i]<-point.size[i]+sum(unique.ind[i,]==individuals[j,])
+#             }
+#             point.size[i]<-point.size[i]/2
+#           }
+#	   old_vect = point.size
+#	}
+	# end too slow
+	## a faster implementation
+	#if(!exists("rmixmod_cex")||rmixmod_cex == "new"||rmixmod_cex == "both"){
+    # Rounded with a threshold to be determined before detecting duplicates
+    # in order to identify close individuals
+    # NB: obviously, this is non an euclidean metric
+#	if(exists("rmixmod_cex_digits")){
+#	   if(rmixmod_cex_digits!=-1){
+#	      print(cat("round digits:",rmixmod_cex_digits))
+#	      individuals = round(individuals,digits=rmixmod_cex_digits)
+#	   }
+#	} else {
+	  ind_threshold = (max(individuals) - min(individuals))/10000
+	  nb_digits = floor(log10(ind_threshold))
+	  if(nb_digits<0){
+	     nb_digits=abs(nb_digits)
+	     print(cat("round digits :",nb_digits))
+	     individuals = round(individuals,digits=nb_digits)	
+	  }
+#	} #end else	
+	# Exemple duplicated():
+	# > vec = c(1,4,5,6,5,7,5,8)
+	# 5 figure 3 fois dans vec: en 3, 5 et 7
+	# > duplicated(vec)
+	# [1] FALSE FALSE FALSE FALSE  TRUE FALSE  TRUE FALSE
+	# > which(duplicated(vec))
+	# [1] 5 7
+	dupl = duplicated(individuals)
+	which_dupl = which(dupl)
+	print(cat("duplicated individuals :",length(which_dupl)))	
+	vect_res = rep(1, nrow(individuals))
+	for(d in which_dupl){
+    	   dupl_elt = individuals[d,]
+    	   # looking for the first occurence of the duplicated element
+    	   for(i in 1:nrow(individuals)){
+       	      if(individuals[i,1]==dupl_elt[1]&&individuals[i,2]==dupl_elt[2]){
+                # increments its weight in the result vector
+                vect_res[i] = vect_res[i] + 1
+	        break
+              }
+           }
         }
+        # duplicates are deleted in the result vector
+        # and in individuals before setting unique.ind
+        if(length(which_dupl)) {
+	   vect_res = vect_res[-which_dupl]
+           unique.ind = individuals[-which_dupl,]
+	} else {
+           unique.ind = individuals
+        }
+	#print(vect_res)
+	point.size = vect_res
+    #} #end if(!exists("rmixmod_cex")||rmixmod_cex == "new"||rmixmod_cex == "both"){
+	## end alternative solution
+#	if(exists("rmixmod_cex")&&(rmixmod_cex == "both")){
+#	print("oldvect--------------------")
+#	print(length(old_vect))
+#	print("newvect--------------------")
+#	print(length(vect_res))
+#	print("which(duplicated(individuals))")
+#	print(which(duplicated(individuals)))
+#	print("which_dupl")
+#	print(which_dupl)
+#	   #diff_vect = which(!(old_vect==vect_res))
+#	   #print(diff_vect)
+#	   #print(point.size[diff_vect])
+#    } # end if(exists("rmixmod_cex")&&(rmixmod_cex == "both"))
         # plotting the first 2 axes  
         plot( unique.ind[,2] ~ unique.ind[,1], cex=point.size,
         col=x@bestResult@partition[-which(duplicated(individuals))]+1, pch=x@bestResult@partition[-which(duplicated(individuals))], xlab='Axis 1', ylab='Axis 2', main='Multiple Correspondance Analysis', ... )
@@ -487,8 +631,8 @@ setMethod(
 setMethod(
   f="hist",
   signature=c("Mixmod"),
-  function(x, ...){
-    histCluster(x@bestResult, x@data, ...)
+  function(x, hist_x_dim=10000, ...){
+    histCluster(x@bestResult, x@data, hist_x_dim=hist_x_dim, ...)
     invisible()
   }
 )

@@ -12,8 +12,8 @@
 }
 \details{
   \tabular{ll}{ Package: \tab Rmixmod\cr Type: \tab
-  Package\cr Version: \tab 2.0.3\cr Date: \tab
-  2014-11-07\cr License: \tab GPL-3 + file LICENSE\cr
+  Package\cr Version: \tab 2.0.1\cr Date: \tab
+  2013-12-05\cr License: \tab GPL-3 + file LICENSE\cr
   LazyLoad: \tab yes\cr }
 
   The general purpose of the package is to discover, or
@@ -120,8 +120,8 @@
   }
 }
 \author{
-  Author: Remi Lebret and Serge Iovleff and Florent
-  Langrognet, with contributions from C. Biernacki and G.
+  Author: 
+  Florent Langrognet and Remi Lebret and Christian Poli and Serge Iovleff, with contributions from C. Biernacki and G.
   Celeux and G. Govaert \email{contact@mixmod.org}
 }
 \references{

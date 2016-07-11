@@ -23,10 +23,13 @@ setClass(
     Class="Parameter",
     representation=representation(
         proportions = "numeric",
+        nbFreeParam = "numeric",
         "VIRTUAL"
     ),
     prototype=prototype(
-        proportions = numeric(0)
+        proportions = numeric(0),
+        nbFreeParam = numeric(0)        
     )
 )
-###################################################################################
+
+###############################################################

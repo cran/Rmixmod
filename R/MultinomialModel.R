@@ -205,7 +205,7 @@ setMethod(
           if ( .Object@equal.proportions ){ list<-c(list,variable.equal) }
         }else{
           if ( .Object@free.proportions ){ list<-c(list,f,cf) }
-          if ( .Object@equal.proportions ){ list<-c(list,c,ce) }
+          if ( .Object@equal.proportions ){ list<-c(list,e,ce) }
         }
         .Object@component.independency <- logical(0)
         .Object@variable.independency <- variable.independency
@@ -257,8 +257,7 @@ setMethod(
 ##'     Binary_pk_Ekjh \tab \tab FALSE \tab FALSE \cr
 ##' }
 ##'
-##' @references 
-##'   R. Lebret, S. Iovleff, F. Langrognet, C. Biernacki, G. Celeux, G. Govaert (2015), "Rmixmod: The R Package of the Model-Based Unsupervised, Supervised, and Semi-Supervised Classification Mixmod Library", Journal of Statistical Software, 67(6), 1-29, doi:10.18637/jss.v067.i06
+##' @references C. Biernacki, G. Celeux, G. Govaert, F. Langrognet. "Model-Based Cluster and Discriminant Analysis with the MIXMOD Software". Computational Statistics and Data Analysis, vol. 51/2, pp. 587-600. (2006)
 ##' @examples
 ##'   mixmodMultinomialModel()
 ##'   # multinomial models with equal proportions
@@ -268,7 +267,7 @@ setMethod(
 ##'   # multinomial models with equal proportions and independent of the variable
 ##'   mixmodMultinomialModel(free.proportions=FALSE, variable.independency=TRUE)
 ##'
-##' @author Remi Lebret and Serge Iovleff and Florent Langrognet, with contributions from C. Biernacki and G. Celeux and G. Govaert \email{contact@@mixmod.org}
+##' @author  Florent Langrognet and Remi Lebret and Christian Poli ans Serge Iovleff, with contributions from C. Biernacki and G. Celeux and G. Govaert \email{contact@@mixmod.org}
 ##' @export
 ##'
 mixmodMultinomialModel<- function( listModels=NULL, free.proportions=TRUE, equal.proportions=TRUE, variable.independency=NULL, component.independency=NULL ){

@@ -2,7 +2,7 @@
 \alias{mixmodPredict}
 \title{Create an instance of the [\code{\linkS4class{MixmodPredict}}] class}
 \usage{
-  mixmodPredict(data, classificationRule)
+  mixmodPredict(data, classificationRule, ...)
 }
 \arguments{
   \item{data}{matrix or data frame containing
@@ -14,6 +14,7 @@
   [\code{\linkS4class{MixmodResults}}] object which
   contains the classification rule computed in the
   mixmodLearn() or mixmodCluster() step.}
+  \item{...}{internal}
 }
 \value{
   Returns an instance of the
@@ -49,7 +50,7 @@
   paste("accuracy= ",mean(heterodatatest$V1 == prediction["partition"])*100,"\%",sep="")
 }
 \author{
-  Remi Lebret and Serge Iovleff and Florent Langrognet,
+  Florent Langrognet and Remi Lebret and Christian Poli and Serge Iovleff,
   with contributions from C. Biernacki and G. Celeux and G.
   Govaert \email{contact@mixmod.org}
 }

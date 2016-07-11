@@ -73,7 +73,7 @@ mixmodMultinomialModel()
   mixmodMultinomialModel(free.proportions=FALSE, variable.independency=TRUE)
 }
 \author{
-  Remi Lebret and Serge Iovleff and Florent Langrognet,
+  Florent Langrognet and Remi Lebret and Christian Poli and Serge Iovleff,
   with contributions from C. Biernacki and G. Celeux and G.
   Govaert \email{contact@mixmod.org}
 }

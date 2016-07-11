@@ -1,12 +1,15 @@
 \name{mixmodLearn}
 \alias{mixmodLearn}
+\alias{mixmodLearn.default}
 \title{Create an instance of the [\code{\linkS4class{MixmodLearn}}] class}
 \usage{
-  mixmodLearn(data, knownLabels, dataType = NULL,
+mixmodLearn(...)
+\method{mixmodLearn}{default}(data, knownLabels, dataType = NULL,
     models = NULL, criterion = "CV", nbCVBlocks = 10,
     weight = NULL)
 }
 \arguments{
+ \item{...}{The following arguments are accepted:}
   \item{data}{frame containing quantitative,qualitative or
   heterogeneous data. Rows correspond to observations and
   columns correspond to variables.}
@@ -66,7 +69,7 @@
 
   ## A qualitative example with the famous birds data set
   data(birds)
-  birds.partition<-c(rep(1,34),rep(2,35))
+  birds.partition<-as.integer(c(rep(1,34),rep(2,35)))
   learn.birds<-mixmodLearn(data=birds, knownLabels=birds.partition)
   ## get summary
   summary(learn.birds)
@@ -78,7 +81,7 @@
   summary(learn.hetero)
 }
 \author{
-  Remi Lebret and Serge Iovleff and Florent Langrognet,
+  Florent Langrognet and Remi Lebret and Christian Poli and Serge Iovleff,
   with contributions from C. Biernacki and G. Celeux and G.
   Govaert \email{contact@mixmod.org}
 }

@@ -52,6 +52,9 @@ setClass(
     if ( length(object@nbCluster) == 0 ){
       stop("nbCluster is empty!")
     }
+    if ( length(object@nbCluster) >1 && (object@strategy@initMethod=="parameter" || object@strategy@initMethod=="partition")){
+      stop("parameter and partition initialisations require nbCluster to be mono-valued!")
+    }
     # check nbCluster parameter
     if (sum(!is.wholenumber(object@nbCluster))){
       stop("nbCluster must contain only integer!")
@@ -82,18 +85,27 @@ setClass(
 ##'
 ##' This function computes an optimal mixture model according to the criteria furnished, 
 ##' and the list of model defined in [\code{\linkS4class{Model}}], using the algorithm specified in [\code{\linkS4class{Strategy}}].
-##' 
-##' @param data frame containing quantitative,qualitative or heterogeneous data. Rows correspond to observations and columns correspond to variables.
-##' @param nbCluster numeric listing the number of clusters.
-##' @param dataType character. Type of data is "quantitative", "qualitative" or "composite". Set as NULL by default, type will be guessed depending on variables type. 
-##' @param models a [\code{\linkS4class{Model}}] object defining the list of models to run. For quantitative data, the model "Gaussian_pk_Lk_C" is called (see mixmodGaussianModel() to specify other models). For qualitative data, the model "Binary_pk_Ekjh" is called (see mixmodMultinomialModel() to specify other models).
-##' @param strategy a [\code{\linkS4class{Strategy}}] object containing the strategy to run. Call mixmodStrategy() method by default.
-##' @param criterion list of character defining the criterion to select the best model. The best model is the one with the lowest criterion value. Possible values: "BIC", "ICL", "NEC", c("BIC", "ICL", "NEC"). Default is "BIC".
-##' @param weight numeric vector with n (number of individuals) rows. Weight is optionnal. This option is to be used when weight is associated to the data.
-##' @param knownLabels vector of size nbSample. it will be used for semi-supervised classification when labels are known. Each cell corresponds to a cluster affectation.
 ##'
-##' @references 
-##'   R. Lebret, S. Iovleff, F. Langrognet, C. Biernacki, G. Celeux, G. Govaert (2015), "Rmixmod: The R Package of the Model-Based Unsupervised, Supervised, and Semi-Supervised Classification Mixmod Library", Journal of Statistical Software, 67(6), 1-29, doi:10.18637/jss.v067.i06
+##' @param ... all arguments are transfered to the MixmodCluster constructor. Valid arguments are:
+##' \describe{
+##' \item{data:}{ frame containing quantitative,qualitative or heterogeneous data. Rows correspond to observations and columns correspond to variables.}
+##' \item{nbCluster:}{ numeric listing the number of clusters.}
+##' \item{dataType:}{ character. Type of data is "quantitative", "qualitative" or "composite". Set as NULL by default, type will be guessed depending on variables type. }
+##' \item{models:}{ a [\code{\linkS4class{Model}}] object defining the list of models to run. For quantitative data, the model "Gaussian_pk_Lk_C" is called (see mixmodGaussianModel() to specify other models). For qualitative data, the model "Binary_pk_Ekjh" is called (see mixmodMultinomialModel() to specify other models).}
+##' \item{strategy:}{ a [\code{\linkS4class{Strategy}}] object containing the strategy to run. Call mixmodStrategy() method by default.}
+##' \item{criterion:}{ list of character defining the criterion to select the best model. The best model is the one with the lowest criterion value. Possible values: "BIC", "ICL", "NEC", c("BIC", "ICL", "NEC"). Default is "BIC".}
+##' \item{weight:}{ numeric vector with n (number of individuals) rows. Weight is optionnal. This option is to be used when weight is associated to the data.}
+##' \item{knownLabels:}{ vector of size nbSample. it will be used for semi-supervised classification when labels are known. Each cell corresponds to a cluster affectation.}
+##' }
+##` @param data frame containing quantitative,qualitative or heterogeneous data. Rows correspond to observations and columns correspond to variables.
+##` @param nbCluster numeric listing the number of clusters.
+##` @param dataType character. Type of data is "quantitative", "qualitative" or "composite". Set as NULL by default, type will be guessed depending on variables type. 
+##` @param models a [\code{\linkS4class{Model}}] object defining the list of models to run. For quantitative data, the model "Gaussian_pk_Lk_C" is called (see mixmodGaussianModel() to specify other models). For qualitative data, the model "Binary_pk_Ekjh" is called (see mixmodMultinomialModel() to specify other models).
+##` @param strategy a [\code{\linkS4class{Strategy}}] object containing the strategy to run. Call mixmodStrategy() method by default.
+##` @param criterion list of character defining the criterion to select the best model. The best model is the one with the lowest criterion value. Possible values: "BIC", "ICL", "NEC", c("BIC", "ICL", "NEC"). Default is "BIC".
+##` @param weight numeric vector with n (number of individuals) rows. Weight is optionnal. This option is to be used when weight is associated to the data.
+##` @param knownLabels vector of size nbSample. it will be used for semi-supervised classification when labels are known. Each cell corresponds to a cluster affectation.
+##'
 ##' @examples
 ##'   ## A quantitative example with the famous geyser data set
 ##'   data(geyser)
@@ -119,7 +131,7 @@ setClass(
 ##'   data(heterodata)
 ##'   mixmodCluster(heterodata,2)
 ##'
-##' @author Remi Lebret and Serge Iovleff and Florent Langrognet, with contributions from C. Biernacki and G. Celeux and G. Govaert \email{contact@@mixmod.org}
+##' @author Florent Langrognet and Remi Lebret and Christian Poli ans Serge Iovleff, with contributions from C. Biernacki and G. Celeux and G. Govaert \email{contact@@mixmod.org}
 ##' @return Returns an instance of the [\code{\linkS4class{MixmodCluster}}] class. Those two attributes will contain all outputs:
 ##' \describe{
 ##'   \item{results}{a list of [\code{\linkS4class{MixmodResults}}] object containing all the results sorted in ascending order according to the given criterion.}
@@ -127,21 +139,23 @@ setClass(
 ##' }
 ##' @export
 ##'
-mixmodCluster <- function(data, nbCluster, dataType=NULL, models=NULL, strategy=mixmodStrategy(), criterion="BIC", weight=NULL, knownLabels=NULL) {
-  # check options
-  if(missing(data)){
-    stop("data is missing !")
-  } 
-  if(missing(nbCluster)){
-    stop("nbCluster is missing!")
-  }
-  if (!is.data.frame(data) & !is.vector(data) & !is.vector(data) ){
-    stop("data must be a data.frame or a vector or a factor")
-  }
+#old_mixmodCluster <- function(data, nbCluster, dataType=NULL, models=NULL, strategy=mixmodStrategy(), criterion="BIC", weight=NULL, knownLabels=NULL) {
+#  # check options
+#  if(missing(data)){
+#    stop("data is missing !")
+#  } 
+#  if(missing(nbCluster)){
+#    stop("nbCluster is missing!")
+#  }
+#  if (!is.data.frame(data) & !is.vector(data) & !is.vector(data) ){
+#    stop("data must be a data.frame or a vector or a factor")
+#  }
+#
+#  # create Mixmod object
+#  xem <- new( "MixmodCluster", data=data, nbCluster=nbCluster, dataType=dataType, models=models, strategy=strategy, criterion=criterion, weight=weight, knownLabels=knownLabels)
 
-  # create Mixmod object
-  xem <- new( "MixmodCluster", data=data, nbCluster=nbCluster, dataType=dataType, models=models, strategy=strategy, criterion=criterion, weight=weight, knownLabels=knownLabels)
-  
+mixmodCluster <- function(...) {
+  xem <- new( "MixmodCluster", ...)
   # call clusteringMain
   .Call("clusteringMain", xem, PACKAGE="Rmixmod")
   # mixmod error?
@@ -150,6 +164,11 @@ mixmodCluster <- function(data, nbCluster, dataType=NULL, models=NULL, strategy=
   # return MixmodClustering object
   return(xem)
 }
+
+mixmodCluster.default <- function(data, nbCluster, dataType=NULL, models=NULL, strategy=mixmodStrategy(), criterion="BIC", weight=NULL, knownLabels=NULL) {
+ stop("mixmodCluster.default: not implemented\n");
+}
+
 ###################################################################################
 
 
@@ -167,15 +186,25 @@ mixmodCluster <- function(data, nbCluster, dataType=NULL, models=NULL, strategy=
 setMethod(
   f="initialize",
   signature=c("MixmodCluster"),
-  definition=function(.Object,strategy,nbCluster,criterion, ...){    
-    # get number of cluster
-    if(!missing(nbCluster)){
-      .Object@nbCluster <- nbCluster
-    }
-    # call initialize method of abstract class Mixmod  
-    .Object<-callNextMethod(.Object,...)
+  definition=function(.Object,data=NULL, nbCluster=NULL, dataType=NULL, models=NULL, strategy=NULL, criterion=NULL, weight=NULL, knownLabels=NULL, seed=-1, xmlIn=NULL, xmlOut=NULL, trace=0, massiccc=0){
+    if(!missing(xmlIn)){
+        if(!missing(nbCluster)||!missing(strategy)||!missing(criterion)){
+          stop("xmlIn argument is mutually exclusive with all other arguments but xmlOut, seed and trace");
+        }
+    } else { # i.e. without xmlIn
+      # get number of cluster
+      if(!missing(nbCluster)){
+        .Object@nbCluster <- nbCluster
+        } else {
+        stop("nbCluster is missing!")
+      }
+      
+      }
+    # call initialize method of abstract class Mixmod
+    #(.Object,data,dataType,models,weight,knownLabels, xmlIn, xmlOut, seed, trace)
+    .Object<-callNextMethod(.Object,data=data, dataType=dataType,models=models,weight=weight,knownLabels=knownLabels, xmlIn=xmlIn, xmlOut=xmlOut, seed=seed, trace=trace, massiccc=massiccc)
     
-    if ( length(.Object@data) ){
+    if ( length(.Object@data)){
       # create MixmodResults object
       if( .Object@dataType == "quantitative" ){
         .Object@bestResult = new("MixmodResults")
@@ -183,10 +212,10 @@ setMethod(
       }else if ( .Object@dataType == "qualitative" ){
         .Object@bestResult = new("MixmodResults")
         .Object@bestResult@parameters = new("MultinomialParameter")
-      }else if ( .Object@dataType == "composite" ){
+      }else if ( .Object@dataType == "composite"){
         .Object@bestResult = new("MixmodResults")
         .Object@bestResult@parameters = new("CompositeParameter")
-        .Object@bestResult@parameters@factor = as.factor(.Object@factor)
+        .Object@bestResult@parameters@factor = as.integer(.Object@factor)
       }
       # create strategy
       if(missing(strategy)){
@@ -202,11 +231,15 @@ setMethod(
       }
       # call validity method
       validObject(.Object)
-    }
+    } else if(!missing(xmlIn)){
+      .Object@bestResult@parameters = new("CompositeParameter")
+      .Object@strategy = new("Strategy")
+      
+    }   
     # return object
     return(.Object)
-  }
-)
+  
+})
 ###################################################################################
 
 ###################################################################################

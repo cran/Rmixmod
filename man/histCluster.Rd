@@ -4,7 +4,7 @@
 \usage{
   histCluster(x, data, variables = colnames(data),
     xlab = rep("", length(variables)),
-    main = paste("Histogram of", variables), ...)
+    main = paste("Histogram of", variables), hist_x_dim=10000, ...)
 }
 \arguments{
   \item{x}{an object of class
@@ -21,6 +21,8 @@
 
   \item{main}{a list of title for the histogram. main must
   have the same length than variables.}
+
+  \item{hist_x_dim}{number of values on the x axis.}
 
   \item{...}{further arguments passed to or from other
   methods}

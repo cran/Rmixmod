@@ -69,6 +69,16 @@ RcppExport SEXP predictMain( SEXP xem )
   BEGIN_RCPP
   // wrap S4 object
   Rcpp::S4 mixmodPredict(xem);
+  //Rcpp::StringVector XmlIn(mixmodPredict.slot("xmlIn"));
+  //std::string xmlInput = "";
+  //if(XmlIn.size()>0)  xmlInput = Rcpp::as< std::vector<std::string> >(XmlIn)[0];
+  //Rcpp::StringVector XmlOut(mixmodPredict.slot("xmlOut"));
+  //std::string xmlOutput = "";
+  //if(XmlOut.size()>0)  xmlOutput = Rcpp::as< std::vector<std::string> >(XmlOut)[0];
+  //std::string xmlInput = Rcpp::as<std::string>(XmlIn);
+  //std::cout << "xmlIn:::::: " << XmlIn << std::endl;
+  int trace = Rcpp::as<int>(mixmodPredict.slot("trace"));
+  int massiccc = Rcpp::as<int>(mixmodPredict.slot("massiccc"));   
   // wrap data in Rcpp matrix
   Rcpp::NumericMatrix RData(SEXP(mixmodPredict.slot("data"))); // creates Rcpp matrix from SEXP
   // wrap type of data
@@ -229,7 +239,7 @@ RcppExport SEXP predictMain( SEXP xem )
   XEM::PredictMain pMain(pInput);
   // pmain run
   try {
-    pMain.run();
+    pMain.run(XEM::IoMode::NUMERIC, trace, massiccc);
   } catch (XEM::Exception & e) {
     // add error
      mixmodPredict.slot("error") = e.what();

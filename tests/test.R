@@ -57,7 +57,7 @@ summary(prediction)
 mean(as.integer(health2003) == prediction["partition"])
 
 # semi-supervised Learning
-birds.partition<-c(rep(1,34),rep(2,35))
+birds.partition<-as.integer(c(rep(1,34),rep(2,35)))
 birds.partition[10]<-0
 birds.partition[20]<-0
 birds.partition[30]<-0

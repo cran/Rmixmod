@@ -91,11 +91,14 @@ void OutputHandling::setGaussianParameter()
   // loop over clusters
   for (int i=0; i<nbCluster_; i++)
   {
-    varianceMatrices[i] = Conversion::CMatrixToRcppMatrix(nbVariable_,nbVariable_,matrixVariance[i]->storeToArray());
+    //varianceMatrices[i] = Conversion::CMatrixToRcppMatrix(nbVariable_,nbVariable_,matrixVariance[i]->storeToArray());
+    std::unique_ptr<double*[],XEM::TabDeleter<double>> stoa(matrixVariance[i]->storeToArray(),
+                                                            XEM::TabDeleter<double>(matrixVariance[i]->getPbDimension()));
+    varianceMatrices[i] = Conversion::CMatrixToRcppMatrix(nbVariable_,nbVariable_,stoa.get());    
   }
   // add variances to S4 object
   param.slot("variance") = varianceMatrices;
-
+  param.slot("nbFreeParam") = gParam->getFreeParameter();
   // add parameters to the output list
   xem_.slot("parameters") = param;
 }
@@ -119,7 +122,7 @@ void OutputHandling::setMultinomialParameter()
   
   //add factor
   param.slot("factor") = Conversion::CVectorToRcppVectorForInt(nbVariable_,bParam->getTabNbModality());
-  
+  param.slot("nbFreeParam") = bParam->getFreeParameter();
   
   //-------------------
   // get scatter
@@ -157,6 +160,7 @@ void OutputHandling::setMultinomialParameter()
 // set composite parameters
 void OutputHandling::setCompositeParameter()
 {
+  const XEM::CompositeParameter * cParam =  dynamic_cast<XEM::CompositeParameter const *>(MOutput_->getParameterDescription()->getParameter());
   // get pointer to gaussian parameters
   const XEM::GaussianEDDAParameter * gParam = dynamic_cast<XEM::GaussianEDDAParameter const *>(MOutput_->getParameterDescription()->getParameter()->getGaussianParameter());
   // get pointer to multinomial parameters
@@ -192,7 +196,7 @@ void OutputHandling::setCompositeParameter()
   }
   // add variances to S4 object
   g_param.slot("variance") = varianceMatrices;
-
+  g_param.slot("nbFreeParam") = gParam->getFreeParameter();
   //Fill Binary Parameter slots
   // add proportions values
   b_param.slot("proportions") = Conversion::CVectorToRcppVector(nbCluster_,bParam->getTabProportion());
@@ -232,9 +236,10 @@ void OutputHandling::setCompositeParameter()
   }
   // add scatters
   b_param.slot("scatter") = vectorOutput;
-
+  b_param.slot("nbFreeParam") = bParam->getFreeParameter();
 
   param.slot("proportions") = g_param.slot("proportions");
+  param.slot("nbFreeParam") = cParam->getFreeParameter();
   param.slot("g_parameter") = g_param;
   param.slot("m_parameter") = b_param;
   xem_.slot("parameters") = param;

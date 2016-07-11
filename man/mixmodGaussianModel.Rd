@@ -120,7 +120,7 @@ mixmodGaussianModel()
   mixmodGaussianModel(listModels=c("Gaussian_p_L_C","Gaussian_p_L_Ck","Gaussian_pk_L_I"))
 }
 \author{
-  Remi Lebret and Serge Iovleff and Florent Langrognet,
+  Florent Langrognet and Remi Lebret and Christian Poli and Serge Iovleff,
   with contributions from C. Biernacki and G. Celeux and G.
   Govaert \email{contact@mixmod.org}
 }

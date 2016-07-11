@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+<!-- Partition -->
+	<xsd:element name="Partition" type="PartitionType"/>
+<!-- Partition Type -->
+	<xsd:complexType name="PartitionType">
+		<xsd:sequence>
+			<xsd:element name="Name" type="xsd:string" minOccurs="0"/>
+			<xsd:element name="NbSample" type="xsd:positiveInteger"/>
+			<xsd:element name="NbCluster" type="xsd:positiveInteger"/>
+			<xsd:element name="Format" type="FormatType"/>
+			<xsd:element name="Type">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:enumeration value="label"/>
+						<xsd:enumeration value="partition"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="Filename" type="xsd:string"/>
+		</xsd:sequence>
+	</xsd:complexType><!-- Format Type -->
+	<xsd:simpleType name="FormatType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="txt"/>
+			<xsd:enumeration value="XML"/>
+			<xsd:enumeration value="hdf5"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!-- End Format Type -->
+<!-- End Partition Type -->
+
+<!-- End Partition -->
+</xsd:schema>

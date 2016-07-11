@@ -1,14 +1,22 @@
 \name{mixmodStrategy}
 \alias{mixmodStrategy}
 \title{Create an instance of [\code{\linkS4class{Strategy}}] class}
+\alias{mixmodStrategy}
 \usage{
-  mixmodStrategy(algo = "EM", nbTry = 1,
-    initMethod = "smallEM", nbTryInInit = 50,
-    nbIterationInInit = 5, nbIterationInAlgo = 200,
-    epsilonInInit = 0.001, epsilonInAlgo = 0.001,
-    seed = NULL)
+# mixmodStrategy(algo = "EM", nbTry = 1,
+#                        initMethod = "smallEM", nbTryInInit = 50,
+#                        nbIterationInInit = 5, nbIterationInAlgo = 200,
+#                        epsilonInInit = 0.001, epsilonInAlgo = 0.001,
+#                        seed = NULL, parameter=NA, labels=NA)
+                        
+# NB: as an implementation detail, this function is variadic:
+ mixmodStrategy(\dots)
+
+
 }
 \arguments{
+ \item{\dots}{arguments passed to or from methods.}
+  \describe{ 
   \item{algo}{list of character string with the estimation
   algorithm.  Possible values: "EM", "SEM", "CEM",
   c("EM","SEM"). Default value is "EM".}
@@ -21,7 +29,8 @@
   \item{initMethod}{a character string with the method of
   initialization of the algorithm specified in the
   \code{algo} argument. Possible values: "random",
-  "smallEM", "CEM", "SEMMax". Default value: "smallEM".}
+  "smallEM", "CEM", "SEMMax", "parameter", "partition".
+  Default value: "smallEM".}
 
   \item{nbTryInInit}{integer defining number of tries in
   \code{initMethod} algorithm. nbTryInInit must be a
@@ -52,6 +61,9 @@
   random number generator. Setting a particular seed allows
   the user to (re)-generate a particular serie of random
   numbers. NULL or negative value for a random seed.}
+  \item{parameter}{instance of "Parameter" subclass. Required if initMethod is "parameter", forbidden otherwise.}
+  \item{labels}{vector of integers containing labels. Required if initMethod is "partition", forbidden otherwise.}   
+  }
 }
 \value{
   a [\code{\linkS4class{Strategy}}] object
@@ -119,7 +131,7 @@ mixmodStrategy()
    mixmodStrategy(algo=c("SEM","EM"), nbIterationInAlgo=c(200,100), epsilonInAlgo=c(NA,0.000001))
 }
 \author{
-  Remi Lebret and Serge Iovleff and Florent Langrognet,
+  Florent Langrognet and Remi Lebret and Christian Poli and Serge Iovleff,
   with contributions from C. Biernacki and G. Celeux and G.
   Govaert \email{contact@mixmod.org}
 }

@@ -1,25 +1,26 @@
 Package: Rmixmod
-Version: 2.0.3
-Date: 2015-10-07
+Version: 2.1.0
+Date: 2016-07-11
 Title: An Interface for MIXMOD
-Description: A collection of functions designed to run supervised and
-    unsupervised classification with MIXture MODelling.
+Description: Supervised and unsupervised classification with MIXture MODelling.
 Authors@R: c(
-    person("Remi", "Lebret", role=c("aut","cre"), email="remi@lebret.ch"),
+    person("Florent", "Langrognet", role=c("aut", "cre"), email="florent.langrognet@univ-fcomte.fr"),
+    person("Remi", "Lebret", role="aut", email="remi@lebret.ch"),
+    person("Christian", "Poli", role="aut", email="christian.poli@inria.fr"),
     person("Serge", "Iovleff", role="aut", email="serge.iovleff@univ-lille1.fr"),
-    person("Florent", "Langrognet", role="aut", email="florent.langrognet@univ-fcomte.fr"),
     person("Benjamin", "Auder", role="ctb", email="benjamin.auder@gmail.com"),
     person("C.", "Biernacki", role="ctb", email="christophe.biernacki@math.univ-lille1.fr"),
     person("G.", "Celeux", role="ctb", email="gilles.celeux@math.u-psud.fr"),
     person("G.", "Govaert", role="ctb", email="gerard.govaert@utc.fr"))
-Author: Remi Lebret [aut, cre],
+Author: Florent Langrognet [aut, cre],
+    Remi Lebret [aut],
+    Christian Poli [aut],
     Serge Iovleff [aut],
-    Florent Langrognet [aut],
     Benjamin Auder [ctb],
     C. Biernacki [ctb],
     G. Celeux [ctb],
     G. Govaert [ctb]
-Maintainer: Remi Lebret <remi@lebret.ch>
+Maintainer: Florent Langrognet <florent.langrognet@univ-fcomte.fr>
 SystemRequirements: GNU make
 NeedsCompilation: yes
 Copyright: Authors, and Mixmod use Newmat C++ library
@@ -31,11 +32,12 @@ LinkingTo: Rcpp
 Type: Package
 LazyLoad: yes
 Depends: R(>= 2.12.0), Rcpp(>= 0.8.0), methods, stats, graphics
-Collate: 'global.R' 'Model.R' 'MultinomialModel.R' 'GaussianModel.R'
-        'CompositeModel.R' 'Parameter.R' 'MultinomialParameter.R'
-        'GaussianParameter.R' 'CompositeParameter.R' 'MixmodResults.R'
-        'Mixmod.R' 'Strategy.R' 'MixmodCluster.R' 'MixmodDAResults.R'
-        'MixmodLearn.R' 'MixmodPredict.R' 'Rmixmod.R' 'zzz.R'
-Packaged: 2015-10-06 06:17:19 UTC; rlebret
+Collate: 'global.R' 'Model.R' 'Parameter.R' 'GaussianParameter.R'
+        'Strategy.R' 'MixmodResults.R' 'MixmodDAResults.R'
+        'MultinomialModel.R' 'GaussianModel.R' 'MultinomialParameter.R'
+        'Mixmod.R' 'CompositeModel.R' 'CompositeParameter.R'
+        'MixmodCluster.R' 'MixmodLearn.R' 'Rmixmod.R' 'MixmodPredict.R'
+        'zzz.R'
+Packaged: 2016-07-11 13:49:23 UTC; poli
 Repository: CRAN
-Date/Publication: 2015-10-06 09:13:52
+Date/Publication: 2016-07-11 19:02:06

@@ -260,8 +260,7 @@ setMethod(
 ##'     Gaussian_pk_Lk_I       \tab \tab \tab Free \tab Equal \tab NA \cr 
 ##' }
 ##'
-##' @references 
-##'   R. Lebret, S. Iovleff, F. Langrognet, C. Biernacki, G. Celeux, G. Govaert (2015), "Rmixmod: The R Package of the Model-Based Unsupervised, Supervised, and Semi-Supervised Classification Mixmod Library", Journal of Statistical Software, 67(6), 1-29, doi:10.18637/jss.v067.i06
+##' @references C. Biernacki, G. Celeux, G. Govaert, F. Langrognet. "Model-Based Cluster and Discriminant Analysis with the MIXMOD Software". Computational Statistics and Data Analysis, vol. 51/2, pp. 587-600. (2006)
 ##' @examples
 ##'   mixmodGaussianModel()
 ##'   # all Gaussian models with equal proportions
@@ -271,7 +270,7 @@ setMethod(
 ##'   # Gaussian models with a pre-defined list
 ##'   mixmodGaussianModel(listModels=c("Gaussian_p_L_C","Gaussian_p_L_Ck","Gaussian_pk_L_I"))
 ##'
-##' @author Remi Lebret and Serge Iovleff and Florent Langrognet, with contributions from C. Biernacki and G. Celeux and G. Govaert \email{contact@@mixmod.org}
+##' @author  Florent Langrognet and Remi Lebret and Christian Poli ans Serge Iovleff, with contributions from C. Biernacki and G. Celeux and G. Govaert \email{contact@@mixmod.org}
 ##' @export
 ##'
 mixmodGaussianModel<- function( family="all", listModels=NULL, free.proportions=TRUE, equal.proportions=TRUE ){

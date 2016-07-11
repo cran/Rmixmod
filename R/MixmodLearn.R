@@ -49,7 +49,7 @@ setClass(
       stop("labels are missing!")
     }
     # check the number of cluster
-    if ( (min(object@knownLabels)<=0) ){
+    if ( (min(as.integer(object@knownLabels))<=0) ){
       stop("Each observation in knownLabels must have a valid cluster affectation !")
     }
     # check criterion parameter
@@ -80,11 +80,25 @@ setClass(
 setMethod(
     f="initialize",
     signature=c("MixmodLearn"),
-    definition=function(.Object,criterion,nbCVBlocks,...){
-      
+#    mixmodLearn <- function(data, knownLabels, dataType=NULL, models=NULL, criterion="CV", nbCVBlocks=10, weight=NULL) {
+    definition=function(.Object,data=NULL, knownLabels=NULL, dataType=NULL, models=NULL, criterion="CV", nbCVBlocks=10, weight=NULL, seed=-1, xmlIn=NULL, xmlOut=NULL, trace=0, massiccc=0){
+    if(!missing(xmlIn)){
+        if(!missing(criterion)||!missing(nbCVBlocks)){
+          stop("xmlIn argument is mutually exclusive with all other arguments but xmlOut, seed and trace");
+        }
+    } else { # i.e without xmlIn
+          if ( missing(knownLabels) ){
+             stop("knownLabels is missing !")
+          }
+          if (!is.vector(knownLabels) & !is.factor(knownLabels) ){
+             stop("knownLabels must be a vector or a factor")
+          }
+          .Object@knownLabels <- knownLabels
+        }
+
       # call initialize method of abstract class Mixmod  
-      .Object<-callNextMethod(.Object,...)
-      
+      #.Object<-callNextMethod(.Object, data, ...)
+      .Object<-callNextMethod(.Object,data=data, dataType=dataType,models=models,weight=weight,knownLabels=knownLabels, xmlIn=xmlIn, xmlOut=xmlOut, seed=seed, trace=trace, massiccc=massiccc)
       if ( length(.Object@data) ){
         # create MixmodDAResults object
         if( .Object@dataType == "quantitative" ){
@@ -100,16 +114,20 @@ setMethod(
         }
         # create nbCluster
         if(length(.Object@knownLabels)){
-          .Object@nbCluster <- max(.Object@knownLabels)
+          .Object@nbCluster <- max(as.integer(.Object@knownLabels))
         }
-        if(missing(criterion)){
-            .Object@criterion <- "CV"
-        }else{
-            .Object@criterion <- criterion
-        }
-        if(!missing(nbCVBlocks)){
-          .Object@nbCVBlocks <- nbCVBlocks
-        }
+        .Object@criterion <- criterion
+        .Object@nbCVBlocks <- nbCVBlocks
+        #if(is.na(criterion)){
+        #    .Object@criterion <- "CV"
+        #}else{
+        #    .Object@criterion <- criterion
+        #}
+        #if(is.na(nbCVBlocks)){
+        #  .Object@nbCVBlocks <- 10
+        #} else {
+        #  .Object@nbCVBlocks <- nbCVBlocks
+        #}
         validObject(.Object)    
       }
       return(.Object)
@@ -131,8 +149,6 @@ setMethod(
 ##' @param nbCVBlocks integer which defines the number of block to perform the Cross Validation. This value will be ignored if the CV criterion is not choosen. Default value is 10.
 ##' @param weight numeric vector with n (number of individuals) rows. Weight is optionnal. This option is to be used when weight is associated to the data.
 ##'
-##' @references 
-##'   R. Lebret, S. Iovleff, F. Langrognet, C. Biernacki, G. Celeux, G. Govaert (2015), "Rmixmod: The R Package of the Model-Based Unsupervised, Supervised, and Semi-Supervised Classification Mixmod Library", Journal of Statistical Software, 67(6), 1-29, doi:10.18637/jss.v067.i06
 ##' @examples
 ##'   ## A quantitative example with the famous iris data set
 ##'   learn.iris<-mixmodLearn(iris[1:4], iris$Species)
@@ -141,7 +157,7 @@ setMethod(
 ##'
 ##'   ## A qualitative example with the famous birds data set
 ##'   data(birds)
-##'   birds.partition<-c(rep(1,34),rep(2,35))
+##'   birds.partition<-as.integer(c(rep(1,34),rep(2,35)))
 ##'   learn.birds<-mixmodLearn(data=birds, knownLabels=birds.partition)
 ##'   ## get summary
 ##'   summary(learn.birds)
@@ -152,7 +168,7 @@ setMethod(
 ##'   ## get summary
 ##'   summary(learn.hetero)
 ##'
-##' @author Remi Lebret and Serge Iovleff and Florent Langrognet, with contributions from C. Biernacki and G. Celeux and G. Govaert \email{contact@@mixmod.org}
+##' @author Florent Langrognet and Remi Lebret and Christian Poli ans Serge Iovleff, with contributions from C. Biernacki and G. Celeux and G. Govaert \email{contact@@mixmod.org}
 ##' @return Returns an instance of the [\code{\linkS4class{MixmodLearn}}] class. Those two attributes will contain all outputs:
 ##' \describe{
 ##'   \item{results}{a list of [\code{\linkS4class{MixmodResults}}] object containing all the results sorted in ascending order according to the given criterion.}
@@ -161,24 +177,10 @@ setMethod(
 
 ##' @export
 ##'
-mixmodLearn <- function(data, knownLabels, dataType=NULL, models=NULL, criterion="CV", nbCVBlocks=10, weight=NULL) {
-  # check options
-  if(missing(data)){
-    stop("data is missing !")
-  } 
-  if ( missing(knownLabels) ){
-    stop("knownLabels is missing !")
-  }
-  if (!is.data.frame(data) & !is.vector(data) & !is.vector(data) ){
-    stop("data must be a data.frame or a vector or a factor")
-  }
-
-  if (!is.vector(knownLabels) & !is.factor(knownLabels) ){
-    stop("knownLabels must be a vector or a factor")
-  }
+mixmodLearn <- function(...) {
 
   # create Mixmod object
-  xem <- new( "MixmodLearn", data=data, knownLabels=knownLabels, dataType=dataType, models=models, criterion=criterion, nbCVBlocks=nbCVBlocks, weight=weight )
+  xem <- new( "MixmodLearn", ... )
   # call learnMain
   .Call("learnMain", xem, PACKAGE="Rmixmod")
   # mixmod error?
@@ -187,6 +189,37 @@ mixmodLearn <- function(data, knownLabels, dataType=NULL, models=NULL, criterion
   # return MixmodLearn object
   return(xem)
 }
+mixmodLearn.default <- function(data, knownLabels, dataType=NULL, models=NULL, criterion="CV", nbCVBlocks=10, weight=NULL) {
+ stop("mixmodLearn.default: not implemented\n");
+}
+
+#old_mixmodLearn <- function(data, knownLabels, dataType=NULL, models=NULL, criterion="CV", nbCVBlocks=10, weight=NULL) {
+#  # check options
+#  if(missing(data)){
+#    stop("data is missing !")
+#  } 
+#  if ( missing(knownLabels) ){
+#    stop("knownLabels is missing !")
+#  }
+#  if (!is.data.frame(data) & !is.vector(data) & !is.vector(data) ){
+#    stop("data must be a data.frame or a vector or a factor")
+#  }
+#
+#  if (!is.vector(knownLabels) & !is.factor(knownLabels) ){
+#    stop("knownLabels must be a vector or a factor")
+#  }
+#
+#  # create Mixmod object
+#  xem <- new( "MixmodLearn", data=data, knownLabels=knownLabels, dataType=dataType, models=models, criterion=criterion, nbCVBlocks=nbCVBlocks, weight=weight )
+#  # call learnMain
+#  .Call("learnMain", xem, PACKAGE="Rmixmod")
+#  # mixmod error?
+#  if ( xem@error ) warning( "All models got errors!" )
+#  
+#  # return MixmodLearn object
+#  return(xem)
+#}
+
 ###################################################################################
 
 

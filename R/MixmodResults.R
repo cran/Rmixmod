@@ -177,8 +177,6 @@ ellipse<-function(x, i, j){
 ##' @param add.ellipse a boolean. Add ellipses to graph. TRUE by default.
 ##' @param ... further arguments passed to or from other methods
 ##'
-##' @references 
-##'   R. Lebret, S. Iovleff, F. Langrognet, C. Biernacki, G. Celeux, G. Govaert (2015), "Rmixmod: The R Package of the Model-Based Unsupervised, Supervised, and Semi-Supervised Classification Mixmod Library", Journal of Statistical Software, 67(6), 1-29, doi:10.18637/jss.v067.i06
 ##' @examples
 ##'   data(geyser)
 ##'   xem1 <- mixmodCluster(geyser,3)
@@ -253,8 +251,6 @@ plotCluster <- function(x, data, variable1=colnames(data)[1], variable2=colnames
 ##' @param main a list of title for the histogram. main must have the same length than variables.
 ##' @param ... further arguments passed to or from other methods
 ##'
-##' @references 
-##'   R. Lebret, S. Iovleff, F. Langrognet, C. Biernacki, G. Celeux, G. Govaert (2015), "Rmixmod: The R Package of the Model-Based Unsupervised, Supervised, and Semi-Supervised Classification Mixmod Library", Journal of Statistical Software, 67(6), 1-29, doi:10.18637/jss.v067.i06
 ##' @examples
 ##'   data(geyser)
 ##'   xem1 <- mixmodCluster(geyser,3)
@@ -264,7 +260,7 @@ plotCluster <- function(x, data, variable1=colnames(data)[1], variable2=colnames
 ##' @seealso \code{\link{hist}}
 ##' @export
 ##'
-histCluster <- function(x, data, variables=colnames(data), xlab=rep("",length(variables)), main=paste("Histogram of",variables), ...){
+histCluster <- function(x, data, variables=colnames(data), xlab=rep("",length(variables)), main=paste("Histogram of",variables), hist_x_dim=10000, ...){
   # check the options
   if ( !is(x,"MixmodResults") )
   stop("'x' must be a MixmodResults object!")
@@ -274,14 +270,18 @@ histCluster <- function(x, data, variables=colnames(data), xlab=rep("",length(va
   stop("'variables' is empty!")
   if ( length(variables)>ncol(data) )
   stop("List of variables too long!")
-
+  if(!missing(main) & length(main)!=length(variables)){
+    stop("'main' must be a vector of strings. It's size must be the same as 'variables' size")
+  }
   # get the indices of variables
   if (is.numeric(variables)){
     if (max(variables)>ncol(data))
       stop("At least one variable index mismatch the data frame dimension")
     else{
       indices<-variables
-      main=paste("Histogram of",colnames(data)[variables])
+      if(missing(main)){
+      main <- paste("Histogram of",colnames(data)[variables])
+      }
     }
   }
   else{
@@ -290,6 +290,9 @@ histCluster <- function(x, data, variables=colnames(data), xlab=rep("",length(va
     else{
       if ( ncol(data)==1 ){ indices<-1 }
       else { indices<-which(colnames(data) %in% variables) }
+      if(missing(main)){
+      main <- paste("Histogram of",variables)
+      }
     }
   }
   nvar<-length(indices)
@@ -311,8 +314,8 @@ histCluster <- function(x, data, variables=colnames(data), xlab=rep("",length(va
     i<-1
     # loop over variables
     for (j in indices ){
-      
-      xaxis<-seq(min(data[,j]),max(data[,j]),by=0.0001)
+      xaxis<-seq(min(data[,j]),max(data[,j]),length=hist_x_dim)
+      #xaxis<-seq(min(data[,j]),max(data[,j]),by=0.0001)
       density<-matrix(nrow=x@nbCluster,ncol=length(xaxis))
       
       # loop over the clusters to generate densities
@@ -320,7 +323,8 @@ histCluster <- function(x, data, variables=colnames(data), xlab=rep("",length(va
         density[k,]<-x@parameters["proportions",k]*dnorm(xaxis,x@parameters["mean",k][j],sqrt(x@parameters["variance",k][j,j]))
       }
       # generate mixture density
-      mixture<-apply(density,2,sum)
+      #mixture<-apply(density,2,sum)
+      mixture<-colSums(density)
       h<-hist(data[,j], xlab=xlab[i], main=main[i], ...)
       
       ratio<-max(h$counts)/max(mixture)
@@ -364,8 +368,6 @@ histCluster <- function(x, data, variables=colnames(data), xlab=rep("",length(va
 ##' @param main a list of title for the barplot. main must have the same length than variables.
 ##' @param ... further arguments passed to or from other methods
 ##'
-##' @references 
-##'   R. Lebret, S. Iovleff, F. Langrognet, C. Biernacki, G. Celeux, G. Govaert (2015), "Rmixmod: The R Package of the Model-Based Unsupervised, Supervised, and Semi-Supervised Classification Mixmod Library", Journal of Statistical Software, 67(6), 1-29, doi:10.18637/jss.v067.i06
 ##' @examples
 ##'   data(birds)
 ##'   xem <- mixmodCluster(birds,2)

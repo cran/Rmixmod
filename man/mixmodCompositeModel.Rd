@@ -133,7 +133,7 @@ mixmodCompositeModel()
   mixmodCompositeModel( listModels=c("Heterogeneous_pk_Ekjh_L_Bk","Heterogeneous_pk_Ekjh_Lk_B") )
 }
 \author{
-  Remi Lebret and Serge Iovleff and Florent Langrognet,
+  Florent Langrognet and Remi Lebret and Christian Poli and Serge Iovleff,
   with contributions from C. Biernacki and G. Celeux and G.
   Govaert \email{contact@mixmod.org}
 }

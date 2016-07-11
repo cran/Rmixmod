@@ -4,6 +4,7 @@
 
 ###################################################################################
 ##' @include global.R
+##' @include Parameter.R
 NULL
 ###################################################################################
 
@@ -58,34 +59,59 @@ NULL
 ##'           }
 ##'        \item Default values are \eqn{200} \code{nbIterationInAlgo} of \code{EM} with an \code{epsilonInAlgo} value of \eqn{10-3}.
 ##'    }
-##' 
-##' @param algo list of character string with the estimation algorithm.  Possible values: "EM", "SEM", "CEM", c("EM","SEM"). Default value is "EM".
-##' @param nbTry integer defining the number of tries. nbTry must be a positive integer. Option available only if \code{init} is "random" or "smallEM" or "CEM" or "SEMMax". Default value: 1.
-##' @param initMethod a character string with the method of initialization of the algorithm specified in the \code{algo} argument. Possible values: "random", "smallEM", "CEM", "SEMMax". Default value: "smallEM".
-##' @param nbTryInInit integer defining number of tries in \code{initMethod} algorithm. nbTryInInit must be a positive integer. Option available only if \code{init} is "smallEM" or "CEM". Default value: 50.
-##' @param nbIterationInInit integer defining the number of "EM" or "SEM" iterations in \code{initMethod}. nbIterationInInit must be a positive integer. Only available if \code{initMethod} is "smallEM" or "SEMMax". Default values: 5 if \code{initMethod} is "smallEM" and 100 if \code{initMethod} is "SEMMax".
-##' @param nbIterationInAlgo list of integers defining the number of iterations if you want to use nbIteration as rule to stop the algorithm(s). Default value: 200. 
-##' @param epsilonInInit real defining the epsilon value in the initialization step. Only available if \code{initMethod} is "smallEM". Default value: 0.001.
-##' @param epsilonInAlgo list of reals defining the epsilon value for the algorithm. Warning: epsilonInAlgo doesn't have any sens if \code{algo} is SEM, so it needs to be set as NaN in that case. Default value: 0.001.
-##' @param seed a positive integer defining the seed of the random number generator. Setting a particular seed allows the user to (re)-generate a particular serie of random numbers. NULL or negative value for a random seed.
+##'
+
+##' @param ... all arguments are transfered to the Strategy constructor. Valid arguments are:
+##'    \describe{
+##'   \item{algo:}{list of character string with the estimation algorithm.  Possible values: "EM", "SEM", "CEM", c("EM","SEM"). Default value is "EM".}
+##'   \item{nbTry:}{integer defining the number of tries. Default value: 1.}
+##'   \item{initMethod:}{a character string with the method of initialization of the algorithm specified in the \code{algo} argument. Possible values: "random", "smallEM", "CEM", "SEMMax", "parameter", "partition". Default value: "smallEM".}
+##'   \item{nbTryInInit:}{integer defining number of tries in \code{initMethod} algorithm. Default value: 50.}
+##'   \item{nbIterationInInit:}{integer defining the number of "EM" or "SEM" iterations in \code{initMethod}. Default values: 5 if \code{initMethod} is "smallEM" and 100 if \code{initMethod} is "SEMMax".}
+##'   \item{nbIterationInAlgo:}{list of integers defining the number of iterations if user want to use nbIteration as rule to stop the algorithm(s). Default value: 200.} 
+##'   \item{epsilonInInit:}{real defining the epsilon value in the initialization step. Only available if \code{initMethod} is "smallEM". Default value: 0.001.}
+##'   \item{epsilonInAlgo:}{list of reals defining the epsilon value for the algorithm. Warning: epsilonInAlgo doesn't have any sens if \code{algo} is SEM, so it needs to be set as NaN in that case. Default value: 0.001.}
+##'   \item{seed:}{integer defining the seed of the random number generator. Setting a particular seed allows the user to (re)-generate a particular serie of random numbers. Default value is NULL, i.e. a random seed.}
+##'      \item{parameter:}{instance of "Parameter" subclass. Required if initMethod is "parameter", forbidden otherwise.}
+##'      \item{labels:}{vector of integers containing labels. Required if initMethod is "partition", forbidden otherwise.}           
+##'    }
+###` #param algo list of character string with the estimation algorithm.  Possible values: "EM", "SEM", "CEM", c("EM","SEM"). Default value is "EM".
+###` #param nbTry integer defining the number of tries. nbTry must be a positive integer. Option available only if \code{init} is "random" or "smallEM" or "CEM" or "SEMMax". Default value: 1.
+###` #param initMethod a character string with the method of initialization of the algorithm specified in the \code{algo} argument. Possible values: "random", "smallEM", "CEM", "SEMMax". Default value: "smallEM".
+###` #param nbTryInInit integer defining number of tries in \code{initMethod} algorithm. nbTryInInit must be a positive integer. Option available only if \code{init} is "random", "smallEM" or "CEM". Default value: 10.
+###` #param nbIterationInInit integer defining the number of "EM" or "SEM" iterations in \code{initMethod}. nbIterationInInit must be a positive integer. Only available if \code{initMethod} is "smallEM" or "SEMMax". Default values: 5 if \code{initMethod} is "smallEM" and 100 if \code{initMethod} is "SEMMax".
+###` #param nbIterationInAlgo list of integers defining the number of iterations if you want to use nbIteration as rule to stop the algorithm(s). Default value: 200. 
+###` #param epsilonInInit real defining the epsilon value in the initialization step. Only available if \code{initMethod} is "smallEM". Default value: 0.001.
+###` #param epsilonInAlgo list of reals defining the epsilon value for the algorithm. Warning: epsilonInAlgo doesn't have any sens if \code{algo} is SEM, so it needs to be set as NaN in that case. Default value: 0.001.
+###` #param seed a positive integer defining the seed of the random number generator. Setting a particular seed allows the user to (re)-generate a particular serie of random numbers. NULL or negative value for a random seed.
 ##'
 ##' @examples
 ##'    mixmodStrategy()
 ##'    mixmodStrategy(algo="CEM",initMethod="random",nbTry=10,epsilonInInit=0.00001)
 ##'    mixmodStrategy(algo=c("SEM","EM"), nbIterationInAlgo=c(200,100), epsilonInAlgo=c(NA,0.000001))
 ##'
-##' @references 
-##'   R. Lebret, S. Iovleff, F. Langrognet, C. Biernacki, G. Celeux, G. Govaert (2015), "Rmixmod: The R Package of the Model-Based Unsupervised, Supervised, and Semi-Supervised Classification Mixmod Library", Journal of Statistical Software, 67(6), 1-29, doi:10.18637/jss.v067.i06
-##'   Biernacki, C., Celeux, G., Govaert, G., 2003. "Choosing starting values for the EM algorithm for getting the highest likelihood in multivariate gaussian mixture models". Computational Statistics and Data Analysis 41, 561-575.
+##' @references  Biernacki, C., Celeux, G., Govaert, G., 2003. "Choosing starting values for the EM algorithm for getting the highest likelihood in multivariate gaussian mixture models". Computational Statistics and Data Analysis 41, 561-575.
 ##'
 ##' @return a [\code{\linkS4class{Strategy}}] object
-##' @author Remi Lebret and Serge Iovleff and Florent Langrognet, with contributions from C. Biernacki and G. Celeux and G. Govaert \email{contact@@mixmod.org}
+##' @author Florent Langrognet and Remi Lebret and Christian Poli ans Serge Iovleff, with contributions from C. Biernacki and G. Celeux and G. Govaert \email{contact@@mixmod.org}
 ##' @export
 ##'
-mixmodStrategy <- function( algo="EM", nbTry=1, initMethod="smallEM", nbTryInInit=50, nbIterationInInit=5, nbIterationInAlgo=200, epsilonInInit=0.001, epsilonInAlgo=0.001, seed=NULL ){
+#old_mixmodStrategy <- function( algo="EM", nbTry=1, initMethod="smallEM", nbTryInInit=10, nbIterationInInit=0, nbIterationInAlgo=200, epsilonInInit=0.001, epsilonInAlgo=0.001, seed=NULL ){
+#  if(missing(nbIterationInInit)){
+#    if(initMethod=="smallEM"){
+#      nbIterationInInit <- 5
+#    } else if(initMethod=="SEMMax"){
+#      nbIterationInInit <- 100
+#    }
+#  } 
+#  # create a new class Strategy
+#  new("Strategy", algo=algo, nbTry=nbTry, initMethod=initMethod, nbTryInInit=nbTryInInit, nbIterationInInit=nbIterationInInit, nbIterationInAlgo=nbIterationInAlgo, epsilonInInit=epsilonInInit, epsilonInAlgo=epsilonInAlgo, seed=seed)
+#}
+mixmodStrategy <- function(...){
   # create a new class Strategy
-  new("Strategy", algo=algo, nbTry=nbTry, initMethod=initMethod, nbTryInInit=nbTryInInit, nbIterationInInit=nbIterationInInit, nbIterationInAlgo=nbIterationInAlgo, epsilonInInit=epsilonInInit, epsilonInAlgo=epsilonInAlgo, seed=seed)
+  new("Strategy", ...)
 }
+
 ###################################################################################
 
 
@@ -95,15 +121,18 @@ mixmodStrategy <- function( algo="EM", nbTry=1, initMethod="smallEM", nbTryInIni
 ##' This class defines the Mixmod strategies.
 ##'
 ##' \describe{
-##'   \item{algo}{list of character string with the estimation algorithm.  Possible values: "EM", "SEM", "CEM", c("EM","SEM"). Default value is "EM".}
-##'   \item{nbTry}{integer defining the number of tries. Default value: 1.}
-##'   \item{initMethod}{a character string with the method of initialization of the algorithm specified in the \code{algo} argument. Possible values: "random", "smallEM", "CEM", "SEMMax". Default value: "smallEM".}
-##'   \item{nbTryInInit}{integer defining number of tries in \code{initMethod} algorithm. Default value: 50.}
-##'   \item{nbIterationInInit}{integer defining the number of "EM" or "SEM" iterations in \code{initMethod}. Default values: 5 if \code{initMethod} is "smallEM" and 100 if \code{initMethod} is "SEMMax".}
-##'   \item{nbIterationInAlgo}{list of integers defining the number of iterations if user want to use nbIteration as rule to stop the algorithm(s). Default value: 200.} 
-##'   \item{epsilonInInit}{real defining the epsilon value in the initialization step. Only available if \code{initMethod} is "smallEM". Default value: 0.001.}
-##'   \item{epsilonInAlgo}{list of reals defining the epsilon value for the algorithm. Warning: epsilonInAlgo doesn't have any sens if \code{algo} is SEM, so it needs to be set as NaN in that case. Default value: 0.001.}
-##'   \item{seed}{integer defining the seed of the random number generator. Setting a particular seed allows the user to (re)-generate a particular serie of random numbers. Default value is NULL, i.e. a random seed.}
+##'   \item{algo:}{list of character string with the estimation algorithm.  Possible values: "EM", "SEM", "CEM", c("EM","SEM"). Default value is "EM".}
+##'   \item{nbTry:}{integer defining the number of tries. Default value: 1.}
+##'   \item{initMethod:}{a character string with the method of initialization of the algorithm specified in the \code{algo} argument. Possible values: "random", "smallEM", "CEM", "SEMMax", "parameter", "partition". Default value: "smallEM".}
+##'   \item{nbTryInInit:}{integer defining number of tries in \code{initMethod} algorithm. Default value: 50.}
+##'   \item{nbIterationInInit:}{integer defining the number of "EM" or "SEM" iterations in \code{initMethod}. Default values: 5 if \code{initMethod} is "smallEM" and 100 if \code{initMethod} is "SEMMax".}
+##'   \item{nbIterationInAlgo:}{list of integers defining the number of iterations if user want to use nbIteration as rule to stop the algorithm(s). Default value: 200.} 
+##'   \item{epsilonInInit:}{real defining the epsilon value in the initialization step. Only available if \code{initMethod} is "smallEM". Default value: 0.001.}
+##'   \item{epsilonInAlgo:}{list of reals defining the epsilon value for the algorithm. Warning: epsilonInAlgo doesn't have any sens if \code{algo} is SEM, so it needs to be set as NaN in that case. Default value: 0.001.}
+##'   \item{seed:}{integer defining the seed of the random number generator. Setting a particular seed allows the user to (re)-generate a particular serie of random numbers. Default value is NULL, i.e. a random seed.}
+##'      \item{parameter:}{instance of "Parameter" subclass. Required if initMethod is "parameter", forbidden otherwise.}
+##'      \item{labels:}{vector of integers containing labels. Required if initMethod is "partition", forbidden otherwise.}           
+
 ##' }
 ##'
 ##' @examples
@@ -127,18 +156,22 @@ setClass(
         nbIterationInAlgo = "numeric",
         epsilonInInit = "numeric",
         epsilonInAlgo = "numeric",
-        seed = "numeric"
+        seed = "numeric",
+        parameter = "Parameter",
+        labels = "numeric"
     ),
     prototype=prototype(
         algo = "EM",
         nbTry = 1,
         initMethod = "smallEM",
-        nbTryInInit = 50,
+        nbTryInInit = 10,
         nbIterationInInit = 5,
         nbIterationInAlgo = 200,
         epsilonInInit = 0.001,
         epsilonInAlgo = 0.001,
-        seed = -1
+        seed = -1,
+        parameter = NULL
+
     ),
     # validity function
     validity=function(object){
@@ -147,7 +180,7 @@ setClass(
         stop("At least one algorithm is not valid. See ?mixmodAlgo for the list of available algorithms.")
       }
       # for 'initMethod'
-      if( (object@initMethod != "smallEM") & (object@initMethod != "random") & (object@initMethod != "CEM") & (object@initMethod != "SEMMax") ){
+      if( (object@initMethod != "smallEM") & (object@initMethod != "random") & (object@initMethod != "CEM") & (object@initMethod != "SEMMax") & (object@initMethod != "parameter") & (object@initMethod != "partition")){
         stop("initMethod name is not valid.")
       }
       # for 'nbTry'
@@ -182,6 +215,16 @@ setClass(
         }
         if(object@nbIterationInInit < 1){
           stop("nbIterationInInit must be positive.")
+        }
+      }
+      if(object@initMethod == "parameter"){
+        if (!is(object@parameter, "Parameter")){
+          stop("parameter is mandatory when the init method is parameter.")
+        }
+      }
+      if(object@initMethod == "partition"){
+        if (!is.numeric(object@labels)){
+          stop("parameter is mandatory when the init method is parameter.")
         }
       }
       # for 'nbIterationInAlgo'
@@ -224,7 +267,7 @@ setClass(
 setMethod(
   f="initialize",
   signature=c("Strategy"),
-  definition=function(.Object,algo,nbTry,initMethod,nbTryInInit,nbIterationInInit,nbIterationInAlgo,epsilonInInit,epsilonInAlgo,seed
+  definition=function(.Object,algo,nbTry,initMethod,nbTryInInit,nbIterationInInit,nbIterationInAlgo,epsilonInInit,epsilonInAlgo,seed, parameter, labels
 ){
     if(!missing(algo)){
       if(length(algo)>1){
@@ -285,22 +328,46 @@ setMethod(
     else{.Object@nbTry<-1}
 
     if(!missing(nbTryInInit)){  .Object@nbTryInInit<-nbTryInInit }
-    else{.Object@nbTryInInit<-50}
+    else{.Object@nbTryInInit<-10}
 
     if(!missing(nbIterationInInit)){  .Object@nbIterationInInit<-nbIterationInInit }
-    else{.Object@nbIterationInInit<-5}
+    else{.Object@nbIterationInInit<-0}
 
     if(!missing(epsilonInInit)){  .Object@epsilonInInit<-epsilonInInit }
     else{.Object@epsilonInInit<-0.001}
-  
+    .Object@parameter <- new("GaussianParameter") 
     if(!missing(initMethod)){ 
-      .Object@initMethod<-initMethod 
+      .Object@initMethod<-initMethod
+      if(.Object@initMethod == "parameter"){
+          if(!missing(parameter)){
+            .Object@parameter <- parameter
+          } else {
+            stop("'parameter' argument is mandatory when initMethod='parameter'")
+          }         
+      }
+      if(.Object@initMethod == "partition"){
+          if(!missing(labels)){      
+          .Object@labels <- labels
+          } else {
+            stop("'labels' argument is mandatory when initMethod='partition'")
+          }                   
+      } else {
+          .Object@labels <- 0
+      }     
       # change default value if necessary
-      if ( (.Object@initMethod == "SEMMax") & (.Object@nbIterationInInit == 5) ){
-        .Object@nbIterationInInit <- 100
+      if(.Object@nbIterationInInit == 0){
+        if (.Object@initMethod == "SEMMax"){
+          .Object@nbIterationInInit <- 100
+        }
+        if (.Object@initMethod == "smallEM"){
+          .Object@nbIterationInInit <- 5
+        }
       }
     }
-    else{.Object@initMethod<-"smallEM"}
+    else{
+    .Object@initMethod<-"smallEM"
+    .Object@nbIterationInInit <- 5	
+    }
   
     validObject(.Object)        
     return(.Object)

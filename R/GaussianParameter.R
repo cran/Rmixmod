@@ -14,8 +14,8 @@ NULL
 ##' This class defines parameters of a Gaussian Mixture Model. Inherits the [\code{\linkS4class{Parameter}}] class.
 ##' 
 ##' \describe{
-##'   \item{mean}{a matrix containing mean of each cluster.}
-##'   \item{variance}{a list of matrices containing variance matrix of each cluster.}
+##'   \item{mean}{a numeric vector containing mean of each cluster.}
+##'   \item{variance}{a vector of matrix containing variance matrix of each cluster.}
 ##' }
 ##'
 ##' @examples
@@ -34,7 +34,7 @@ setClass(
         variance = "list"
     ),
     prototype=prototype(
-        mean = matrix(0),
+        mean = matrix(nrow=0,ncol=0),
         variance = list(0)
     ),
     contains=c("Parameter")

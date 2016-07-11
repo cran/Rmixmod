@@ -79,17 +79,24 @@
 #include <string>
 
 #include "mixmod/Utilities/Util.h"
+#include "mixmod/Utilities/exceptions/OtherException.h"
 #include "mixmod/Clustering/ClusteringMain.h"
 #include "mixmod/Clustering/ClusteringInput.h"
 #include "mixmod/Clustering/ClusteringOutput.h"
 #include "mixmod/Clustering/ClusteringModelOutput.h"
+#include "mixmod/Clustering/ClusteringStrategy.h"
+#include "mixmod/Clustering/ClusteringStrategyInit.h"
 #include "mixmod/Kernel/IO/ParameterDescription.h"
 #include "mixmod/Kernel/Parameter/GaussianParameter.h"
 #include "mixmod/Kernel/IO/GaussianData.h"
 #include "mixmod/Kernel/IO/BinaryData.h"
 #include "mixmod/Kernel/IO/CompositeData.h"
+#include "mixmod/Kernel/Algo/Algo.h"
 #include "mixmod/Matrix/Matrix.h"
-
+#ifdef RMIXMOD_XML
+#include "mixmod_iostream/IOStreamUtil.h"
+#include "mixmod_iostream/DomClusteringProject.h"
+#endif
 #include <Rcpp.h>
 
 #include "Conversion.h"
@@ -106,42 +113,65 @@
 RcppExport SEXP clusteringMain( SEXP xem )
 {
 BEGIN_RCPP
-
-  // wrap S4 object
+  std::unique_ptr<XEM::ClusteringMain> cMain; //(cInput.get());
+ std::unique_ptr<XEM::ClusteringInput> cInput; //(new XEM::ClusteringInput(clusterArray, *dataDescription)); 
+ // wrap S4 object
   Rcpp::S4 mixmodClustering(xem);
-  // wrap data in Rcpp matrix
-  Rcpp::NumericMatrix RData(SEXP(mixmodClustering.slot("data"))); // creates Rcpp matrix from SEXP
-  // wrap clusters in Rcpp
-  Rcpp::NumericVector RnbCluster(mixmodClustering.slot("nbCluster")); // keep a copy (as the classic version does)
-  // wrap partition matrix in Rcpp matrix
-  Rcpp::NumericVector RPartition(mixmodClustering.slot("knownLabels"));
-  // wrap list algoOptions
-  Rcpp::S4 RalgoOptions(mixmodClustering.slot("strategy"));
-  // wrap criterion
-  Rcpp::CharacterVector Rcriterion(mixmodClustering.slot("criterion"));
-  // wrap models
-  Rcpp::S4 Rmodel(mixmodClustering.slot("models"));
-  // wrap type of data
-  Rcpp::StringVector Rtype(mixmodClustering.slot("dataType"));
-  // wrap weight in Rcpp
-  Rcpp::NumericVector Rweight(mixmodClustering.slot("weight")); 
+  // define a new MixmodResults object
+  Rcpp::S4 iResults(mixmodClustering.slot("bestResult"));
+  //Rcpp::StringVector XmlIn(mixmodClustering.slot("xmlIn"));
+  Rcpp::S4 XmlInObj(mixmodClustering.slot("xmlIn"));
+  bool conversionOnly = false; // actually conversionOnly could be true only when an xmlIn in given
+  XEM::IoMode iomode = XEM::IoMode::NUMERIC;  
+  std::string xmlInput = "";
+  //Rcpp::S4 sfile = XmlInObj.slot("file");
+  std::vector<std::string>  xmlv =  Rcpp::as< std::vector<std::string> >(XmlInObj.slot("file"));
+  if(xmlv.size()>0){
+    xmlInput = xmlv[0];
+  }
+  //if(XmlIn.size()>0)  xmlInput = Rcpp::as< std::vector<std::string> >(XmlIn)[0];
+  Rcpp::StringVector XmlOut(mixmodClustering.slot("xmlOut"));
+  std::string xmlOutput = "";
+  if(XmlOut.size()>0)  xmlOutput = Rcpp::as< std::vector<std::string> >(XmlOut)[0];
+  //std::string xmlInput = Rcpp::as<std::string>(XmlIn);
+  //std::cout << "xmlIn:::::: " << XmlIn << std::endl;
+  int seed = Rcpp::as<int>(mixmodClustering.slot("seed"));
+  int trace = Rcpp::as<int>(mixmodClustering.slot("trace"));
+  int massiccc = Rcpp::as<int>(mixmodClustering.slot("massiccc"));    
+  if(xmlInput==""){
+    // wrap data in Rcpp matrix
+    Rcpp::NumericMatrix RData(SEXP(mixmodClustering.slot("data"))); // creates Rcpp matrix from SEXP
+    // wrap clusters in Rcpp
+    Rcpp::NumericVector RnbCluster(mixmodClustering.slot("nbCluster")); // keep a copy (as the classic version does)
+    // wrap partition matrix in Rcpp matrix
+    Rcpp::NumericVector RPartition(mixmodClustering.slot("knownLabels"));
+    // wrap list algoOptions
+    Rcpp::S4 RalgoOptions(mixmodClustering.slot("strategy"));
+    // wrap criterion
+    Rcpp::CharacterVector Rcriterion(mixmodClustering.slot("criterion"));
+    // wrap models
+    Rcpp::S4 Rmodel(mixmodClustering.slot("models"));
+    // wrap type of data
+    Rcpp::StringVector Rtype(mixmodClustering.slot("dataType"));
+    // wrap weight in Rcpp
+    Rcpp::NumericVector Rweight(mixmodClustering.slot("weight")); 
+    // wrap factor in Rcpp
+    Rcpp::NumericVector Rfactor(mixmodClustering.slot("factor"));
 
-  // gaussian, binary or heterogeneous ?
-  XEM::DataType dataType;
-  if(Rcpp::as<std::string>(Rtype) == std::string("quantitative"))
-    dataType = XEM::QuantitativeData;
-  else if(Rcpp::as<std::string>(Rtype) == std::string("qualitative"))
-    dataType = XEM::QualitativeData;
-  else
-    dataType = XEM::HeterogeneousData;
-  // data descritor
-  XEM::DataDescription* dataDescription;
-  XEM::GaussianData* gData(0);
-  XEM::BinaryData* bData(0);
-  XEM::CompositeData* cData(0);
-  // wrap factor in Rcpp
-  Rcpp::NumericVector Rfactor(mixmodClustering.slot("factor"));
-  switch (dataType) {
+    // gaussian, binary or heterogeneous ?
+    XEM::DataType dataType;
+    if(Rcpp::as<std::string>(Rtype) == std::string("quantitative"))
+      dataType = XEM::QuantitativeData;
+    else if(Rcpp::as<std::string>(Rtype) == std::string("qualitative"))
+      dataType = XEM::QualitativeData;
+    else
+      dataType = XEM::HeterogeneousData;
+    // data descritor
+    XEM::DataDescription* dataDescription;
+    XEM::GaussianData* gData(0);
+    XEM::BinaryData* bData(0);
+    XEM::CompositeData* cData(0);
+    switch (dataType) {
     case XEM::QuantitativeData:
       /*===============================================*/
       /*  Create XEM gaussian data set and description */
@@ -160,62 +190,145 @@ BEGIN_RCPP
       cData = Conversion::DataToXemCompositeData(RData, Rfactor);
       dataDescription = new XEM::DataDescription(cData);
       break;
-      default:
+    default:
       break;
-  }
+    }
 
-  /*===============================================*/
-  /*  Create XEM cluster array */
-  std::vector<int64_t> clusterArray;
-  Rcpp::NumericVector::iterator it;
-  for( it = RnbCluster.begin(); it != RnbCluster.end(); ++it)
-  { clusterArray.push_back((int64_t)(*it));}
+    /*===============================================*/
+    /*  Create XEM cluster array */
+    std::vector<int64_t> clusterArray;
+    Rcpp::NumericVector::iterator it;
+    for( it = RnbCluster.begin(); it != RnbCluster.end(); ++it)
+      { clusterArray.push_back((int64_t)(*it));}
   
-  /*===============================================*/
-  /* Initialize input parameters in MIXMOD         */
-  // create XEMClusteringInput
-  XEM::ClusteringInput * cInput =  new XEM::ClusteringInput(clusterArray, *dataDescription);
-  
-  // initialize the parameters using user defined values (see Algo.R)
-  ClusteringInputHandling initInput(cInput, RalgoOptions);
+    /*===============================================*/
+    /* Initialize input parameters in MIXMOD         */
+    // create XEMClusteringInput
+    //XEM::ClusteringInput * cInput =  new XEM::ClusteringInput(clusterArray, *dataDescription);
+    //std::unique_ptr<XEM::ClusteringInput> cInput(new XEM::ClusteringInput(clusterArray, *dataDescription));
+    cInput.reset(new XEM::ClusteringInput(clusterArray, *dataDescription));
+    // initialize the parameters using user defined values (see Algo.R)
+    ClusteringInputHandling initInput(cInput.get(), RalgoOptions);
 
-  // initialize criterion name (BIC, AIC, ...)
-  initInput.setCriterionName(Rcriterion);
+    // initialize criterion name (BIC, AIC, ...)
+    initInput.setCriterionName(Rcriterion);
 
-  // initialize the model (gaussian_...)
-  initInput.setModel(Rmodel);
+    // initialize the model (gaussian_...)
+    initInput.setModel(Rmodel);
 
-  // set weight
-  initInput.setWeight(Rweight);
+    // set weight
+    initInput.setWeight(Rweight);
   
-  // set knownPartition
-  initInput.setKnownPartition(RPartition);
+    // set knownPartition
+    initInput.setKnownPartition(RPartition);
   
-  /* XEM will check if the option are corrects (should be the case) */
-  cInput->finalize();
-  
+    /* XEM will check if the option are corrects (should be the case) */
+    cInput->finalize();
+    cMain.reset(new XEM::ClusteringMain(cInput.get()));
+    // check if it is a NULL value
+    if (!Rf_isNull( RalgoOptions.slot("seed") )){
+      //seed = -1;
+      //}else{
+      seed = (int)Rcpp::as<int>(RalgoOptions.slot("seed"));
+    }
+    // release memory
+    //if (dataDescription) delete dataDescription;
+    //if (gData) delete gData;
+    //if (bData) delete bData;
+    //if (cData) delete cData;
+
+  } else { // i.e. with xml
+#ifdef RMIXMOD_XML
+    //std::cout<< "works with xmlIn"<< std::endl;
+    std::string numFormat = Rcpp::as<std::string>(XmlInObj.slot("numFormat"));
+    if(numFormat == "hexBinary") iomode = XEM::IoMode::BINARY;
+    conversionOnly = Rcpp::as<bool>(XmlInObj.slot("conversionOnly"));
+    cMain.reset(XEM::IStream(xmlInput, XEM::IOStreamFormat::XML, false, iomode));
+    //cMain.reset(XEM::IStream_XML(xmlInput, false));
+    //cMain.reset(XEM::IStream(xmlInput, XEM::IOStreamFormat::XML, false, XEM::IoMode::BINARY));
+    Rcpp::S4 params(iResults.slot("parameters"));
+    switch(cMain->getInput()->getDataType()){
+    case XEM::QuantitativeData:
+      iResults.slot("parameters") = params.slot("g_parameter");
+      mixmodClustering.slot("dataType") = Rcpp::StringVector("quantitative");
+      break;
+    case XEM::QualitativeData:
+      iResults.slot("parameters") = params.slot("m_parameter");
+      mixmodClustering.slot("dataType") = Rcpp::StringVector("qualitative");      
+      break;
+    case XEM::HeterogeneousData:
+      mixmodClustering.slot("dataType") = Rcpp::StringVector("composite");      
+      break;
+    }
+    Rcpp::NumericVector vectorNbCluster(cMain->getInput()->getNbClusterSize());
+    for(int i=0;i<cMain->getInput()->getNbClusterSize();i++) vectorNbCluster(i) = cMain->getInput()->getNbCluster(i);
+    mixmodClustering.slot("nbCluster") = vectorNbCluster;
+    Rcpp::StringVector vectorCrit(cMain->getInput()->getNbCriterion());
+    for(int i=0;i<cMain->getInput()->getNbCriterion();i++) vectorCrit(i) = CriterionNameToString(cMain->getInput()->getCriterionName(i));
+    mixmodClustering.slot("criterion") =  vectorCrit;
+    mixmodClustering.slot("nbSample") = Rcpp::NumericVector(1,cMain->getInput()->getNbSample());
+    mixmodClustering.slot("nbVariable") = Rcpp::NumericVector(1,cMain->getInput()->getPbDimension());
+    Rcpp::S4 strategy(mixmodClustering.slot("strategy"));
+    Rcpp::StringVector vectorAlgo(cMain->getInput()->getStrategy()->getNbAlgo());
+    for(int i=0;i<cMain->getInput()->getStrategy()->getNbAlgo();i++) vectorAlgo(i) = AlgoNameToString(cMain->getInput()->getStrategy()->getAlgo(i)->getAlgoName());
+    strategy.slot("algo") = vectorAlgo;
+    strategy.slot("nbTry") = Rcpp::NumericVector(1,cMain->getInput()->getStrategy()->getNbTry());
+    strategy.slot("initMethod") = Rcpp::StringVector(StrategyInitNameToStringApp(cMain->getInput()->getStrategy()->getStrategyInit()->getStrategyInitName()));
+    strategy.slot("nbTryInInit") = Rcpp::NumericVector(1,cMain->getInput()->getStrategy()->getNbTryInInit());
+    strategy.slot("nbIterationInInit") = Rcpp::NumericVector(1,cMain->getInput()->getStrategy()->getNbIterationInInit());
+    strategy.slot("epsilonInInit") = Rcpp::NumericVector(1,cMain->getInput()->getStrategy()->getEpsilonInInit());
+    strategy.slot("nbIterationInAlgo") = Rcpp::NumericVector(1,cMain->getInput()->getStrategy()->getAlgo(0)->getNbIteration());
+    strategy.slot("epsilonInAlgo") = Rcpp::NumericVector(1,cMain->getInput()->getStrategy()->getAlgo(0)->getEpsilon());
+    if(seed>=0){
+      strategy.slot("seed") = mixmodClustering.slot("seed");
+    }
+    mixmodClustering.slot("strategy") = strategy;
+
+    /*
+#c@strategy     c@data         c@factor       c@knownLabels  c@nbVariable   c@criterion    c@error        c@xmlIn
+    #c@bestResult   c@dataType     c@nbCluster    c@weight       c@nbSample     c@models       c@results      c@xmlOut
+    > c@strategy@
+c@strategy@algo               c@strategy@epsilonInInit
+c@strategy@nbTry              c@strategy@epsilonInAlgo
+c@strategy@initMethod         c@strategy@seed
+c@strategy@nbTryInInit        c@strategy@parameter
+c@strategy@nbIterationInInit  c@strategy@labels
+c@strategy@nbIterationInAlgo  
+    */
+    //http://www.hep.by/gnu/r-patched/r-exts/R-exts_11.html
+    //return mixmodClustering;
+#else
+    THROW(XEM::OtherException, XEM::xmlFeaturesNotAvailable);
+#endif    
+  } //end else
 //  cInput->edit(std::cout);
 //  std::cout << "Input finished" << std::endl;
   /*===============================================*/
   /* Computation of the estimates */
   // XEMClusteringMain
-  XEM::ClusteringMain cMain(cInput);
-  int seed;
-  // check if it is a NULL value
-  if (Rf_isNull( RalgoOptions.slot("seed") )){
-    seed = -1;
-  }else{
-    seed = (int)Rcpp::as<int>(RalgoOptions.slot("seed"));
-  }
+  //XEM::ClusteringMain cMain(cInput.get());
+  
+  //cout<<"seed is..... "<<seed<<endl;
+  //cout<<"trace is..... "<<trace<<endl;  
   // xmain run
-  cMain.run(seed);
-
+  if(!conversionOnly){
+    cMain->run(seed, XEM::IoMode::NUMERIC, trace, massiccc);
+  } //else {
+    //cout<<"********************************** CONVERSION ONLY ********************************"<<endl;  
+  //}
+  if(xmlOutput!=""){
+#ifdef RMIXMOD_XML
+    XEM::OStream(xmlOutput, XEM::IOStreamFormat::XML, cMain.get(), XEM::IoMode::NUMERIC);
+#else
+    THROW(XEM::OtherException, XEM::xmlFeaturesNotAvailable);
+#endif    
+  }
   //std::cout << "Run finished" << std::endl;
   /*===============================================*/
   // get XEMClusteringOutput object from cMain
-  XEM::ClusteringOutput * cOutput = cMain.getOutput();
+  XEM::ClusteringOutput * cOutput = cMain->getOutput();
   // Treatment : sort with the first criterion (there is only one criterion)  
-  cOutput->sort(cInput->getCriterionName(0));
+  cOutput->sort(cMain->getInput()->getCriterionName(0));
   //std::cout << "Sort finished" << std::endl;
   
   
@@ -224,15 +337,14 @@ BEGIN_RCPP
   
   if ( cOutput->atLeastOneEstimationNoError() )
   {
-    // define a new MixmodResults object
-    Rcpp::S4 iResults(mixmodClustering.slot("bestResult"));
     // create a list of results
     Rcpp::List resList(cOutput->getNbClusteringModelOutput());
     // loop over all estimation
     for ( int i=0; i<cOutput->getNbClusteringModelOutput(); i++ )
     {
       // create the output object for R
-      ClusteringOutputHandling(cOutput->getClusteringModelOutput(i), iResults,dataType, Rcriterion);
+      //ClusteringOutputHandling(cOutput->getClusteringModelOutput(i), iResults,cMain->getInput()->getDataType(), Rcriterion);
+      ClusteringOutputHandling(cOutput->getClusteringModelOutput(i), iResults,cMain->getInput()->getDataType(), cMain->getInput()->getCriterionName());      
       // add those results to the list
       resList[i] = Rcpp::clone(iResults);
     } 
@@ -241,7 +353,8 @@ BEGIN_RCPP
     // TODO: if no criterion...
     
     // add the best results
-    ClusteringOutputHandling(cOutput->getClusteringModelOutput().front(), iResults, dataType, Rcriterion);
+    //ClusteringOutputHandling(cOutput->getClusteringModelOutput().front(), iResults,cMain->getInput()->getDataType() , Rcriterion);
+    ClusteringOutputHandling(cOutput->getClusteringModelOutput().front(), iResults,cMain->getInput()->getDataType() ,cMain->getInput()->getCriterionName());
     mixmodClustering.slot("bestResult") = Rcpp::clone(iResults);
   }
   
@@ -249,11 +362,6 @@ BEGIN_RCPP
   mixmodClustering.slot("error") = !cOutput->atLeastOneEstimationNoError();
   
   //std::cout << "Output finished" << std::endl;
-  // release memory
-  if (dataDescription) delete dataDescription;
-  if (gData) delete gData;
-  if (bData) delete bData;
-  if (cData) delete cData;
   
   // return final output
   return mixmodClustering;

@@ -1,12 +1,15 @@
 \name{mixmodCluster}
 \alias{mixmodCluster}
+\alias{mixmodCluster.default}
 \title{Create an instance of the [\code{\linkS4class{MixmodCluster}}] class}
 \usage{
-  mixmodCluster(data, nbCluster, dataType = NULL,
+mixmodCluster(...)
+\method{mixmodCluster}{default}(data, nbCluster, dataType = NULL,
     models = NULL, strategy = mixmodStrategy(),
     criterion = "BIC", weight = NULL, knownLabels = NULL)
 }
 \arguments{
+ \item{...}{The following arguments are accepted:}
   \item{data}{frame containing quantitative,qualitative or
   heterogeneous data. Rows correspond to observations and
   columns correspond to variables.}
@@ -41,6 +44,7 @@
   \item{knownLabels}{vector of size nbSample. it will be
   used for semi-supervised classification when labels are
   known. Each cell corresponds to a cluster affectation.}
+
 }
 \value{
   Returns an instance of the
@@ -52,6 +56,7 @@
   the given criterion.} \item{bestResult}{a S4
   [\code{\linkS4class{MixmodResults}}] object containing
   the best model results.} }
+  
 }
 \description{
   This function computes an optimal mixture model according
@@ -85,7 +90,7 @@
   mixmodCluster(heterodata,2)
 }
 \author{
-  Remi Lebret and Serge Iovleff and Florent Langrognet,
+  Florent Langrognet and Remi Lebret and Christian Poli and Serge Iovleff,
   with contributions from C. Biernacki and G. Celeux and G.
   Govaert \email{contact@mixmod.org}
 }

@@ -69,6 +69,17 @@ RcppExport SEXP learnMain( SEXP xem )
   
   // wrap S4 object
   Rcpp::S4 mixmodLearn(xem);
+  //Rcpp::StringVector XmlIn(mixmodLearn.slot("xmlIn"));
+  std::string xmlInput = "";
+  //if(XmlIn.size()>0)  xmlInput = Rcpp::as< std::vector<std::string> >(XmlIn)[0];
+  Rcpp::StringVector XmlOut(mixmodLearn.slot("xmlOut"));
+  std::string xmlOutput = "";
+  if(XmlOut.size()>0)  xmlOutput = Rcpp::as< std::vector<std::string> >(XmlOut)[0];
+  //std::string xmlInput = Rcpp::as<std::string>(XmlIn);
+  //std::cout << "xmlIn:::::: " << XmlIn << std::endl;
+  int seed = Rcpp::as<int>(mixmodLearn.slot("seed"));
+  int trace = Rcpp::as<int>(mixmodLearn.slot("trace"));
+  int massiccc = Rcpp::as<int>(mixmodLearn.slot("massiccc"));    
   // wrap data in Rcpp matrix
   Rcpp::NumericMatrix RData(SEXP(mixmodLearn.slot("data"))); // creates Rcpp matrix from SEXP
   // wrap partition matrix in Rcpp matrix
@@ -154,7 +165,7 @@ RcppExport SEXP learnMain( SEXP xem )
   // LearnMain
   XEM::LearnMain lMain(lInput);
   // lmain run
-  lMain.run(-1);
+  lMain.run(seed, XEM::IoMode::NUMERIC, trace, massiccc);
 
   //std::cout << "Run finished" << std::endl;
   /*===============================================*/

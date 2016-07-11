@@ -49,7 +49,9 @@ setClass(
     error = "character",
     classificationRule = "MixmodResults",
     partition = "integer",
-    proba = "matrix"
+    proba = "matrix",
+    trace = "numeric",
+    massiccc = "numeric"        
   ),
   prototype=prototype(
     data = matrix(nrow=0,ncol=0),
@@ -58,7 +60,9 @@ setClass(
     nbSample = integer(0),
     error = "No error",
     partition = integer(0),
-    proba = matrix(nrow=0,ncol=0)
+    proba = matrix(nrow=0,ncol=0),
+    trace = numeric(0),
+    massiccc = numeric(0)        
   ),
   # define validity function
   validity=function(object){
@@ -82,8 +86,6 @@ setClass(
 ##' @param data matrix or data frame containing quantitative,qualitative or composite data. Rows correspond to observations and columns correspond to variables.
 ##' @param classificationRule a [\code{\linkS4class{MixmodResults}}] object which contains the classification rule computed in the mixmodLearn() or mixmodCluster() step.
 ##'
-##' @references 
-##'   R. Lebret, S. Iovleff, F. Langrognet, C. Biernacki, G. Celeux, G. Govaert (2015), "Rmixmod: The R Package of the Model-Based Unsupervised, Supervised, and Semi-Supervised Classification Mixmod Library", Journal of Statistical Software, 67(6), 1-29, doi:10.18637/jss.v067.i06
 ##' @examples
 ##'
 ##'   # start by extract 10 observations from iris data set
@@ -108,11 +110,18 @@ setClass(
 ##'   # compare prediction with real results
 ##'   paste("accuracy= ",mean(heterodatatest$V1 == prediction["partition"])*100,"%",sep="")
 ##'
-##' @author Remi Lebret and Serge Iovleff and Florent Langrognet, with contributions from C. Biernacki and G. Celeux and G. Govaert \email{contact@@mixmod.org}
+##' @author Florent Langrognet and Remi Lebret and Christian Poli ans Serge Iovleff, with contributions from C. Biernacki and G. Celeux and G. Govaert \email{contact@@mixmod.org}
 ##' @return Returns an instance of the [\code{\linkS4class{MixmodPredict}}] class which contains predicted partition and probabilities.
 ##' @export
 ##'
-mixmodPredict <- function(data, classificationRule) {
+mixmodPredict <- function(data, classificationRule, ...) {
+  # non documented params
+  dots <- list(...)
+  dotnames<-as.list(names(dots))
+  trace <- 0
+  if("trace" %in% dotnames) trace <- dots["trace"]
+  massiccc <- 0
+  if("massiccc" %in% dotnames) massiccc <- dots["massiccc"]
   # check options
   
   # check whether there is classification rule
@@ -123,12 +132,12 @@ mixmodPredict <- function(data, classificationRule) {
   if(missing(data)){
     stop("data is missing !")
   }
-  if (!is.data.frame(data) & !is.vector(data) & !is.vector(data) ){
+  if (!is.data.frame(data) & !is.vector(data) & !is.factor(data) ){
     stop("data must be a data.frame or a vector or a factor")
   }
   
   # create Mixmod object
-  xem <- new( "MixmodPredict", data=data, classificationRule=classificationRule )
+  xem <- new( "MixmodPredict", data=data, classificationRule=classificationRule, trace=trace, massiccc=massiccc )
   # call predictMain
   .Call("predictMain", xem, PACKAGE="Rmixmod")
   # mixmod error?
@@ -154,7 +163,7 @@ mixmodPredict <- function(data, classificationRule) {
 setMethod(
   f="initialize",
   signature=c("MixmodPredict"),
-  definition=function(.Object,data,classificationRule){
+  definition=function(.Object,data,classificationRule, trace=0, massiccc=0){
     if(!missing(data)){
       if ( is.factor(data) ) data<-as.integer(data)
       else if ( !is.vector(data) ){
@@ -193,6 +202,8 @@ setMethod(
       stop( "Unknown type of parameters within classificationRule!" )
     }
 
+    .Object@trace = trace
+    .Object@massiccc = massiccc    
     validObject(.Object)     
     return(.Object)
   }
