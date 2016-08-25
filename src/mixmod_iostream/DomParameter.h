@@ -33,7 +33,7 @@
 #include "mixmod/Clustering/ClusteringInput.h"
 #include "mixmod/Clustering/ClusteringStrategy.h"
 #include "mixmod/Clustering/ClusteringStrategyInit.h"
-#include "mixmod_iostream/NodeClusteringOutput.h"
+#include "mixmod_iostream/NodeOpOutput.h"
 
 namespace XEM {
 
@@ -50,6 +50,7 @@ public:
 	DomParameter(string & sFilename);    
 	DomParameter(ParameterDescription* parameterDescription, string sFilename);
 	DomParameter(ClusteringInput* cInput, string sFilename);    
+	DomParameter(PredictInput* cInput, string sFilename);    
     DomParameter(xmlpp::Element *element);
 
 	///read Parameter

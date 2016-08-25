@@ -48,26 +48,26 @@ namespace XEM {
   }
 
 //common part between Clustering & AD
-  NodeInput::NodeInput(ClusteringInput * input, string & s) : xmlpp::Document() {
+  NodeInput::NodeInput(Input * input, string & s, string dataTag) : xmlpp::Document() {
 
 	//_rootInput = createElement( "Input" );
     _rootInput = create_root_node( "Input");
-	writeDataNode(input, s);
+	writeDataNode(input, s, dataTag);
 	writeSelectVariableNode(input);
 	writeSelectIndividualNode(input);
 }
 
-  void NodeInput::writeDataNode(ClusteringInput * input, string & s) {
+  void NodeInput::writeDataNode(Input * input, string & s, string dataTag) {
 
 	//Data
-    xmlpp::Element *data = _rootInput->add_child("Data");
+    xmlpp::Element *data = _rootInput->add_child(dataTag);
 	//dataFilename
     string dataFilename = s + ".mxd";
     data->add_child_text(dataFilename);
 	DomData doc(input->getDataDescription(), s);
 }
 
-  void NodeInput::writeSelectVariableNode(ClusteringInput * input) {
+  void NodeInput::writeSelectVariableNode(Input * input) {
 
 	//SelectVariable
     xmlpp::Element *select = _rootInput->add_child("SelectVariable");
@@ -79,13 +79,13 @@ namespace XEM {
 
 }
 
-  void NodeInput::writeSelectIndividualNode(ClusteringInput * input) {
+  void NodeInput::writeSelectIndividualNode(Input * input) {
   }
 
-  DataDescription & NodeInput::readDataNode() {
+  DataDescription & NodeInput::readDataNode(std::string dataTag) {
 
 	if (!_rootInput) throw;
-    xmlpp::Element *elementData = dynamic_cast<xmlpp::Element*>(_rootInput->get_first_child("Data"));
+    xmlpp::Element *elementData = dynamic_cast<xmlpp::Element*>(_rootInput->get_first_child(dataTag));
     string filename;
     if (!elementData) throw;
       //absolute filename is the name of .mxd file

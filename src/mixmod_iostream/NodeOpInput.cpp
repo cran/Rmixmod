@@ -54,14 +54,25 @@ namespace XEM {
 	writePartitionNode(input, s);
 	writeWeightsNode(input, s);
   }
-  
+  NodeOpInput::NodeOpInput(LearnInput * input, string & s)
+    : NodeInput(input, s) {
+	writeListModel(input);    
+    writePartitionNode(input, s);
+    writeCriterionNode(input);
+    writeNbCVBlocks(input);
+    writeWeightsNode(input, s);
+  }
+  NodeOpInput::NodeOpInput(PredictInput * input, string & s)
+    : NodeInput(input, s, "DataToClassify") {
+    writeParameterNode(input, s);
+  }
   NodeOpInput::NodeOpInput( xmlpp::Element * rootInput ) : NodeInput(rootInput) {
     
   }
 
   //read the clustering to fill XEMNvInput
   void NodeOpInput::readXmlCommand(ClusteringInput & input) {
-
+    
 	//read data from file (method from XEM::NodeInput)
 	DataDescription dataDescription = readDataNode();
 
@@ -79,9 +90,40 @@ namespace XEM {
 	readPartitionNode(input);
 	readWeightsNode(input);
   }
-  void NodeOpInput::readXmlCommand(LearnInput & input) {}
-   
-  void NodeOpInput::writeListModel(ClusteringInput * input) {
+  void NodeOpInput::readXmlCommand(LearnInput & input) {
+    //LabelDescription lDescription = readLabels();
+	//DataDescription dataDescription = readDataNode();
+    //vector<int64_t> nbCluster(1);
+    //nbCluster[0] = readPartitionNode(input);
+    //std::unique_ptr<LabelDescription> labelDescription(readPartitionNode());
+    //LabelDescription labelDescription(readPartitionNode());    
+    //nbCluster[0] = labelDescription.getNbCluster();
+    //input.cloneInitialisation(nbCluster, dataDescription);
+    //input.setKnownLabelDescription(labelDescription);
+    readPartitionNode(input);
+	readCriterionNode(input);    
+	readModelNode(input);
+    readNbCVBlocksNode(input);    
+    readWeightsNode(input);
+  }
+
+  PredictInput * NodeOpInput::readXmlPredictInput(){
+    DataDescription dataDescription = readDataNode("DataToClassify");
+    xmlpp::Element* parameterNode = dynamic_cast<xmlpp::Element*>(_rootInput->get_first_child("Parameter"));
+    //check the .mxp
+ 
+    string filename = parameterNode->get_child_text()->get_content();
+    ValidateSchema(filename, IOStreamXMLFile::Parameter);
+    DomParameter domParam;
+    ParameterDescription * paramDescription = domParam.readParameter(filename);
+    return new PredictInput(&dataDescription, paramDescription);
+
+  }
+  void NodeOpInput::writeNbCVBlocks(LearnInput *input){
+    xmlpp::Element *elt = _rootInput->add_child("NbCVBlocks");
+    elt->add_child_text(std::to_string(input->getNbCVBlock()));
+  }
+  void NodeOpInput::writeListModel(Input * input) {
     //model
     //XEMBinaryData * binaryData = 
     //dynamic_cast<XEMBinaryData *>((input->getDataDescription()).
@@ -177,7 +219,7 @@ namespace XEM {
   }
 
   // criterion
-  void NodeOpInput::writeCriterionNode(ClusteringInput * input) {
+  void NodeOpInput::writeCriterionNode(Input * input) {
 
     xmlpp::Element *listCriterion = _rootInput->add_child("ListCriterion");
     for (int64_t i = 0; i < input->getNbCriterion(); ++i) {
@@ -198,9 +240,28 @@ namespace XEM {
       DomLabel doc(input->getKnownPartition(), str);
     }
   }
+  void NodeOpInput::writePartitionNode(LearnInput * input, string & s) {
+
+    if (input->getKnownLabelDescription()) {
+      //partition
+      xmlpp::Element *partition =  _rootInput->add_child("Partition");
+      //partitionFilename
+      string str = s + "Partition";
+      partition->add_child_text(str + ".mxl");
+      //LabelDescription labdesc((*(const_cast<LabelDescription *>(input->getKnownLabelDescription()))));
+      DomLabel doc(input->getKnownLabelDescriptionNC(), str);
+      //DomLabel doc(&labdesc, str);
+    }
+  }
+  void NodeOpInput::writeParameterNode(PredictInput * input, string & s) {
+    xmlpp::Element *filename = _rootInput->add_child("Parameter");
+    string parameterFilename = s + "Parameter";
+    filename->add_child_text(parameterFilename + ".mxp");
+    DomParameter dpar(input, parameterFilename);
+  }
 
   //weights
-  void NodeOpInput::writeWeightsNode(ClusteringInput * input, string & s) {
+  void NodeOpInput::writeWeightsNode(Input * input, string & s) {
 
 	// HACK [bauder: I don't like that; we could use a bool e.g. "_customWeights"...]
 	// Check if some weight differs from 1.0. If yes, a weights files is provided.
@@ -339,47 +400,56 @@ namespace XEM {
       }
 	}
   }
-
+  void NodeOpInput::readNbCVBlocksNode(LearnInput & input) {
+    if (!_rootInput) return;
+    xmlpp::Element *elt = dynamic_cast<xmlpp::Element*>(_rootInput->get_first_child("NbCVBlocks"));
+    if(!elt) return;
+    input.setNbCVBlock(std::stoll(elt->get_child_text()->get_content()));
+  }
+  
   //read the model node
-  void NodeOpInput::readModelNode(ClusteringInput & input) {
-    if (_rootInput) {
-      //_root is clustering node
-      xmlpp::Element *elementListModel = dynamic_cast<xmlpp::Element*>(_rootInput->get_first_child("ListModel"));
-      if(!elementListModel) return;
-      //fisrt model Node
-      auto children = elementListModel->get_children();
-      int64_t compt = 0;
-      for (auto it=children.begin(); it != children.end(); ++it){
-        xmlpp::Element* elementTypeModel = dynamic_cast<xmlpp::Element*>(*it);
-        if(!elementTypeModel) continue; //the current node isn't an element
-        //choice between 2 model types Binary or EDDA (HDModel not available in Clustering) 
-        //with same following process 
-        auto m_children = elementTypeModel->get_children();
-        vector<string> vModelName(0);
-        //cross all the model names
-        for (auto it2=m_children.begin(); it2 != m_children.end(); ++it2){
-          xmlpp::Element* elementModel = dynamic_cast<xmlpp::Element*>(*it2);
-          if(!elementModel) continue;
-          //model name of the current node
-          string strModelName = elementModel->get_child_text()->get_content(); //elementModel.text().toStdString();
+  //template<class T>
+  void NodeOpInput::readModelNode(Input & input) {
+    if (!_rootInput) return;
+    //_root is clustering node
+    xmlpp::Element *elementListModel = dynamic_cast<xmlpp::Element*>(_rootInput->get_first_child("ListModel"));
+    if(!elementListModel) return;
+    //fisrt model Node
+    auto children = elementListModel->get_children();
+    int64_t compt = 0;
+    for (auto it=children.begin(); it != children.end(); ++it){
+      xmlpp::Element* elementTypeModel = dynamic_cast<xmlpp::Element*>(*it);
+      if(!elementTypeModel) continue; //the current node isn't an element
+      //choice between 2 model types Binary or EDDA (HDModel not available in Clustering) 
+      //with same following process 
+      auto m_children = elementTypeModel->get_children();
+      vector<string> vModelName(0);
+      //cross all the model names
+      for (auto it2=m_children.begin(); it2 != m_children.end(); ++it2){
+        xmlpp::Element* elementModel = dynamic_cast<xmlpp::Element*>(*it2);
+        if(!elementModel) continue;
+        //model name of the current node
+        string strModelName = elementModel->get_child_text()->get_content(); //elementModel.text().toStdString();
         
-          if (find(vModelName.begin(), vModelName.end(), strModelName) == vModelName.end()) {
+        if (find(vModelName.begin(), vModelName.end(), strModelName) == vModelName.end()) {
           
-            //fill the XEMNvInput with the model current Model, set or insert according to case
-            if (compt == 0) {
-              input.setModelType(new ModelType(StringToModelName(strModelName)), compt);
-            }
-            else {
-              input.insertModelType(new ModelType(StringToModelName(strModelName)), compt);
-            }
-          
-            compt++;
-            vModelName.push_back(strModelName);
+          //fill the XEMNvInput with the model current Model, set or insert according to case
+          if (compt == 0) {
+            input.setModelType(new ModelType(StringToModelName(strModelName)), compt);
           }
+          else {
+            input.insertModelType(new ModelType(StringToModelName(strModelName)), compt);
+          }
+          
+          compt++;
+          vModelName.push_back(strModelName);
         }
       }
     }
+    
   }
+  //template void NodeOpInput::readModelNode(ClusteringInput&);
+  //template void NodeOpInput::readModelNode(LearnInput&);  
   void NodeOpInput::setInitPartition(string sFilename,ClusteringStrategy * strat){
   	//-------
 	//load file in this
@@ -387,12 +457,11 @@ namespace XEM {
     xmlpp::DomParser parser;
     parser.parse_file(sFilename);
     xmlpp::Document *doc = parser.get_document();    
-	xmlpp::Element *root = doc->get_root_node();//documentElement();
+    xmlpp::Element *root = doc->get_root_node();//documentElement();
      //------------------------
     //Declaration of variables
     //------------------------
-    xmlpp::Element *elementNbSample, *elementNbCluster, *elementFormat, 
-      *elementFilename;
+    xmlpp::Element *elementNbSample, *elementNbCluster, *elementFormat, *elementType, *elementFilename;
     
     //nbSample
     elementNbSample = dynamic_cast<xmlpp::Element*>(root->get_first_child("NbSample"));
@@ -407,6 +476,11 @@ namespace XEM {
     FormatNumeric::FormatNumericFile format = 
       StringToFormatNumericFile(elementFormat->get_child_text()->get_content());
 
+    //Type
+    elementType = dynamic_cast<xmlpp::Element*>(root->get_first_child("Type"));
+    TypePartition::TypePartition type = 
+      StringToTypePartition(elementType->get_child_text()->get_content());
+
     //Parameter Filename
     elementFilename = dynamic_cast<xmlpp::Element*>(root->get_first_child("Filename"));
     string partFilename = elementFilename->get_child_text()->get_content();
@@ -420,7 +494,7 @@ namespace XEM {
 	}    
     Partition * part = new Partition();
     part->setDimension(nbSample, nbCluster);
-    part->setPartitionFile(partFilename);
+    part->setPartitionFile(partFilename, type);
     partitionFile >> *part;
     strat->setInitPartition(part, 0);//0 is the place where the partition will be stocked 
   }
@@ -641,7 +715,7 @@ namespace XEM {
   }
 
   
-  void NodeOpInput::readCriterionNode(ClusteringInput & input) {
+  void NodeOpInput::readCriterionNode(Input & input) {
     if (!_rootInput) return;
     xmlpp::Element *elementListCriterion = dynamic_cast<xmlpp::Element*>(_rootInput->get_first_child("ListCriterion"));
     if (!elementListCriterion) return;
@@ -674,6 +748,53 @@ namespace XEM {
     }
   }
 
+  void NodeOpInput::readPartitionNodeImpl(NumericPartitionInfo & partitionInfo, xmlpp::Element *elementPartition){
+
+    string filename;
+
+    filename = elementPartition->get_child_text()->get_content(); //.text().toStdString();
+    ValidateSchema(filename, IOStreamXMLFile::Partition);
+    //throw IOStreamErrorType::badLoadXML;
+      
+    // temporary [??] fix, assuming TXT format (TODO: ?!)
+    // TODO: duplicated code from XEMClusteringMain * XEMIStream(...)
+    xmlpp::DomParser parser;
+    parser.parse_file(filename);
+    xmlpp::Document *doc = parser.get_document();
+    xmlpp::Element *_root = doc->get_root_node();
+    xmlpp::Element *elementNbSample, *elementNbCluster, *elementFormat, *elementType, *elementFilename;
+
+    //nbSample
+    elementNbSample = dynamic_cast<xmlpp::Element*>(_root->get_first_child("NbSample"));
+    int64_t nbSample = std::stoll(elementNbSample->get_child_text()->get_content());
+    
+    //nbCluster
+    elementNbCluster = dynamic_cast<xmlpp::Element*>(_root->get_first_child("NbCluster"));
+    int64_t nbCluster = std::stoll(elementNbCluster->get_child_text()->get_content());
+
+    //Format
+    elementFormat = dynamic_cast<xmlpp::Element*>(_root->get_first_child("Format"));
+    FormatNumeric::FormatNumericFile format = 
+      StringToFormatNumericFile(elementFormat->get_child_text()->get_content());
+
+    //Type
+    elementType = dynamic_cast<xmlpp::Element*>(_root->get_first_child("Type"));
+    TypePartition::TypePartition type = 
+      StringToTypePartition(elementType->get_child_text()->get_content());
+
+    //Parameter Filename
+    elementFilename = dynamic_cast<xmlpp::Element*>(_root->get_first_child("Filename"));
+    string partFilename = elementFilename->get_child_text()->get_content();
+
+
+    //NumericPartitionFile partitionFile;
+    partitionInfo.partitionFile._fileName = partFilename;
+    partitionInfo.partitionFile._format = format;
+    partitionInfo.partitionFile._type = type;
+    partitionInfo.nbCluster = nbCluster;
+    partitionInfo.nbSample = nbSample;
+  }
+    /*  
   void NodeOpInput::readPartitionNode(ClusteringInput & input) {
 	//read the partition node  
 	if (!_rootInput) return;
@@ -690,13 +811,100 @@ namespace XEM {
       parser.parse_file(filename);
       xmlpp::Document *doc = parser.get_document();
       xmlpp::Element *_root = doc->get_root_node();
-      xmlpp::Element *elt = dynamic_cast<xmlpp::Element*>(_root->get_first_child("Filename"));
-      string partitionFilename = elt->get_child_text()->get_content();
-      input.insertKnownPartition(partitionFilename);
-    }
-}
+      xmlpp::Element *elementNbSample, *elementNbCluster, *elementFormat, *elementType, *elementFilename;
 
-  void NodeOpInput::readWeightsNode(ClusteringInput & input) {
+      //nbSample
+      elementNbSample = dynamic_cast<xmlpp::Element*>(_root->get_first_child("NbSample"));
+      int64_t nbSample = std::stoll(elementNbSample->get_child_text()->get_content());
+
+      //nbCluster
+      elementNbCluster = dynamic_cast<xmlpp::Element*>(_root->get_first_child("NbCluster"));
+      int64_t nbCluster = std::stoll(elementNbCluster->get_child_text()->get_content());
+
+      //Format
+      elementFormat = dynamic_cast<xmlpp::Element*>(_root->get_first_child("Format"));
+      FormatNumeric::FormatNumericFile format = 
+        StringToFormatNumericFile(elementFormat->get_child_text()->get_content());
+
+      //Type
+      elementType = dynamic_cast<xmlpp::Element*>(_root->get_first_child("Type"));
+      TypePartition::TypePartition type = 
+        StringToTypePartition(elementType->get_child_text()->get_content());
+
+      //Parameter Filename
+      elementFilename = dynamic_cast<xmlpp::Element*>(_root->get_first_child("Filename"));
+      string partFilename = elementFilename->get_child_text()->get_content();
+
+
+      NumericPartitionFile partitionFile;
+      partitionFile._fileName = partFilename;
+      partitionFile._format = format;
+      partitionFile._type = type;
+
+      input.insertKnownPartition(partitionFile);
+    }
+  }
+    */
+  int64_t NodeOpInput::readPartitionNode(ClusteringInput & input) {
+	//read the partition node  
+	if (!_rootInput) return 0;
+    xmlpp::Element *elementPartition = dynamic_cast<xmlpp::Element*>(_rootInput->get_first_child("Partition"));
+    if (elementPartition && input.getNbCluster().size() == 1) {
+      NumericPartitionInfo partitionInfo;
+      readPartitionNodeImpl(partitionInfo, elementPartition);
+      input.insertKnownPartition(partitionInfo.partitionFile);
+    }
+    return 0;
+  }
+  /*
+  
+  int64_t NodeOpInput::readPartitionNode(LearnInput & input) {
+    xmlpp::Element *elementPartition = dynamic_cast<xmlpp::Element*>(_rootInput->get_first_child("Partition"));
+    NumericPartitionInfo pi;
+    readPartitionNodeImpl(pi, elementPartition);
+    Partition part(pi.nbSample, pi.nbCluster, pi.partitionFile);
+    std::vector<int64_t> labels(pi.nbSample);
+    int64_t** tv = part.getTabValue();
+    for(int64_t i=0;i<pi.nbSample;i++){
+      int64_t label_i = 0;
+      for(int64_t j=0;j<pi.nbCluster;j++){
+        label_i += tv[i][j]*(j+1);
+      }
+      labels[i] = label_i;
+    }
+    LabelDescription labelDescription(pi.nbSample, labels);
+    input.setKnownLabelDescription(labelDescription);
+    return pi.nbCluster;
+  }
+  */
+
+   void NodeOpInput::readPartitionNode(LearnInput & input) {
+    xmlpp::Element *elementPartition = dynamic_cast<xmlpp::Element*>(_rootInput->get_first_child("Partition"));
+    NumericPartitionInfo npi;
+    readPartitionNodeImpl(npi, elementPartition);
+    Partition part(npi.nbSample, npi.nbCluster, npi.partitionFile);
+    std::vector<int64_t> labels(npi.nbSample);
+    int64_t** tv = part.getTabValue();
+    for(int64_t i=0;i<npi.nbSample;i++){
+      int64_t label_i = 0;
+      for(int64_t j=0;j<npi.nbCluster;j++){
+        label_i += tv[i][j]*(j+1);
+      }
+      labels[i] = label_i;
+    }
+	DataDescription dataDescription = readDataNode();
+    vector<int64_t> nbCluster(1);    
+    LabelDescription *labelDescription = new LabelDescription(npi.nbSample, labels);
+    nbCluster[0] = labelDescription->getNbCluster();
+    input.cloneInitialisation(nbCluster, dataDescription);
+    input.setKnownLabelDescription(labelDescription);
+
+  }
+
+
+  
+    
+  void NodeOpInput::readWeightsNode(Input & input) {
 	//read the weights node  
 	if (!_rootInput) return;
     xmlpp::Element *elementWeights = dynamic_cast<xmlpp::Element*>(_rootInput->get_first_child("Weights"));

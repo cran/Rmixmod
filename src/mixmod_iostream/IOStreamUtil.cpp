@@ -24,17 +24,19 @@
  ***************************************************************************/
 
 #include "mixmod_iostream/IOStreamUtil.h"
-#include "mixmod_iostream/DomClusteringProject.h"
-#include "mixmod_iostream/DomDAProject.h"
-#include "mixmod_iostream/NodeClusteringInput.h"
-#include "mixmod_iostream/NodeClusteringOutput.h"
+//#include "mixmod_iostream/DomClusteringProject.h"
+#include "mixmod_iostream/DomOpProject.h"
+//#include "mixmod_iostream/DomDAProject.h"
+#include "mixmod_iostream/NodeOpInput.h"
+#include "mixmod_iostream/NodeOpOutput.h"
 
 #include "mixmod/Kernel/IO/BinaryData.h"
 #include "mixmod/Kernel/IO/GaussianData.h"
-#include "mixmod/Clustering/ClusteringInput.h"
+//#include "mixmod/Clustering/ClusteringInput.h"
 #include "mixmod/Clustering/ClusteringMain.h"
-#include "mixmod/Clustering/ClusteringOutput.h"
-#include "mixmod/Clustering/ClusteringModelOutput.h"
+//#include "mixmod/Clustering/ClusteringOutput.h"
+//#include "mixmod/Clustering/ClusteringModelOutput.h"
+
 #include "mixmod/Kernel/IO/QualitativeColumnDescription.h"
 #include "mixmod/Kernel/IO/QuantitativeColumnDescription.h"
 #include "mixmod/Kernel/Model/ModelType.h"
@@ -140,61 +142,154 @@ ClusteringMain * IStream(const string & s, IOStreamFormat format, bool bOnlyInpu
 //-----------------
 //read the XML file
 //-----------------
-ClusteringMain * IStream_XML(const std::string& s, bool bOnlyInput) {
-  //take the absolute path
-  const string str = s;
-  ValidateSchema(str, IOStreamXMLFile::Project);
-  xmlpp::DomParser parser;
-  parser.parse_file(s);
-  xmlpp::Document *doc = parser.get_document();
-  xmlpp::Element *root = doc->get_root_node();  
-  if ( root->get_name() == "Project" ) {
-    string str = root->get_attribute_value("type", "xsi");
-    if (str.compare("Clustering") == 0) {
-      DomClusteringProject docClustering(root);
-
-      //clusteringInput
-      ClusteringInput * cInput = new ClusteringInput();
-
-      docClustering.readClustering(cInput);
-
-      //HACK: set nbVariables_binary and nbVariables_gaussian for CompositeParameter, in case of...
-      //TODO: refactor...
-      if (cInput->getDataType() == HeterogeneousData) {
-        Global::nbVariables_binary = cInput->getData()->getBinaryData()->_pbDimension;
-        Global::nbVariables_gaussian = cInput->getData()->getGaussianData()->_pbDimension;
-      }
-      if (cInput->getDataType() == QualitativeData || cInput->getDataType() == HeterogeneousData) {
-        Global::vNbFactor.clear();
-        for (int i=0; i<cInput->getData()->getBinaryData()->getPbDimension(); i++)
-          Global::vNbFactor.push_back(cInput->getData()->getBinaryData()->getTabNbModality()[i]);
-      }
-
-      ClusteringOutput * cOutput = NULL;
-      xmlpp::Element *listOutput = dynamic_cast<xmlpp::Element*>(root->get_first_child("ListOutput"));
-      if (listOutput && !bOnlyInput) {
-        //ClusteringOutput
-        cOutput = new ClusteringOutput(cInput->getCriterionName());
-        docClustering.readClustering(cOutput);
-      }
-
-      cInput->finalize();
-      return new ClusteringMain(cInput, cOutput);
-    }
-    else if (str.compare("DiscriminantAnalysis") == 0) {
-      //TODO
-      return NULL;
-    }
+  ClusteringMain * IStream_XML_Clustering(const std::string& s, bool bOnlyInput, IoMode iomode) {
+    IOMODE = iomode; //TODO...
+    return IStream_XML(s, bOnlyInput);
   }
-  else {
-    throw IOStreamErrorType::badIOStreamFormat;
-  }
+  ClusteringMain * IStream_XML(const std::string& s, bool bOnlyInput) {
+    //take the absolute path
+    const string str = s;
+    ValidateSchema(str, IOStreamXMLFile::Project);
+    xmlpp::DomParser parser;
+    parser.parse_file(s);
+    xmlpp::Document *doc = parser.get_document();
+    xmlpp::Element *root = doc->get_root_node();  
+    if ( root->get_name() != "Project" ) throw IOStreamErrorType::badIOStreamFormat;
+    string xsitype = root->get_attribute_value("type", "xsi");
+    if (xsitype.compare("Clustering") != 0) throw IOStreamErrorType::badXML;    
+    //DomClusteringProject docClustering(root);
+    DomOpProject docClustering(root);
+      
+    //clusteringInput
+    ClusteringInput * cInput = new ClusteringInput();
 
-  return NULL;
+    //docClustering.readClustering(cInput);
+    docClustering.readXmlFillIn<ClusteringInput>(cInput);
+    //HACK: set nbVariables_binary and nbVariables_gaussian for CompositeParameter, in case of...
+    //TODO: refactor...
+    if (cInput->getDataType() == HeterogeneousData) {
+      Global::nbVariables_binary = cInput->getData()->getBinaryData()->_pbDimension;
+      Global::nbVariables_gaussian = cInput->getData()->getGaussianData()->_pbDimension;
+    }
+    if (cInput->getDataType() == QualitativeData || cInput->getDataType() == HeterogeneousData) {
+      Global::vNbFactor.clear();
+      for (int i=0; i<cInput->getData()->getBinaryData()->getPbDimension(); i++)
+        Global::vNbFactor.push_back(cInput->getData()->getBinaryData()->getTabNbModality()[i]);
+    }
+
+    ClusteringOutput * cOutput = NULL;
+    xmlpp::Element *listOutput = dynamic_cast<xmlpp::Element*>(root->get_first_child("ListOutput"));
+    if (listOutput && !bOnlyInput) {
+      //ClusteringOutput
+      cOutput = new ClusteringOutput(cInput->getCriterionName());
+      //docClustering.readClustering(cOutput);
+      docClustering.readXmlFillOut<ClusteringOutput, ClusteringModelOutput>(cOutput);
+    }
+
+    cInput->finalize();
+    return new ClusteringMain(cInput, cOutput);
 }
 
+  //////////////////////////////////////////////////////////////////::
+//---------------------------------------------
+//read the XML file 4 clustering with templates
+//---------------------------------------------
+  LearnMain * IStream_XML_Learn(const std::string& s, bool bOnlyInput, IoMode iomode) {
+	IOMODE = iomode; //TODO...    
+    //take the absolute path
+    const string str = s;
+    ValidateSchema(str, IOStreamXMLFile::Project);
+    xmlpp::DomParser parser;
+    parser.parse_file(s);
+    xmlpp::Document *doc = parser.get_document();
+    xmlpp::Element *root = doc->get_root_node();  
+    if ( root->get_name() != "Project" ) throw IOStreamErrorType::badIOStreamFormat;
+    string xsitype = root->get_attribute_value("type", "xsi");
+    if (xsitype.compare("Learn") != 0)  throw IOStreamErrorType::badXML;    
+   
+    DomOpProject docLearn(root);
+
+    //learnInput
+    LearnInput * lInput = new LearnInput();
+
+    docLearn.readXmlFillIn<LearnInput>(lInput);
+
+    //HACK: set nbVariables_binary and nbVariables_gaussian for CompositeParameter, in case of...
+    //TODO: refactor...
+    if (lInput->getDataType() == HeterogeneousData) {
+      Global::nbVariables_binary = lInput->getData()->getBinaryData()->_pbDimension;
+      Global::nbVariables_gaussian = lInput->getData()->getGaussianData()->_pbDimension;
+    }
+    if (lInput->getDataType() == QualitativeData || lInput->getDataType() == HeterogeneousData) {
+      Global::vNbFactor.clear();
+      for (int i=0; i<lInput->getData()->getBinaryData()->getPbDimension(); i++)
+        Global::vNbFactor.push_back(lInput->getData()->getBinaryData()->getTabNbModality()[i]);
+    }
+
+    LearnOutput * lOutput = NULL;
+    //xmlpp::Element *listOutput = dynamic_cast<xmlpp::Element*>(root->get_first_child("ListOutput"));
+    //if (listOutput && !bOnlyInput) {
+    if (!bOnlyInput) {
+      //LearnOutput
+      lOutput = new LearnOutput();//lInput->getCriterionName());
+      docLearn.readXmlFillOut<LearnOutput, LearnModelOutput>(lOutput);
+    }
+
+    lInput->finalize();
+    return new LearnMain(lInput, lOutput);
+    
+    //return NULL;
+  }
+  
+  PredictMain * IStream_XML_Predict(const std::string& s, bool bOnlyInput, IoMode iomode) {
+	IOMODE = iomode; //TODO...    
+    //take the absolute path
+    const string str = s;
+    ValidateSchema(str, IOStreamXMLFile::Project);
+    xmlpp::DomParser parser;
+    parser.parse_file(s);
+    xmlpp::Document *doc = parser.get_document();
+    xmlpp::Element *root = doc->get_root_node();  
+    if ( root->get_name() != "Project" ) throw IOStreamErrorType::badIOStreamFormat;
+    string xsitype = root->get_attribute_value("type", "xsi");
+    if (xsitype.compare("Predict") != 0)  throw IOStreamErrorType::badXML;    
+   
+    DomOpProject docPredict(root);
+
+    //predictInput
+    PredictInput * pInput = docPredict.readXmlPredictInput();
+
+    //HACK: set nbVariables_binary and nbVariables_gaussian for CompositeParameter, in case of...
+    //TODO: refactor...
+    if (pInput->getDataType() == HeterogeneousData) {
+      Global::nbVariables_binary = pInput->getData()->getBinaryData()->_pbDimension;
+      Global::nbVariables_gaussian = pInput->getData()->getGaussianData()->_pbDimension;
+    }
+    if (pInput->getDataType() == QualitativeData || pInput->getDataType() == HeterogeneousData) {
+      Global::vNbFactor.clear();
+      for (int i=0; i<pInput->getData()->getBinaryData()->getPbDimension(); i++)
+        Global::vNbFactor.push_back(pInput->getData()->getBinaryData()->getTabNbModality()[i]);
+    }
+
+    PredictOutput * pOutput = NULL;
+    //xmlpp::Element *listOutput = dynamic_cast<xmlpp::Element*>(root->get_first_child("ListOutput"));
+    //if (listOutput && !bOnlyInput) {
+    if (!bOnlyInput) {
+      //PredictOutput
+      pOutput = new PredictOutput();//pInput->getCriterionName());
+      docPredict.readXmlFillOut<PredictOutput, PredictModelOutput>(pOutput);
+    }
+
+    pInput->finalize();
+    return new PredictMain(pInput, pOutput);
+    
+    //return NULL;
+  }
+
+
+  
 ///to validate schema XML. The used .xsd depends on xml file 
-void ValidateSchema(const string & s, const IOStreamXMLFile & xmlFile) {
+  void ValidateSchema(const string & s, const IOStreamXMLFile & xmlFile, bool verbose) {
 
   bool res = false;
   string schemafile;
@@ -207,6 +302,7 @@ void ValidateSchema(const string & s, const IOStreamXMLFile & xmlFile) {
     schemafile = res_path + "data.xsd";
     break;
   case IOStreamXMLFile::Partition:
+  case IOStreamXMLFile::Label:    
     schemafile = res_path + "label_or_partition.xsd";
     break;
   case IOStreamXMLFile::Parameter:
@@ -224,7 +320,8 @@ void ValidateSchema(const string & s, const IOStreamXMLFile & xmlFile) {
     validator.validate(s);
   }
   catch (xmlpp::validity_error & e) {
-    std::cout<< "file:"<<s<<",schema:"<<schemafile<<","<<e.what()<<std::endl;
+    if(verbose)
+      std::cout<< "file:"<<s<<",schema:"<<schemafile<<","<<e.what()<<std::endl;
     throw IOStreamErrorType::badXML;    
   }
 
@@ -553,7 +650,7 @@ void OStream(const string & s, IOStreamFormat format, ClusteringMain * cMain, Io
 		// XML format
 		//----------
 
-		OStream_Clustering_XML(s, cMain); 
+		OStream_XML(s, cMain); 
 	}
 	else if (format == IOStreamFormat::FLAT) {
 		// FLAT format
@@ -565,19 +662,24 @@ void OStream(const string & s, IOStreamFormat format, ClusteringMain * cMain, Io
 		throw IOStreamErrorType::badIOWriteFormat;
 	}
 }
-
-void OStream_Clustering_XML(const string & s, ClusteringMain * cMain) {
-  string dataFilename = string(s);
-
-  //fill project with our input and output
-  DomClusteringProject project ;
-  project.writeClustering(dataFilename, cMain);
-  string filename = dataFilename + ".mixmod";
-  removeIfExists(filename);
-  //creates the .mixmod with project
-  project.write_to_file(filename);
-}
-
+  
+  template<class T>
+  void OStream_XML(const string & s, T * cMain, IoMode iomode) {
+    IOMODE = iomode; //TODO...
+    string dataFilename = string(s);
+    
+    //fill project with our input and output
+    DomOpProject project ;
+    project.writeMixmodXml(dataFilename, cMain);
+    string filename = dataFilename + ".mixmod";
+    removeIfExists(filename);
+    //creates the .mixmod with project
+    project.write_to_file(filename);
+  }
+  template void   OStream_XML(const string & s, ClusteringMain* cMain, IoMode iomode);
+  template void   OStream_XML(const string & s, LearnMain* cMain, IoMode iomode);
+  template void   OStream_XML(const string & s, PredictMain* cMain, IoMode iomode);    
+  
 void OStream_DiscriminantAnalysis_XML(const string & s, ClusteringMain * cMain) {
 }
 
@@ -849,7 +951,30 @@ void OStream_Clustering_FLAT(ClusteringMain * cMain) {
 	 errorMixmodStream.close();
 	 */
 }
-
+  // Tools for floats
+  double custom_stod(string s){
+    if (IOMODE != IoMode::BINARY || s.find('.')!=string::npos) {
+      return std::stod(s);
+    }
+    double result;      
+    stringstream stream;
+    uint64_t tmp;
+    stream << hex << s; 
+    stream >> tmp;
+    memcpy(&result, &tmp, sizeof(tmp));
+    return result;
+  }
+  string custom_dtos(double d){
+    if (IOMODE != IoMode::BINARY) {
+      return std::to_string(d);
+    }
+    stringstream stream;
+    int64_t tmp;
+    double tmp_value = d;
+    memcpy(&tmp, &tmp_value, sizeof(tmp_value));
+    stream << hex << tmp;
+    return stream.str();
+  }
 //VariableTypeToString
 string ColumnTypeToString(const IOStreamColumnType & columnType) {
 	string res;

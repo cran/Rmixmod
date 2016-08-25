@@ -43,6 +43,43 @@ namespace XEM {
   DomLabel::DomLabel(string & sFilename) : xmlpp::Document() {
     set_internal_subset(sFilename, "", "");
   }
+
+
+  DomLabel::DomLabel(LabelDescription* labelDescription, string str) : xmlpp::Document() {
+    _root = create_root_node("Label_or_Partition");
+    _root->set_namespace_declaration("http://www.w3.org/2001/XMLSchema-instance", "xsi");
+	//QDomText text;
+    xmlpp::Element* new_elt = NULL;
+	//Name
+	if ( !labelDescription->getInfoName().empty() ) {
+      new_elt = _root->add_child("Name");
+      new_elt->add_child_text(labelDescription->getInfoName());      
+	}
+
+	//NbSample
+    new_elt = _root->add_child("NbSample");
+    new_elt->add_child_text(std::to_string(labelDescription->getNbSample()));        
+    new_elt = _root->add_child("NbCluster");
+    new_elt->add_child_text(std::to_string(labelDescription->getNbCluster()));        
+    new_elt = _root->add_child("Format");
+    new_elt->add_child_text(FormatNumericFileToString(labelDescription->getFormat()));           
+    new_elt = _root->add_child("Type");
+    new_elt->add_child_text("label");        
+	//datafilename
+	labelDescription->saveNumericValues(str + ".txt");
+    new_elt = _root->add_child("Filename");
+    new_elt->add_child_text(str + ".txt");               
+	//writeListColumnNode(labelDescription->getAllColumnDescription());
+	//write new file .mxd to describe data
+    Glib::ustring filename = str + ".mxl";
+    removeIfExists(filename);
+    write_to_file(filename);    
+  }
+  /*
+  //Old style constructor, to be deleted ASAP
+  //NB:  Labels as Data representation is not suitable because zeroes are not allowed as
+  //qualitative data values but zeroes are valid label values in semi-supervized classification
+  //TO BE REMOVED ASAP
   DomLabel::DomLabel(LabelDescription* labelDescription, string str) : xmlpp::Document() {
     _root = create_root_node("Data");
     _root->set_namespace_declaration("http://www.w3.org/2001/XMLSchema-instance", "xsi");
@@ -73,11 +110,11 @@ namespace XEM {
 	writeListColumnNode(labelDescription->getAllColumnDescription());
 
 	//write new file .mxd to describe data
-    Glib::ustring filename = str + ".mxd";
+    Glib::ustring filename = str + ".mxl";
     removeIfExists(filename);
     write_to_file(filename);    
   }
-
+  */
   DomLabel::DomLabel(Partition * partition, string & sFilename) {
     //_root = createElement( "Partition" );
     _root = create_root_node("Partition");
@@ -114,8 +151,8 @@ namespace XEM {
   DomLabel::DomLabel(xmlpp::Element *root) {
     _root = create_root_node_by_import(root);
   }
-
-  unique_ptr<LabelDescription>  DomLabel::readLabel(string sFilename) {
+  
+  unique_ptr<LabelDescription>  DomLabel::readLabelAsData(string sFilename) {
   //-------
   //load file in variable "doc"
   //-------
@@ -233,7 +270,59 @@ namespace XEM {
 //                            format, dataFilename, sName);
   }
 
+  
+  
+  unique_ptr<LabelDescription>  DomLabel::readLabel(string sFilename) {
+  //-------
+  //load file in variable "doc"
+  //-------
+    xmlpp::DomParser parser;
+    parser.parse_file(sFilename);
+    xmlpp::Document *doc = parser.get_document();
+    xmlpp::Element *_root = doc->get_root_node();
+  
+    if(_root->get_name() != "Label_or_Partition") throw IOStreamErrorType::badElementInDataXML;
+    
+    //------------------------
+    //Declaration of variables
+    //------------------------
+    xmlpp::Element *elementName, *elementNbSample, *elementNbCluster, *elementFormat, 
+				*elementLabelFilename, *elementListColumn ;
 
+    //name
+    elementName = dynamic_cast<xmlpp::Element*>(_root->get_first_child("Name"));
+    string sName = elementName ? elementName->get_child_text()->get_content() : "";
+    //nbSample
+    elementNbSample = dynamic_cast<xmlpp::Element*>(_root->get_first_child("NbSample"));
+    int64_t nbSample = std::stoll(elementNbSample->get_child_text()->get_content());
+    //nbSample
+    elementNbCluster = dynamic_cast<xmlpp::Element*>(_root->get_first_child("NbCluster"));
+    int64_t nbCluster = std::stoll(elementNbCluster->get_child_text()->get_content());
+  
+    //Format
+    elementFormat = dynamic_cast<xmlpp::Element*>(_root->get_first_child("Format"));
+    FormatNumeric::FormatNumericFile format =
+      StringToFormatNumericFile(elementFormat->get_child_text()->get_content());
+    //Parameter Filename
+    elementLabelFilename = dynamic_cast<xmlpp::Element*>(_root->get_first_child("Filename"));
+    string dataFilename = elementLabelFilename->get_child_text()->get_content();
+    //ListColumn
+    //elementListColumn = _root.namedItem("ListColumn").toElement();
+    //elementListColumn = dynamic_cast<xmlpp::Element*>(_root->get_first_child("ListColumn"));
+    
+    //initialization of ColumnDescription vector
+    vector<ColumnDescription *> vColumnDescription(1);
+    QualitativeColumnDescription * column = new QualitativeColumnDescription(0, nbCluster);
+    string lab = "Label";
+    column->setName(lab);
+    vColumnDescription[0] = column;
+    unique_ptr<LabelDescription> newLabelDescription(new LabelDescription(nbSample, 1, vColumnDescription, format, dataFilename, sName));
+    return newLabelDescription;
+
+//  return new LabelDescription(nbSample, iNbColumn, vColumnDescription, 
+//                            format, dataFilename, sName);
+  }
+  
   void DomLabel::writeListColumnNode(const vector<ColumnDescription *> & vColumnDescription) {
 
 	//ListColumn

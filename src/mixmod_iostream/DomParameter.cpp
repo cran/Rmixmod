@@ -88,32 +88,28 @@ namespace XEM {
     removeIfExists(file);
     write_to_file(file);    
   }
-  
-  DomParameter::DomParameter(ClusteringInput* cInput, string sFilename) {
-    //ParameterDescription* parameterDescription = NULL;
-    Parameter * parameter = cInput->getStrategy()->getStrategyInit()->getInitParameter(0);
-    _root = create_root_node("Parameter");
-    _root->set_namespace_declaration("http://www.w3.org/2001/XMLSchema-instance", "xsi");
+  static void domParameterImpl(Input* cInput, Parameter * parameter, xmlpp::Element *root, string sFilename){
+    root->set_namespace_declaration("http://www.w3.org/2001/XMLSchema-instance", "xsi");
 	//text
     xmlpp::Element* new_elt = NULL;
 	//name 
 	/*if ( !parameterDescription->getInfoName().empty() ) {
-      new_elt = _root->add_child("Name");
+      new_elt = root->add_child("Name");
       new_elt->add_child_text(parameterDescription->getInfoName());      
       }*/
 
 	//NbVariable
-    new_elt = _root->add_child("NbVariable");
+    new_elt = root->add_child("NbVariable");
     new_elt->add_child_text(std::to_string(cInput->getPbDimension()));        
 	//NbCluster
-    new_elt = _root->add_child("NbCluster");
+    new_elt = root->add_child("NbCluster");
     new_elt->add_child_text(std::to_string(cInput->getNbCluster(0)));       
 	//Format
-    new_elt = _root->add_child("Format");
+    new_elt = root->add_child("Format");
     new_elt->add_child_text(FormatNumericFileToString(parameter->getFormat()));        
 	//Filename
 	//parameterDescription->saveNumericValues(sFilename + ".txt");
-    new_elt = _root->add_child("ParameterFilename");
+    new_elt = root->add_child("ParameterFilename");
     std::string parFilename = parameter->getFilename();
     if(parFilename != ""){
       new_elt->add_child_text(parFilename);
@@ -124,30 +120,47 @@ namespace XEM {
       new_elt->add_child_text(txtFile);
     }
 	//model
-    new_elt = _root->add_child("Model");
+    new_elt = root->add_child("Model");
     new_elt->add_child_text(ModelNameToString(parameter->getModelType()->getModelName()));           
 	if (isBinary(parameter->getModelType()->getModelName())) {
-      _root->set_attribute("type", "Qualitative", "xsi");
+      root->set_attribute("type", "Qualitative", "xsi");
 	}
 
 	//TODO: HeterogeneousParameter handling is still highly experimental
 	else if (isHeterogeneous(parameter->getModelType()->getModelName())) {
-      _root->set_attribute("type", "Composite", "xsi");
+      root->set_attribute("type", "Composite", "xsi");
 	}
 
 	else {
-      _root->set_attribute("type", "Quantitative", "xsi");
+      root->set_attribute("type", "Quantitative", "xsi");
 	}
 
-    string file = sFilename + ".mxp";
-    removeIfExists(file);
-    write_to_file(file);    
   }
   
   DomParameter::DomParameter(xmlpp::Element *root) {
     _root = create_root_node_by_import(root);
   }
 
+  DomParameter::DomParameter(ClusteringInput* cInput, string sFilename) {
+    //ParameterDescription* parameterDescription = NULL;
+    Parameter * parameter = cInput->getStrategy()->getStrategyInit()->getInitParameter(0);
+    _root = create_root_node("Parameter");
+    domParameterImpl(cInput, parameter, _root, sFilename);    
+    string file = sFilename + ".mxp";
+    removeIfExists(file);
+    write_to_file(file);    
+  }
+  DomParameter::DomParameter(PredictInput* pInput, string sFilename) {
+    //ParameterDescription* parameterDescription = NULL;
+    Parameter * parameter = pInput->getClassificationRule();
+    _root = create_root_node("Parameter");
+    domParameterImpl(pInput, parameter, _root, sFilename);    
+    string file = sFilename + ".mxp";
+    removeIfExists(file);
+    write_to_file(file);    
+  }
+
+  
   ParameterDescription * DomParameter::readParameter(string sFilename) {
 
 	//-------

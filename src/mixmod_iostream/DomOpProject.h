@@ -23,37 +23,51 @@
     All informations available on : http://www.mixmod.org                                                                                               
 ***************************************************************************/
 
-#ifndef XEM_DOMCLUSTERINGPROJECT_H
-#define XEM_DOMCLUSTERINGPROJECT_H
+#ifndef XEM_DOMOPPROJECT_H
+#define XEM_DOMOPPROJECT_H
 
 #include "mixmod_iostream/DomProject.h"
 
 namespace XEM {
-
+  class ClusteringMain;
 ///use to create .mixmod file in Clustering case
-class DomClusteringProject : public DomProject {
+  class DomOpProject : public DomProject {
 
 public : 
     
 	///constructor by default
-	DomClusteringProject();    
+	DomOpProject();    
 
 	///destructor
-	virtual ~DomClusteringProject();
+	virtual ~DomOpProject();
 
 	///constructor by initialization
-	DomClusteringProject(xmlpp::Element *root);
+	DomOpProject(xmlpp::Element *root);
 
 	///fill the xmlpp::Document to create the .mixmod file from a ClusteringInput and ClusteringOutput
-	void writeClustering(string & s, ClusteringMain * cMain);
-
+	//void writeClustering(string & s, ClusteringMain * cMain);    
+	void writeMixmodXml(string & s, ClusteringMain * cMain);
+	void writeMixmodXml(string & s, LearnMain * lMain);    
+    void writeMixmodXml(string& s, PredictMain * pMain);
 	///read a XML file and fill ClusteringInput
-	void readClustering(ClusteringInput * cInput);
-
+	//void readClustering(ClusteringInput * cInput);
+	void readXmlFillIn(ClusteringInput * cInput);
+	//void readXmlFillIn(LearnInput * cInput);        
+    template<class T>
+    void readXmlFillIn(T  *cInput);
+    PredictInput * readXmlPredictInput();
+    //template<class ClusteringInput*>
+    //void readXmlFillIn(ClusteringInput *cInput);          
 	///read a XML file and fill ClusteringOutput
-	void readClustering(ClusteringOutput * cOutput);
+	//void readClustering(ClusteringOutput * cOutput);
+    //void readXmlFillOut(ClusteringOutput * cOutput);
+    //void readXmlFillOut(LearnOutput * cOutput);
+    template<typename T, typename U>
+      void readXmlFillOut(T  * cOutput );
+    //template<typename T>    
+    //void readXmlFillOut(T * cOutput);    
 };
 
 } //end namespace
 
-#endif // XEM_DOMCLUSTERINGPROJECT_H
+#endif // XEM_DOMOPPROJECT_H

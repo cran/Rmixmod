@@ -33,14 +33,27 @@
 
 #include "mixmod/Clustering/ClusteringInput.h"
 #include "mixmod/Clustering/ClusteringOutput.h"
+//#include "mixmod/Clustering/ClusteringInput.h"
+#include "mixmod/Clustering/ClusteringOutput.h"
+
+// DiscriminantAnalysis
+#include "mixmod/DiscriminantAnalysis/Learn/LearnInput.h"
+#include "mixmod/DiscriminantAnalysis/Learn/LearnMain.h"
+#include "mixmod/DiscriminantAnalysis/Learn/LearnOutput.h"
+#include "mixmod/DiscriminantAnalysis/Predict/PredictInput.h"
+#include "mixmod/DiscriminantAnalysis/Predict/PredictMain.h"
+#include "mixmod/DiscriminantAnalysis/Predict/PredictOutput.h"
 #include "mixmod/Utilities/Util.h"
+
+
 
 namespace XEM {
 
   const string XML_RESOURCES_PATH = XEM_RESOURCES_PATH;
   
-class ClusteringMain;
-
+  class ClusteringMain;
+  class LearnMain;
+ 
 enum class IOStreamFormat {
 	XML,
 	FLAT // old format (flat format)
@@ -75,42 +88,54 @@ enum class IOStreamErrorType {
 	notAbsoluteFileDataName
 };
 
-enum class IOStreamXMLFile {
-	Project,
-	Data,
-	Partition,
-	Parameter,
-	Weights
-};
+ enum class IOStreamXMLFile {
+   Project,
+     Data,
+     Partition,
+     Parameter,
+     Weights,
+     Label            
+     };
 
 //IOStreamErrorTypeToString
 string IOStreamErrorTypeToString(const IOStreamErrorType & errorType);
 
 ///read input and output data
-ClusteringMain * IStream(const std::string& s, 
+ClusteringMain * IStream(const std::string& s, //OBSOLETE!!
 		IOStreamFormat format = defaultIOStreamFormat, bool bOnlyInput = false, IoMode iomode = IoMode::NUMERIC);
 
 ///read input data in XML
-ClusteringMain * IStream_XML(const string & s, bool bOnlyInput);
+ ClusteringMain * IStream_XML(const string & s, bool bOnlyInput); //OBSOLETE!!
+ ClusteringMain * IStream_XML_Clustering(const string & s, bool bOnlyInput, IoMode iomode = IoMode::NUMERIC);
+ LearnMain * IStream_XML_Learn(const string & s, bool bOnlyInput, IoMode iomode = IoMode::NUMERIC);
+ PredictMain * IStream_XML_Predict(const string & s, bool bOnlyInput, IoMode iomode = IoMode::NUMERIC);  
+ClusteringMain * OLD_IStream_XML(const string & s, bool bOnlyInput);
+
+ 
 
 ///read input data in FLAT
 ClusteringMain * IStream_FLAT(const string & s);
 
 ///validate schema according to XML File
-void ValidateSchema(const string& s, const IOStreamXMLFile& xmlFile);
+ void ValidateSchema(const string& s, const IOStreamXMLFile& xmlFile, bool verbose=true);
 
 ///write input and output Data
 void OStream(const string& s, IOStreamFormat format = defaultIOStreamFormat,
 		ClusteringMain* cMain = NULL, IoMode iomode = IoMode::NUMERIC);
 
 ///write input and output Data in XML for clustering study
-void OStream_Clustering_XML(const string & s, ClusteringMain * cMain);
+template<class T>
+void OStream_XML(const string & s, T * cMain, IoMode iomode = IoMode::NUMERIC);
 
 ///write output Data in FLAT format (txt) for clustering study
 void OStream_Clustering_FLAT(ClusteringMain * cMain);
 
 void OStream_DiscriminantAnalysis_XML(const string & s, ClusteringMain * cMain);
 
+// Tools for floats
+ double custom_stod(string s);
+ string custom_dtos(double); 
+ 
 //VariableTypeToString
 string ColumnTypeToString(const IOStreamColumnType & columnType);
 

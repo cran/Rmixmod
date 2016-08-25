@@ -95,7 +95,7 @@
 #include "mixmod/Matrix/Matrix.h"
 #ifdef RMIXMOD_XML
 #include "mixmod_iostream/IOStreamUtil.h"
-#include "mixmod_iostream/DomClusteringProject.h"
+//#include "mixmod_iostream/DomClusteringProject.h"
 #endif
 #include <Rcpp.h>
 
@@ -112,7 +112,7 @@
  */
 RcppExport SEXP clusteringMain( SEXP xem )
 {
-BEGIN_RCPP
+  BEGIN_RCPP
   std::unique_ptr<XEM::ClusteringMain> cMain; //(cInput.get());
  std::unique_ptr<XEM::ClusteringInput> cInput; //(new XEM::ClusteringInput(clusterArray, *dataDescription)); 
  // wrap S4 object
@@ -246,43 +246,93 @@ BEGIN_RCPP
     cMain.reset(XEM::IStream(xmlInput, XEM::IOStreamFormat::XML, false, iomode));
     //cMain.reset(XEM::IStream_XML(xmlInput, false));
     //cMain.reset(XEM::IStream(xmlInput, XEM::IOStreamFormat::XML, false, XEM::IoMode::BINARY));
+    cInput.reset(dynamic_cast<XEM::ClusteringInput*>(cMain->getInput()));
     Rcpp::S4 params(iResults.slot("parameters"));
-    switch(cMain->getInput()->getDataType()){
+    switch(cInput->getDataType()){
     case XEM::QuantitativeData:
       iResults.slot("parameters") = params.slot("g_parameter");
       mixmodClustering.slot("dataType") = Rcpp::StringVector("quantitative");
+      mixmodClustering.slot("models") = XmlInObj.slot("gaussianModel");
       break;
     case XEM::QualitativeData:
       iResults.slot("parameters") = params.slot("m_parameter");
-      mixmodClustering.slot("dataType") = Rcpp::StringVector("qualitative");      
+      mixmodClustering.slot("dataType") = Rcpp::StringVector("qualitative");
+      mixmodClustering.slot("models") = XmlInObj.slot("multinomialModel");
       break;
     case XEM::HeterogeneousData:
-      mixmodClustering.slot("dataType") = Rcpp::StringVector("composite");      
+      mixmodClustering.slot("dataType") = Rcpp::StringVector("composite");
+      mixmodClustering.slot("models") = XmlInObj.slot("compositeModel");
       break;
     }
-    Rcpp::NumericVector vectorNbCluster(cMain->getInput()->getNbClusterSize());
-    for(int i=0;i<cMain->getInput()->getNbClusterSize();i++) vectorNbCluster(i) = cMain->getInput()->getNbCluster(i);
+    Rcpp::NumericVector vectorNbCluster(cInput->getNbClusterSize());
+    for(int i=0;i<cInput->getNbClusterSize();i++) vectorNbCluster(i) = cInput->getNbCluster(i);
     mixmodClustering.slot("nbCluster") = vectorNbCluster;
-    Rcpp::StringVector vectorCrit(cMain->getInput()->getNbCriterion());
-    for(int i=0;i<cMain->getInput()->getNbCriterion();i++) vectorCrit(i) = CriterionNameToString(cMain->getInput()->getCriterionName(i));
+    Rcpp::StringVector vectorCrit(cInput->getNbCriterion());
+    for(int i=0;i<cInput->getNbCriterion();i++) vectorCrit(i) = CriterionNameToString(cInput->getCriterionName(i));
     mixmodClustering.slot("criterion") =  vectorCrit;
-    mixmodClustering.slot("nbSample") = Rcpp::NumericVector(1,cMain->getInput()->getNbSample());
-    mixmodClustering.slot("nbVariable") = Rcpp::NumericVector(1,cMain->getInput()->getPbDimension());
+    mixmodClustering.slot("nbSample") = Rcpp::NumericVector(1,cInput->getNbSample());
+    mixmodClustering.slot("nbVariable") = Rcpp::NumericVector(1,cInput->getPbDimension());
     Rcpp::S4 strategy(mixmodClustering.slot("strategy"));
-    Rcpp::StringVector vectorAlgo(cMain->getInput()->getStrategy()->getNbAlgo());
-    for(int i=0;i<cMain->getInput()->getStrategy()->getNbAlgo();i++) vectorAlgo(i) = AlgoNameToString(cMain->getInput()->getStrategy()->getAlgo(i)->getAlgoName());
+    Rcpp::StringVector vectorAlgo(cInput->getStrategy()->getNbAlgo());
+    for(int i=0;i<cInput->getStrategy()->getNbAlgo();i++) vectorAlgo(i) = AlgoNameToString(cInput->getStrategy()->getAlgo(i)->getAlgoName());
     strategy.slot("algo") = vectorAlgo;
-    strategy.slot("nbTry") = Rcpp::NumericVector(1,cMain->getInput()->getStrategy()->getNbTry());
-    strategy.slot("initMethod") = Rcpp::StringVector(StrategyInitNameToStringApp(cMain->getInput()->getStrategy()->getStrategyInit()->getStrategyInitName()));
-    strategy.slot("nbTryInInit") = Rcpp::NumericVector(1,cMain->getInput()->getStrategy()->getNbTryInInit());
-    strategy.slot("nbIterationInInit") = Rcpp::NumericVector(1,cMain->getInput()->getStrategy()->getNbIterationInInit());
-    strategy.slot("epsilonInInit") = Rcpp::NumericVector(1,cMain->getInput()->getStrategy()->getEpsilonInInit());
-    strategy.slot("nbIterationInAlgo") = Rcpp::NumericVector(1,cMain->getInput()->getStrategy()->getAlgo(0)->getNbIteration());
-    strategy.slot("epsilonInAlgo") = Rcpp::NumericVector(1,cMain->getInput()->getStrategy()->getAlgo(0)->getEpsilon());
+    strategy.slot("nbTry") = Rcpp::NumericVector(1,cInput->getStrategy()->getNbTry());
+    strategy.slot("initMethod") = Rcpp::StringVector(StrategyInitNameToStringApp(cInput->getStrategy()->getStrategyInit()->getStrategyInitName()));
+    strategy.slot("nbTryInInit") = Rcpp::NumericVector(1,cInput->getStrategy()->getNbTryInInit());
+    strategy.slot("nbIterationInInit") = Rcpp::NumericVector(1,cInput->getStrategy()->getNbIterationInInit());
+    strategy.slot("epsilonInInit") = Rcpp::NumericVector(1,cInput->getStrategy()->getEpsilonInInit());
+    strategy.slot("nbIterationInAlgo") = Rcpp::NumericVector(1,cInput->getStrategy()->getAlgo(0)->getNbIteration());
+    strategy.slot("epsilonInAlgo") = Rcpp::NumericVector(1,cInput->getStrategy()->getAlgo(0)->getEpsilon());
     if(seed>=0){
       strategy.slot("seed") = mixmodClustering.slot("seed");
     }
     mixmodClustering.slot("strategy") = strategy;
+    // labels ...
+    if (cInput->getKnownLabelDescription()) {
+      if (cInput->getKnownPartition()) {
+        // knowPartition and knownLabelDescription can't be both not NULL !
+        THROW(XEM::OtherException, XEM::internalMixmodError);
+      }
+      const std::vector<int64_t> & labels = cInput->getKnownLabelDescription()->getLabel()->getLabel();
+      Rcpp::NumericVector labelsNV(labels.size());
+      for(int64_t i=0;i<labels.size();++i){
+        labelsNV(i) = labels[i];
+      }
+
+      mixmodClustering.slot("knownLabels") = labelsNV;
+    }
+    // ... or partition
+    if (cInput->getKnownPartition()) {
+      //std::vector<int64_t> labels(cInput->getNbSample());
+      Rcpp::NumericVector labelsNV(cInput->getNbSample());
+      int64_t** tv = cInput->getKnownPartition()->getTabValue();
+      for(int64_t i=0;i<cInput->getNbSample();i++){
+        int64_t label_i = 0;
+        for(int64_t j=0;j<cInput->getNbCluster()[0];j++){
+          label_i += tv[i][j]*(j+1);
+        }
+        labelsNV(i) = label_i;
+      }
+      mixmodClustering.slot("knownLabels") = labelsNV;
+    }
+    // weight
+    if(cInput->getData()->getWeight()){
+      Rcpp::NumericVector weightNV(cInput->getNbSample());
+      for(int64_t i=0;i<weightNV.size();++i){
+        weightNV(i) = cInput->getData()->getWeightI(i);
+      }
+      mixmodClustering.slot("weight") = weightNV;
+    }
+
+    // models
+    std::vector<XEM::ModelType*> modelTypeV = cInput->getModelType();
+    
+    Rcpp::StringVector modelsV(modelTypeV.size());
+    for(int64_t i=0;i<modelTypeV.size();++i){
+      modelsV(i) = XEM::ModelNameToString(modelTypeV[i]->getModelName());
+    }
+    Rcpp::S4 slotModels(mixmodClustering.slot("models"));
+    slotModels.slot("listModels") = modelsV;
 
     /*
 #c@strategy     c@data         c@factor       c@knownLabels  c@nbVariable   c@criterion    c@error        c@xmlIn
@@ -312,7 +362,21 @@ c@strategy@nbIterationInAlgo
   //cout<<"trace is..... "<<trace<<endl;  
   // xmain run
   if(!conversionOnly){
-    cMain->run(seed, XEM::IoMode::NUMERIC, trace, massiccc);
+    try{
+      cMain->run(seed, XEM::IoMode::NUMERIC, trace, massiccc);
+    }
+    catch(XEM::OtherException & e){
+      // The following "if" (based on what()) is FRAGILE! SO:
+      // TO DO ASAP (when mixmodLib were available):
+      // * activate (uncomment) if(e.getErrorType()...) instead of:
+      /// if(std::string(e.what())=...)
+      if(std::string(e.what())=="All models got errors"){
+      //if(e.getErrorType()==XEM::AllModelsGotErros){
+        mixmodClustering.slot("error") = true;
+        return mixmodClustering;
+      }
+      throw;
+    }
   } //else {
     //cout<<"********************************** CONVERSION ONLY ********************************"<<endl;  
   //}
@@ -341,13 +405,13 @@ c@strategy@nbIterationInAlgo
     Rcpp::List resList(cOutput->getNbClusteringModelOutput());
     // loop over all estimation
     for ( int i=0; i<cOutput->getNbClusteringModelOutput(); i++ )
-    {
-      // create the output object for R
-      //ClusteringOutputHandling(cOutput->getClusteringModelOutput(i), iResults,cMain->getInput()->getDataType(), Rcriterion);
-      ClusteringOutputHandling(cOutput->getClusteringModelOutput(i), iResults,cMain->getInput()->getDataType(), cMain->getInput()->getCriterionName());      
-      // add those results to the list
-      resList[i] = Rcpp::clone(iResults);
-    } 
+      {
+        // create the output object for R
+        //ClusteringOutputHandling(cOutput->getClusteringModelOutput(i), iResults,cMain->getInput()->getDataType(), Rcriterion);
+        ClusteringOutputHandling(cOutput->getClusteringModelOutput(i), iResults,cMain->getInput()->getDataType(), cMain->getInput()->getCriterionName());      
+        // add those results to the list
+        resList[i] = Rcpp::clone(iResults);
+      } 
     // add all results
     mixmodClustering.slot("results") = resList;
     // TODO: if no criterion...
@@ -362,10 +426,9 @@ c@strategy@nbIterationInAlgo
   mixmodClustering.slot("error") = !cOutput->atLeastOneEstimationNoError();
   
   //std::cout << "Output finished" << std::endl;
-  
+
   // return final output
   return mixmodClustering;
-
-END_RCPP
+  END_RCPP  
 
 }

@@ -32,39 +32,53 @@
 #include "mixmod/Kernel/IO/Partition.h"
 
 namespace XEM {
-
+struct NumericPartitionInfo {
+  NumericPartitionFile partitionFile;
+  int64_t nbSample;
+  int64_t nbCluster;
+};
 ///Input node in .mixmod file in case clustering
-class NodeClusteringInput : public NodeInput {
+class NodeOpInput : public NodeInput {
 
 public:
 
 	///Constructor & Destructor
-	NodeClusteringInput();
-	~NodeClusteringInput();
-	NodeClusteringInput(ClusteringInput * input, string & s);
-	NodeClusteringInput(xmlpp::Element * rootInput);
+	NodeOpInput();
+	~NodeOpInput();
+	NodeOpInput(ClusteringInput * input, string & s);
+	NodeOpInput(LearnInput * input, string & s);    
+	NodeOpInput(PredictInput * input, string & s);    
+	NodeOpInput(xmlpp::Element * rootInput);
 
 	///writer node
-	void writeListModel(ClusteringInput * input);
+	void writeListModel(Input * input);
 	void writeNbClusterNode(ClusteringInput * input);
 	void writeStrategyNode(ClusteringInput * input, string & s);
 	void writeAlgoNode(xmlpp::Element *listAlgo, const Algo * algo);
 	void writeInitNode(xmlpp::Element *strategyElement, ClusteringInput * input, string & s);
-	void writeCriterionNode(ClusteringInput * input);
+	void writeCriterionNode(Input * input);
 	void writePartitionNode(ClusteringInput * input, string & s);
-	void writeWeightsNode(ClusteringInput * input, string & s);
-
+	void writePartitionNode(LearnInput * input, string & s);
+	void writeWeightsNode(Input * input, string & s);
+    void writeNbCVBlocks(LearnInput *input);
+    void writeParameterNode(PredictInput * input, string & s);
 	///read Node
-	void readClustering(ClusteringInput & input);
-
-	void readModelNode(ClusteringInput & input);
+	void readXmlCommand(ClusteringInput & input);
+	void readXmlCommand(LearnInput & input);    
+    PredictInput * readXmlPredictInput();
+    void readNbCVBlocksNode(LearnInput & input);
+	void readModelNode(Input & input);
 	void readStrategyNode(ClusteringInput & input);
 	void readAlgoNode(ClusteringStrategy * strat, xmlpp::Element * n);
 	void readInitNode(ClusteringStrategy * strat, xmlpp::Element * n);
-	void readCriterionNode(ClusteringInput & input);
-	void readPartitionNode(ClusteringInput & input);
-	void readWeightsNode(ClusteringInput & input);
+	void readCriterionNode(Input & input);
+	int64_t readPartitionNode(ClusteringInput & input);
+	void readPartitionNode(LearnInput & input);
+	//LabelDescription & readPartitionNode();        
+	void readWeightsNode(Input & input);
     static void setInitPartition(string sFilename, ClusteringStrategy * strat);
+ private:
+    void readPartitionNodeImpl(NumericPartitionInfo & partitionFile, xmlpp::Element *elementPartition);
 };
 
 } //end namespace

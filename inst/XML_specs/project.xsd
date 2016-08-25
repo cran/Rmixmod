@@ -57,28 +57,26 @@ end removed -->
                 </xsd:complexContent>
         </xsd:complexType>
         <!--End Project-->
+        <xsd:complexType name="SelectVariableType">
+          <xsd:sequence>
+            <xsd:choice>
+              <xsd:element name="Variable" type="xsd:positiveInteger" maxOccurs="unbounded"/>
+              <xsd:element name="ALL"/>
+            </xsd:choice>
+          </xsd:sequence>
+        </xsd:complexType>
+        <xsd:complexType name="SelectIndividualType">
+          <xsd:sequence>
+            <xsd:element name="Individual" type="xsd:positiveInteger" maxOccurs="unbounded"/>
+          </xsd:sequence>
+        </xsd:complexType>
         
         <!-- Input Type -->
         <xsd:complexType name="InputType">
                 <xsd:sequence>
-                        <xsd:element name="Data" type="xsd:string"/>
-                        <xsd:element name="SelectVariable" minOccurs="0">
-                                <xsd:complexType>
-                                        <xsd:sequence>
-                                                <xsd:choice>
-                                                        <xsd:element name="Variable" type="xsd:positiveInteger" maxOccurs="unbounded"/>
-                                                        <xsd:element name="ALL"/>
-                                                </xsd:choice>
-                                        </xsd:sequence>
-                                </xsd:complexType>
-                        </xsd:element>
-                        <xsd:element name="SelectIndividual" minOccurs="0">
-                                <xsd:complexType>
-                                        <xsd:sequence>
-                                                <xsd:element name="Individual" type="xsd:positiveInteger" maxOccurs="unbounded"/>
-                                        </xsd:sequence>
-                                </xsd:complexType>
-                        </xsd:element>
+                        <xsd:element name="Data" type="xsd:anyURI"/>
+                        <xsd:element name="SelectVariable" type="SelectVariableType" minOccurs="0"/>
+                        <xsd:element name="SelectIndividual" type="SelectIndividualType" minOccurs="0"/>
                         <xsd:element minOccurs="0" name="ListModel" type="ListModelType"/>
                 </xsd:sequence>
         </xsd:complexType>
@@ -93,7 +91,7 @@ end removed -->
                             <xsd:element minOccurs="0" name="Strategy" type="StrategyType"/>
                             <xsd:element minOccurs="0" name="ListCriterion" type="ClusteringListCriterion"/>
                             <xsd:element minOccurs="0" name="Partition" type="xsd:anyURI"/>
-                            <xsd:element minOccurs="0" name="Weights" type="xsd:string"/>
+                            <xsd:element minOccurs="0" name="Weights" type="xsd:anyURI"/>
                           </xsd:sequence>
                         </xsd:extension>
                 </xsd:complexContent>
@@ -122,8 +120,8 @@ end removed -->
                                   <xsd:element name="Partition" type="xsd:anyURI"/>
                                  <!--xsd:element minOccurs="0" name="ListModel" type="ListModelType" (inherited) /-->
                                  <xsd:element minOccurs="0" name="ListCriterion" type="LearnListCriterion"/>
-                                 <xsd:element minOccurs="0" name="nbCVBlocks" type="xsd:positiveInteger"/>
-                                 <xsd:element minOccurs="0" name="Weights" type="xsd:string"/>
+                                 <xsd:element minOccurs="0" name="NbCVBlocks" type="xsd:positiveInteger"/>
+                                 <xsd:element minOccurs="0" name="Weights" type="xsd:anyURI"/>
                     <!-- ENLEVé: xsd:element minOccurs="0" name="Parameter" type="xsd:string"/ -->
                                 </xsd:sequence>
                         </xsd:extension>
@@ -133,6 +131,7 @@ end removed -->
         <xsd:complexType name="PredictInputType"> <!--il n'est pas extension de InputType! -->          
           <xsd:sequence>
             <xsd:element name="DataToClassify" type="xsd:anyURI"/>
+            <xsd:element name="SelectVariable" type="SelectVariableType" minOccurs="0"/>
             <xsd:element name="Parameter" type="xsd:anyURI"/>
             <!-- c'est un bon choix, une alternative serait d'avoir (à la place du paremeter) un OutputType (comme on le fait dans R). Mais c'est certainement moins souple-->
           </xsd:sequence>
@@ -627,20 +626,26 @@ end removed -->
                         
                 </xsd:sequence>
         </xsd:complexType>
+        <xsd:simpleType name="ListOfPositiveIntType">
+          <xsd:list itemType="xsd:positiveInteger"/>
+        </xsd:simpleType>
+        <xsd:simpleType name="ListOfNNIntType">
+          <xsd:list itemType="xsd:nonNegativeInteger"/>
+        </xsd:simpleType>
         <xsd:complexType name="VectOfIntType">
         <xsd:sequence>
-        <xsd:element name="cell" type="xsd:positiveInteger"  maxOccurs="unbounded"/>
+        <xsd:element name="cell" type="xsd:nonNegativeInteger"  maxOccurs="unbounded"/>
         </xsd:sequence>        
         </xsd:complexType>
-       <xsd:complexType name="MatrixOfIntType">
+       <xsd:complexType name="MatrixOfNNIntType">
         <xsd:sequence>
-        <xsd:element name="row" type="VectOfIntType"  maxOccurs="unbounded"/>
+        <xsd:element name="row" type="ListOfNNIntType"  maxOccurs="unbounded"/>
         </xsd:sequence>        
         </xsd:complexType>       
          <xsd:complexType name="MAPType">
                 <xsd:sequence>
-                        <xsd:element name="errorRate"  type="DoubleOrHex"/>
-                       <xsd:element name="classification" type="MatrixOfIntType"/>
+                        <xsd:element name="ErrorRate"  type="DoubleOrHex"/>
+                       <xsd:element name="Classification" type="MatrixOfNNIntType"/>
                                                 
                 </xsd:sequence>        
         </xsd:complexType>
@@ -648,9 +653,10 @@ end removed -->
         <xsd:group name="LearnOutputGroup">
                   <xsd:sequence>
   <xsd:group ref="OutputGroup"/>
- <xsd:element name="CVLabels" minOccurs="0" type="VectOfIntType"/>
+ <xsd:element name="CVLabels" minOccurs="0" type="ListOfPositiveIntType"/>
 <xsd:element name="CVClassification" minOccurs="0" type="MAPType"/>
 <xsd:element name="MapClassification" type="MAPType"/>
+
                   </xsd:sequence>
         </xsd:group>
  <!-- List Predict Output Type -->
@@ -663,12 +669,12 @@ end removed -->
         <!-- Output Type -->        
         <xsd:complexType name="PredictOutputType">
          <xsd:choice>
-<xsd:element ref="Error"/>
-                      <xsd:sequence>
-                        <xsd:element name="Label" type="xsd:string"/>
-                        <xsd:element name="Proba" type="xsd:string"/>
-                  </xsd:sequence>
-              </xsd:choice>
+           <xsd:element ref="Error"/>
+           <xsd:sequence>
+             <xsd:element name="Label" type="xsd:anyURI"/>
+             <xsd:element name="Proba" type="xsd:anyURI"/>
+           </xsd:sequence>
+         </xsd:choice>
         </xsd:complexType>
         
 

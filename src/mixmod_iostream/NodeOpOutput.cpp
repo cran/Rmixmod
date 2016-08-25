@@ -1,5 +1,5 @@
 /***************************************************************************
-							 SRC/MIXMOD_IOSTREAM/XEMNodeClusteringOutput.cpp  description
+							 SRC/MIXMOD_IOSTREAM/XEMNodeOpOutput.cpp  description
 	copyright            : (C) MIXMOD Team - 2001-2011
 	email                : contact@mixmod.org
  ***************************************************************************/
@@ -23,33 +23,48 @@
 	All informations available on : http://www.mixmod.org                                                                                               
  ***************************************************************************/
 
-#include "mixmod_iostream/NodeClusteringOutput.h"
+#include "mixmod_iostream/NodeOpOutput.h"
 #include "mixmod_iostream/DomParameter.h"
 #include "mixmod_iostream/DomLabel.h"
 #include "mixmod_iostream/DomProba.h"
 #include "mixmod/Kernel/Model/ModelType.h"
 #include "mixmod/Kernel/Criterion/CriterionOutput.h"
 #include "mixmod/Clustering/ClusteringModelOutput.h"
+#include "mixmod/DiscriminantAnalysis/Learn/LearnModelOutput.h"
+#include "mixmod/DiscriminantAnalysis/Predict/PredictModelOutput.h"
+#include "mixmod/Kernel/IO/Label.h"
 
 namespace XEM {
 
-  NodeClusteringOutput::NodeClusteringOutput() : NodeOutput() {
+  NodeOpOutput::NodeOpOutput() : NodeOutput() {
   }
 
-  NodeClusteringOutput::~NodeClusteringOutput() {
+  NodeOpOutput::~NodeOpOutput() {
   }
 
-  NodeClusteringOutput::NodeClusteringOutput(ClusteringOutput * output, string & s) : NodeOutput() {
+  NodeOpOutput::NodeOpOutput(ClusteringOutput * output, string & s) : NodeOutput() {
 	for (int64_t i = 0; i < output->getNbClusteringModelOutput(); ++i) {
       writeOutput(output->getClusteringModelOutput(i), output->getCriterionName(), s, i + 1);
 	}
   }
+  NodeOpOutput::NodeOpOutput(LearnOutput * output, const std::vector<CriterionName> & criterionName, string & s) : NodeOutput() {
+	for (int64_t i = 0; i < output->getNbLearnModelOutput(); ++i) {
+      writeOutput(output->getLearnModelOutput(i), criterionName, s, i + 1);
+	}
+  }
+  NodeOpOutput::NodeOpOutput(PredictOutput * output, string & s) : NodeOutput() {
+    auto vect = output->getPredictModelOutput();
+	for (int64_t i = 0; i < vect.size(); ++i) {
+      writePredictOutput(vect[i], s, i + 1);
+	}
+  }
 
-  NodeClusteringOutput::NodeClusteringOutput( xmlpp::Element *rootOutput ) : NodeOutput(rootOutput) {
+  NodeOpOutput::NodeOpOutput( xmlpp::Element *rootOutput ) : NodeOutput(rootOutput) {
   }
 
   //read the clustering to fill XEMOutput
-  ClusteringModelOutput * NodeClusteringOutput::readClustering() {
+  template<class T>
+  T * NodeOpOutput::read4Output() {
 
 	//model
     xmlpp::Element *elementModel = dynamic_cast<xmlpp::Element*>(_rootOutput->get_first_child("Model"));
@@ -66,7 +81,7 @@ namespace XEM {
       
       Exception error = Exception(elementError->get_child_text()->get_content());
 
-      return new ClusteringModelOutput(modelType, nbCluster, error);
+      return new T(modelType, nbCluster, error);
 	}
 	else {
       //Criterion
@@ -91,7 +106,7 @@ namespace XEM {
         else {
           //criterion Value
           xmlpp::Element* cvElt = dynamic_cast<xmlpp::Element*>(elementOutputCriterion->get_first_child("CriterionValue"));
-          if (IOMODE == IoMode::BINARY) {
+          /*if (IOMODE == IoMode::BINARY) {
             stringstream stream;
             uint64_t tmp;
             stream << hex << cvElt->get_child_text()->get_content(); 
@@ -100,7 +115,8 @@ namespace XEM {
           }
           else {
             criterionValue = std::stod(cvElt->get_child_text()->get_content()); 
-          }
+            }*/
+          criterionValue = custom_stod(cvElt->get_child_text()->get_content()); 
           //.toElement().text().toDouble();
         }
 
@@ -110,8 +126,8 @@ namespace XEM {
 
       //likelihood
       xmlpp::Element *elementLikelihood = dynamic_cast<xmlpp::Element*>(_rootOutput->get_first_child("Likelihood"));
-      double likelihood;
-      if (IOMODE == IoMode::BINARY) {
+      double likelihood = custom_stod(elementLikelihood->get_child_text()->get_content());
+      /*if (IOMODE == IoMode::BINARY) {
         stringstream stream;
         uint64_t tmp;
         stream << hex << elementLikelihood->get_child_text()->get_content(); 
@@ -120,7 +136,7 @@ namespace XEM {
       }
       else {
         likelihood = std::stod(elementLikelihood->get_child_text()->get_content());
-      }
+        }*/
       //Parameter
       xmlpp::Element *elementParameter = dynamic_cast<xmlpp::Element*>(_rootOutput->get_first_child("Parameter"));
 
@@ -144,13 +160,16 @@ namespace XEM {
       //ParameterDescription & parameterDescription, LabelDescription & labelDescription,  
       //ProbaDescription & probaDescription);
 
-      return new ClusteringModelOutput(modelType, nbCluster, vCriterionOutput, 
+      return new T(modelType, nbCluster, vCriterionOutput, 
                                        likelihood, *readParameter(parameterFilename), 
                                        *readLabel(labelFilename), *readProba(probaFilename));
 	}
   }
+  template ClusteringModelOutput *  NodeOpOutput::read4Output<ClusteringModelOutput>();
+  template LearnModelOutput *  NodeOpOutput::read4Output<LearnModelOutput>();
+  template PredictModelOutput *  NodeOpOutput::read4Output<PredictModelOutput>();    
 
-  ParameterDescription * NodeClusteringOutput::readParameter(string sFilename) {
+  ParameterDescription * NodeOpOutput::readParameter(string sFilename) {
 	ValidateSchema(sFilename, IOStreamXMLFile::Parameter);
     //throw IOStreamErrorType::badLoadXML;
 
@@ -159,16 +178,23 @@ namespace XEM {
 	return parameter.readParameter(sFilename);
   }
 
-  unique_ptr<LabelDescription>  NodeClusteringOutput::readLabel(string sFilename) {
-	ValidateSchema(sFilename, IOStreamXMLFile::Data);
-    //throw IOStreamErrorType::badLoadXML;
-
-	DomLabel label;
-
-	return label.readLabel(sFilename);
+  unique_ptr<LabelDescription>  NodeOpOutput::readLabel(string sFilename) {
+    DomLabel label;
+    try{
+      ValidateSchema(sFilename, IOStreamXMLFile::Label, false);
+      return label.readLabel(sFilename);
+    }
+    catch(IOStreamErrorType &e){
+      //that's because NR tests still contain obsolete Labels represented as (qualitative) Data
+      //NB:  Labels as Data representation is not suitable because zeroes are not allowed as
+      //qualitative data values but zeroes are valid label values in semi-supervized classification
+      //TO BE REMOVED ASAP
+      ValidateSchema(sFilename, IOStreamXMLFile::Data);
+      return label.readLabelAsData(sFilename);
+    }
   }
 
-  unique_ptr<ProbaDescription> NodeClusteringOutput::readProba(string sFilename) {
+  unique_ptr<ProbaDescription> NodeOpOutput::readProba(string sFilename) {
 	ValidateSchema(sFilename, IOStreamXMLFile::Data);
     //throw IOStreamErrorType::badLoadXML;
 
@@ -176,8 +202,79 @@ namespace XEM {
 
 	return proba.readProba(sFilename);
   }
+  template <class T>
+  static std::string join(T vect, int64_t sz,  std::string sep){
+    std::stringstream acc;
+    for(int64_t i = 0; i < sz; i++){
+      if(i > 0)
+        acc << sep;
+      acc << std::to_string(vect[i]);
+    }
+    return acc.str();
+  }
+  template std::string join(std::vector<int64_t> vect, int64_t sz,  std::string sep);
+  template std::string join(int64_t* vect, int64_t sz,  std::string sep);
+  
+  void NodeOpOutput::writeOutputExt(ClusteringModelOutput* output,  xmlpp::Element *outputElement){}
+  void NodeOpOutput::writeOutputExt(LearnModelOutput* output,  xmlpp::Element *outputElement){
+    /*      <xsd:group name="LearnOutputGroup">
+            <xsd:sequence>
+            <xsd:group ref="OutputGroup"/>
+            <xsd:element name="CVLabels" minOccurs="0" type="VectOfIntType"/>
+            <xsd:element name="CVClassification" minOccurs="0" type="MAPType"/>
+            <xsd:element name="MapClassification" type="MAPType"/>
+            <xsd:element name="MapErrorRate" type="DoubleOrHex"/>
+            </xsd:sequence>
+            </xsd:group>
+    */
 
-  void NodeClusteringOutput::writeOutput(ClusteringModelOutput* output, 
+
+    std::vector<int64_t> labels = output->getLabelDescription()->getLabel()->getLabel();
+    int64_t nbCluster = output->getNbCluster();
+    if(output->getCVLabel()){
+      //<xsd:element name="CVLabels" minOccurs="0" type="VectOfIntType"/>
+      std::vector<int64_t> cvLabels = output->getCVLabel()->getLabel()->getLabel();      
+      xmlpp::Element *cvElement = outputElement->add_child("CVLabels");
+      /*for(int64_t i=0;i<cvLabels.size();i++){
+        xmlpp::Element *cellElement = cvElement->add_child("cell");
+        cellElement->add_child_text(std::to_string(cvLabels[i]));          
+        }*/
+      cvElement->add_child_text(join(cvLabels, cvLabels.size(), " "));
+      //end CVLabels
+      int64_t** tab = output->getCVLabel()->getLabel()->getClassificationTab(labels, nbCluster);
+      // <xsd:element name="CVClassification" minOccurs="0" type="MAPType"/>
+      xmlpp::Element *cvClsElement = outputElement->add_child("CVClassification");
+      xmlpp::Element *mapErrElement = cvClsElement->add_child("ErrorRate");
+      mapErrElement->add_child_text(custom_dtos(output->getCVLabel()->getLabel()->getErrorRate(labels)));
+      xmlpp::Element *mapClassification = cvClsElement->add_child("Classification");
+      for(int64_t i=0;i<nbCluster;i++){
+        xmlpp::Element *rowElement = mapClassification->add_child("row");
+        /*for(int64_t j=0;j<nbCluster;j++){
+          xmlpp::Element *cellElement = rowElement->add_child("cell");
+          cellElement->add_child_text(std::to_string(tab[i][j]));
+          }*/
+        rowElement->add_child_text(join(tab[i], nbCluster, " "));
+      }
+    }
+    //<xsd:element name="MapClassification" type="MAPType"/>
+    int64_t** tab = output->getLabelDescription()->getLabel()->getClassificationTab(labels, nbCluster);
+    xmlpp::Element *mapElement = outputElement->add_child("MapClassification");
+    xmlpp::Element *mapErrElement = mapElement->add_child("ErrorRate");
+    mapErrElement->add_child_text(custom_dtos(output->getLabelDescription()->getLabel()->getErrorRate(labels)));
+    xmlpp::Element *mapClassification = mapElement->add_child("Classification");    
+    for(int64_t i=0;i<nbCluster;i++){
+      xmlpp::Element *rowElement = mapClassification->add_child("row");
+      /*for(int64_t j=0;j<nbCluster;j++){
+        xmlpp::Element *cellElement = rowElement->add_child("cell");
+        cellElement->add_child_text(std::to_string(tab[i][j]));
+        }*/
+      rowElement->add_child_text(join(tab[i], nbCluster, " "));
+    }
+    //<xsd:element name="MapErrorRate" type="DoubleOrHex"/>
+  }
+  
+  template <class T>
+  void NodeOpOutput::writeOutput(T* output, 
                                          const std::vector<CriterionName> & criterionName, string str, int64_t numOutput)
   {
 	//strategy
@@ -199,7 +296,7 @@ namespace XEM {
 
         if (output->getCriterionOutput(criterionName[i]).getError() == NOERROR) {
           xmlpp::Element *valueElement = criterionElement->add_child("CriterionValue");                  
-          if (IOMODE == IoMode::BINARY) {
+          /*if (IOMODE == IoMode::BINARY) {
             stringstream stream;
             int64_t tmp;
             double tmp_value = output->getCriterionOutput(criterionName[i]).getValue();
@@ -210,7 +307,8 @@ namespace XEM {
           }
           else {
             valueElement->add_child_text(std::to_string(output->getCriterionOutput(criterionName[i]).getValue()));
-          }
+            }*/
+          valueElement->add_child_text(custom_dtos(output->getCriterionOutput(criterionName[i]).getValue()));
         }
         else {
           xmlpp::Element *errorElement = criterionElement->add_child("Error");
@@ -220,7 +318,7 @@ namespace XEM {
 
       //Likelihood
       xmlpp::Element *likelihoodElement = outputElement->add_child("Likelihood");
-      if (IOMODE == IoMode::BINARY) {
+      /*if (IOMODE == IoMode::BINARY) {
         stringstream stream;
         int64_t tmp;
         double tmp_value = output->getLikelihood();
@@ -231,7 +329,8 @@ namespace XEM {
       }
       else {
         likelihoodElement->add_child_text(std::to_string(output->getLikelihood()));
-      }
+        }*/
+      likelihoodElement->add_child_text(custom_dtos(output->getLikelihood()));
       //Parameter
       xmlpp::Element *parameterElement = outputElement->add_child("Parameter");
       string parameterFilename = str+"Param"+std::to_string(numOutput);
@@ -240,6 +339,41 @@ namespace XEM {
       //create parameter file (.mxp)
       DomParameter docParameter(
                                 output->getParameterDescription(), parameterFilename); //.toStdString());
+
+      //label
+      xmlpp::Element *labelElement = outputElement->add_child("Label");
+      string labelFilename = str + "Label" + std::to_string(numOutput);
+      labelElement->add_child_text(labelFilename + ".mxl");
+      //create label file (.mxd)
+      DomLabel docLabel(output->getLabelDescription(), labelFilename);
+
+      //proba
+      xmlpp::Element *probaElement = outputElement->add_child("Proba");
+      string probaFilename = str + "Proba" + std::to_string(numOutput);
+      probaElement->add_child_text(probaFilename + ".mxd");
+      //create proba file (.mxd)
+      DomProba docProba(output->getProbaDescription(), probaFilename);
+      writeOutputExt(output, outputElement);
+	}
+	else {
+      //error
+      xmlpp::Element *errorElement = outputElement->add_child("Error");
+      errorElement->add_child_text(output->getStrategyRunError().what());
+	}
+  }
+  template void NodeOpOutput::writeOutput<ClusteringModelOutput>(ClusteringModelOutput* output, 
+                                          const std::vector<CriterionName> & criterionName, string str, int64_t numOutput);
+  template void NodeOpOutput::writeOutput<LearnModelOutput>(LearnModelOutput* output, 
+                                          const std::vector<CriterionName> & criterionName, string str, int64_t numOutput);
+
+  //writePredictOutput
+  void NodeOpOutput::writePredictOutput(PredictModelOutput* output, 
+                                         string str, int64_t numOutput)
+  {
+
+    xmlpp::Element *outputElement = _rootOutput->add_child("Output");
+
+	if (output->getStrategyRunError() == NOERROR) {
 
       //label
       xmlpp::Element *labelElement = outputElement->add_child("Label");
@@ -254,6 +388,7 @@ namespace XEM {
       probaElement->add_child_text(probaFilename + ".mxd");
       //create proba file (.mxd)
       DomProba docProba(output->getProbaDescription(), probaFilename);
+
 	}
 	else {
       //error
@@ -261,5 +396,7 @@ namespace XEM {
       errorElement->add_child_text(output->getStrategyRunError().what());
 	}
   }
-
+  
+  
+  
 } //end namespace

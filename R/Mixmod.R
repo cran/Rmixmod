@@ -43,7 +43,10 @@ setClass(
   representation=representation(
     file = "character",
     numFormat = "character",
-    conversionOnly="logical"
+    conversionOnly="logical",
+    gaussianModel = "Model",
+    multinomialModel = "Model",
+    compositeModel = "Model"
     ),
   prototype=prototype(
     file = character(0),
@@ -66,6 +69,10 @@ setMethod(
     .Object@file <- file
     .Object@numFormat <- numFormat
     .Object@conversionOnly <- conversionOnly
+    .Object@gaussianModel = new("GaussianModel", listModels="Gaussian_pk_Lk_C", family="general", free.proportions=TRUE, equal.proportions=FALSE)
+    .Object@multinomialModel = new("MultinomialModel", listModels="Binary_pk_Ekjh", free.proportions=TRUE, equal.proportions=FALSE)
+    .Object@compositeModel = new("CompositeModel", listModels="Heterogeneous_pk_Ekjh_Lk_Bk", free.proportions=TRUE, equal.proportions=FALSE)      
+
     validObject(.Object)
     return(.Object)
     }

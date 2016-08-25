@@ -32,29 +32,6 @@
   are aligned and delimited by blanks. There are no missing
   values.
 }
-\details{
-  The sinking of the Titanic is a famous event, and new
-  books are still being published about it.  Many
-  well-known facts-from the proportions of first-class
-  passengers to the "women and children first" policy, and
-  the fact that that policy was not entirely successful in
-  saving the women and children in the third class-are
-  reflected in the survival rates for various classes of
-  passenger.
-
-  These data were originally collected by the British Board
-  of Trade in their investigation of the sinking.  Note
-  that there is not complete agreement among primary
-  sources as to the exact numbers on board, rescued, or
-  lost.
-
-  Due in particular to the very successful film "Titanic",
-  the last years saw a rise in public interest in the
-  Titanic.  Very detailed data about the passengers is now
-  available on the Internet, at sites such as "Encyclopedia
-  Titanica"
-  (\url{http://www.rmplc.co.uk/eduweb/sites/phind}).
-}
 \examples{
 data(titanic)
 }

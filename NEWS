@@ -1,0 +1,12 @@
+Rmixmod 2.1.1
+-------------
+- bug fixes
+
+Rmixmod 2.1.0
+-------------
+- Initialisation with labels (PARTITION) or with a parameter (PARAMETER)
+- Memory leaks decreased (mixmodLib)
+- bug fixes
+
+
+

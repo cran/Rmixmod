@@ -204,8 +204,8 @@ setClass(
         if (!is.double(object@epsilonInInit)){
           stop("epsilonInInit must be a real. Default value will be used.")
         }
-        if ( (object@epsilonInInit > 1) | (object@epsilonInInit < 0) ){
-          stop("epsilonInInit must be less than one and positive.")
+        if ( (object@epsilonInInit > 1) | (object@epsilonInInit <= 0) ){
+          stop("epsilonInInit must be less than one and strictly positive.")
         }
       } 
       # for 'nbIterationInInit'
@@ -243,8 +243,8 @@ setClass(
         stop("epsilonInAlgo must be a real.")
       }
       if ( sum(!is.nan(object@epsilonInAlgo)) ){
-        if( (max(object@epsilonInAlgo,na.rm=TRUE) > 1) | (min(object@epsilonInAlgo,na.rm=TRUE) < 0) ) {
-          stop("epsilonInAlgo must be less than one and positive.")
+        if( (max(object@epsilonInAlgo,na.rm=TRUE) > 1) | (min(object@epsilonInAlgo,na.rm=TRUE) <= 0) ) {
+          stop("epsilonInAlgo must be less than one and strictly positive.")
         }
       }
       return(TRUE)

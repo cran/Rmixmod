@@ -29,6 +29,12 @@ public:
                      , Rcpp::CharacterVector const & Rcriterion
                      , std::vector<int64_t> labels
                      );
+  LearnOutputHandling( XEM::LearnModelOutput* lMOutput
+                     , Rcpp::S4& xem
+                     , const XEM::DataType dataType
+                     , std::vector <XEM::CriterionName> const & iCriterion
+                     , std::vector<int64_t> labels
+                     );
   
   /** destructor */
   ~LearnOutputHandling();

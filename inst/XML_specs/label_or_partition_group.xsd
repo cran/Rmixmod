@@ -2,8 +2,12 @@
 
 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
 
-<!-- Label_or_Partition -->
-	<xsd:element name="Label_or_Partition" type="Label_or_PartitionType"/>
+  <!-- Label_or_Partition -->
+
+    <xsd:element name="Label_or_Partition" type="Label_or_PartitionType"/><!--devenu inutile-->
+    <xsd:element name="Label" type="Label_or_PartitionType"/>
+    <xsd:element name="Partition" type="Label_or_PartitionType"/>
+
 <!-- Label_or_Partition Type -->
 	<xsd:complexType name="Label_or_PartitionType">
 		<xsd:sequence>
@@ -11,7 +15,7 @@
 			<xsd:element name="NbSample" type="xsd:positiveInteger"/>
 			<xsd:element name="NbCluster" type="xsd:positiveInteger"/>
 			<xsd:element name="Format" type="FormatType"/>
-			<xsd:element name="Type">
+			<xsd:element name="Type"  minOccurs="0"> <!--devenu inutile en réalité-->
 				<xsd:simpleType>
 					<xsd:restriction base="xsd:string">
 						<xsd:enumeration value="label"/>

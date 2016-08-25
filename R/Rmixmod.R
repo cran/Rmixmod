@@ -5,8 +5,8 @@
 ##' \tabular{ll}{
 ##'   Package: \tab Rmixmod\cr 
 ##'   Type: \tab Package\cr 
-##'   Version: \tab 2.1.0\cr
-##'   Date: \tab 2016-07-11\cr 
+##'   Version: \tab 2.1.1\cr
+##'   Date: \tab 2016-08-25\cr 
 ##'   License: \tab GPL-3 + file LICENSE\cr 
 ##'   LazyLoad: \tab yes\cr
 ##' }

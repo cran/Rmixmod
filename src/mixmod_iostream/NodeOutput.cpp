@@ -47,8 +47,9 @@ namespace XEM {
   }
 
 //common part between Clustering & DA
+/*
   NodeOutput::NodeOutput(ClusteringOutput* output, string& s) : xmlpp::Document() {
 	_rootOutput = create_root_node("ListOutput");        
   }
-
+*/
 } //end namespace

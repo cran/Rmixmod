@@ -1,5 +1,5 @@
 /***************************************************************************
-							 SRC/MIXMOD_IOSTREAM/XEMNodeClusteringOutput.h  description
+							 SRC/MIXMOD_IOSTREAM/XEMNodeOpOutput.h  description
 	copyright            : (C) MIXMOD Team - 2001-2011
 	email                : contact@mixmod.org
  ***************************************************************************/
@@ -35,20 +35,24 @@ class ProbaDescription;
 class ParameterDescription;
 
 ///Output node in .mixmod file in case clustering
-class NodeClusteringOutput : public NodeOutput {
+class NodeOpOutput : public NodeOutput {
 
 public:
 
 	///Constructor & Destructor
-	NodeClusteringOutput();
-	~NodeClusteringOutput();
-	NodeClusteringOutput(ClusteringOutput* output, string& s);
-	NodeClusteringOutput(xmlpp::Element * rootOutput);
+	NodeOpOutput();
+	~NodeOpOutput();
+	NodeOpOutput(ClusteringOutput* output, string& s);
+    NodeOpOutput(LearnOutput * output, const std::vector<CriterionName> & criterionName, string & s);
+    NodeOpOutput(PredictOutput * output, string & s);    
+	NodeOpOutput(xmlpp::Element * rootOutput);
 
 	///writer node
 
 	///read Node one <Output>
-	ClusteringModelOutput * readClustering();
+	//ClusteringModelOutput * readClustering();
+    template<class T>
+      T* read4Output();
 
 private:
 
@@ -61,9 +65,14 @@ private:
 	///read Proba node
 	unique_ptr<ProbaDescription> readProba(string sFilename);
 
-	///write output node 
-	void writeOutput(ClusteringModelOutput* output, 
+	///write output node
+    template <class T>
+	void writeOutput(T* output, 
 			const std::vector<CriterionName> & criterionName, string str, int64_t numOutput);
+    void writeOutputExt(ClusteringModelOutput* output,  xmlpp::Element *outputElement);
+    void writeOutputExt(LearnModelOutput* output,  xmlpp::Element *outputElement);
+	void writePredictOutput(PredictModelOutput* output, string str, int64_t numOutput);
+    
 };
 
 } //end namespace

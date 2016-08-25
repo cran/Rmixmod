@@ -1,12 +1,13 @@
 #https://nerdland.net/2009/07/detecting-c-libraries-with-autotools/
 AC_INIT(Rmixmod, "package")
 AC_PATH_PROG([PKG_CONFIG], [pkg-config])
-if test -z "${PKG_CONFIG}"; then
-  AC_MSG_WARN([cannot find pkg-config, Rmixmod will be installed without optional XML features])
-else
-    PKG_CHECK_MODULES([LIBXMLXX], [libxml++-2.6],[],[AC_MSG_WARN([No package 'libxml++-2.6' found, Rmixmod will be installed without optional XML features])])
+if test "${RMIXMOD_WITH_XML}" -eq 1  ; then
+   if test -z "${PKG_CONFIG}"; then     
+      AC_MSG_WARN([cannot find pkg-config, Rmixmod will be installed without optional XML features])
+   else
+      PKG_CHECK_MODULES([LIBXMLXX], [libxml++-2.6],[],[AC_MSG_WARN([No package 'libxml++-2.6' found, Rmixmod will be installed without optional XML features])])
+   fi
 fi
-
 echo "LIBXMLXX_CFLAGS: $LIBXMLXX_CFLAGS"
 echo "LIBXMLXX_LIBS: $LIBXMLXX_LIBS"
 RMIXMOD_XML=""

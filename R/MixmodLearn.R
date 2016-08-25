@@ -129,7 +129,9 @@ setMethod(
         #  .Object@nbCVBlocks <- nbCVBlocks
         #}
         validObject(.Object)    
-      }
+      } else if(!missing(xmlIn)){
+      .Object@bestResult@parameters = new("CompositeParameter")      
+    } 
       return(.Object)
     }
 )

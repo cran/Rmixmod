@@ -46,7 +46,8 @@ public:
 	DomLabel(Partition * partition, string & sFilename);
 	DomLabel(xmlpp::Element *root);
 
-	unique_ptr<LabelDescription> readLabel(string sFilename);
+	unique_ptr<LabelDescription> readLabel(string sFilename); 
+	unique_ptr<LabelDescription> readLabelAsData(string sFilename);   
 	void writeListColumnNode(const vector<ColumnDescription *> & vColumnDescription);
 
 private:

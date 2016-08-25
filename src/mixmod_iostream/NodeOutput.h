@@ -45,7 +45,7 @@ public:
 
 	///constructor
 	NodeOutput(string & s);
-	NodeOutput(ClusteringOutput * output, string & s);
+	//NodeOutput(ClusteringOutput * output, string & s);
 	NodeOutput(xmlpp::Element *rootOutput);
 
 	///get

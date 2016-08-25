@@ -45,7 +45,7 @@ public:
 
 	///constructor
 	NodeInput(string & s);
-	NodeInput(ClusteringInput * input, string & s);
+	NodeInput(Input * input, string & s, string dataTag="Data");
 	NodeInput(xmlpp::Element *rootInput);
 
 	///get
@@ -54,12 +54,12 @@ public:
 protected:
 
 	//write necessary node
-	void writeDataNode(ClusteringInput * input, string & s);
-	void writeSelectVariableNode(ClusteringInput * input);
-	void writeSelectIndividualNode(ClusteringInput * input);
+	void writeDataNode(Input * input, string & s, string dataTag="Data");
+	void writeSelectVariableNode(Input * input);
+	void writeSelectIndividualNode(Input * input);
 
 	//read necessary node
-	DataDescription & readDataNode();
+	DataDescription & readDataNode(string dataTag="Data");
 	vector<int64_t> readNbClusterNode();
 
 	//parameter
