@@ -33,7 +33,7 @@
 #include "mixmod/DiscriminantAnalysis/Learn/LearnModelOutput.h"
 #include "mixmod/DiscriminantAnalysis/Predict/PredictModelOutput.h"
 #include "mixmod/Kernel/IO/Label.h"
-
+#include <stdio.h>
 namespace XEM {
 
   NodeOpOutput::NodeOpOutput() : NodeOutput() {
@@ -64,69 +64,95 @@ namespace XEM {
 
   //read the clustering to fill XEMOutput
   template<class T>
-  T * NodeOpOutput::read4Output() {
-
+  T * NodeOpOutput::read4Output(Input *inp) {
+    PredictInput* pInput = nullptr;
+    ParameterDescription *parDesc = nullptr;
+    ModelType modelType;
+    int64_t nbCluster;
+    vector<CriterionOutput*> vCriterionOutput;
+    double likelihood = 0.0;
+    ///////
+	std::vector<CriterionName>* vCriterion = new std::vector<CriterionName>();
+	const int nbCriterion = inp->getCriterionName().size();
+	for (int iCriterion = 0; iCriterion<nbCriterion; iCriterion++)
+		vCriterion->push_back(inp->getCriterionName()[iCriterion]);
+    ///////
 	//model
     xmlpp::Element *elementModel = dynamic_cast<xmlpp::Element*>(_rootOutput->get_first_child("Model"));
-	ModelName modelName = StringToModelName(elementModel->get_child_text()->get_content());
-	ModelType modelType(modelName);
-
+    if(elementModel){
+      ModelName modelName = StringToModelName(elementModel->get_child_text()->get_content());
+      modelType = ModelType(modelName);
+    } else{
+        pInput = dynamic_cast<PredictInput*>(inp);
+        if(!pInput) throw  IOStreamErrorType::badLoadXML; //TO DO: find a better error type...
+        parDesc = new ParameterDescription(pInput->getClassificationRule());
+        modelType = ModelType(*parDesc->getModelType());
+        nbCluster = parDesc->getNbCluster();
+    }
 	//nbCluster
     xmlpp::Element *elementNbCluster = dynamic_cast<xmlpp::Element*>(_rootOutput->get_first_child("NbCluster"));
-    int64_t nbCluster = std::stoll(elementNbCluster->get_child_text()->get_content());
-
+    if(elementNbCluster){
+      nbCluster = std::stoll(elementNbCluster->get_child_text()->get_content());
+    }
 	//error
     xmlpp::Element *elementError = dynamic_cast<xmlpp::Element*>(_rootOutput->get_first_child("Error"));
 	if (elementError) {
       
       Exception error = Exception(elementError->get_child_text()->get_content());
 
-      return new T(modelType, nbCluster, error);
+      T* moutput =  new T(modelType, nbCluster, error);
+      for (auto it= vCriterion->begin(); it != vCriterion->end(); it++) {
+        CriterionName criterion = *it;
+        moutput->setCriterionOutput(CriterionOutput(criterion, 0.0, error));
+      }
+      return moutput;
 	}
 	else {
       //Criterion
       xmlpp::Element *elementListCriterion =  dynamic_cast<xmlpp::Element*>(_rootOutput->get_first_child("ListOutputCriterion"));
-      auto children = elementListCriterion->get_children();
-      vector<CriterionOutput*> vCriterionOutput;
-      for (auto it=children.begin(); it != children.end(); ++it){
-        xmlpp::Element * elementOutputCriterion = dynamic_cast<xmlpp::Element*>(*it);
-        if(!elementOutputCriterion) continue;
+      if(elementListCriterion){
+        auto children = elementListCriterion->get_children();
+      
+        for (auto it=children.begin(); it != children.end(); ++it){
+          xmlpp::Element * elementOutputCriterion = dynamic_cast<xmlpp::Element*>(*it);
+          if(!elementOutputCriterion) continue;
         
-        //criterion Name
-        xmlpp::Element *cnElt = dynamic_cast<xmlpp::Element*>(elementOutputCriterion->get_first_child("CriterionName"));
-        CriterionName criterionName = StringtoCriterionName(cnElt->get_child_text()->get_content());
-        double criterionValue = 0;
-        Exception * error = NOERROR.clone();
-        xmlpp::Element *elementError = dynamic_cast<xmlpp::Element*>(elementOutputCriterion->get_first_child("Error"));
-        if(elementError){
-          //error
-          delete error;
-          error = new Exception(elementError->get_child_text()->get_content());
-        }
-        else {
-          //criterion Value
-          xmlpp::Element* cvElt = dynamic_cast<xmlpp::Element*>(elementOutputCriterion->get_first_child("CriterionValue"));
-          /*if (IOMODE == IoMode::BINARY) {
-            stringstream stream;
-            uint64_t tmp;
-            stream << hex << cvElt->get_child_text()->get_content(); 
-            stream >> tmp;
-            memcpy(&criterionValue, &tmp, sizeof(tmp));
+          //criterion Name
+          xmlpp::Element *cnElt = dynamic_cast<xmlpp::Element*>(elementOutputCriterion->get_first_child("CriterionName"));
+          CriterionName criterionName = StringtoCriterionName(cnElt->get_child_text()->get_content());
+          double criterionValue = 0;
+          Exception * error = NOERROR.clone();
+          xmlpp::Element *elementError = dynamic_cast<xmlpp::Element*>(elementOutputCriterion->get_first_child("Error"));
+          if(elementError){
+            //error
+            delete error;
+            error = new Exception(elementError->get_child_text()->get_content());
+          } else {
+            //criterion Value
+            xmlpp::Element* cvElt = dynamic_cast<xmlpp::Element*>(elementOutputCriterion->get_first_child("CriterionValue"));
+            /*if (IOMODE == IoMode::BINARY) {
+              stringstream stream;
+              uint64_t tmp;
+              stream << hex << cvElt->get_child_text()->get_content(); 
+              stream >> tmp;
+              memcpy(&criterionValue, &tmp, sizeof(tmp));
+              }
+              else {
+              criterionValue = std_stod(cvElt->get_child_text()->get_content()); 
+              }*/
+            criterionValue = custom_stod(cvElt->get_child_text()->get_content()); 
+            //.toElement().text().toDouble();
           }
-          else {
-            criterionValue = std::stod(cvElt->get_child_text()->get_content()); 
-            }*/
-          criterionValue = custom_stod(cvElt->get_child_text()->get_content()); 
-          //.toElement().text().toDouble();
+
+          vCriterionOutput.push_back(new CriterionOutput(criterionName, criterionValue, *error));
+          delete error;
         }
-
-        vCriterionOutput.push_back(new CriterionOutput(criterionName, criterionValue, *error));
-        delete error;
       }
-
       //likelihood
       xmlpp::Element *elementLikelihood = dynamic_cast<xmlpp::Element*>(_rootOutput->get_first_child("Likelihood"));
-      double likelihood = custom_stod(elementLikelihood->get_child_text()->get_content());
+      if(elementLikelihood){
+        likelihood = custom_stod(elementLikelihood->get_child_text()->get_content());
+      }
       /*if (IOMODE == IoMode::BINARY) {
         stringstream stream;
         uint64_t tmp;
@@ -135,12 +161,19 @@ namespace XEM {
         memcpy(&likelihood, &tmp, sizeof(tmp));
       }
       else {
-        likelihood = std::stod(elementLikelihood->get_child_text()->get_content());
+        likelihood = std_stod(elementLikelihood->get_child_text()->get_content());
         }*/
       //Parameter
+      
+      string parameterFilename = "";
       xmlpp::Element *elementParameter = dynamic_cast<xmlpp::Element*>(_rootOutput->get_first_child("Parameter"));
-
-      string parameterFilename = elementParameter->get_child_text()->get_content();
+      if(elementParameter){
+        parameterFilename = elementParameter->get_child_text()->get_content();
+      } /*else {
+        PredictInput* pInput = dynamic_cast<PredictInput*>(inp);
+        if(!pInput) throw  IOStreamErrorType::badLoadXML; //TO DO: find a better error type...
+        parDesc = new ParameterDescription(pInput->getClassificationRule());
+        }*/
       //TODO : take the XEMParameterDescription
 
 
@@ -159,15 +192,15 @@ namespace XEM {
       //vector<CriterionOutput> & criterionOutput, double likelihood, 
       //ParameterDescription & parameterDescription, LabelDescription & labelDescription,  
       //ProbaDescription & probaDescription);
-
+      // TODO: manage memory leaks on ParameterDescription
       return new T(modelType, nbCluster, vCriterionOutput, 
-                                       likelihood, *readParameter(parameterFilename), 
+                   likelihood, parameterFilename==""? *parDesc : *readParameter(parameterFilename), 
                                        *readLabel(labelFilename), *readProba(probaFilename));
 	}
   }
-  template ClusteringModelOutput *  NodeOpOutput::read4Output<ClusteringModelOutput>();
-  template LearnModelOutput *  NodeOpOutput::read4Output<LearnModelOutput>();
-  template PredictModelOutput *  NodeOpOutput::read4Output<PredictModelOutput>();    
+  template ClusteringModelOutput *  NodeOpOutput::read4Output<ClusteringModelOutput>(Input *inp);
+  template LearnModelOutput *  NodeOpOutput::read4Output<LearnModelOutput>(Input *inp);
+  template PredictModelOutput *  NodeOpOutput::read4Output<PredictModelOutput>(Input *inp);    
 
   ParameterDescription * NodeOpOutput::readParameter(string sFilename) {
 	ValidateSchema(sFilename, IOStreamXMLFile::Parameter);
@@ -215,8 +248,8 @@ namespace XEM {
   template std::string join(std::vector<int64_t> vect, int64_t sz,  std::string sep);
   template std::string join(int64_t* vect, int64_t sz,  std::string sep);
   
-  void NodeOpOutput::writeOutputExt(ClusteringModelOutput* output,  xmlpp::Element *outputElement){}
-  void NodeOpOutput::writeOutputExt(LearnModelOutput* output,  xmlpp::Element *outputElement){
+  void NodeOpOutput::writeOutputExt(ClusteringModelOutput* output,  xmlpp::Element *outputElement, string str){}
+  void NodeOpOutput::writeOutputExt(LearnModelOutput* output,  xmlpp::Element *outputElement, string str){
     /*      <xsd:group name="LearnOutputGroup">
             <xsd:sequence>
             <xsd:group ref="OutputGroup"/>
@@ -239,7 +272,13 @@ namespace XEM {
         xmlpp::Element *cellElement = cvElement->add_child("cell");
         cellElement->add_child_text(std::to_string(cvLabels[i]));          
         }*/
-      cvElement->add_child_text(join(cvLabels, cvLabels.size(), " "));
+      //cvElement->add_child_text(join(cvLabels, cvLabels.size(), " "));
+      string labelFilename = str + "CVLabels";
+      cvElement->add_child_text(labelFilename + ".mxl");
+      //create label file (.mxl)
+      LabelDescription *labelDesc = new LabelDescription(cvLabels.size(), cvLabels);
+      DomLabel domLabel(labelDesc, labelFilename);
+      
       //end CVLabels
       int64_t** tab = output->getCVLabel()->getLabel()->getClassificationTab(labels, nbCluster);
       // <xsd:element name="CVClassification" minOccurs="0" type="MAPType"/>
@@ -315,7 +354,6 @@ namespace XEM {
           errorElement->add_child_text(output->getStrategyRunError().what());
         }
       }
-
       //Likelihood
       xmlpp::Element *likelihoodElement = outputElement->add_child("Likelihood");
       /*if (IOMODE == IoMode::BINARY) {
@@ -344,8 +382,8 @@ namespace XEM {
       xmlpp::Element *labelElement = outputElement->add_child("Label");
       string labelFilename = str + "Label" + std::to_string(numOutput);
       labelElement->add_child_text(labelFilename + ".mxl");
-      //create label file (.mxd)
-      DomLabel docLabel(output->getLabelDescription(), labelFilename);
+      //create label file (.mxl)
+      DomLabel domLabel(output->getLabelDescription(), labelFilename);
 
       //proba
       xmlpp::Element *probaElement = outputElement->add_child("Proba");
@@ -353,7 +391,16 @@ namespace XEM {
       probaElement->add_child_text(probaFilename + ".mxd");
       //create proba file (.mxd)
       DomProba docProba(output->getProbaDescription(), probaFilename);
-      writeOutputExt(output, outputElement);
+      writeOutputExt(output, outputElement, str);
+      if(MASSICCC!=0){
+        string entropyBasename = "entropy" + std::to_string(numOutput) + ".txt";
+        string dest = PROJECT_DIRNAME + "/"+entropyBasename;
+        rename(entropyBasename.c_str(), dest.c_str());
+        xmlpp::Element *massicccElement =  outputElement->add_child("Custom");
+        massicccElement->add_child_text(normalizeFilename(dest));
+        
+      }
+      
 	}
 	else {
       //error
@@ -378,8 +425,8 @@ namespace XEM {
       //label
       xmlpp::Element *labelElement = outputElement->add_child("Label");
       string labelFilename = str + "Label" + std::to_string(numOutput);
-      labelElement->add_child_text(labelFilename + ".mxd");
-      //create label file (.mxd)
+      labelElement->add_child_text(labelFilename + ".mxl");
+      //create label file (.mxl)
       DomLabel docLabel(output->getLabelDescription(), labelFilename);
 
       //proba

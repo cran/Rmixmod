@@ -63,13 +63,13 @@ namespace XEM {
     
 
 	//datafilename
-	probaDescription->saveNumericValues(sFilename + ".txt");
+	probaDescription->saveNumericValues(getAbsolutePath(sFilename + ".txt"));
     new_elt = _root->add_child("DataFilename");
     new_elt->add_child_text(sFilename + ".txt");        
 
 	writeListColumnNode(probaDescription->getAllColumnDescription());
 	//write new file .mxd to describe data
-    Glib::ustring filename = sFilename + ".mxd";
+    Glib::ustring filename = getAbsolutePath(sFilename + ".mxd");
     removeIfExists(filename);
     write_to_file(filename);    
 }

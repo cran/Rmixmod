@@ -134,11 +134,20 @@ setMethod(
 ##' @keywords internal
 ##'
 ellipse<-function(x, i, j){
+  parameters = x@parameters;
+  factor = NULL;
+  if( is(x@parameters, "CompositeParameter") ){
+    parameters = x@parameters@g_parameter
+    factor = x@parameters@factor;
+    i = i - length(which(factor[1:i]>0))    
+    j = j - length(which(factor[1:j]>0))
+  }   
+
   # loop over the cluster
   for ( k in 1:x@nbCluster ){
     angles <- seq(0, 2*pi, length.out=200)
-    ctr<-c(x@parameters@mean[k,i],x@parameters@mean[k,j])
-    A<-matrix(c(x@parameters@variance[[k]][i,i],x@parameters@variance[[k]][j,i],x@parameters@variance[[k]][i,j],x@parameters@variance[[k]][j,j]), nrow=2)
+    ctr<-c(parameters@mean[k,i],parameters@mean[k,j])
+    A<-matrix(c(parameters@variance[[k]][i,i],parameters@variance[[k]][j,i],parameters@variance[[k]][i,j],parameters@variance[[k]][j,j]), nrow=2)
     eigVal  <- eigen(A)$values
     eigVec  <- eigen(A)$vectors
     eigScl  <- eigVec %*% diag(sqrt(eigVal))  # scale eigenvectors to length = square-root
@@ -193,7 +202,8 @@ ellipse<-function(x, i, j){
 plotCluster <- function(x, data, variable1=colnames(data)[1], variable2=colnames(data)[2], col=x@partition+1, pch=x@partition, xlab=variable1, ylab=variable2, add.ellipse=TRUE, ...){
   if ( !is(x,"MixmodResults") )
     stop("x must be a MixmodResults object!")
-  if ( !is(x@parameters, "GaussianParameter") )
+  #if ( !is(x@parameters, "GaussianParameter") )
+  if ( !.is_quantitative_alike2(x, data, c(variable1, variable2)))
     stop("x must contains Gaussian parameters!")
   if ( !is.matrix(data) & !is.data.frame(data) )
     stop("data must be a data.frame or a matrix object!")
@@ -249,6 +259,7 @@ plotCluster <- function(x, data, variable1=colnames(data)[1], variable2=colnames
 ##' @param variables list of variables names (or indices) to compute a histogram. All variables from data by default.
 ##' @param xlab a list of title for the x axis. xlab must have the same length than variables.
 ##' @param main a list of title for the histogram. main must have the same length than variables.
+##' @param hist_x_dim Dimension of the histogram (???)
 ##' @param ... further arguments passed to or from other methods
 ##'
 ##' @examples
@@ -299,10 +310,18 @@ histCluster <- function(x, data, variables=colnames(data), xlab=rep("",length(va
   
   # get old par 
   op <- par(no.readonly = TRUE) # the whole list of settable par's.
-  
-  if ( is(x@parameters, "GaussianParameter") ){
-    if ( isQualitative(data) )
-      stop("data must contain only quantitative variables!")
+  #&& is.dataType(data.frame(x@data)[y]) == "quantitative" 
+  #if ( is(x@parameters, "GaussianParameter") || (is(x@parameters, "CompositeParameter") && is.dataType(data.frame(data)[variables])=="quantitative")){
+  #if ( is(x@parameters, "GaussianParameter") ){
+  if (  .is_quantitative_alike2(x, data, variables)){
+    #if ( isQualitative(data) )
+    #  stop("data must contain only quantitative variables!")
+    parameters = x@parameters;
+    factor = NULL;
+    if( is(x@parameters, "CompositeParameter") ){
+        parameters = x@parameters@g_parameter
+        factor = x@parameters@factor;  
+    }   
     # split the layout
     if( nvar < 4 & nvar > 1) par( mfrow = c( 1, nvar ) )
     else if ( nvar >= 4 ){
@@ -313,6 +332,7 @@ histCluster <- function(x, data, variables=colnames(data), xlab=rep("",length(va
     }
     i<-1
     # loop over variables
+    print(indices);
     for (j in indices ){
       xaxis<-seq(min(data[,j]),max(data[,j]),length=hist_x_dim)
       #xaxis<-seq(min(data[,j]),max(data[,j]),by=0.0001)
@@ -320,7 +340,8 @@ histCluster <- function(x, data, variables=colnames(data), xlab=rep("",length(va
       
       # loop over the clusters to generate densities
       for( k in 1:x@nbCluster ){
-        density[k,]<-x@parameters["proportions",k]*dnorm(xaxis,x@parameters["mean",k][j],sqrt(x@parameters["variance",k][j,j]))
+        corr_j = j;if( is(x@parameters, "CompositeParameter") ) corr_j = j - length(which(factor[1:j]>0))
+        density[k,]<-parameters["proportions",k]*dnorm(xaxis,parameters["mean",k][corr_j],sqrt(parameters["variance",k][corr_j,corr_j]))
       }
       # generate mixture density
       #mixture<-apply(density,2,sum)

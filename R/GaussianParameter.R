@@ -160,6 +160,8 @@ setMethod(
 
 
 ###################################################################################
+##' 
+##'
 ##' @name [
 ##' @rdname extract-methods
 ##' @aliases [<-,GaussianParameter-method

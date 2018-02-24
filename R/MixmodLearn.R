@@ -138,6 +138,27 @@ setMethod(
 ###################################################################################
 
 
+##' mixmodLearn
+##'
+##' TODO: describe...
+##'
+##' @param ... ...
+##'
+##' @export
+##'
+mixmodLearn <- function(...) {
+
+  # create Mixmod object
+  xem <- new( "MixmodLearn", ... )
+  # call learnMain
+  .Call("learnMain", xem, PACKAGE="Rmixmod")
+  # mixmod error?
+  if ( xem@error ) warning( "All models got errors!" )
+  
+  # return MixmodLearn object
+  return(xem)
+}
+
 ###################################################################################
 ##' Create an instance of the [\code{\linkS4class{MixmodLearn}}] class
 ##'
@@ -176,21 +197,6 @@ setMethod(
 ##'   \item{results}{a list of [\code{\linkS4class{MixmodResults}}] object containing all the results sorted in ascending order according to the given criterion.}
 ##'   \item{bestResult}{a S4 [\code{\linkS4class{MixmodResults}}] object containing the best model results.}
 ##' }
-
-##' @export
-##'
-mixmodLearn <- function(...) {
-
-  # create Mixmod object
-  xem <- new( "MixmodLearn", ... )
-  # call learnMain
-  .Call("learnMain", xem, PACKAGE="Rmixmod")
-  # mixmod error?
-  if ( xem@error ) warning( "All models got errors!" )
-  
-  # return MixmodLearn object
-  return(xem)
-}
 mixmodLearn.default <- function(data, knownLabels, dataType=NULL, models=NULL, criterion="CV", nbCVBlocks=10, weight=NULL) {
  stop("mixmodLearn.default: not implemented\n");
 }
@@ -328,6 +334,8 @@ setMethod(
 
 
 ###################################################################################
+##' 
+##'
 ##' @name [
 ##' @rdname extract-methods
 ##' @aliases [<-,MixmodLearn-method

@@ -5,22 +5,28 @@
 <!-- Data -->
 
 	<xsd:element name="Data" type="DataType"/>
-	
+  <xsd:simpleType name="FloatEncodingType">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="HumanReadable"/>
+      <xsd:enumeration value="HexBinary"/>
+    </xsd:restriction>
+  </xsd:simpleType>                	
 <!-- Data Type -->
 	<xsd:complexType name="DataType">
-		<xsd:sequence>
-			<xsd:element name="Name" type="xsd:string" minOccurs="0"/>
-			<xsd:element name="NbSample" type="xsd:positiveInteger"/>
-			<!--xsd:element name="NbColumn" type="xsd:positiveInteger"/-->
-			<xsd:element name="Format" type="FormatType"/>
-			<xsd:element name="DataFilename" type="xsd:string"/>
-			<xsd:element name="ListColumn" type="ListColumnType" minOccurs="0">
-				<xsd:unique name="MyColumn">
-					<xsd:selector xpath="./Column"/>
-					<xsd:field xpath="@Num"/> 
-				</xsd:unique>
-			</xsd:element>
-		</xsd:sequence>
+	  <xsd:sequence>
+        <xsd:element name="FloatEncoding" minOccurs="0" type="FloatEncodingType"/>
+		<xsd:element name="Name" type="xsd:string" minOccurs="0"/>
+		<xsd:element name="NbSample" type="xsd:positiveInteger"/>
+		<!--xsd:element name="NbColumn" type="xsd:positiveInteger"/-->
+		<xsd:element name="Format" type="FormatType"/>
+		<xsd:element name="DataFilename" type="xsd:string"/>
+		<xsd:element name="ListColumn" type="ListColumnType" minOccurs="0">
+		  <xsd:unique name="MyColumn">
+			<xsd:selector xpath="./Column"/>
+			<xsd:field xpath="@Num"/> 
+		  </xsd:unique>
+		</xsd:element>
+	  </xsd:sequence>
 	</xsd:complexType>
 
 	<!-- Format Type -->

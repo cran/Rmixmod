@@ -19,13 +19,15 @@ var.comp.independent <- mixmodMultinomialModel(variable.independency = TRUE, com
 # Strategy
 mixmodStrategy()
 strategy1 <- mixmodStrategy(algo = "CEM", initMethod = "random", nbTry = 10, epsilonInInit = 0.000001)
+
+# TODO: some issues with this strategy (because of SEM algorithm ?)
 strategy2 <- mixmodStrategy(algo = c("SEM", "EM"), nbIterationInAlgo = c(200, 100), epsilonInAlgo = c(NA, 0.0001))
 
 ###  Unsupervised classification
 
 # Continuous variables: Geyser dataset
 data("geyser")
-xem.geyser <- mixmodCluster(data = geyser, nbCluster = 2:8,criterion = c("BIC", "ICL", "NEC"), models = mixmodGaussianModel(),strategy = strategy2)
+xem.geyser <- mixmodCluster(data = geyser, nbCluster = 2:8,criterion = c("BIC", "ICL", "NEC"), models = mixmodGaussianModel(),strategy = strategy1) #TODO: was strategy2
 xem.geyser
 summary(xem.geyser)
 plot(xem.geyser)

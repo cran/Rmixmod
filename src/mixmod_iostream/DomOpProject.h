@@ -63,7 +63,7 @@ public :
     //void readXmlFillOut(ClusteringOutput * cOutput);
     //void readXmlFillOut(LearnOutput * cOutput);
     template<typename T, typename U>
-      void readXmlFillOut(T  * cOutput );
+      void readXmlFillOut(T  * cOutput, Input *inp);
     //template<typename T>    
     //void readXmlFillOut(T * cOutput);    
 };

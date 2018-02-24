@@ -67,14 +67,15 @@ public:
 		m.insert(std::make_pair(xmlFeaturesNotAvailable, "XML features are not available"));
 		return m;
 	}
-
 	static std::map<OtherError, const char*> mapErrorMsg;
-
+    OtherError getErrorType() const throw();
+    
 protected:
 
 	OtherError _errorType;
 };
 
+ inline OtherError OtherException::getErrorType() const throw() {return _errorType;}
 }
 
 #endif /* XEMOTHEREXCEPTION_H_ */

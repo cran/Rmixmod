@@ -52,8 +52,8 @@ setClass(
     if ( length(object@nbCluster) == 0 ){
       stop("nbCluster is empty!")
     }
-    if ( length(object@nbCluster) >1 && (object@strategy@initMethod=="parameter" || object@strategy@initMethod=="partition")){
-      stop("parameter and partition initialisations require nbCluster to be mono-valued!")
+    if ( length(object@nbCluster) >1 && (object@strategy@initMethod=="parameter" || object@strategy@initMethod=="label")){
+      stop("parameter and label initialisations require nbCluster to be mono-valued!")
     }
     # check nbCluster parameter
     if (sum(!is.wholenumber(object@nbCluster))){
@@ -165,9 +165,9 @@ mixmodCluster <- function(...) {
   return(xem)
 }
 
-mixmodCluster.default <- function(data, nbCluster, dataType=NULL, models=NULL, strategy=mixmodStrategy(), criterion="BIC", weight=NULL, knownLabels=NULL) {
- stop("mixmodCluster.default: not implemented\n");
-}
+#mixmodCluster.default <- function(data, nbCluster, dataType=NULL, models=NULL, strategy=mixmodStrategy(), criterion="BIC", weight=NULL, knownLabels=NULL) {
+# stop("mixmodCluster.default: not implemented\n");
+#}
 
 ###################################################################################
 
@@ -222,6 +222,10 @@ setMethod(
         .Object@strategy = new("Strategy")
       }else{
         .Object@strategy <- strategy
+      }
+      if(!missing(seed) && .Object@strategy@seed!=-1){
+        stop("'seed' value specification is inconsistent: mixmodCluster argument is ",seed,
+                 "since strategy@seed is ", .Object@strategy@seed)
       }
       # get criterion parameter
       if(missing(criterion)){
@@ -358,6 +362,8 @@ setMethod(
 
 
 ###################################################################################
+##' 
+##'
 ##' @name [
 ##' @rdname extract-methods
 ##' @aliases [<-,MixmodCluster-method

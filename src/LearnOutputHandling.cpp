@@ -87,8 +87,6 @@ LearnOutputHandling::LearnOutputHandling( XEM::LearnModelOutput* lMOutput
 {
   // get criterion
   std::vector<std::string> criterionName; //= Rcpp::as< std::vector<std::string> >(Rcriterion);
-  // add criterion name
-  xem_.slot("criterion") = criterionName;
   
   // fill other slot only if no error
   if ( dynamic_cast<XEM::Exception&>(lMOutput->getStrategyRunError()) == XEM::NOERROR ){
@@ -100,6 +98,8 @@ LearnOutputHandling::LearnOutputHandling( XEM::LearnModelOutput* lMOutput
       criterionValue.push_back(lMOutput->getCriterionOutput(iCriterion[i]).getValue());
       criterionName.push_back(CriterionNameToString(iCriterion[i]));
     }    
+    // add criterion name
+    xem_.slot("criterion") = criterionName;
     // add criterion value
     xem_.slot("criterionValue") = criterionValue;    
     

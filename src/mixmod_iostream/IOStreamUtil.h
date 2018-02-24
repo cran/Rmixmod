@@ -32,7 +32,7 @@
 #include <sys/stat.h>
 
 #include "mixmod/Clustering/ClusteringInput.h"
-#include "mixmod/Clustering/ClusteringOutput.h"
+//#include "mixmod/Clustering/ClusteringOutput.h"
 //#include "mixmod/Clustering/ClusteringInput.h"
 #include "mixmod/Clustering/ClusteringOutput.h"
 
@@ -58,6 +58,15 @@ enum class IOStreamFormat {
 	XML,
 	FLAT // old format (flat format)
 };
+enum class PathMode {
+	ABSOLUTE,
+	RELATIVE 
+};
+
+ 
+ static PathMode PATHMODE = PathMode::ABSOLUTE;
+ extern string PROJECT_DIRNAME;
+ 
 const IOStreamFormat defaultIOStreamFormat = IOStreamFormat::XML;
 
 enum class IOStreamColumnType {
@@ -66,6 +75,13 @@ enum class IOStreamColumnType {
 	Individual,
 	Weight,
 	Unused
+};
+
+ enum class ProjectType {
+   Clustering,
+     Learn,
+     Predict,
+     Unknown
 };
 
 enum class IOStreamErrorType {
@@ -97,6 +113,16 @@ enum class IOStreamErrorType {
      Label            
      };
 
+ class IoModeManager {
+ public:
+   IoModeManager(IoMode);
+   IoModeManager(xmlpp::Element*);
+   ~IoModeManager();
+
+ private:
+   IoMode previous_;
+
+ };
 //IOStreamErrorTypeToString
 string IOStreamErrorTypeToString(const IOStreamErrorType & errorType);
 
@@ -122,10 +148,14 @@ ClusteringMain * IStream_FLAT(const string & s);
 ///write input and output Data
 void OStream(const string& s, IOStreamFormat format = defaultIOStreamFormat,
 		ClusteringMain* cMain = NULL, IoMode iomode = IoMode::NUMERIC);
-
+ string getBaseName(const string& s);
+ string getDirName(const string& s); 
+ vector<string> getPathElements(const string& s);
+ string normalizeFilename(const string& s);
+ string getAbsolutePath(const string& s);
 ///write input and output Data in XML for clustering study
 template<class T>
-void OStream_XML(const string & s, T * cMain, IoMode iomode = IoMode::NUMERIC);
+  void OStream_XML(const string & s, T * cMain, IoMode iomode = IoMode::NUMERIC, PathMode pathMode = PathMode::ABSOLUTE);
 
 ///write output Data in FLAT format (txt) for clustering study
 void OStream_Clustering_FLAT(ClusteringMain * cMain);
@@ -134,6 +164,7 @@ void OStream_DiscriminantAnalysis_XML(const string & s, ClusteringMain * cMain);
 
 // Tools for floats
  double custom_stod(string s);
+ double std_stod(string s); 
  string custom_dtos(double); 
  
 //VariableTypeToString
@@ -146,7 +177,8 @@ IOStreamColumnType StringToColumnType(const string & strColumnType);
 Glib::ustring XMLFileTypeToString(IOStreamXMLFile file);
 
 void removeIfExists(const std::string& filename); 
- 
+//void copyFile(const std::string& src, const std::string& dest);
+
 /// createMixmodDataFileFromUserDataFile
 /*
 Note : if nbSample==0 : file is read (and write) until the end and nbSample is updated
@@ -178,6 +210,8 @@ inline Glib::ustring XMLFileTypeToString(IOStreamXMLFile file) {
 	return res;
 }
 
+ ProjectType getProjectType(string filename);
+ 
 //CPOLI 
 xmlpp::Element *get_first_child_element(xmlpp::Node *parent);
 // Boolean indicating if we save relative or absolute files names (inside .mixmod and .mx* files)

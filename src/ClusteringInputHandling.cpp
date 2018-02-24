@@ -95,6 +95,7 @@ void ClusteringInputHandling::setInitAlgo()
   {
     setNbTry();
     setNbTryInInit();
+    cStrategy_->setStrategyInitName(XEM::RANDOM);    
     return;
   }
   else if (init == "smallEM")

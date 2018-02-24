@@ -61,6 +61,25 @@ GaussianDiagParameter::GaussianDiagParameter(Model * iModel, ModelType * iModelT
 		_tabWk[k] = new DiagMatrix(_pbDimension); //Id
 	}
 }
+//-------------------------------------------------------------------------------------
+// constructor for ParameterDescription (C.Poli)
+//-------------------------------------------------------------------------------------
+GaussianDiagParameter::GaussianDiagParameter(int64_t iNbCluster, int64_t iPbDimension, ModelType * iModelType) 
+: GaussianEDDAParameter(iNbCluster, iPbDimension, iModelType) 
+{
+	int64_t k;
+	_tabLambda = new double [_nbCluster];
+	_tabShape = new DiagMatrix*[_nbCluster];
+	_W = new DiagMatrix(_pbDimension); //Id
+	for (k = 0; k < _nbCluster; k++) {
+		_tabLambda[k] = 1.0;
+		_tabShape[k] = new DiagMatrix(_pbDimension); //Id 
+
+		_tabSigma[k] = new DiagMatrix(_pbDimension); //Id
+		_tabInvSigma[k] = new DiagMatrix(_pbDimension); //Id
+		_tabWk[k] = new DiagMatrix(_pbDimension); //Id
+	}
+}
 
 //---------------------------------------------------------------------
 // copy Constructor

@@ -47,7 +47,7 @@ public:
 	/// Constructor
 	// called by XEMModel
 	GaussianDiagParameter(Model * iModel, ModelType * iModelType);
-
+    GaussianDiagParameter(int64_t iNbCluster, int64_t iPbDimension, ModelType * iModelType);
 	/// Constructor (copy)
 	GaussianDiagParameter(const GaussianDiagParameter * iParameter);
 

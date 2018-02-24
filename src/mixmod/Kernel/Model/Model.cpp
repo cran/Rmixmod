@@ -643,7 +643,7 @@ vector< vector<double> > Model::getEntropyMatrix() {
                 if (bParameter->getTabCenter()[k][j] == (m + 1)) {
                   prod = prod * ((1 - scatter[k][j][m]));
                 }
-                else { //Verifier avec Gilles ou Christophe cette partie, c'est pas sur par rapport au pdf...
+                else { 
                   prod = prod * (scatter[k][j][m] / (tabNbModality - 1));
                 }
               }

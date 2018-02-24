@@ -65,7 +65,7 @@ NULL
 ##'    \describe{
 ##'   \item{algo:}{list of character string with the estimation algorithm.  Possible values: "EM", "SEM", "CEM", c("EM","SEM"). Default value is "EM".}
 ##'   \item{nbTry:}{integer defining the number of tries. Default value: 1.}
-##'   \item{initMethod:}{a character string with the method of initialization of the algorithm specified in the \code{algo} argument. Possible values: "random", "smallEM", "CEM", "SEMMax", "parameter", "partition". Default value: "smallEM".}
+##'   \item{initMethod:}{a character string with the method of initialization of the algorithm specified in the \code{algo} argument. Possible values: "random", "smallEM", "CEM", "SEMMax", "parameter", "label". Default value: "smallEM".}
 ##'   \item{nbTryInInit:}{integer defining number of tries in \code{initMethod} algorithm. Default value: 50.}
 ##'   \item{nbIterationInInit:}{integer defining the number of "EM" or "SEM" iterations in \code{initMethod}. Default values: 5 if \code{initMethod} is "smallEM" and 100 if \code{initMethod} is "SEMMax".}
 ##'   \item{nbIterationInAlgo:}{list of integers defining the number of iterations if user want to use nbIteration as rule to stop the algorithm(s). Default value: 200.} 
@@ -73,7 +73,7 @@ NULL
 ##'   \item{epsilonInAlgo:}{list of reals defining the epsilon value for the algorithm. Warning: epsilonInAlgo doesn't have any sens if \code{algo} is SEM, so it needs to be set as NaN in that case. Default value: 0.001.}
 ##'   \item{seed:}{integer defining the seed of the random number generator. Setting a particular seed allows the user to (re)-generate a particular serie of random numbers. Default value is NULL, i.e. a random seed.}
 ##'      \item{parameter:}{instance of "Parameter" subclass. Required if initMethod is "parameter", forbidden otherwise.}
-##'      \item{labels:}{vector of integers containing labels. Required if initMethod is "partition", forbidden otherwise.}           
+##'      \item{labels:}{vector of integers containing labels. Required if initMethod is "label", forbidden otherwise.}           
 ##'    }
 ###` #param algo list of character string with the estimation algorithm.  Possible values: "EM", "SEM", "CEM", c("EM","SEM"). Default value is "EM".
 ###` #param nbTry integer defining the number of tries. nbTry must be a positive integer. Option available only if \code{init} is "random" or "smallEM" or "CEM" or "SEMMax". Default value: 1.
@@ -123,7 +123,7 @@ mixmodStrategy <- function(...){
 ##' \describe{
 ##'   \item{algo:}{list of character string with the estimation algorithm.  Possible values: "EM", "SEM", "CEM", c("EM","SEM"). Default value is "EM".}
 ##'   \item{nbTry:}{integer defining the number of tries. Default value: 1.}
-##'   \item{initMethod:}{a character string with the method of initialization of the algorithm specified in the \code{algo} argument. Possible values: "random", "smallEM", "CEM", "SEMMax", "parameter", "partition". Default value: "smallEM".}
+##'   \item{initMethod:}{a character string with the method of initialization of the algorithm specified in the \code{algo} argument. Possible values: "random", "smallEM", "CEM", "SEMMax", "parameter", "label". Default value: "smallEM".}
 ##'   \item{nbTryInInit:}{integer defining number of tries in \code{initMethod} algorithm. Default value: 50.}
 ##'   \item{nbIterationInInit:}{integer defining the number of "EM" or "SEM" iterations in \code{initMethod}. Default values: 5 if \code{initMethod} is "smallEM" and 100 if \code{initMethod} is "SEMMax".}
 ##'   \item{nbIterationInAlgo:}{list of integers defining the number of iterations if user want to use nbIteration as rule to stop the algorithm(s). Default value: 200.} 
@@ -131,7 +131,7 @@ mixmodStrategy <- function(...){
 ##'   \item{epsilonInAlgo:}{list of reals defining the epsilon value for the algorithm. Warning: epsilonInAlgo doesn't have any sens if \code{algo} is SEM, so it needs to be set as NaN in that case. Default value: 0.001.}
 ##'   \item{seed:}{integer defining the seed of the random number generator. Setting a particular seed allows the user to (re)-generate a particular serie of random numbers. Default value is NULL, i.e. a random seed.}
 ##'      \item{parameter:}{instance of "Parameter" subclass. Required if initMethod is "parameter", forbidden otherwise.}
-##'      \item{labels:}{vector of integers containing labels. Required if initMethod is "partition", forbidden otherwise.}           
+##'      \item{labels:}{vector of integers containing labels. Required if initMethod is "label", forbidden otherwise.}           
 
 ##' }
 ##'
@@ -180,7 +180,7 @@ setClass(
         stop("At least one algorithm is not valid. See ?mixmodAlgo for the list of available algorithms.")
       }
       # for 'initMethod'
-      if( (object@initMethod != "smallEM") & (object@initMethod != "random") & (object@initMethod != "CEM") & (object@initMethod != "SEMMax") & (object@initMethod != "parameter") & (object@initMethod != "partition")){
+      if( (object@initMethod != "smallEM") & (object@initMethod != "random") & (object@initMethod != "CEM") & (object@initMethod != "SEMMax") & (object@initMethod != "parameter") & (object@initMethod != "label")){
         stop("initMethod name is not valid.")
       }
       # for 'nbTry'
@@ -222,7 +222,7 @@ setClass(
           stop("parameter is mandatory when the init method is parameter.")
         }
       }
-      if(object@initMethod == "partition"){
+      if(object@initMethod == "label"){
         if (!is.numeric(object@labels)){
           stop("parameter is mandatory when the init method is parameter.")
         }
@@ -246,6 +246,9 @@ setClass(
         if( (max(object@epsilonInAlgo,na.rm=TRUE) > 1) | (min(object@epsilonInAlgo,na.rm=TRUE) <= 0) ) {
           stop("epsilonInAlgo must be less than one and strictly positive.")
         }
+      }
+      if(object@seed != -1){
+        print("WARNING: Strategy@seed attribute is obsolete! Consider using mixmodCluster function's 'seed' parameter instead")
       }
       return(TRUE)
     }
@@ -345,11 +348,11 @@ setMethod(
             stop("'parameter' argument is mandatory when initMethod='parameter'")
           }         
       }
-      if(.Object@initMethod == "partition"){
+      if(.Object@initMethod == "label"){
           if(!missing(labels)){      
           .Object@labels <- labels
           } else {
-            stop("'labels' argument is mandatory when initMethod='partition'")
+            stop("'labels' argument is mandatory when initMethod='label'")
           }                   
       } else {
           .Object@labels <- 0
@@ -459,6 +462,8 @@ setMethod(
 
 
 ###################################################################################
+##' 
+##'
 ##' @name [
 ##' @rdname extract-methods
 ##' @aliases [<-,Strategy-method

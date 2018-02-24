@@ -69,7 +69,7 @@ struct GenericData {
 
 GenericData* readGenericData (string fileName) {
 	fstream file;
-	file.open (fileName.c_str());
+	file.open (fileName.c_str(), std::ios::in);
 	if (!file.is_open()) {
 		THROW (InputException, wrongDataFileName);
 	}

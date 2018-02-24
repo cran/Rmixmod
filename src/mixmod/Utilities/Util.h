@@ -65,6 +65,7 @@
 // Need matrix applications
 #include "mixmod/Utilities/maths/SelectLibrary.h"
 
+using namespace std;
 
 namespace XEM {
 
@@ -830,7 +831,7 @@ template<typename T> void editTab(T ** tab, int64_t dim1, int64_t dim2,
 		flux << before;
 		for (j = 0; j < dim2; j++)
       putDoubleInStream(flux, p_tab_i[j], sep);
-		flux << endl;
+		flux << std::endl;
 		p_tab++;
 	}
 }

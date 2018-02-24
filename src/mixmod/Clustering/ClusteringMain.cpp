@@ -40,6 +40,7 @@
 #include "mixmod/Kernel/Criterion/ICLCriterion.h"
 #include "mixmod/Kernel/Criterion/NECCriterion.h"
 #include "mixmod/Kernel/IO/ModelOutput.h"
+#include <ctime>
 
 namespace XEM {
 
@@ -58,10 +59,6 @@ ClusteringMain::~ClusteringMain() {
 }
 
 void ClusteringMain::run(int seed, IoMode iomode, int verbose, int massiccc) {
-#ifdef _OPENMP
-#pragma omp parallel
-#endif
-{
 	//TODO: naming conventions ? (this doesn't look good)
 	IOMODE = iomode;
 	VERBOSE = verbose;
@@ -95,8 +92,37 @@ void ClusteringMain::run(int seed, IoMode iomode, int verbose, int massiccc) {
 		}
 	}
 
-  Data* workingData = _input->getDataDescription().getData();
-  ClusteringStrategy* workingStrategy = _input->getStrategy();
+  // Initialize timer info	
+  int64_t count = 0; // = nbModel_i + 1 + nbCluster_i * nbModel. Used for timer info with openMP.
+  time_t startTime;
+  ofstream progressFile;
+  ofstream progressFile2;
+  if (MASSICCC == 1) {
+    time(&startTime);
+  }
+
+	// Initialize output [HACK: using pointer because of an error when retrieving CriterionOutput later]
+	//std::vector<CriterionName>* vCriterion = new std::vector<CriterionName>();
+	std::vector<CriterionName>* vCriterion = new std::vector<CriterionName>();
+	const int nbCriterion = _input->getCriterionName().size();
+	for (int iCriterion = 0; iCriterion<nbCriterion; iCriterion++)
+		vCriterion->push_back(_input->getCriterionName()[iCriterion]);
+	_output = new ClusteringOutput(*vCriterion);
+
+	// Main loop : build and run every model, and incrementally fill output
+	// NOTE: potential parallelization here (OpenMP at least)
+
+
+  const int nbModel = _input->getModelType().size();
+  const int nbnbCluster = _input->getNbCluster().size();
+  _output->clusteringModelOutputResize(nbModel * nbnbCluster);
+
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
+{
+  Data* workingData = _input->getDataDescription().getData()->clone();
+  ClusteringStrategy* workingStrategy = _input->getStrategy()->clone();
 
 	// Prepare reduced data if qualitative data and DATA_REDUCE==true
 	std::vector<int64_t> correspondenceOriginDataToReduceData;
@@ -122,32 +148,8 @@ void ClusteringMain::run(int seed, IoMode iomode, int verbose, int massiccc) {
 		}
 	}
 
-	// Initialize output [HACK: using pointer because of an error when retrieving CriterionOutput later]
-	//std::vector<CriterionName>* vCriterion = new std::vector<CriterionName>();
-	std::vector<CriterionName>* vCriterion = new std::vector<CriterionName>();
-	const int nbCriterion = _input->getCriterionName().size();
-	for (int iCriterion = 0; iCriterion<nbCriterion; iCriterion++)
-		vCriterion->push_back(_input->getCriterionName()[iCriterion]);
-	_output = new ClusteringOutput(*vCriterion);
 
-	// Main loop : build and run every model, and incrementally fill output
-	// NOTE: potential parallelization here (OpenMP at least)
-
-	// Initialize timer info	
-	std::time_t startTime;
-	ofstream progressFile;
-	if (MASSICCC == 1) {
-		std::time(&startTime);
-	}
-
-  const int nbModel = _input->getModelType().size();
-  const int nbnbCluster = _input->getNbCluster().size();
 #ifdef _OPENMP
-#pragma omp critical
-#endif
-  _output->clusteringModelOutputResize(nbModel * nbnbCluster);
-#ifdef _OPENMP
-  omp_set_num_threads(1); // Force only 1 threads while it's not working like it should... Remove this to enable "export OMP_NUM_THREADS"
 #pragma omp for collapse(2)
 #endif
   for (int nbCluster_i = 0; nbCluster_i < nbnbCluster; nbCluster_i++) {
@@ -208,7 +210,8 @@ void ClusteringMain::run(int seed, IoMode iomode, int verbose, int massiccc) {
 			// 3. compute criteria
 			//--------------------
 
-			ClusteringModelOutput* cmoutput = new ClusteringModelOutput(model);
+			ClusteringModelOutput* cmoutput;
+			cmoutput = new ClusteringModelOutput(model);
 			_output->addEstimation(cmoutput, nbModel_i + nbCluster_i * nbModel);
 			if (model->getErrorType() == NOERROR) {
 			  atLeastOneModelOk = true;
@@ -272,32 +275,36 @@ void ClusteringMain::run(int seed, IoMode iomode, int verbose, int massiccc) {
 			// model cannot be null (especially when we'll use enum class)
       delete model;
 			//Write progress in file
-			if (MASSICCC == 1) {
-				progressFile.open ("progress.json");
-				progressFile << "{ \"Progress\" :  " << ((double)nbModel_i + 1 + (double)nbCluster_i * (double)nbModel)/((double)nbModel * (double)nbnbCluster) * 100.0;
-				std::time_t currTime;
-				std::time(&currTime);
-				double timePerModel = std::difftime(currTime, startTime) / ((double)nbModel_i + 1 + (double)nbCluster_i * (double)nbModel);
-				progressFile << ", \"Estimated remaining time\" : " << timePerModel * (nbModel - nbModel_i - 1) +  (nbnbCluster - nbCluster_i - 1) * nbModel * timePerModel << " } ";
-				progressFile.close();
-			}
-		}
-	}
+      if (MASSICCC == 1) {
+        time_t currTime;
+        time(&currTime);
+        double timePerModel = difftime(currTime, startTime) / ((double)count + 1);
+        progressFile.open ("progress.json");
+        progressFile << "{ \"Progress\" :  " << ((double)count + 1.0)/((double)nbModel * (double)nbnbCluster) * 100.0;
+        progressFile << ", \"Estimated remaining time\" : " << timePerModel * (nbModel * nbnbCluster - count - 1) << " } ";
+        progressFile.close();
+
+      }
+      count++;
+    }
+  }
 
 
 	// Conditionally release memory
   if (_input->getKnownLabelDescription()) delete workingKnownPartition;
   if (_input->getDataType() == QualitativeData && DATA_REDUCE) {
-    delete workingData;
     delete workingStrategy;
   }
+  delete workingData;
+//delete workingStrategy; //Invalid read dans le cas USER_PARTITION && example... 
+
 //delete vCriterion;
 
   if (!atLeastOneModelOk){
     THROW(OtherException, AllModelsGotErros);
   }
 
-}
+} // End of openMP parallel section
 }
 
 }

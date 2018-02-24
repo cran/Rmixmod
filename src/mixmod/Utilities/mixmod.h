@@ -20,7 +20,7 @@
     You should have received a copy of the GNU General Public License
     along with MIXMOD.  If not, see <http://www.gnu.org/licenses/>.
 
-    All informations available on : http://www.mixmod.org                                                                                               
+    All informations available on : http://www.mixmod.org
 ***************************************************************************/
 
 #ifndef MIXMOD_H
@@ -33,11 +33,9 @@
 #ifndef WANT_MATH
 #define WANT_MATH
 #endif
-
-// newmat includes
-#include "NEWMAT/newmatap.h"
-#include "NEWMAT/newmatio.h"
-
+#ifndef XEMmathLib
+#define XEMmathLib 1 // default is Eigen
+#endif
 // mixmod includes
 #include "mixmod/Clustering/ClusteringInput.h"
 #include "mixmod/Clustering/ClusteringOutput.h"

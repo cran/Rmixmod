@@ -2,15 +2,6 @@
 ##'
 ##' Rmixmod is a package based on the existing MIXMOD software. MIXMOD is a tool for fitting a mixture model of multivariate gaussian or multinomial components to a given data set with either a clustering, a density estimation or a discriminant analysis point of view.
 ##'
-##' \tabular{ll}{
-##'   Package: \tab Rmixmod\cr 
-##'   Type: \tab Package\cr 
-##'   Version: \tab 2.1.1\cr
-##'   Date: \tab 2016-08-25\cr 
-##'   License: \tab GPL-3 + file LICENSE\cr 
-##'   LazyLoad: \tab yes\cr
-##' }
-##'
 ##' The general purpose of the package is to discover, or explain, group structures in multivariate data sets with unknown (cluster analysis or clustering) or known class discriminant analysis or classification). It is an exploratory data analysis tool for solving clustering and classification problems. But it can also be regarded as a semi-parametric tool to estimate densities with Gaussian mixture distributions and multinomial distributions.
 ##'
 ##' Mathematically, mixture probability density function (pdf) \eqn{f} is a weighted sum of \eqn{K} components densities : 
@@ -128,7 +119,7 @@ NULL
 ##'
 ##' These data were originally collected by the British Board of Trade in their investigation of the sinking.  Note that there is not complete agreement among primary sources as to the exact numbers on board, rescued, or lost.
 ##'
-##' Due in particular to the very successful film "Titanic", the last years saw a rise in public interest in the Titanic.  Very detailed data about the passengers is now available on the Internet, at sites such as "Encyclopedia Titanica" (\url{http://www.rmplc.co.uk/eduweb/sites/phind}).
+##' Due in particular to the very successful film "Titanic", the last years saw a rise in public interest in the Titanic.  Very detailed data about the passengers is now available on the Internet, at sites such as "Encyclopedia Titanica".
 ##'
 ##' @format A data frame with 2201 observations on the following 4 variables.
 ##'
@@ -349,4 +340,32 @@ NULL
 ##' @examples
 ##' data(heterodatatest)
 ##' summary(heterodatatest)
+NULL
+
+#' clusteringMain
+#'
+#' TODO: describe
+#'
+#' @name clusteringMain
+NULL
+
+#' learnMain
+#'
+#' TODO: describe
+#'
+#' @name learnMain
+NULL
+
+#' predictMain
+#'
+#' TODO: describe
+#'
+#' @name predictMain
+NULL
+
+#' xMain
+#'
+#' TODO: describe
+#'
+#' @name xMain
 NULL

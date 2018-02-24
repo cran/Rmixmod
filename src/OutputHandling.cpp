@@ -16,9 +16,6 @@
 
 #include "mixmod/Kernel/IO/ProbaDescription.h"
 #include "mixmod/Kernel/IO/Proba.h"
-#include "mixmod/Kernel/Parameter/BinaryParameter.h"
-#include "mixmod/Kernel/Parameter/GaussianEDDAParameter.h"
-#include "mixmod/Kernel/Parameter/CompositeParameter.h"
 #include "mixmod/Kernel/IO/ParameterDescription.h"
 
 #include "mixmod/Matrix/Matrix.h"
@@ -60,6 +57,31 @@ OutputHandling::OutputHandling( XEM::ModelOutput* MOutput, Rcpp::S4& xem, const 
     }
   }
 }
+OutputHandling::OutputHandling( XEM::Parameter* par, Rcpp::S4& xem, const XEM::DataType dataType, int nbCluster )
+                              : MOutput_(nullptr)
+                              , xem_(xem)
+                              , nbCluster_(nbCluster)       
+{
+  
+  // add nbCluster value
+  //xem_.slot("nbCluster") = nbCluster_;
+    
+  // add parameters
+  switch (dataType) {
+  case XEM::QuantitativeData:
+    setGaussianParameter(dynamic_cast<XEM::GaussianEDDAParameter const *>(par));
+    break;
+  case XEM::QualitativeData:
+    setMultinomialParameter(dynamic_cast<XEM::BinaryParameter const *>(par));
+    break;
+  case XEM::HeterogeneousData:
+    setCompositeParameter(dynamic_cast<XEM::CompositeParameter *>(par));
+    break;
+  default:
+    break;
+  }
+  
+}
 
 // destructor
 OutputHandling::~OutputHandling()
@@ -67,10 +89,10 @@ OutputHandling::~OutputHandling()
 
 
 // set gaussian paramaters 
-void OutputHandling::setGaussianParameter()
+void OutputHandling::setGaussianParameter(XEM::GaussianEDDAParameter const * parArg)
 {
   // get pointer to gaussian parameters
-  const XEM::GaussianEDDAParameter * gParam = dynamic_cast<XEM::GaussianEDDAParameter const *>(MOutput_->getParameterDescription()->getParameter());
+  const XEM::GaussianEDDAParameter * gParam = parArg!=nullptr ? parArg : dynamic_cast<XEM::GaussianEDDAParameter const *>(MOutput_->getParameterDescription()->getParameter());
   // get the number of variables
   nbVariable_ = gParam->getPbDimension();
   
@@ -104,10 +126,10 @@ void OutputHandling::setGaussianParameter()
 }
 
 // set multinomial parameters 
-void OutputHandling::setMultinomialParameter()
+void OutputHandling::setMultinomialParameter(XEM::BinaryParameter const * parArg)
 {
   // get pointer to multinomial parameters
-  const XEM::BinaryParameter * bParam = static_cast<XEM::BinaryParameter const *>(MOutput_->getParameterDescription()->getParameter());
+  const XEM::BinaryParameter * bParam = parArg!=nullptr ? parArg : dynamic_cast<XEM::BinaryParameter const *>(MOutput_->getParameterDescription()->getParameter());
   
   // get the number of variables
   nbVariable_ = bParam->getPbDimension();
@@ -158,13 +180,13 @@ void OutputHandling::setMultinomialParameter()
 }
 
 // set composite parameters
-void OutputHandling::setCompositeParameter()
+void OutputHandling::setCompositeParameter(XEM::CompositeParameter  *parArg)
 {
-  const XEM::CompositeParameter * cParam =  dynamic_cast<XEM::CompositeParameter const *>(MOutput_->getParameterDescription()->getParameter());
+  XEM::CompositeParameter * cParam =  parArg!=nullptr ? parArg : dynamic_cast<XEM::CompositeParameter  *>(MOutput_->getParameterDescription()->getParameter());
   // get pointer to gaussian parameters
-  const XEM::GaussianEDDAParameter * gParam = dynamic_cast<XEM::GaussianEDDAParameter const *>(MOutput_->getParameterDescription()->getParameter()->getGaussianParameter());
+  const XEM::GaussianEDDAParameter * gParam = dynamic_cast<XEM::GaussianEDDAParameter const *>(cParam->getGaussianParameter());
   // get pointer to multinomial parameters
-  const XEM::BinaryParameter * bParam = static_cast<XEM::BinaryParameter const *>(MOutput_->getParameterDescription()->getParameter()->getBinaryParameter());
+  const XEM::BinaryParameter * bParam = static_cast<XEM::BinaryParameter const *>(cParam->getBinaryParameter());
 
   // get the number of variables
   int64_t nbVariable_Gaussian = gParam->getPbDimension();

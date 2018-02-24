@@ -44,7 +44,7 @@ public:
 	/// Constructor
 	// called by XEMModel
 	GaussianSphericalParameter(Model * iModel, ModelType * iModelType);
-
+    GaussianSphericalParameter(int64_t iNbCluster, int64_t iPbDimension, ModelType * iModelType);
 	/// Constructor (copy)
 	GaussianSphericalParameter(const GaussianSphericalParameter * iParameter);
 

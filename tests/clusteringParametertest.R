@@ -23,6 +23,5 @@ data <- iris[,1:4]
 
 param <- createGaussianParameter(3,4);
 
-#strategy = new("Strategy", initMethod="parameter", parameter=param)
 strategy <- mixmodStrategy(initMethod="parameter", parameter=param)
 out <- mixmodCluster(data=data, nbCluster=3 , strategy=strategy);

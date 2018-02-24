@@ -181,6 +181,7 @@ setMethod(
 
 
 ###################################################################################
+##'
 ##' @name [
 ##' @rdname extract-methods
 ##' @aliases [<-,MultinomialParameter-method

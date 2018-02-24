@@ -22,7 +22,12 @@
 
 	All informations available on : http://www.mixmod.org                                                                                               
  ***************************************************************************/
-
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+//#include <sys/sendfile.h>
+#include <stdio.h>
+#include <unistd.h>
 #include "mixmod_iostream/IOStreamUtil.h"
 //#include "mixmod_iostream/DomClusteringProject.h"
 #include "mixmod_iostream/DomOpProject.h"
@@ -51,7 +56,7 @@
 #include "mixmod/Kernel/IO/LabelDescription.h"
 
 namespace XEM {
-
+  string PROJECT_DIRNAME = "xxx";
 //IOStreamErrorTypeToString
 string IOStreamErrorTypeToString(const IOStreamErrorType & errorType) {
 	string res;
@@ -158,8 +163,8 @@ ClusteringMain * IStream(const string & s, IOStreamFormat format, bool bOnlyInpu
     string xsitype = root->get_attribute_value("type", "xsi");
     if (xsitype.compare("Clustering") != 0) throw IOStreamErrorType::badXML;    
     //DomClusteringProject docClustering(root);
+    IoModeManager ioMode = IoModeManager(root);  //set the IoMode defined by a FloatEncoding tag, if it exists    
     DomOpProject docClustering(root);
-      
     //clusteringInput
     ClusteringInput * cInput = new ClusteringInput();
 
@@ -183,7 +188,7 @@ ClusteringMain * IStream(const string & s, IOStreamFormat format, bool bOnlyInpu
       //ClusteringOutput
       cOutput = new ClusteringOutput(cInput->getCriterionName());
       //docClustering.readClustering(cOutput);
-      docClustering.readXmlFillOut<ClusteringOutput, ClusteringModelOutput>(cOutput);
+      docClustering.readXmlFillOut<ClusteringOutput, ClusteringModelOutput>(cOutput, cInput);
     }
 
     cInput->finalize();
@@ -206,7 +211,7 @@ ClusteringMain * IStream(const string & s, IOStreamFormat format, bool bOnlyInpu
     if ( root->get_name() != "Project" ) throw IOStreamErrorType::badIOStreamFormat;
     string xsitype = root->get_attribute_value("type", "xsi");
     if (xsitype.compare("Learn") != 0)  throw IOStreamErrorType::badXML;    
-   
+    IoModeManager ioMode = IoModeManager(root);  //set the IoMode defined by a FloatEncoding tag, if it exists   
     DomOpProject docLearn(root);
 
     //learnInput
@@ -232,7 +237,7 @@ ClusteringMain * IStream(const string & s, IOStreamFormat format, bool bOnlyInpu
     if (!bOnlyInput) {
       //LearnOutput
       lOutput = new LearnOutput();//lInput->getCriterionName());
-      docLearn.readXmlFillOut<LearnOutput, LearnModelOutput>(lOutput);
+      docLearn.readXmlFillOut<LearnOutput, LearnModelOutput>(lOutput, lInput);
     }
 
     lInput->finalize();
@@ -253,7 +258,7 @@ ClusteringMain * IStream(const string & s, IOStreamFormat format, bool bOnlyInpu
     if ( root->get_name() != "Project" ) throw IOStreamErrorType::badIOStreamFormat;
     string xsitype = root->get_attribute_value("type", "xsi");
     if (xsitype.compare("Predict") != 0)  throw IOStreamErrorType::badXML;    
-   
+    IoModeManager ioMode = IoModeManager(root);  //set the IoMode defined by a FloatEncoding tag, if it exists   
     DomOpProject docPredict(root);
 
     //predictInput
@@ -277,7 +282,7 @@ ClusteringMain * IStream(const string & s, IOStreamFormat format, bool bOnlyInpu
     if (!bOnlyInput) {
       //PredictOutput
       pOutput = new PredictOutput();//pInput->getCriterionName());
-      docPredict.readXmlFillOut<PredictOutput, PredictModelOutput>(pOutput);
+      docPredict.readXmlFillOut<PredictOutput, PredictModelOutput>(pOutput, pInput);
     }
 
     pInput->finalize();
@@ -662,23 +667,52 @@ void OStream(const string & s, IOStreamFormat format, ClusteringMain * cMain, Io
 		throw IOStreamErrorType::badIOWriteFormat;
 	}
 }
-  
+  string getBaseName(const string& s){
+    std::size_t i = s.find_last_of("/");
+    return s.substr(i+1);
+  }
+  string getDirName(const string& s){
+    std::size_t i = s.find_last_of("/");
+    return s.substr(0, i);
+  }
+  vector<string> getPathElements(const string& s){
+    vector<string> res(2);
+    std::size_t i = s.find_last_of("/");
+    res[0] = s.substr(0, i);
+    res[1] = s.substr(i+1);
+    return res;
+  }
+  string normalizeFilename(const string& s){
+    if(PATHMODE == PathMode::ABSOLUTE) return s;
+    vector<string> vs = getPathElements(s);
+    if(vs[0].compare(PROJECT_DIRNAME)!=0) return s;
+    return vs[1];
+    
+  }
+  string getAbsolutePath(const string& s){
+    if(PATHMODE == PathMode::ABSOLUTE) return s;
+    return PROJECT_DIRNAME+"/"+s;
+  }
   template<class T>
-  void OStream_XML(const string & s, T * cMain, IoMode iomode) {
+  void OStream_XML(const string & s, T * cMain, IoMode iomode, PathMode pathMode) {
     IOMODE = iomode; //TODO...
     string dataFilename = string(s);
     
     //fill project with our input and output
     DomOpProject project ;
-    project.writeMixmodXml(dataFilename, cMain);
+    PATHMODE = pathMode;
+    vector<string> elts = getPathElements(s);
+    PROJECT_DIRNAME = elts[0];
+    string prefix = (pathMode == PathMode::ABSOLUTE) ? dataFilename : elts[1];
+    project.writeMixmodXml(prefix, cMain);
     string filename = dataFilename + ".mixmod";
     removeIfExists(filename);
     //creates the .mixmod with project
     project.write_to_file(filename);
   }
-  template void   OStream_XML(const string & s, ClusteringMain* cMain, IoMode iomode);
-  template void   OStream_XML(const string & s, LearnMain* cMain, IoMode iomode);
-  template void   OStream_XML(const string & s, PredictMain* cMain, IoMode iomode);    
+  template void   OStream_XML(const string & s, ClusteringMain* cMain, IoMode iomode, PathMode pathMode);
+  template void   OStream_XML(const string & s, LearnMain* cMain, IoMode iomode, PathMode pathMode);
+  template void   OStream_XML(const string & s, PredictMain* cMain, IoMode iomode, PathMode pathMode);    
   
 void OStream_DiscriminantAnalysis_XML(const string & s, ClusteringMain * cMain) {
 }
@@ -953,7 +987,10 @@ void OStream_Clustering_FLAT(ClusteringMain * cMain) {
 }
   // Tools for floats
   double custom_stod(string s){
-    if (IOMODE != IoMode::BINARY || s.find('.')!=string::npos) {
+    //cout<<"custom_stod:"<<s<<":"<<endl;
+    //if (IOMODE != IoMode::BINARY || s.find('.')!=string::npos) {
+    if (IOMODE != IoMode::BINARY) {      
+      //cout<<"custom_stod_HR:"<<s<<":"<<endl;
       return std::stod(s);
     }
     double result;      
@@ -963,6 +1000,10 @@ void OStream_Clustering_FLAT(ClusteringMain * cMain) {
     stream >> tmp;
     memcpy(&result, &tmp, sizeof(tmp));
     return result;
+  }
+  double std_stod(string s){
+    //cout<<"custom_stod:"<<s<<":"<<endl;
+    return std::stod(s);
   }
   string custom_dtos(double d){
     if (IOMODE != IoMode::BINARY) {
@@ -1180,5 +1221,54 @@ std::vector<int64_t> Global::vNbFactor;
       }
       return NULL;
   }
+  /*  
+  void copyFile(const std::string& src, const std::string& dest){
+    struct stat stat_src;
+    off_t offset = 0;
+    int src_fd = open (src.c_str(), O_RDONLY);
+    fstat (src_fd, &stat_src);
+    int dest_fd = open (dest.c_str(), O_WRONLY | O_CREAT, stat_src.st_mode);
+    sendfile (dest_fd, src_fd, &offset, stat_src.st_size);
+    close (dest_fd);
+    close (src_fd);
+    }*/
+  
+  ProjectType getProjectType(string filename){
+    ValidateSchema(filename, IOStreamXMLFile::Project);
+    xmlpp::DomParser parser;
+    parser.parse_file(filename);
+    xmlpp::Document *doc = parser.get_document();
+    xmlpp::Element *root = doc->get_root_node();  
+    if ( root->get_name() != "Project" ) throw IOStreamErrorType::badIOStreamFormat;
+    string xsitype = root->get_attribute_value("type", "xsi");
+    if (xsitype.compare("Clustering") == 0) return ProjectType::Clustering;
+    if (xsitype.compare("Learn") == 0) return ProjectType::Learn;
+    if (xsitype.compare("Predict") == 0) return ProjectType::Predict;
+    return ProjectType::Unknown;            
+  }
+
+  IoModeManager::IoModeManager(xmlpp::Element* root){
+    //xmlpp::Element* elt = dynamic_cast<xmlpp::Element*>(root->get_first_child("FloatEncoding"));
+    /*if(elt){
+      previous_ = IOMODE;      
+      string encoding = elt->get_child_text()->get_content();
+      if(encoding.compare("HexBinary")==0){
+        IOMODE = IoMode::BINARY;
+      } else {
+        IOMODE = IoMode::NUMERIC;
+      }
+      } */
+  }
+
+  
+  IoModeManager::IoModeManager(IoMode mode){
+    //previous_ = IOMODE;
+    //IOMODE = mode;
+  }
+  IoModeManager::~IoModeManager(){
+    //IOMODE = previous_;
+  }
 
 } //end namespace
+
+

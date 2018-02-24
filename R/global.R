@@ -189,6 +189,61 @@ setGeneric(
     standardGeneric("sortByCriterion")
   }
 )
+
+.is_dtype_alike <- function(x, y, dt, t_func){
+       if( x@dataType == dt ) return (TRUE);
+       if( x@dataType != "composite" ) return (FALSE);
+       # here x@dataType == "composite"
+       if( is.null(y)) return(TRUE);
+       if (is.numeric(y)){
+          num_y <- y;
+       } else {
+         num_y <- c();
+         for(i in 1:length(y)){
+            num_y[i] <- which(colnames(x@data) == y[i]);
+         }
+       }
+       factor <- x@bestResult@parameters@factor; #TODO: was out@..., but who was 'out' ?!
+       for(i in num_y){
+             #if(factor[i] != 0) return (FALSE);
+             if(t_func(factor[i])) return (FALSE);             
+       }
+       return (TRUE);
+     }    
+.test_nz <-function(t){return(t!=0);}
+.test_z <-function(t){return(t==0);}
+.is_quantitative_alike <- function(x, y, showOnly){
+      if(!is.null(showOnly) && showOnly != 'quantitative') return(FALSE);
+      return(.is_dtype_alike(x, y, 'quantitative', .test_nz))
+    }
+.is_qualitative_alike <- function(x, y, showOnly){
+      if(!is.null(showOnly) && showOnly != 'qualitative') return(FALSE);
+      if(!is.null(y)){
+        stop("y parameter is not relevant in plot() when data are qualitative");
+      }
+      return(.is_dtype_alike(x, y, 'qualitative', .test_z))
+    }
+
+.is_quantitative_alike2 <- function(x, data, vars){
+       if( is(x@parameters, "GaussianParameter")  ) return (TRUE);
+       if( !is(x@parameters, "CompositeParameter") ) return (FALSE);
+       # here x@dataType == "composite"
+       if( is.null(vars)) return(FALSE);
+       if (is.numeric(vars)){
+          num_var <- vars;
+       } else {
+         num_var <- c();
+         for(i in 1:length(vars)){
+            num_var[i] <- which(colnames(data) == vars[i]);
+         }
+       }
+       factor <- x@parameters@factor;
+       for(i in num_var){
+             if(factor[i] != 0) return (FALSE);
+       }
+       return (TRUE);
+     }    
+
 ###################################################################################
 
 
@@ -288,7 +343,6 @@ NULL
 ###################################################################################
 ##' Produce result summaries of a Rmixmod class 
 ##'
-##' @param x Either a \code{\linkS4class{Mixmod}} object, a \code{\linkS4class{Parameter}} object or a \code{\linkS4class{MixmodResults}} object.
 ##' @param ... further arguments passed to or from other methods
 ##'
 ##' @return NULL. Summaries to standard out.
@@ -316,6 +370,7 @@ NULL
 ##' @param i the name of the element we want to extract or replace.
 ##' @param j if the element designing by i is complex, j specifying elements to extract or replace.
 ##' @param drop For matrices and arrays.  If TRUE the result is coerced to the lowest possible dimension (see the examples).  This only works for extracting elements, not for the replacement.  See drop for further details.
+##' @param value TODO...
 ##'
 ##' @name [
 ##' @docType methods

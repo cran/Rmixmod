@@ -22,33 +22,42 @@
 
     All informations available on : http://www.mixmod.org                                                                                               
 ***************************************************************************/
-
-#ifndef mixmod_SelectLibrary_H
-#define mixmod_SelectLibrary_H
-
 // Route to interface from any mathematical library to our code.
 // Only the following include would change if we try another library.
 
-// Current setting: NEWMAT [seg fault with Eigen, TOFIX]
+
 #ifndef XEMmathLib
-#define XEMmathLib 4
+#define XEMmathLib 1 // default is Eigen
 #endif
 
 #if XEMmathLib == 0
-#include "mixmod/Matrix/Libraries/Armadillo.h"
+#include "mixmod/Utilities/maths/NEWMAT.h" // Old library, still available
 
 #elif XEMmathLib == 1
-#include "mixmod/Matrix/Libraries/Eigen.h"
+#include "mixmod/Utilities/maths/Eigen.h" // Default library, only required one
 
 #elif XEMmathLib == 2
-#include "mixmod/Matrix/Libraries/GSL.h"
+#include "mixmod/Utilities/maths/GSL.h" // Optional.
 
 #elif XEMmathLib == 3
-#include "mixmod/Matrix/Libraries/ITpp.h"
+#include "mixmod/Utilities/maths/ITpp.h" // Optional.
 
 #elif XEMmathLib == 4
-#include "mixmod/Utilities/maths/NEWMAT.h"
+#include "mixmod/Utilities/maths/Armadillo.h" // Optional.
 
 #endif
 
-#endif
+
+/*
+enum Storage_type {
+
+	row = 0,         // stored by row
+	column = 1,      // stored by colmun
+};*/
+
+
+
+
+// Current setting: NEWMAT [seg fault with Eigen, TOFIX]
+//#include "mixmod/Utilities/maths/NEWMAT.h"
+//#include "mixmod/Utilities/maths/Eigen.h"

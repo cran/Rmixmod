@@ -12,32 +12,14 @@ NULL
 
 
 ###################################################################################
-##' Constructor of [\code{\linkS4class{Mixmod}}] class
+##' Constructor of [\code{\linkS4class{MixmodXmlInput}}] class
 ##' 
-##' This is a class to run mixmod library.
+##' This is ...
 ##'
-##' \describe{
-##'   \item{data}{numeric vector or a data frame of observations. Can be qualitative,quantitative or both(heterogeneous)}
-##'   \item{dataType}{character. Type of data. It defines whether data is quantitative, qualitative or composite}
-##'   \item{nbCluster}{integer. It indicates the number of classes.}
-##'   \item{knownLabels}{numeric. It contains the known labels.}
-##'   \item{weight}{numeric vector with n (number of individuals) rows. Weight is optionnal. This option is to be used when weight is associated to the data.}
-##'   \item{nbVariable}{integer. The number of variables.}
-##'   \item{nbSample}{integer. The number of observations.}
-##'   \item{criterion}{list of character. This option permits to select the criterion giving the best configuration of an execution.}
-##'   \item{models}{a S4 [\code{\linkS4class{Model}}] object. Defining the list of models to be tested.}
-##'   \item{error}{logical. Say if at least one model finished with no error in MIXMOD.}
-##'   \item{results}{a list of S4 [\code{\linkS4class{MixmodResults}}] object containing all results. Results are sorted into a ascending order according to the first criterion (descending order for the CV criterion). This order can be changed by using the sortByCriterion() method.}
-##' }
+##' @name MixmodXmlInput-class
+##' @rdname MixmodXmlInput-class
+##' @exportClass MixmodXmlInput
 ##'
-##' @examples
-##'   getSlots("Mixmod")
-##'
-##' @name Mixmod-class
-##' @rdname Mixmod-class
-##' @exportClass Mixmod
-##'
-
 setClass(
   Class="MixmodXmlInput",
   representation=representation(
@@ -77,9 +59,43 @@ setMethod(
     return(.Object)
     }
   )
+
+#' mixmodXmlInput
+#'
+#' TODO: describe..
+#'
+#' @param ... ...
+#'
 mixmodXmlInput <- function(...){
   return(new("MixmodXmlInput", ...))
 }
+
+###################################################################################
+##' Constructor of [\code{\linkS4class{Mixmod}}] class
+##' 
+##' This is a class to run mixmod library.
+##'
+##' \describe{
+##'   \item{data}{numeric vector or a data frame of observations. Can be qualitative,quantitative or both(heterogeneous)}
+##'   \item{dataType}{character. Type of data. It defines whether data is quantitative, qualitative or composite}
+##'   \item{nbCluster}{integer. It indicates the number of classes.}
+##'   \item{knownLabels}{numeric. It contains the known labels.}
+##'   \item{weight}{numeric vector with n (number of individuals) rows. Weight is optionnal. This option is to be used when weight is associated to the data.}
+##'   \item{nbVariable}{integer. The number of variables.}
+##'   \item{nbSample}{integer. The number of observations.}
+##'   \item{criterion}{list of character. This option permits to select the criterion giving the best configuration of an execution.}
+##'   \item{models}{a S4 [\code{\linkS4class{Model}}] object. Defining the list of models to be tested.}
+##'   \item{error}{logical. Say if at least one model finished with no error in MIXMOD.}
+##'   \item{results}{a list of S4 [\code{\linkS4class{MixmodResults}}] object containing all results. Results are sorted into a ascending order according to the first criterion (descending order for the CV criterion). This order can be changed by using the sortByCriterion() method.}
+##' }
+##'
+##' @examples
+##'   getSlots("Mixmod")
+##'
+##' @name Mixmod-class
+##' @rdname Mixmod-class
+##' @exportClass Mixmod
+##'
 setClass(
   Class="Mixmod",
   representation=representation(
@@ -355,6 +371,8 @@ setMethod(
 
 
 ###################################################################################
+##' @param object An object (???)
+##
 ##' @rdname summary-methods
 ##' @aliases summary summary,Mixmod-method
 ##'
@@ -389,7 +407,10 @@ setMethod(
 ##' 2-dimensional representation of the data set. Bigger symbol means that observations are similar.
 ##'
 ##' @param x an object of class [\code{\linkS4class{Mixmod}}]
-##' @param y a list of variables to plot (subset). Variables names or indices. Only in a quantitive case.
+##' @param y a list of variables to plot (subset). Variables names or indices. Only in a quantitative case.
+##' @param showOnly show only (...)
+##' @param withResult with result (...)
+##' @param hist_x_dim Histogram dimension (???)
 ##' @param ... further arguments passed to or from other methods
 ##'
 ##' @importFrom graphics plot
@@ -417,9 +438,29 @@ setMethod(
 setMethod(
   f="plot",
   signature=c("Mixmod"),
-  function(x, y, hist_x_dim=10000, ...){
+  function(x, y, showOnly=NULL, withResult=NULL, hist_x_dim=10000, ...){
     # for quantitative data
-    if ( x@dataType == "quantitative" ){
+    #if ( x@dataType == "quantitative" ||(x@dataType == "composite" && is.dataType(data.frame(x@data)[y]) == "quantitative" )){
+    #if ( x@dataType == "quantitative" ){
+    if(x@dataType != "composite" && !is.null(showOnly)){
+       stop("showOnly argument is allowed only when data are composite");
+    }
+    if(!is.null(showOnly) && !(showOnly %in% c('quantitative', 'qualitative'))){
+      stop("only 'quantitative'and 'qualitative' values are allowed for showOnly");             
+    }
+    if ( x@dataType == "composite" && is.null(showOnly)){
+      stop("showOnly argument (i.e. showOnly={'quantitative'|'qualitative'}) is mandatory when data are heterogeneous")
+    }
+    y2 = NULL; if(!missing(y)) y2 = y;
+    if(is.null(withResult)){
+        thisResult = x@bestResult;
+    } else if(is(withResult, "MixmodResults")){
+      #if(!(withResult %in% x@results)) stop("unknown result");
+      thisResult = withResult;
+    } else if(withResult %in% 1:length(x@results)) {
+      thisResult = x@results[[withResult]];
+    } else stop("unknown result.");
+    if ( .is_quantitative_alike(x, y2, showOnly) ) {
       # create layout
       if ( x@nbVariable == 1 ){
         stop("data has only one variable. Try hist() function to get a 1D representation of x.")
@@ -448,7 +489,7 @@ setMethod(
         for ( i in 1:length(y) ){
           #par(mfg=c(i,i))
           screen(i+((i-1)*length(y)))
-          histCluster(x@bestResult, x@data, variables=y[i], hist_x_dim=hist_x_dim, ...)
+          histCluster(thisResult, x@data, variables=y[i], hist_x_dim=hist_x_dim, ...)
         }
         if (length(y)>1){
           # create biplots
@@ -456,7 +497,7 @@ setMethod(
             for( j in 1:(i-1) ){
               #par(mfg=c(i,j))
               screen(j+((i-1)*length(y)))
-              plotCluster(x@bestResult, x@data, variable1=y[j], variable2=y[i], ...)
+              plotCluster(thisResult, x@data, variable1=y[j], variable2=y[i], ...)
             }
           }
         }
@@ -465,7 +506,7 @@ setMethod(
         par(op)
 
       }
-      else{ 
+      else{ # y is missing => show all variables
         # get old par 
         op <- par(no.readonly = TRUE) # the whole list of settable par's.
         # changing marging
@@ -473,20 +514,28 @@ setMethod(
         # decreasing font size
         par(cex = .75)
         # create layout matrix
+        nbVariable = x@nbVariable;
+        cols = colnames(x@data);
+        if( x@dataType == "composite" ){
+          factor = thisResult@parameters@factor;
+          data = x@data[,which(factor==0)];
+          nbVariable = length(which(factor==0));
+          cols = cols[which(factor==0)];
+        }          
         #par( mfrow = c(x@nbVariable, x@nbVariable) )
-        split.screen(c(x@nbVariable, x@nbVariable))
+        split.screen(c(nbVariable, nbVariable))
         # create histogram on diagonal
-        for ( i in 1:x@nbVariable ){
+        for ( i in 1:nbVariable ){
           #par(mfg=c(i,i))
-          screen(i+((i-1)*x@nbVariable))
-          histCluster(x@bestResult, x@data, variables=colnames(x@data)[i], hist_x_dim=hist_x_dim, ...)
+          screen(i+((i-1)*nbVariable))
+          histCluster(thisResult, x@data, variables=cols[i], hist_x_dim=hist_x_dim, ...)
         }
         # create biplots
-        for ( i in 2:x@nbVariable ){
+        for ( i in 2:nbVariable ){
           for( j in 1:(i-1) ){
             #par(mfg=c(i,j))
-            screen(j+((i-1)*x@nbVariable))
-            plotCluster(x@bestResult, x@data, variable1=colnames(x@data)[j], variable2=colnames(x@data)[i], ...)
+            screen(j+((i-1)*nbVariable))
+            plotCluster(thisResult, x@data, variable1=cols[j], variable2=cols[i], ...)
           }
         }
         close.screen(all.screens = TRUE)
@@ -495,19 +544,26 @@ setMethod(
       }
     }
     # for qualitative data
-    else if ( x@dataType == "qualitative" ){
+    else if ( .is_qualitative_alike(x, y2, showOnly) ){
       # create layout
-      if ( x@nbVariable == 1 ){
+      nbVariable = x@nbVariable;
+      data = x@data;
+      if( x@dataType == "composite" ){
+          factor = thisResult@parameters@factor;
+          data = x@data[,which(factor!=0)];
+          nbVariable = length(which(factor!=0));
+      }
+      if ( nbVariable == 1 ){
         stop("data has only one variable. Try barplot() function to get a 1D representation of x.")
       }else{
         # create layout matrix
         par( mfrow = c(1, 1))
         # get binary matrix from x
-        matX <- matrix2binary(as.data.frame(x@data))
+        matX <- matrix2binary(as.data.frame(data))
         # get number of observations
         n <- dim(matX)[1]
         # get number of variables
-        p <- ncol(x@data)
+        p <- ncol(data)
         Dc <- drop((rep(1, n)) %*% matX)
         Y <- t(t(matX)/(sqrt(p * Dc)))
         Y.svd <- svd(Y)
@@ -595,11 +651,11 @@ setMethod(
 #    } # end if(exists("rmixmod_cex")&&(rmixmod_cex == "both"))
         # plotting the first 2 axes  
         plot( unique.ind[,2] ~ unique.ind[,1], cex=point.size,
-        col=x@bestResult@partition[-which(duplicated(individuals))]+1, pch=x@bestResult@partition[-which(duplicated(individuals))], xlab='Axis 1', ylab='Axis 2', main='Multiple Correspondance Analysis', ... )
+        col=thisResult@partition[-which(duplicated(individuals))]+1, pch=thisResult@partition[-which(duplicated(individuals))], xlab='Axis 1', ylab='Axis 2', main='Multiple Correspondance Analysis', ... )
       }
     }
     else if ( x@dataType == "composite" ){
-      stop("visualization for heterogeneous is not available yet")
+      stop("showOnly argument (i.e. showOnly={'quantitative'|'qualitative'}) is mandatory when data are heterogeneous")
     }
     invisible()
   }
@@ -617,7 +673,7 @@ setMethod(
 ##' Data with the density of each cluster and the mixture density are drawn for each variable.
 ##'  
 ##' @param x an object of class [\code{\linkS4class{Mixmod}}]
-##' @param variables list of variables names (or indices) to compute a histogram. All variables from data by default.
+##' @param hist_x_dim Dimension of the histogram (???)
 ##' @param ... further arguments passed to or from other methods
 ##'
 ##' @importFrom graphics hist
@@ -655,8 +711,7 @@ setMethod(
 ##' Each line corresponds to one variable. Barplot is drawn for each cluster with the probabilities for 
 ##' each modality to be in that cluster.
 ##'  
-##' @param x an object of class [\code{\linkS4class{Mixmod}}]
-##' @param variables list of variables names (or indices) to compute a histogram. All variables from data by default.
+##' @param height an object of class [\code{\linkS4class{Mixmod}}] (???)
 ##' @param ... further arguments passed to or from other methods
 ##'
 ##' @importFrom graphics barplot

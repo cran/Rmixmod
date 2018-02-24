@@ -33,6 +33,7 @@
 #include "mixmod/Kernel/Model/BinaryModel.h"
 #include "mixmod/Utilities/Error.h"
 #include "mixmod/Kernel/IO/Partition.h"
+#include <ctime>
 
 namespace XEM {
 
@@ -157,7 +158,7 @@ void PredictMain::run(IoMode iomode, int verbose, int massiccc) {
 	// create output
 	_output = new PredictOutput(estimation);
 
-	// release memory
+// release memory
 	delete estimation;
 }
 

@@ -78,7 +78,7 @@ public:
 	void readWeightsNode(Input & input);
     static void setInitPartition(string sFilename, ClusteringStrategy * strat);
  private:
-    void readPartitionNodeImpl(NumericPartitionInfo & partitionFile, xmlpp::Element *elementPartition);
+    void readPartitionNodeImpl(NumericPartitionInfo & partitionFile, xmlpp::Element *elementPartition, TypePartition::TypePartition ty);
 };
 
 } //end namespace

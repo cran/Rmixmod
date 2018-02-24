@@ -69,12 +69,12 @@ SymmetricMatrix::~SymmetricMatrix() {
 double SymmetricMatrix::determinant(Exception& errorType) {
 	double det = 0;
 	try {
-		det = _value->LogDeterminant();
+		det = _value->determinant(_store);
 	}
 	catch (...) {
 		throw errorType;
 	}
-	if (det < minDeterminantValue) {
+	if (fabs(det) < minDeterminantValue) {
 		throw NumericException(dynamic_cast<NumericException&> (errorType));
 	}
 	return det;
@@ -151,7 +151,7 @@ void SymmetricMatrix::inverse(Matrix * & Inv) {
 		Inv = new SymmetricMatrix(_s_pbDimension);
 	}
 
-	MATH::SymmetricMatrix* value_Inv = _value->Inverse();
+	MATH::SymmetricMatrix* value_Inv = _value->Inverse(_store);
 
 	Inv->setSymmetricStore(value_Inv->Store());
 	//cout<<"Inv Symm :  "<<Inv<<endl;
@@ -426,7 +426,7 @@ void SymmetricMatrix::computeSVD(DiagMatrix* & S, GeneralMatrix* & O) {
 	int64_t dim = O->getPbDimension();
 	MATH::DiagonalMatrix * tabShape_k = new MATH::DiagonalMatrix(dim);
 	MATH::Matrix * tabOrientation_k = new MATH::Matrix(dim, dim);
-	_value->computeSVD(tabShape_k, tabOrientation_k);
+	_value->computeSVD(tabShape_k, tabOrientation_k, _store);
 
 	double * storeS = S->getStore();
 	double * storeO = O->getStore();

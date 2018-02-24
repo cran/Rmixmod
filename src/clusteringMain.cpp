@@ -229,7 +229,11 @@ RcppExport SEXP clusteringMain( SEXP xem )
     if (!Rf_isNull( RalgoOptions.slot("seed") )){
       //seed = -1;
       //}else{
-      seed = (int)Rcpp::as<int>(RalgoOptions.slot("seed"));
+      int strategy_seed = (int)Rcpp::as<int>(RalgoOptions.slot("seed"));
+      if(seed!=-1 && strategy_seed!=-1 && seed!=strategy_seed){
+        THROW(XEM::OtherException, XEM::internalMixmodError);
+      }
+      seed = strategy_seed!=-1?strategy_seed:seed;
     }
     // release memory
     //if (dataDescription) delete dataDescription;

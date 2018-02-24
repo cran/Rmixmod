@@ -54,6 +54,8 @@ public:
 	/// Constructor
 	ClusteringStrategy(const ClusteringStrategy & strategy);
 
+  ClusteringStrategy* clone(); 
+
 	/// Destructor
 	~ClusteringStrategy();
 

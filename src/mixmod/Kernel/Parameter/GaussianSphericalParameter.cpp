@@ -54,6 +54,20 @@ GaussianSphericalParameter::GaussianSphericalParameter(Model * iModel, ModelType
 		_tabWk[k] = new SphericalMatrix(_pbDimension); //Id
 	}
 }
+//-------------------------------------------------------------------------------------
+// constructor for ParameterDescription (C.Poli)
+//-------------------------------------------------------------------------------------
+GaussianSphericalParameter::GaussianSphericalParameter(int64_t iNbCluster, int64_t iPbDimension, ModelType * iModelType) 
+: GaussianEDDAParameter(iNbCluster, iPbDimension, iModelType) 
+{
+	int64_t k;
+	_W = new SphericalMatrix(_pbDimension);
+	for (k = 0; k < _nbCluster; k++) {
+		_tabSigma[k] = new SphericalMatrix(_pbDimension); //Id
+		_tabInvSigma[k] = new SphericalMatrix(_pbDimension); //Id
+		_tabWk[k] = new SphericalMatrix(_pbDimension); //Id
+	}
+}
 
 //---------------------------------------------------------------------
 // copy constructor

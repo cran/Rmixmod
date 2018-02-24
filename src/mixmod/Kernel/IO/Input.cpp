@@ -351,6 +351,11 @@ void Input::setKnownLabelDescription(LabelDescription & labeldescription) {
 
 	_knownLabelDescription = new LabelDescription(labeldescription);
 }
+void Input::setKnownLabelDescription(LabelDescription *labeldescription) {
+	removeKnownLabelDescription();
+
+	_knownLabelDescription = labeldescription;
+}
 
 void Input::removeKnownLabelDescription() {
 	if (!_knownLabelDescription)

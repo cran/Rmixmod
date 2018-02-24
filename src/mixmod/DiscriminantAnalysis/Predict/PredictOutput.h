@@ -64,7 +64,7 @@ public:
 	PredictModelOutput * getPredictModelOutput(unsigned int index) const;
 
 	std::vector<PredictModelOutput *> const & getPredictModelOutput() const;
-
+    void setPredictModelOutput(std::vector<PredictModelOutput *> & predictModelOutput);
 private:
 	
 	// Vector containing output for each model

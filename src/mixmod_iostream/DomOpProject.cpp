@@ -96,7 +96,7 @@ namespace XEM {
 
 
   }
-  template void   DomOpProject::readXmlFillIn(ClusteringInput*);
+  template void   DomOpProject::readXmlFillIn<ClusteringInput>(ClusteringInput*);
   template void   DomOpProject::readXmlFillIn(LearnInput*);  
 
   PredictInput * DomOpProject::readXmlPredictInput(){
@@ -120,7 +120,7 @@ namespace XEM {
   }
   
   template<typename T, typename U>
-  void DomOpProject::readXmlFillOut(T  * cOutput ) {
+  void DomOpProject::readXmlFillOut(T  * cOutput, Input *inp) {
 	//read the XML file which the case is clustering then fill the ClusteringOutput
 
 	//root in input
@@ -134,7 +134,7 @@ namespace XEM {
         xmlpp::Element* nodeElementOutput = dynamic_cast<xmlpp::Element*>(*it);
         if(!nodeElementOutput) continue;
         NodeOpOutput nodeOutput(nodeElementOutput);
-        U * modelOutput = nodeOutput.read4Output<U>(); //nodeOutput.readClustering();
+        U * modelOutput = nodeOutput.read4Output<U>(inp); //nodeOutput.readClustering();
         vClusteringModelOutput.push_back(modelOutput);
       }
       //cOutput->setClusteringModelOutput(vClusteringModelOutput);
@@ -144,9 +144,9 @@ namespace XEM {
       cOutput = NULL;
     }
   }
-  template void DomOpProject::readXmlFillOut<ClusteringOutput, ClusteringModelOutput>(ClusteringOutput*);
-  template void DomOpProject::readXmlFillOut<LearnOutput, LearnModelOutput>(LearnOutput*);
-  template void DomOpProject::readXmlFillOut<PredictOutput, PredictModelOutput>(PredictOutput*);    
+  template void DomOpProject::readXmlFillOut<ClusteringOutput, ClusteringModelOutput>(ClusteringOutput*, Input *inp);
+  template void DomOpProject::readXmlFillOut<LearnOutput, LearnModelOutput>(LearnOutput*, Input *inp);
+  template void DomOpProject::readXmlFillOut<PredictOutput, PredictModelOutput>(PredictOutput*, Input *inp);    
 }  
   /*
   void DomOpProject::readXmlFillOut(LearnOutput  * cOutput ) {}

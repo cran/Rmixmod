@@ -1,11 +1,13 @@
 include $(R_HOME)/etc${R_ARCH}/Makeconf
 include ../XmlMakevars
+
 #-----------------------------------------------------------------------
 # Variables
-# 
+#
 LIB = ../mixmod.a
 SRC_DIR = ..
 IOSTREAM_DIR = ../mixmod_iostream/
+#EIGENDIR = "../eigen3"
 
 #-----------------------------------------------------------------------
 # Sources files
@@ -21,7 +23,7 @@ OBJS= $(SRCS:%.cpp=%.o)
 # rule for compiling the cpp files
 #
 %.o: %.cpp
-	$(CXX)  $(CXXFLAGS) ${CPICFLAGS}  $(OMPSTATUS) -DXEM_RESOURCES_PATH='"${R_PACKAGE_DIR}/XML_specs"' -I${SRC_DIR} -I${IOSTREAM_DIR} $(LIBXMLXX_CFLAGS)  $< -c -o $@
+	$(CXX) $(CXXFLAGS) ${CPICFLAGS} $(OMPSTATUS) -Wno-ignored-attributes -DXEM_RESOURCES_PATH='"${R_PACKAGE_DIR}/XML_specs"' -I${SRC_DIR} -I${IOSTREAM_DIR} $(LIBXMLXX_CFLAGS) $< -c -o $@
 
 #-----------------------------------------------------------------------
 # The rule lib create the library MIXMOD [??!]
@@ -30,8 +32,6 @@ lib: $(LIB)
 
 $(LIB): $(OBJS)
 	$(AR) -rc $@ $?
-  
-mostlyclean: clean
 
 clean:
 	@-rm -rf .libs _libs $(LIB)

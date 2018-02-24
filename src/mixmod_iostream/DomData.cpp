@@ -59,7 +59,9 @@ namespace XEM {
 	//Name
 	if ( !dataFile.getInfoName().empty() ) {
       new_elt = _root->add_child("Name");
-      new_elt->add_child_text(dataFile.getInfoName());
+      //new_elt->add_child_text(dataFile.getInfoName());
+      new_elt->add_child_text(normalizeFilename(dataFile.getInfoName()));
+      //new_elt->add_child_text(dataFile.getInfoName());            
         
 	}
 
@@ -83,7 +85,7 @@ namespace XEM {
 	//appendChild( _root );
 
 	//write new file .mxd to describe data
-    Glib::ustring filename = sFilename + ".mxd";
+    Glib::ustring filename = getAbsolutePath(sFilename + ".mxd");
     removeIfExists(filename);
     write_to_file(filename);
 }
@@ -249,8 +251,9 @@ void DomData::writeListColumnNode(const vector<ColumnDescription *> & vColumnDes
 
       //name
       if (!vColumnDescription[i]->getName().empty()) {
-        xmlpp::Element *name = column->add_child("Name");
-        name->add_child_text(vColumnDescription[i]->getName());
+        //xmlpp::Element *name = column->add_child("Name");
+        //name->add_child_text(vColumnDescription[i]->getName());
+        column->set_attribute("Name", vColumnDescription[i]->getName());
       }
 
       //different cases

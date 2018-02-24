@@ -28,6 +28,7 @@
 #include "mixmod/Kernel/Algo/EMAlgo.h"
 #include <algorithm>
 #include "mixmod/Kernel/IO/BinaryData.h"
+#include "mixmod/Kernel/IO/GaussianData.h"
 #include "mixmod_iostream/DomLabel.h"
 #include "mixmod_iostream/DomParameter.h"
 #include "mixmod/Clustering/ClusteringInput.h"
@@ -37,6 +38,10 @@
 #include "mixmod/Kernel/Model/ModelType.h"
 #include "mixmod/Kernel/Criterion/Criterion.h"
 #include "mixmod/Kernel/IO/ParameterDescription.h"
+#include "mixmod/Kernel/IO/QualitativeColumnDescription.h"
+
+
+
 namespace XEM {
 
   NodeOpInput::NodeOpInput() : NodeInput() {
@@ -63,7 +68,7 @@ namespace XEM {
     writeWeightsNode(input, s);
   }
   NodeOpInput::NodeOpInput(PredictInput * input, string & s)
-    : NodeInput(input, s, "DataToClassify") {
+    : NodeInput(input, s) {
     writeParameterNode(input, s);
   }
   NodeOpInput::NodeOpInput( xmlpp::Element * rootInput ) : NodeInput(rootInput) {
@@ -108,7 +113,25 @@ namespace XEM {
   }
 
   PredictInput * NodeOpInput::readXmlPredictInput(){
-    DataDescription dataDescription = readDataNode("DataToClassify");
+    DataDescription dataDescription = readDataNode();
+    //CompositeData *cData = dynamic_cast<CompositeData*>(dataDescription->getData());
+    Data *cData = dataDescription.getData();
+    if (dataDescription.getDataType() == HeterogeneousData) {
+      Global::nbVariables_binary = cData->getBinaryData()->_pbDimension;
+      Global::nbVariables_gaussian = cData->getGaussianData()->_pbDimension;
+      /*Global::vNbFactor.clear();
+      for (int i=0; i<cData->getPbDimension(); i++){
+        const XEM::QualitativeColumnDescription *ccd = dynamic_cast<const XEM::QualitativeColumnDescription*>(dataDescription.getColumnDescription(i));
+        Global::vNbFactor.push_back(ccd==nullptr ? 0 : ccd->getNbFactor());
+        }*/
+    }
+    if (dataDescription.getDataType() == QualitativeData || dataDescription.getDataType() == HeterogeneousData) {
+    //if (dataDescription.getDataType() == QualitativeData) {      
+      Global::vNbFactor.clear();
+      for (int i=0; i<cData->getBinaryData()->getPbDimension(); i++)
+        Global::vNbFactor.push_back(cData->getBinaryData()->getTabNbModality()[i]);
+    }
+    
     xmlpp::Element* parameterNode = dynamic_cast<xmlpp::Element*>(_rootInput->get_first_child("Parameter"));
     //check the .mxp
  
@@ -163,6 +186,7 @@ namespace XEM {
     if(!EDDAModel->get_first_child()) listModel->remove_child(EDDAModel);
 
 	//HDModel
+    /*
 	if (HDModel->get_first_child()) {
       //subDimensionEqual
       if (input->getModelType()[0]->_subDimensionEqual != 0) {
@@ -176,6 +200,36 @@ namespace XEM {
         for (int64_t i = 0; i < input->getModelType()[0]->_nbSubDimensionFree; i++) {
           xmlpp::Element *dk =  listDk->add_child("Dk");
           dk->add_child_text(std::to_string(input->getModelType()[0]->getTabSubDimensionFreeI(i)));
+        }
+      }
+	} else {
+      listModel->remove_child(HDModel);
+      }*/
+
+	if (HDModel->get_first_child()) {
+      bool equalDone = false, freeDone = false;
+      std::vector<ModelType*> mtvect = input->getModelType();
+      for(int64_t k=0;k<mtvect.size();k++){
+        //subDimensionEqual
+        ModelType* mtype = mtvect[k];
+        const ModelName & mName = mtype->getModelName();
+        if(!isHD(mName)) continue;
+        if (!equalDone && !isFreeSubDimension(mName)) { // i.e. equal
+          xmlpp::Element *d = HDModel->add_child("D");
+          d->add_child_text(std::to_string(mtype->getSubDimensionEqual()));
+          equalDone = true;
+        }
+
+        //subDimensionFree
+        if (!freeDone && isFreeSubDimension(mName)) {
+          xmlpp::Element * listDk = HDModel->add_child("ListDk");
+          listDk->set_attribute("NbCluster",std::to_string(mtype->_nbSubDimensionFree));
+          for (int64_t i = 0; i < mtype->_nbSubDimensionFree; i++) {
+            xmlpp::Element *dk =  listDk->add_child("Dk");
+            dk->add_child_text(std::to_string(mtype->getTabSubDimensionFreeI(i)));
+            dk->set_attribute("Num", std::to_string(i+1));
+          }
+          freeDone = true;
         }
       }
 	} else {
@@ -232,11 +286,14 @@ namespace XEM {
   void NodeOpInput::writePartitionNode(ClusteringInput * input, string & s) {
 
     if (input->getKnownPartition()) {
+      Partition *part = input->getKnownPartition();
+      string tag = part->getPartitionFile()._type==TypePartition::label ? "Label" : "Partition";
+      string extn = part->getPartitionFile()._type==TypePartition::label ? ".mxl" : ".mxd";
       //partition
-      xmlpp::Element *partition =  _rootInput->add_child("Partition");
+      xmlpp::Element *partition =  _rootInput->add_child(tag);
       //partitionFilename
-      string str = s + "Partition";
-      partition->add_child_text(str + ".mxl");
+      string str = s + tag;
+      partition->add_child_text(str + extn);
       DomLabel doc(input->getKnownPartition(), str);
     }
   }
@@ -244,9 +301,9 @@ namespace XEM {
 
     if (input->getKnownLabelDescription()) {
       //partition
-      xmlpp::Element *partition =  _rootInput->add_child("Partition");
+      xmlpp::Element *partition =  _rootInput->add_child("Label");
       //partitionFilename
-      string str = s + "Partition";
+      string str = s + "Label";
       partition->add_child_text(str + ".mxl");
       //LabelDescription labdesc((*(const_cast<LabelDescription *>(input->getKnownLabelDescription()))));
       DomLabel doc(input->getKnownLabelDescriptionNC(), str);
@@ -354,8 +411,11 @@ namespace XEM {
       {
 
 		for (int64_t i = 0; i < strategy->getStrategyInit()->getNbPartition(); ++i) {
-          xmlpp::Element *filename = init->add_child("Partition");
-          string partitionFilename = sFilename + "InitPartition"+ std::to_string(i+1) + ".mxl";
+      //_root = createElement( "Partition" );
+          string tag = strategy->getStrategyInit()->getPartition(i)->getPartitionFile()._type==TypePartition::label ? "Label" : "Partition";
+          string extn = strategy->getStrategyInit()->getPartition(i)->getPartitionFile()._type==TypePartition::label ? ".mxl" : ".mxd";
+          xmlpp::Element *filename = init->add_child(tag);
+          string partitionFilename = sFilename + "InitPartition"+ std::to_string(i+1) + extn;
           filename->add_child_text(partitionFilename);
           string str =  sFilename + "InitPartition" + std::to_string(i + 1);
           //DomLabel doc(cInput->getKnownPartition(), str);
@@ -428,6 +488,7 @@ namespace XEM {
       for (auto it2=m_children.begin(); it2 != m_children.end(); ++it2){
         xmlpp::Element* elementModel = dynamic_cast<xmlpp::Element*>(*it2);
         if(!elementModel) continue;
+        if(elementModel->get_name() != "Model") continue;
         //model name of the current node
         string strModelName = elementModel->get_child_text()->get_content(); //elementModel.text().toStdString();
         
@@ -444,6 +505,47 @@ namespace XEM {
           compt++;
           vModelName.push_back(strModelName);
         }
+      }
+      if(elementTypeModel->get_name() == "HDModel"){
+            xmlpp::Element* dElement = dynamic_cast<xmlpp::Element*>(elementTypeModel->get_first_child("D"));
+            int64_t dValue = std::stoll(dElement->get_child_text()->get_content());
+            xmlpp::Element* dkListElt = dynamic_cast<xmlpp::Element*>(elementTypeModel->get_first_child("ListDk"));
+            vector<int64_t> dkVect;
+            int64_t nbSubDimFree = 0;
+            if(dkListElt){
+              nbSubDimFree = std::stoll(dkListElt->get_attribute_value("NbCluster"));
+              auto dkChildren = dkListElt->get_children();              
+              for (auto dkit=dkChildren.begin(); dkit != dkChildren.end(); ++dkit){
+                xmlpp::Element* dkElt = dynamic_cast<xmlpp::Element*>(*dkit);
+                if(!dkElt) continue;
+                //std::cout<<"Dk: "<< dkElt->get_child_text()->get_content()<<std::endl;
+                //dkVect.push_back(std::stoll(dkElt->get_attribute_value("Num")));
+                dkVect.push_back(std::stoll(dkElt->get_child_text()->get_content()));
+              }
+            }
+            //for(auto mtit= input.getModelType().begin(); mtit!=input.getModelType().end(); ++mtit){
+            //ModelType* mType = dynamic_cast<ModelType*>(*mtit);
+            for(int k=0; k< input.getModelType().size();k++){
+              ModelType* mType =input.getModelType()[k];
+              if(!isHD(mType->getModelName())) continue;
+              if(isFreeSubDimension(mType->getModelName())){
+                //
+                if(dkListElt){
+                  for(int64_t i=0; i< dkVect.size(); i++){
+                    mType->_nbSubDimensionFree = nbSubDimFree;
+                    mType->setTabSubDimensionFree(dkVect[i], i);
+                  }
+                } else {
+                  // TODO: define a better fitted exception
+                  throw IOStreamErrorType::badXML;
+                }
+
+              } else {
+                mType->setSubDimensionEqual(dValue);
+              }
+              
+            }
+            
       }
     }
     
@@ -478,8 +580,8 @@ namespace XEM {
 
     //Type
     elementType = dynamic_cast<xmlpp::Element*>(root->get_first_child("Type"));
-    TypePartition::TypePartition type = 
-      StringToTypePartition(elementType->get_child_text()->get_content());
+    TypePartition::TypePartition type = TypePartition::partition;
+      //StringToTypePartition(elementType->get_child_text()->get_content());
 
     //Parameter Filename
     elementFilename = dynamic_cast<xmlpp::Element*>(root->get_first_child("Filename"));
@@ -559,7 +661,7 @@ namespace XEM {
           if (iteration && epsilon) {//NBITERATION_EPSILON
             strat->setStopNameInInit(NBITERATION_EPSILON);
             strat->setNbIterationInInit(std::stoll(iteration->get_child_text()->get_content()));//iteration.text().toLongLong());
-            strat->setEpsilonInInit(std::stod(epsilon->get_child_text()->get_content())); //epsilon.text().toDouble());
+            strat->setEpsilonInInit(std_stod(epsilon->get_child_text()->get_content())); //epsilon.text().toDouble());
             
           }
           else if (iteration) {//NBITERATION
@@ -569,7 +671,7 @@ namespace XEM {
           }
           else if (epsilon) {//EPSILON
             strat->setStopNameInInit(EPSILON);
-            strat->setEpsilonInInit(std::stod(epsilon->get_child_text()->get_content()));
+            strat->setEpsilonInInit(std_stod(epsilon->get_child_text()->get_content()));
           }
         }
         break;
@@ -673,7 +775,7 @@ namespace XEM {
             if (iteration && epsilon) {//NBITERATION_EPSILON
               strat->setAlgoStopRule(NBITERATION_EPSILON, compt);
               strat->setAlgoIteration(compt, std::stoll(iteration->get_child_text()->get_content()));
-              strat->setAlgoEpsilon(compt, std::stod(epsilon->get_child_text()->get_content()));
+              strat->setAlgoEpsilon(compt, std_stod(epsilon->get_child_text()->get_content()));
               
             }
             else if (iteration) {//NBITERATION
@@ -683,7 +785,7 @@ namespace XEM {
             }
             else if (epsilon) {//EPSILON
               strat->setAlgoStopRule(EPSILON, compt);
-              strat->setAlgoEpsilon(compt, std::stod(epsilon->get_child_text()->get_content()));
+              strat->setAlgoEpsilon(compt, std_stod(epsilon->get_child_text()->get_content()));
             }
           }
           break;
@@ -748,7 +850,7 @@ namespace XEM {
     }
   }
 
-  void NodeOpInput::readPartitionNodeImpl(NumericPartitionInfo & partitionInfo, xmlpp::Element *elementPartition){
+  void NodeOpInput::readPartitionNodeImpl(NumericPartitionInfo & partitionInfo, xmlpp::Element *elementPartition, TypePartition::TypePartition ty){
 
     string filename;
 
@@ -762,6 +864,7 @@ namespace XEM {
     parser.parse_file(filename);
     xmlpp::Document *doc = parser.get_document();
     xmlpp::Element *_root = doc->get_root_node();
+    IoModeManager ioMode = IoModeManager(_root);  //set the IoMode defined by a FloatEncoding tag, if it exists        
     xmlpp::Element *elementNbSample, *elementNbCluster, *elementFormat, *elementType, *elementFilename;
 
     //nbSample
@@ -778,10 +881,12 @@ namespace XEM {
       StringToFormatNumericFile(elementFormat->get_child_text()->get_content());
 
     //Type
+    
+    TypePartition::TypePartition type = ty; //TypePartition::partition;
     elementType = dynamic_cast<xmlpp::Element*>(_root->get_first_child("Type"));
-    TypePartition::TypePartition type = 
-      StringToTypePartition(elementType->get_child_text()->get_content());
-
+    if(elementType){
+      type = StringToTypePartition(elementType->get_child_text()->get_content());
+    }
     //Parameter Filename
     elementFilename = dynamic_cast<xmlpp::Element*>(_root->get_first_child("Filename"));
     string partFilename = elementFilename->get_child_text()->get_content();
@@ -848,10 +953,15 @@ namespace XEM {
   int64_t NodeOpInput::readPartitionNode(ClusteringInput & input) {
 	//read the partition node  
 	if (!_rootInput) return 0;
+    TypePartition::TypePartition type = TypePartition::partition;
     xmlpp::Element *elementPartition = dynamic_cast<xmlpp::Element*>(_rootInput->get_first_child("Partition"));
+    if(!elementPartition){
+      elementPartition = dynamic_cast<xmlpp::Element*>(_rootInput->get_first_child("Label"));
+      type = TypePartition::label;
+    }
     if (elementPartition && input.getNbCluster().size() == 1) {
       NumericPartitionInfo partitionInfo;
-      readPartitionNodeImpl(partitionInfo, elementPartition);
+      readPartitionNodeImpl(partitionInfo, elementPartition, type);
       input.insertKnownPartition(partitionInfo.partitionFile);
     }
     return 0;
@@ -879,9 +989,16 @@ namespace XEM {
   */
 
    void NodeOpInput::readPartitionNode(LearnInput & input) {
+    TypePartition::TypePartition type = TypePartition::partition;
+     
     xmlpp::Element *elementPartition = dynamic_cast<xmlpp::Element*>(_rootInput->get_first_child("Partition"));
+    if(!elementPartition){
+      elementPartition = dynamic_cast<xmlpp::Element*>(_rootInput->get_first_child("Label"));
+      type = TypePartition::label;
+    }
+
     NumericPartitionInfo npi;
-    readPartitionNodeImpl(npi, elementPartition);
+    readPartitionNodeImpl(npi, elementPartition, type);
     Partition part(npi.nbSample, npi.nbCluster, npi.partitionFile);
     std::vector<int64_t> labels(npi.nbSample);
     int64_t** tv = part.getTabValue();

@@ -178,9 +178,11 @@ public:
 	//------- KnownLabel -----------//
 	///getKnownLabelDescription
 	const LabelDescription * getKnownLabelDescription() const;
+	LabelDescription * getKnownLabelDescriptionNC() const;    
 
 	/// setKnownLabelDescription
 	void setKnownLabelDescription(LabelDescription & labeldescription);
+	void setKnownLabelDescription(LabelDescription *labeldescription);    
 
 	/// removeLabel
 	void removeKnownLabelDescription();
@@ -270,6 +272,9 @@ inline Partition * Input::getKnownPartition() const {
 }
 
 inline const LabelDescription * Input::getKnownLabelDescription() const {
+	return _knownLabelDescription;
+}
+inline LabelDescription * Input::getKnownLabelDescriptionNC() const{
 	return _knownLabelDescription;
 }
 

@@ -38,6 +38,7 @@
 #include "mixmod/Kernel/Criterion/BICCriterion.h"
 #include "mixmod/Kernel/Criterion/CVCriterion.h"
 #include "mixmod/Kernel/IO/ModelOutput.h"
+#include <ctime>
 
 namespace XEM {
 
@@ -211,10 +212,10 @@ void LearnMain::run(int seed, IoMode iomode, int verbose, int massiccc) {
 	std::vector<CriterionName> const & criterion = _input->getCriterionName();
 
 	// Initialize timer info	
-	std::time_t startTime;
+	time_t startTime;
 	ofstream progressFile;
 	if (MASSICCC == 1) {
-		std::time(&startTime);
+		time(&startTime);
 	}
 
 	// loop over all models
@@ -254,9 +255,9 @@ void LearnMain::run(int seed, IoMode iomode, int verbose, int massiccc) {
         if (MASSICCC == 1) {
           progressFile.open ("progress.json");
           progressFile << "{ \"Progress\" :  " << ((double)iCriterion + 1 + (double)iModel * (double)criterion.size())/((double)criterion.size() * (double)nbEstimation) * 100.0;
-          std::time_t currTime;
-          std::time(&currTime);
-          double timePerModel = std::difftime(currTime, startTime) / ((double)iCriterion + 1 + (double)iModel * (double)criterion.size());
+          time_t currTime;
+          time(&currTime);
+          double timePerModel = difftime(currTime, startTime) / ((double)iCriterion + 1 + (double)iModel * (double)criterion.size());
           progressFile << ", \"Estimated remaining time\" : " << timePerModel * (criterion.size() - iCriterion - 1) +  (nbEstimation - iModel - 1) * criterion.size() * timePerModel << " } ";
           progressFile.close();
         }
@@ -270,7 +271,22 @@ void LearnMain::run(int seed, IoMode iomode, int verbose, int massiccc) {
 						criterion[iCriterion], 0.0, estimations[iModel]->getErrorType()));
 			} // end iCriterion
 		}
-	}//end iModel
+    //Compute Entropy if needed (for massiccc's visualization)
+    if (MASSICCC == 1 || MASSICCC == 10 || MASSICCC == 11) {
+      vector< vector<double> > entropyM = estimations[iModel]->getEntropyMatrix();
+      int nbVariables = estimations[iModel]->getData()->getPbDimension();
+      ofstream entropyFile;
+      entropyFile.open ("entropy" + std::to_string(iModel + 1) + ".txt");
+      for (int j = 0; j < nbVariables; j++) {
+        for (int l = 0; l < nbCluster; l++) {
+          entropyFile << entropyM[j][l] << "  ";
+        }
+        entropyFile << endl;
+      } 
+      entropyFile.close();
+    }
+
+  }//end iModel
 
 	// release memory
 	// NOTE [bauder, 2013-02-24]: not everything should be released here, 

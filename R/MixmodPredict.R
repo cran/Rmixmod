@@ -5,6 +5,7 @@
 ###################################################################################
 ##' @include global.R
 ##' @include MixmodResults.R
+##' @include Mixmod.R
 NULL
 ###################################################################################
 
@@ -50,6 +51,8 @@ setClass(
     classificationRule = "MixmodResults",
     partition = "integer",
     proba = "matrix",
+    xmlIn = "MixmodXmlInput",
+    xmlOut = "character",
     trace = "numeric",
     massiccc = "numeric"        
   ),
@@ -61,6 +64,7 @@ setClass(
     error = "No error",
     partition = integer(0),
     proba = matrix(nrow=0,ncol=0),
+    xmlOut = character(0),
     trace = numeric(0),
     massiccc = numeric(0)        
   ),
@@ -85,6 +89,7 @@ setClass(
 ##' 
 ##' @param data matrix or data frame containing quantitative,qualitative or composite data. Rows correspond to observations and columns correspond to variables.
 ##' @param classificationRule a [\code{\linkS4class{MixmodResults}}] object which contains the classification rule computed in the mixmodLearn() or mixmodCluster() step.
+##' @param ... ...
 ##'
 ##' @examples
 ##'
@@ -114,7 +119,7 @@ setClass(
 ##' @return Returns an instance of the [\code{\linkS4class{MixmodPredict}}] class which contains predicted partition and probabilities.
 ##' @export
 ##'
-mixmodPredict <- function(data, classificationRule, ...) {
+oldmixmodPredict <- function(data, classificationRule, ...) {
   # non documented params
   dots <- list(...)
   dotnames<-as.list(names(dots))
@@ -146,6 +151,24 @@ mixmodPredict <- function(data, classificationRule, ...) {
   # return MixmodPredict object
   return(xem)
 }
+
+#' mixmodPredict
+#'
+#' TODO: describe
+#'
+#' @param ... ...
+#'
+#' @return A MixmodPredict object
+#'
+mixmodPredict <- function(...) {
+  # create Mixmod object
+  xem <- new( "MixmodPredict", ...)
+  # call predictMain
+  .Call("predictMain", xem, PACKAGE="Rmixmod")
+  # mixmod error?
+  if ( xem@error != "No error" ) warning( paste("Mixmod error: ", xem@error) )
+  return(xem)
+}
 ###################################################################################
 
 
@@ -163,48 +186,60 @@ mixmodPredict <- function(data, classificationRule, ...) {
 setMethod(
   f="initialize",
   signature=c("MixmodPredict"),
-  definition=function(.Object,data,classificationRule, trace=0, massiccc=0){
-    if(!missing(data)){
-      if ( is.factor(data) ) data<-as.integer(data)
-      else if ( !is.vector(data) ){
-        # loop over columns to check whether type is factor
-        for ( j in 1:ncol(data) ){
-          if ( is.factor(data[,j]) ) data[,j] <- as.integer(data[,j])
+  definition=function(.Object,data,classificationRule,  xmlIn=NULL, xmlOut=NULL, trace=0, massiccc=0){
+    if(!missing(xmlIn)){
+        if(!missing(data)||!missing(classificationRule)){
+          stop("xmlIn argument is mutually exclusive with all other arguments but xmlOut and trace");
         }
-      }
-      .Object@data <- as.matrix(data)
-      .Object@nbSample <- nrow(.Object@data)
-      .Object@nbVariable <- ncol(.Object@data)
-    }else{
-      stop("data is missing !")
-    } 
-    # check whether there is classification rule
-    if ( missing(classificationRule) ){
-      stop("classificationRule is missing !")
-    }
-    else if ( !is(classificationRule, "MixmodResults") ){
-      stop("classificationRule must be a 'MixmodResults' object!")
-    }
-    else{
-      .Object@classificationRule <- classificationRule
-    }
-    
-    if ( is(classificationRule@parameters, "MultinomialParameter") ){
-      .Object@dataType <- "qualitative"
-    }
-    else if ( is(classificationRule@parameters, "GaussianParameter") ){
-      .Object@dataType <- "quantitative"
-    } 
-    else if ( is(classificationRule@parameters, "CompositeParameter") ){
-      .Object@dataType <- "composite"
-    }
-    else{
-      stop( "Unknown type of parameters within classificationRule!" )
-    }
-
+        .Object@xmlIn = xmlIn
+        .Object@classificationRule <- new("MixmodResults")
+        .Object@classificationRule@parameters = new("CompositeParameter")
+      } else { # i.e without xmlIn
+        
+        if(!missing(data)){
+          if (!is.data.frame(data) & !is.vector(data) & !is.factor(data) ){
+            stop("data must be a data.frame or a vector or a factor")
+          }
+          if ( is.factor(data) ) data<-as.integer(data)
+          else if ( !is.vector(data) ){
+                                        # loop over columns to check whether type is factor
+            for ( j in 1:ncol(data) ){
+              if ( is.factor(data[,j]) ) data[,j] <- as.integer(data[,j])
+            }
+          }
+          .Object@data <- as.matrix(data)
+          .Object@nbSample <- nrow(.Object@data)
+          .Object@nbVariable <- ncol(.Object@data)
+        } else {
+          stop("data is missing !")
+        } 
+                                        # check whether there is classification rule
+        if ( missing(classificationRule) ){
+          stop("classificationRule is missing !")
+        }
+        else if ( !is(classificationRule, "MixmodResults") ){
+          stop("classificationRule must be a 'MixmodResults' object!")
+        }
+        else{
+          .Object@classificationRule <- classificationRule
+        }
+        
+        if ( is(classificationRule@parameters, "MultinomialParameter") ){
+          .Object@dataType <- "qualitative"
+        }
+        else if ( is(classificationRule@parameters, "GaussianParameter") ){
+          .Object@dataType <- "quantitative"
+        } 
+        else if ( is(classificationRule@parameters, "CompositeParameter") ){
+          .Object@dataType <- "composite"
+        }
+        else{
+          stop( "Unknown type of parameters within classificationRule!" )
+        }
+      } #end without xml
     .Object@trace = trace
     .Object@massiccc = massiccc    
-    validObject(.Object)     
+    if(missing(xmlIn)){validObject(.Object)}
     return(.Object)
   }
 )

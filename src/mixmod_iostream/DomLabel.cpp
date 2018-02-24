@@ -46,7 +46,7 @@ namespace XEM {
 
 
   DomLabel::DomLabel(LabelDescription* labelDescription, string str) : xmlpp::Document() {
-    _root = create_root_node("Label_or_Partition");
+    _root = create_root_node("Label");
     _root->set_namespace_declaration("http://www.w3.org/2001/XMLSchema-instance", "xsi");
 	//QDomText text;
     xmlpp::Element* new_elt = NULL;
@@ -63,15 +63,15 @@ namespace XEM {
     new_elt->add_child_text(std::to_string(labelDescription->getNbCluster()));        
     new_elt = _root->add_child("Format");
     new_elt->add_child_text(FormatNumericFileToString(labelDescription->getFormat()));           
-    new_elt = _root->add_child("Type");
-    new_elt->add_child_text("label");        
+    //new_elt = _root->add_child("Type");
+    //new_elt->add_child_text("label");        
 	//datafilename
-	labelDescription->saveNumericValues(str + ".txt");
+	labelDescription->saveNumericValues(getAbsolutePath(str + ".txt"));
     new_elt = _root->add_child("Filename");
     new_elt->add_child_text(str + ".txt");               
 	//writeListColumnNode(labelDescription->getAllColumnDescription());
 	//write new file .mxd to describe data
-    Glib::ustring filename = str + ".mxl";
+    Glib::ustring filename = getAbsolutePath(str + ".mxl");
     removeIfExists(filename);
     write_to_file(filename);    
   }
@@ -117,7 +117,9 @@ namespace XEM {
   */
   DomLabel::DomLabel(Partition * partition, string & sFilename) {
     //_root = createElement( "Partition" );
-    _root = create_root_node("Partition");
+    string tag = partition->getPartitionFile()._type==TypePartition::label ? "Label" : "Partition";
+    string extn = partition->getPartitionFile()._type==TypePartition::label ? ".mxl" : ".mxd";
+    _root = create_root_node(tag);
     xmlpp::Element* new_elt = NULL;
 	//text
 
@@ -133,8 +135,8 @@ namespace XEM {
     new_elt = _root->add_child("Format");
     new_elt->add_child_text(FormatNumericFileToString(partition->getPartitionFile()._format));            
 	//type
-    new_elt = _root->add_child("Type");
-    new_elt->add_child_text(TypePartitionToString(partition->getPartitionFile()._type));            
+    //new_elt = _root->add_child("Type");
+    //new_elt->add_child_text(TypePartitionToString(partition->getPartitionFile()._type));            
 	//Filename
     new_elt = _root->add_child("Filename");
     new_elt->add_child_text(partition->getPartitionFile()._fileName);            
@@ -142,7 +144,7 @@ namespace XEM {
 	//appendChild(_root);
 
 	//write in new file .mxl to describe the partition
-    Glib::ustring filename = sFilename + ".mxl";
+    Glib::ustring filename = sFilename + extn;
     removeIfExists(filename);
     write_to_file(filename);
     
@@ -281,7 +283,7 @@ namespace XEM {
     xmlpp::Document *doc = parser.get_document();
     xmlpp::Element *_root = doc->get_root_node();
   
-    if(_root->get_name() != "Label_or_Partition") throw IOStreamErrorType::badElementInDataXML;
+    if(_root->get_name() != "Label"/*&&_root->get_name() != "Partition"*/) throw IOStreamErrorType::badElementInDataXML;
     
     //------------------------
     //Declaration of variables

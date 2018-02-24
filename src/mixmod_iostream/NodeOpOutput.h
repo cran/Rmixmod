@@ -52,7 +52,7 @@ public:
 	///read Node one <Output>
 	//ClusteringModelOutput * readClustering();
     template<class T>
-      T* read4Output();
+      T* read4Output(Input *inp);
 
 private:
 
@@ -69,8 +69,8 @@ private:
     template <class T>
 	void writeOutput(T* output, 
 			const std::vector<CriterionName> & criterionName, string str, int64_t numOutput);
-    void writeOutputExt(ClusteringModelOutput* output,  xmlpp::Element *outputElement);
-    void writeOutputExt(LearnModelOutput* output,  xmlpp::Element *outputElement);
+    void writeOutputExt(ClusteringModelOutput* output,  xmlpp::Element *outputElement, string str);
+    void writeOutputExt(LearnModelOutput* output,  xmlpp::Element *outputElement, string str);
 	void writePredictOutput(PredictModelOutput* output, string str, int64_t numOutput);
     
 };

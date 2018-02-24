@@ -68,6 +68,10 @@ ClusteringStrategy::ClusteringStrategy(const ClusteringStrategy & strategy) {
 	}
 }
 
+ClusteringStrategy* ClusteringStrategy::clone() {
+	return new ClusteringStrategy(*this);
+}
+
 //----------
 //Destructor
 //----------

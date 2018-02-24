@@ -12,6 +12,9 @@
 #include <Rcpp.h>
 #include <stdint.h>
 #include "mixmod/Utilities/Util.h"
+#include "mixmod/Kernel/Parameter/BinaryParameter.h"
+#include "mixmod/Kernel/Parameter/GaussianEDDAParameter.h"
+#include "mixmod/Kernel/Parameter/CompositeParameter.h"
 
 /** base class for handling the mixmod outputs and filling them in
  *  a Rcpp list */
@@ -24,19 +27,20 @@ public:
    *  @param output the Rcpp list to fill in
    **/
   OutputHandling( XEM::ModelOutput* MOutput, Rcpp::S4& xem, const XEM::DataType dataType);
+  OutputHandling( XEM::Parameter* par, Rcpp::S4& xem, const XEM::DataType dataType, int nbCluster);  
   
   /** destructor */
   ~OutputHandling();
   
 private:
   /** set gaussian paramaters */
-  void setGaussianParameter();
+  void setGaussianParameter(XEM::GaussianEDDAParameter const * parArg=nullptr);
   
   /** set multinomial parameters */
-  void setMultinomialParameter();
+  void setMultinomialParameter(XEM::BinaryParameter const * parArg=nullptr);
   
   /** set composite parameters */
-  void setCompositeParameter();
+  void setCompositeParameter(XEM::CompositeParameter *parArg=nullptr);
 
 protected:
   /** A pointer on the MIXMOD output */

@@ -25,6 +25,8 @@
 
 #include "mixmod/Kernel/IO/ParameterDescription.h"
 #include "mixmod/Kernel/Parameter/GaussianGeneralParameter.h"
+#include "mixmod/Kernel/Parameter/GaussianDiagParameter.h"
+#include "mixmod/Kernel/Parameter/GaussianSphericalParameter.h"
 #include "mixmod/Kernel/Parameter/BinaryEkjhParameter.h"
 #include "mixmod/Kernel/Parameter/CompositeParameter.h"
 #include "mixmod/Kernel/Model/Model.h"
@@ -34,7 +36,30 @@
 #include "mixmod/Kernel/IO/Data.h"
 
 namespace XEM {
+  static GaussianEDDAParameter* makeGaussianParameter(GaussianGeneralParameter *genParam,
+                                                      int64_t iNbCluster,
+                                                      int64_t iPbDimension, ModelName& modelName){
+    if(isGeneral(modelName)){
+      return genParam;
+    }
+    if(!isEDDA(modelName)){
+      THROW(OtherException, internalMixmodError);
+    }
+    GaussianEDDAParameter *eddaParam = nullptr;
+    ModelType *modelType = new ModelType(modelName);
+    if(isDiagonal(modelName)){
+      eddaParam = new GaussianDiagParameter(iNbCluster, iPbDimension, modelType);
+      eddaParam-> initUSER(genParam);
+    } else { // spherical
+      eddaParam = new GaussianSphericalParameter(iNbCluster, iPbDimension, modelType);
+      eddaParam-> initUSER(genParam);
+    }
+    delete genParam;
+    return eddaParam;
+  }
 
+
+    
 //------------
 // Constructor by default
 //------------
@@ -146,7 +171,8 @@ ParameterDescription::ParameterDescription(
 		THROW(InputException, wrongLabelFileName);
 	}
 	// create _parameter : always a XEMGaussianGeneralParameter is created
-	_parameter = new GaussianGeneralParameter(nbCluster, _nbVariable, _modelType, filename);
+	_parameter = makeGaussianParameter(new GaussianGeneralParameter(nbCluster, _nbVariable, _modelType, filename), nbCluster, _nbVariable, modelName);
+
 }
 
 // ---------------------------
@@ -175,12 +201,20 @@ ParameterDescription::ParameterDescription(
 	}
 	int64_t * tabNbFactor = new int64_t[nbVariable_binary];
 	recopyVectorToTab(nbFactor, tabNbFactor);
+	ModelType* _binarymodelType = new ModelType(getBinaryModelNamefromHeterogeneous(modelName));
+	ModelType* _gaussianmodelType = new ModelType(getGaussianModelNamefromHeterogeneous(modelName));
 
-	GaussianGeneralParameter* gaussian_parameter =
-		new GaussianGeneralParameter(nbCluster, nbVariable_gaussian, _modelType, filename, nbVariable_binary, nbFactor);
+	//GaussianGeneralParameter* gaussian_parameter =
+	GaussianEDDAParameter* gaussian_parameter =      
+      makeGaussianParameter(new GaussianGeneralParameter(nbCluster,
+                                                         nbVariable_gaussian,
+                                                         _gaussianmodelType,
+                                                         filename, nbVariable_binary, nbFactor),
+                            nbCluster, nbVariable_gaussian,
+                            _gaussianmodelType->_nameModel);
 	BinaryEkjhParameter* binary_parameter =
 		new BinaryEkjhParameter(
-			nbCluster, nbVariable_binary, _modelType, tabNbFactor, filename);
+			nbCluster, nbVariable_binary, _binarymodelType, tabNbFactor, filename);
 
 	_parameter = new CompositeParameter(gaussian_parameter, binary_parameter, _modelType);
 }
@@ -241,8 +275,9 @@ ParameterDescription::ParameterDescription(
 	_modelType = new ModelType(modelName);
 
 	// create _parameter : always a XEMGaussianGeneralParameter is created
-	_parameter = new GaussianGeneralParameter(nbCluster, _nbVariable,
-		_modelType, proportions, means, variances);
+	_parameter = makeGaussianParameter(new GaussianGeneralParameter(nbCluster, _nbVariable,
+                                                                    _modelType, proportions, means, variances),
+                                       nbCluster, _nbVariable, modelName);
 }
 
 //constructor for Heterogeneous data
@@ -266,11 +301,20 @@ ParameterDescription::ParameterDescription(
 	int64_t * tabNbFactor = new int64_t[nbBinaryVariable];
 	recopyVectorToTab(nbFactor, tabNbFactor);
 	ModelType* _binarymodelType = new ModelType(getBinaryModelNamefromHeterogeneous(modelName));
-	ModelType* _gaussianmodelType = new ModelType(getBinaryModelNamefromHeterogeneous(modelName));
+	ModelType* _gaussianmodelType = new ModelType(getGaussianModelNamefromHeterogeneous(modelName));
 	_modelType = new ModelType(modelName);
 	// create _parameter : always a XEMGaussianGeneralParameter is created
-	Parameter* g_parameter = new GaussianGeneralParameter(
-			nbCluster, nbGaussianVariable, _gaussianmodelType, proportions, means, variances);
+	Parameter* g_parameter = makeGaussianParameter(
+                                                   new GaussianGeneralParameter(
+                                                                                nbCluster,
+                                                                                nbGaussianVariable,
+                                                                                _gaussianmodelType,
+                                                                                proportions,
+                                                                                means,
+                                                                                variances),
+                                                   nbCluster,
+                                                   nbGaussianVariable,
+                                                   _gaussianmodelType->_nameModel);
 	// create _parameter : always a XEMBinaryEkjhParameter is created
 	Parameter* b_paramemter = new BinaryEkjhParameter(
 			nbCluster, nbBinaryVariable, _binarymodelType, 

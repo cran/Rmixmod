@@ -2,20 +2,28 @@
 
 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
 <!-- Parameter -->
-	<xsd:element name="Parameter" type="ParameterType"/>
-<!-- Parameter Type-->
-	<xsd:complexType  abstract="true" name="ParameterType">
-		<xsd:sequence>
-			<xsd:element name="Name" type="xsd:string" minOccurs="0"/>
-			<xsd:element name="NbVariable" type="xsd:positiveInteger"/>	
-			<xsd:element name="NbCluster" type="xsd:positiveInteger"/>
-			<xsd:element name="Format" type="FormatType"/>
-			<!-- if the model is composite, additional information (pbDimension for each data 
-			component) will be provided to retrieve parameter values -->
-			<xsd:element name="ParameterFilename" type="xsd:string"/>
-			<xsd:element name="Model" type="ModelType"/>
-		</xsd:sequence>
-	</xsd:complexType>
+<xsd:element name="Parameter" type="ParameterType"/>
+  <xsd:simpleType name="FloatEncodingType">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="HumanReadable"/>
+      <xsd:enumeration value="HexBinary"/>
+    </xsd:restriction>
+  </xsd:simpleType>       
+  <!-- Parameter Type-->
+  <xsd:complexType  abstract="true" name="ParameterType">
+	<xsd:sequence>
+      <xsd:element name="FloatEncoding" minOccurs="0" type="FloatEncodingType"/>
+      
+	  <xsd:element name="Name" type="xsd:string" minOccurs="0"/>
+	  <xsd:element name="NbVariable" type="xsd:positiveInteger"/>	
+	  <xsd:element name="NbCluster" type="xsd:positiveInteger"/>
+	  <xsd:element name="Format" type="FormatType"/>
+	  <!-- if the model is composite, additional information (pbDimension for each data 
+		   component) will be provided to retrieve parameter values -->
+	  <xsd:element name="ParameterFilename" type="xsd:anyURI"/>
+	  <xsd:element name="Model" type="ModelType"/>
+	</xsd:sequence>
+  </xsd:complexType>
 	
 	<!-- Parameter Type : Qualitative -->
 	<xsd:complexType name="Qualitative">

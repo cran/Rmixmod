@@ -48,19 +48,19 @@ namespace XEM {
   }
 
 //common part between Clustering & AD
-  NodeInput::NodeInput(Input * input, string & s, string dataTag) : xmlpp::Document() {
+  NodeInput::NodeInput(Input * input, string & s) : xmlpp::Document() {
 
 	//_rootInput = createElement( "Input" );
     _rootInput = create_root_node( "Input");
-	writeDataNode(input, s, dataTag);
+	writeDataNode(input, s);
 	writeSelectVariableNode(input);
 	writeSelectIndividualNode(input);
 }
 
-  void NodeInput::writeDataNode(Input * input, string & s, string dataTag) {
+  void NodeInput::writeDataNode(Input * input, string & s) {
 
 	//Data
-    xmlpp::Element *data = _rootInput->add_child(dataTag);
+    xmlpp::Element *data = _rootInput->add_child("Data");
 	//dataFilename
     string dataFilename = s + ".mxd";
     data->add_child_text(dataFilename);
@@ -82,10 +82,10 @@ namespace XEM {
   void NodeInput::writeSelectIndividualNode(Input * input) {
   }
 
-  DataDescription & NodeInput::readDataNode(std::string dataTag) {
+  DataDescription & NodeInput::readDataNode() {
 
 	if (!_rootInput) throw;
-    xmlpp::Element *elementData = dynamic_cast<xmlpp::Element*>(_rootInput->get_first_child(dataTag));
+    xmlpp::Element *elementData = dynamic_cast<xmlpp::Element*>(_rootInput->get_first_child("Data"));
     string filename;
     if (!elementData) throw;
       //absolute filename is the name of .mxd file

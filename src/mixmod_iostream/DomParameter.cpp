@@ -65,7 +65,7 @@ namespace XEM {
     new_elt = _root->add_child("Format");
     new_elt->add_child_text(FormatNumericFileToString(parameterDescription->getFormat()));        
 	//Filename
-	parameterDescription->saveNumericValues(sFilename + ".txt");
+	parameterDescription->saveNumericValues(getAbsolutePath(sFilename + ".txt"));
     new_elt = _root->add_child("ParameterFilename");
     new_elt->add_child_text(sFilename + ".txt");        
 	//model
@@ -84,7 +84,7 @@ namespace XEM {
       _root->set_attribute("type", "Quantitative", "xsi");
 	}
 
-    string file = sFilename + ".mxp";
+    string file = getAbsolutePath(sFilename + ".mxp");
     removeIfExists(file);
     write_to_file(file);    
   }
@@ -112,10 +112,11 @@ namespace XEM {
     new_elt = root->add_child("ParameterFilename");
     std::string parFilename = parameter->getFilename();
     if(parFilename != ""){
-      new_elt->add_child_text(parFilename);
+      new_elt->add_child_text(normalizeFilename(parFilename));
     } else {
       std::string txtFile = sFilename + ".txt";
-      std::ofstream fo(txtFile.c_str(), ios::out);
+      string absPath = getAbsolutePath(txtFile);
+      std::ofstream fo(absPath.c_str(), ios::out);
       parameter->edit(fo);
       new_elt->add_child_text(txtFile);
     }
@@ -146,7 +147,7 @@ namespace XEM {
     Parameter * parameter = cInput->getStrategy()->getStrategyInit()->getInitParameter(0);
     _root = create_root_node("Parameter");
     domParameterImpl(cInput, parameter, _root, sFilename);    
-    string file = sFilename + ".mxp";
+    string file = getAbsolutePath(sFilename + ".mxp");
     removeIfExists(file);
     write_to_file(file);    
   }
@@ -155,7 +156,7 @@ namespace XEM {
     Parameter * parameter = pInput->getClassificationRule();
     _root = create_root_node("Parameter");
     domParameterImpl(pInput, parameter, _root, sFilename);    
-    string file = sFilename + ".mxp";
+    string file = getAbsolutePath(sFilename + ".mxp");
     removeIfExists(file);
     write_to_file(file);    
   }
@@ -224,7 +225,7 @@ namespace XEM {
                                       parameterFilename, sName, modelName);
     }
     else { //gaussian
-      if(!isGeneral(modelName)) modelName = Gaussian_pk_Lk_Ck; // because ParameterDescription creates a GaussianGeneralParameter object anyway
+      //if(!isGeneral(modelName)) modelName = Gaussian_pk_Lk_Ck; // because ParameterDescription creates a GaussianGeneralParameter object anyway
       return new ParameterDescription(nbCluster, nbVariable, format,
                                       parameterFilename, sName, modelName);
     }
