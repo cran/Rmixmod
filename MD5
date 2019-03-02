@@ -1,4 +1,4 @@
-1891ac212bc4507f265d6e9b9f53b570 *DESCRIPTION
+ec8a08764b6153d9b3a24ad3484a38c7 *DESCRIPTION
 49da110999dbf6fcd83df69edebacd88 *NAMESPACE
 67cc51b7f0381fcac32079c7d3ac25b6 *R/A_NAMESPACE.R
 93b178f1c325e633d8135bd08eb97a6f *R/CompositeModel.R
@@ -20,7 +20,7 @@ a1de9924e35969c6cf959ab208e905a4 *R/Parameter.R
 aab46a2ea1e38bfac5839d84c6224d85 *R/Strategy.R
 7ead6c542356ff67a733fcd6a5d5addd *R/global.R
 ff74d0c149177e1f0dd99b43593a64f3 *R/zzz.R
-ac85d71f5fd57e6b31c2d2192bbe18a2 *configure
+adfd3ef3fe36e572b060fa716b545d9e *configure
 a2924121b4d88109f5fe43fcdb9331bb *data/birds.rda
 dcb2505b6ce6d0b6c1ed371fb530e6bb *data/car.rda
 939e8b7f2b7c7310bbc05b732ebda52f *data/finance.rda
@@ -109,8 +109,8 @@ e6fa449694d6c4eb92dd8ea473684bc3 *src/Conversion.cpp
 7227c7cc5b5f2aa44b17317768a2b098 *src/InputHandling.h
 af5294b481fbd8f918ad3ed388f26057 *src/LearnOutputHandling.cpp
 909460c368a8b03dd7a072e8db3e64bd *src/LearnOutputHandling.h
-abe73cf7c9ec88779aa3faf8044854dc *src/Makevars
-74f10982d1319b72fb3a38ae19b9dd4c *src/Makevars.win
+5794d6c643c7923f18a124ecf65ca754 *src/Makevars
+4c5bd8d68e60f23e97576c993329047d *src/Makevars.win
 9489aaa89209611c4584981b7934e4cb *src/OutputHandling.cpp
 b30d08967de8073f607b17711c8a7f6a *src/OutputHandling.h
 9a3ddee0b412f31a5cbeb664bad4f1f7 *src/Rmixmod_init.c
@@ -263,13 +263,13 @@ c1f99f9855ec759fb308aad828f3977f *src/mixmod/Kernel/Parameter/Parameter.h
 18745298e871dd72c9acb5a20e3b68b0 *src/mixmod/Matrix/DiagMatrix.cpp
 2bc508b7ac5ea9d21b40afdb7be0fa42 *src/mixmod/Matrix/DiagMatrix.h
 4fb2a5e5f10380b54fbb7fce227e0777 *src/mixmod/Matrix/GeneralMatrix.cpp
-042e6a0ad13a535b1ba8f736e9d88053 *src/mixmod/Matrix/GeneralMatrix.h
-e59723c46daa7f590ffc63c40fd52af5 *src/mixmod/Matrix/Matrix.cpp
+6ed38b9fd7c1758339cfb567ec48cd28 *src/mixmod/Matrix/GeneralMatrix.h
+e351d27b66cce061468e1c9d0c591ba1 *src/mixmod/Matrix/Matrix.cpp
 efffe2919a61fbb659ff43d7520c6ea9 *src/mixmod/Matrix/Matrix.h
-85a8c466e59463a3a399d678747ba72a *src/mixmod/Matrix/SphericalMatrix.cpp
+aa1519c5d1866df9e6d894c2f7e712de *src/mixmod/Matrix/SphericalMatrix.cpp
 4670c2d1c4370e0b60456b6c60579062 *src/mixmod/Matrix/SphericalMatrix.h
 8aeaf7a1b35f8ecef7946d68ad27e9b9 *src/mixmod/Matrix/SymmetricMatrix.cpp
-a53ed433f7e72dd0885db4510ff913f2 *src/mixmod/Matrix/SymmetricMatrix.h
+f46a66df8ab53bd3ff1e7f1cb342048f *src/mixmod/Matrix/SymmetricMatrix.h
 ea72c80a5a689737904365623313b5e9 *src/mixmod/Utilities/Error.cpp
 eb20095aa2f66dd68a10b02e9a65c94c *src/mixmod/Utilities/Error.h
 ee3fa71a15d70f5f406c01ac629da19b *src/mixmod/Utilities/ExampleDataUtil.cpp
@@ -277,7 +277,7 @@ f24f1a30519a3da44a89b02b8d29c596 *src/mixmod/Utilities/ExampleDataUtil.h
 2c490ba3d6eaec46d073ea4e673a4c44 *src/mixmod/Utilities/Random.cpp
 feeb049111bcbe1fe512c27223ec443e *src/mixmod/Utilities/Random.h
 837e2ae250b316400d819a236811dad0 *src/mixmod/Utilities/Util.cpp
-d18a8f305c52281dbbcac90dd4bfa833 *src/mixmod/Utilities/Util.h
+64224cc975180b81cbab158477f3456e *src/mixmod/Utilities/Util.h
 41bb286b549908bd9dbf8763b1f30168 *src/mixmod/Utilities/exceptions/DCVException.cpp
 5ccf54b4fea6acad6c29659643a5bd43 *src/mixmod/Utilities/exceptions/DCVException.h
 7a921d1633f5093c2854ee69519b77de *src/mixmod/Utilities/exceptions/DCVonlyInGaussianCaseException.cpp
@@ -298,7 +298,7 @@ c304d90c6494e409f52b6f6eb0026676 *src/mixmod/Utilities/exceptions/NumericExcepti
 5206ad1580abab16f81ae7a99a08b940 *src/mixmod/Utilities/maths/SelectLibrary.h
 7da723f82e5cac5ea56b0225da422a6d *src/mixmod/Utilities/maths/_ReadMe
 916c2ceb45d1db00b51301dd80ed159c *src/mixmod/Utilities/mixmod.h
-2d0637c4754a782f76a4d9489d4d060f *src/mixmod/mixmod_r.mk
+5ed1197d830c1aafea1141b0b60beea3 *src/mixmod/mixmod_r.mk
 70ba56aa87b7802e6f359de4f9de470d *src/mixmod_iostream/DomData.cpp
 76a2432290eb85e91269da0d279125fb *src/mixmod_iostream/DomData.h
 ac26fae25a6c33711db0dbd29fd6415f *src/mixmod_iostream/DomLabel.cpp
@@ -321,7 +321,7 @@ fa530883053cc7b011f3b48fccd4432c *src/mixmod_iostream/NodeOpOutput.cpp
 5edd4bce0c65a363739fd468f1d66347 *src/mixmod_iostream/NodeOpOutput.h
 8624102b709ce13ec673ae0a036f6098 *src/mixmod_iostream/NodeOutput.cpp
 a3472ed53b5ffdd84dc4ef65a28ea7b0 *src/mixmod_iostream/NodeOutput.h
-bb3cb9ad50e5d35031380af1f84c72d2 *src/mixmod_iostream/mixmod_iostream_r.mk
+a8703def659fb5adf328e8a71132d318 *src/mixmod_iostream/mixmod_iostream_r.mk
 abe9a036fe6d4395f1492247d033a76d *src/mixmod_iostream/to_be_removed/DomClusteringProject.cpp
 c1403fbd1011239131734f0ff8e120e0 *src/mixmod_iostream/to_be_removed/DomClusteringProject.h
 e8137a7662535c2faef3470140269758 *src/mixmod_iostream/to_be_removed/DomDAProject.cpp

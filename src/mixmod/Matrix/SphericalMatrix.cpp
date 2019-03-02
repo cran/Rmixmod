@@ -26,6 +26,7 @@
 #include "mixmod/Matrix/SphericalMatrix.h"
 #include "mixmod/Matrix/GeneralMatrix.h"
 #include "mixmod/Matrix/DiagMatrix.h"
+#include "mixmod/Utilities/maths/SelectLibrary.h"
 
 namespace XEM {
 

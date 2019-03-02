@@ -23,6 +23,7 @@
     All informations available on : http://www.mixmod.org                                                                                               
 ***************************************************************************/
 #include "mixmod/Matrix/Matrix.h"
+#include "mixmod/Utilities/maths/SelectLibrary.h"
 
 namespace XEM {
 

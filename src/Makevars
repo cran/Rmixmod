@@ -16,7 +16,7 @@ MIXMODLIB    = mixmod.a
 
 ## Use the R_HOME indirection to support installations of multiple R version
 PKG_CXXFLAGS = -DRPACKAGE -DXEM_RESOURCES_PATH='"$(R_PACKAGE_DIR)/XML_specs"' $(RMIXMOD_XML) \
-	$(OMPSTATUS) -Wno-ignored-attributes -I. -I./mixmod_iostream $(LIBXMLXX_CFLAGS) #-I$(EIGENDIR) $(SHLIB_OPENMP_CXXFLAGS)
+	$(OMPSTATUS) -I. -I./mixmod_iostream $(LIBXMLXX_CFLAGS) #-I$(EIGENDIR) $(SHLIB_OPENMP_CXXFLAGS)
 PKG_LIBS = `$(R_HOME)/bin/Rscript -e "Rcpp:::LdFlags()"` -L$(MIXMODDIR) $(MIXMODLIB) $(LIBXMLXX_LIBS) #$(SHLIB_OPENMP_CFLAGS)
 
 ##

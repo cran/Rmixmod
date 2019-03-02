@@ -2023,7 +2023,7 @@ $as_echo "no" >&6; }
 fi
 
 
-if test "${RMIXMOD_WITH_XML}" -eq 1  ; then
+if test "${RMIXMOD_WITH_XML}" = 1  ; then
 	if test -z "${PKG_CONFIG}"; then
 		{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: cannot find pkg-config, Rmixmod will be installed without optional XML features" >&5
 $as_echo "$as_me: WARNING: cannot find pkg-config, Rmixmod will be installed without optional XML features" >&2;}
@@ -2150,8 +2150,8 @@ $as_echo "no" >&6; }
 fi
 
 pkg_failed=no
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for libxml++-2.6" >&5
-$as_echo_n "checking for libxml++-2.6... " >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for LIBXMLXX" >&5
+$as_echo_n "checking for LIBXMLXX... " >&6; }
 
 if test -n "$LIBXMLXX_CFLAGS"; then
     pkg_cv_LIBXMLXX_CFLAGS="$LIBXMLXX_CFLAGS"
@@ -2191,7 +2191,7 @@ fi
 
 
 if test $pkg_failed = yes; then
-        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+   	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 
 if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
@@ -2210,7 +2210,7 @@ fi
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: No package 'libxml++-2.6' found, Rmixmod will be installed without optional XML features" >&5
 $as_echo "$as_me: WARNING: No package 'libxml++-2.6' found, Rmixmod will be installed without optional XML features" >&2;}
 elif test $pkg_failed = untried; then
-        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+     	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: No package 'libxml++-2.6' found, Rmixmod will be installed without optional XML features" >&5
 $as_echo "$as_me: WARNING: No package 'libxml++-2.6' found, Rmixmod will be installed without optional XML features" >&2;}
@@ -2230,7 +2230,7 @@ if test ! -z "$LIBXMLXX_CFLAGS"  ; then
 	RMIXMOD_XML="-DRMIXMOD_XML=1"
 fi
 OMP_FLAGS=""
-if test "${RMIXMOD_WITH_OMP}" -eq 1  ; then
+if test "${RMIXMOD_WITH_OMP}" = 1  ; then
 	OMP_FLAGS="-fopenmp"
 fi
 ac_ext=c

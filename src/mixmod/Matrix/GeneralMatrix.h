@@ -26,6 +26,7 @@
 #define XEMGENERALMATRIX_H
 
 #include "mixmod/Matrix/Matrix.h"
+#include "mixmod/Utilities/maths/SelectLibrary.h"
 
 namespace XEM {
 

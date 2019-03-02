@@ -47,7 +47,6 @@
 #include "mixmod/Utilities/exceptions/NumericException.h"
 #include "mixmod/Utilities/exceptions/OtherException.h"
 
-
 // Need matrix output routines
 #include <vector>
 #include <fstream>
@@ -63,7 +62,11 @@
 #include <assert.h> //For debugging purpose
 
 // Need matrix applications
-#include "mixmod/Utilities/maths/SelectLibrary.h"
+//#include "mixmod/Utilities/maths/SelectLibrary.h"
+#include <cmath>
+#ifndef XEMmathLib
+#define XEMmathLib 1 // default is Eigen
+#endif
 
 using namespace std;
 

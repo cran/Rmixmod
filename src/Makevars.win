@@ -14,9 +14,8 @@ MIXMODLIB    = mixmod.a
 #LIBXMLXX_LIBS=@LIBXMLXX_LIBS@
 #RMIXMOD_XML=@RMIXMOD_XML@
 
-PKG_CXXFLAGS = -DWITHOUT_OMP -DXEM_RESOURCES_PATH='"$(R_PACKAGE_DIR)/XML_specs"' $(RMIXMOD_XML) -Wno-ignored-attributes -I. -I./mixmod_iostream $(LIBXMLXX_CFLAGS) #-I$(EIGENDIR)
-## Use the R_HOME indirection to support installations of multiple R version
-PKG_LIBS = `$(R_HOME)/bin/Rscript -e "Rcpp:::LdFlags()"` -L$(MIXMODDIR) $(MIXMODLIB) $(LIBXMLXX_LIBS)
+PKG_CXXFLAGS = -DWITHOUT_OMP -DXEM_RESOURCES_PATH='"$(R_PACKAGE_DIR)/XML_specs"' $(RMIXMOD_XML) -I. -I./mixmod_iostream $(LIBXMLXX_CFLAGS) #-I$(EIGENDIR)
+PKG_LIBS = -L$(MIXMODDIR) $(MIXMODLIB) $(LIBXMLXX_LIBS)
 
 ##
 ## Targets
