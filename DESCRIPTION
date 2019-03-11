@@ -1,5 +1,5 @@
 Package: Rmixmod
-Version: 2.1.2.1
+Version: 2.1.2.2
 Title: Classification with Mixture Modelling
 Description: Interface of 'MIXMOD' software for supervised, unsupervised and
     semi-supervised classification with mixture modelling.
@@ -35,7 +35,7 @@ Collate: 'A_NAMESPACE.R' 'global.R' 'Model.R' 'MultinomialModel.R'
         'MixmodLearn.R' 'MixmodPredict.R' 'MixmodXml.R' 'Rmixmod.R'
         'zzz.R'
 RoxygenNote: 5.0.1
-Packaged: 2019-03-02 12:43:39 UTC; ripley
+Packaged: 2019-03-11 07:19:59 UTC; hornik
 Author: Florent Langrognet [aut],
   Remi Lebret [aut],
   Christian Poli [aut],
@@ -49,7 +49,7 @@ Author: Florent Langrognet [aut],
   G<c3><a9>rard Govaert [ctb]
 Maintainer: ORPHANED
 Repository: CRAN
-Date/Publication: 2019-03-02 13:56:27 UTC
+Date/Publication: 2019-03-11 07:30:40 UTC
 X-CRAN-Original-Maintainer: Benjamin Auder <benjamin.auder@u-psud.fr>
-X-CRAN-Comment: Orphaned on 2019-03-02 as check issues were not
-        corrected despite reminder.
+X-CRAN-Comment: Orphaned and corrected on 2019-03-02 as check issues
+        were not corrected despite reminder.
