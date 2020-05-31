@@ -16,4 +16,3 @@ This class defines parameters of a Mixture Model.
   getSlots("Parameter")
 
 }
-

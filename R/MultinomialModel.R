@@ -2,33 +2,32 @@
 ##                             MultinomialModel.R                                ##
 ###################################################################################
 
-###################################################################################
-##' @include global.R
-##' @include Model.R
+#' @include global.R
+#' @include Model.R
 NULL
-###################################################################################
 
-###################################################################################
-##' Constructor of [\code{\linkS4class{MultinomialModel}}] class
-##'
-##' This class defines a multinomial Model. Inherits the [\code{\linkS4class{Model}}] class.
-##' 
-##' \describe{
-##'   \item{variable.independency}{logical}
-##'   \item{component.independency}{logical}
-##' }
-##'
-##' @examples
-##'   new("MultinomialModel")
-##'   new("MultinomialModel", listModels=c("Binary_pk_E","Binary_p_E") )
-##'   new("MultinomialModel", free.proportions=FALSE, variable.independency=TRUE )
-##'
-##'   getSlots("MultinomialModel")
-##' 
-##' @name MultinomialModel-class
-##' @rdname MultinomialModel-class
-##' @exportClass MultinomialModel
-##'
+#' MultinomialModel
+#'
+#' Constructor of [\code{\linkS4class{MultinomialModel}}] class
+#'
+#' This class defines a multinomial Model. Inherits the [\code{\linkS4class{Model}}] class.
+#' 
+#' \describe{
+#'   \item{variable.independency}{logical}
+#'   \item{component.independency}{logical}
+#' }
+#'
+#' @examples
+#'   new("MultinomialModel")
+#'   new("MultinomialModel", listModels=c("Binary_pk_E","Binary_p_E") )
+#'   new("MultinomialModel", free.proportions=FALSE, variable.independency=TRUE )
+#'
+#'   getSlots("MultinomialModel")
+#' 
+#' @name MultinomialModel-class
+#' @rdname MultinomialModel-class
+#' @exportClass MultinomialModel
+#'
 setClass(
     Class="MultinomialModel",
     representation=representation(
@@ -91,20 +90,17 @@ setClass(
       
     }
 )
-###################################################################################
 
-
-###################################################################################
-##' Create an instance of the [\code{\linkS4class{MultinomialModel}}] class using new/initialize.
-##' 
-##' Initialization method. Used internally in the `Rmixmod' package.
-##' 
-##' @seealso \code{\link{initialize}}
-##'
-##' @keywords internal
-##'
-##' @rdname initialize-methods
-##'
+#' Create an instance of the [\code{\linkS4class{MultinomialModel}}] class using new/initialize.
+#' 
+#' Initialization method. Used internally in the `Rmixmod' package.
+#' 
+#' @seealso \code{\link{initialize}}
+#'
+#' @keywords internal
+#'
+#' @rdname initialize-methods
+#'
 setMethod(
   f="initialize",
   signature=c("MultinomialModel"),
@@ -226,50 +222,47 @@ setMethod(
     return(.Object)
   }
 )
-###################################################################################
 
-
-###################################################################################
-##' Create an instance of the [\code{\linkS4class{MultinomialModel}}] class
-##'
-##' Define a list of multinomial model to test in MIXMOD.
-##'
-##' In the multinomial mixture model, the multinomial distribution is associated to the \eqn{j}th variable of the \eqn{k}th component is reparameterized by a center \eqn{a_k^j} and the dispersion \eqn{\varepsilon_k^j} around this center. Thus, it allows us to give an interpretation similar to the center and the variance matrix used for continuous data in the Gaussian mixture context. In the following, this model will be denoted by \eqn{[\varepsilon_k^j]}. In this context, three other models can be easily deduced. We note \eqn{[\varepsilon_k]} the model where \eqn{\varepsilon_k^j} is independent of the variable \eqn{j}, \eqn{[\varepsilon^j]} the model where \eqn{\varepsilon_k^j} is independent of the component \eqn{k} and, finally, \eqn{[\varepsilon]} the model where \eqn{\varepsilon_k^j} is independent of both the variable $j$ and the component \eqn{k}.  In order to maintain some unity in the notation, we will denote also \eqn{[\varepsilon_k^{jh}]} the most general model introduced at the previous section.
-##' 
-##' @param listModels a list of characters containing a list of models. It is optional.
-##' @param free.proportions logical to include models with free proportions. Default is TRUE.
-##' @param equal.proportions logical to include models with equal proportions. Default is FALSE.
-##' @param variable.independency logical to include models where \eqn{[\varepsilon_k^j]} is independent of the variable \eqn{j}. Optionnal.
-##' @param component.independency logical to include models where \eqn{[\varepsilon_k^j]} is independent of the component \eqn{k}. Optionnal.
-##'
-##' @return an object of [\code{\linkS4class{MultinomialModel}}] containing some of the 10 Binary Models:
-##' \tabular{rlll}{
-##'     Model \tab Prop. \tab Var. \tab Comp. \cr
-##'     Binary_p_E     \tab Equal \tab TRUE \tab TRUE \cr
-##'     Binary_p_Ej    \tab \tab FALSE \tab TRUE \cr
-##'     Binary_p_Ek    \tab \tab TRUE \tab FALSE \cr
-##'     Binary_p_Ekj   \tab \tab FALSE \tab FALSE \cr
-##'     Binary_p_Ekjh  \tab \tab FALSE \tab FALSE \cr
-##'     Binary_pk_E    \tab  Free \tab TRUE \tab TRUE \cr
-##'     Binary_pk_Ej   \tab \tab FALSE \tab TRUE \cr
-##'     Binary_pk_Ek   \tab \tab TRUE \tab FALSE \cr
-##'     Binary_pk_Ekj  \tab \tab FALSE \tab FALSE  \cr
-##'     Binary_pk_Ekjh \tab \tab FALSE \tab FALSE \cr
-##' }
-##'
-##' @references C. Biernacki, G. Celeux, G. Govaert, F. Langrognet. "Model-Based Cluster and Discriminant Analysis with the MIXMOD Software". Computational Statistics and Data Analysis, vol. 51/2, pp. 587-600. (2006)
-##' @examples
-##'   mixmodMultinomialModel()
-##'   # multinomial models with equal proportions
-##'   mixmodMultinomialModel(equal.proportions=TRUE,free.proportions=FALSE)
-##'   # multinomial models with a pre-defined list
-##'   mixmodMultinomialModel( listModels=c("Binary_pk_E","Binary_p_E") )
-##'   # multinomial models with equal proportions and independent of the variable
-##'   mixmodMultinomialModel(free.proportions=FALSE, variable.independency=TRUE)
-##'
-##' @author  Florent Langrognet and Remi Lebret and Christian Poli ans Serge Iovleff, with contributions from C. Biernacki and G. Celeux and G. Govaert \email{contact@@mixmod.org}
-##' @export
-##'
+#' Create an instance of the [\code{\linkS4class{MultinomialModel}}] class
+#'
+#' Define a list of multinomial model to test in MIXMOD.
+#'
+#' In the multinomial mixture model, the multinomial distribution is associated to the \eqn{j}th variable of the \eqn{k}th component is reparameterized by a center \eqn{a_k^j} and the dispersion \eqn{\varepsilon_k^j} around this center. Thus, it allows us to give an interpretation similar to the center and the variance matrix used for continuous data in the Gaussian mixture context. In the following, this model will be denoted by \eqn{[\varepsilon_k^j]}. In this context, three other models can be easily deduced. We note \eqn{[\varepsilon_k]} the model where \eqn{\varepsilon_k^j} is independent of the variable \eqn{j}, \eqn{[\varepsilon^j]} the model where \eqn{\varepsilon_k^j} is independent of the component \eqn{k} and, finally, \eqn{[\varepsilon]} the model where \eqn{\varepsilon_k^j} is independent of both the variable $j$ and the component \eqn{k}.  In order to maintain some unity in the notation, we will denote also \eqn{[\varepsilon_k^{jh}]} the most general model introduced at the previous section.
+#' 
+#' @param listModels a list of characters containing a list of models. It is optional.
+#' @param free.proportions logical to include models with free proportions. Default is TRUE.
+#' @param equal.proportions logical to include models with equal proportions. Default is FALSE.
+#' @param variable.independency logical to include models where \eqn{[\varepsilon_k^j]} is independent of the variable \eqn{j}. Optionnal.
+#' @param component.independency logical to include models where \eqn{[\varepsilon_k^j]} is independent of the component \eqn{k}. Optionnal.
+#'
+#' @return an object of [\code{\linkS4class{MultinomialModel}}] containing some of the 10 Binary Models:
+#' \tabular{rlll}{
+#'     Model \tab Prop. \tab Var. \tab Comp. \cr
+#'     Binary_p_E     \tab Equal \tab TRUE \tab TRUE \cr
+#'     Binary_p_Ej    \tab \tab FALSE \tab TRUE \cr
+#'     Binary_p_Ek    \tab \tab TRUE \tab FALSE \cr
+#'     Binary_p_Ekj   \tab \tab FALSE \tab FALSE \cr
+#'     Binary_p_Ekjh  \tab \tab FALSE \tab FALSE \cr
+#'     Binary_pk_E    \tab  Free \tab TRUE \tab TRUE \cr
+#'     Binary_pk_Ej   \tab \tab FALSE \tab TRUE \cr
+#'     Binary_pk_Ek   \tab \tab TRUE \tab FALSE \cr
+#'     Binary_pk_Ekj  \tab \tab FALSE \tab FALSE  \cr
+#'     Binary_pk_Ekjh \tab \tab FALSE \tab FALSE \cr
+#' }
+#'
+#' @references C. Biernacki, G. Celeux, G. Govaert, F. Langrognet. "Model-Based Cluster and Discriminant Analysis with the MIXMOD Software". Computational Statistics and Data Analysis, vol. 51/2, pp. 587-600. (2006)
+#' @examples
+#'   mixmodMultinomialModel()
+#'   # multinomial models with equal proportions
+#'   mixmodMultinomialModel(equal.proportions=TRUE,free.proportions=FALSE)
+#'   # multinomial models with a pre-defined list
+#'   mixmodMultinomialModel( listModels=c("Binary_pk_E","Binary_p_E") )
+#'   # multinomial models with equal proportions and independent of the variable
+#'   mixmodMultinomialModel(free.proportions=FALSE, variable.independency=TRUE)
+#'
+#' @author  Florent Langrognet and Remi Lebret and Christian Poli ans Serge Iovleff, with contributions from C. Biernacki and G. Celeux and G. Govaert \email{contact@@mixmod.org}
+#' @export
+#'
 mixmodMultinomialModel<- function( listModels=NULL, free.proportions=TRUE, equal.proportions=TRUE, variable.independency=NULL, component.independency=NULL ){
 
     if ( !is.null(listModels) ){
@@ -289,13 +282,10 @@ mixmodMultinomialModel<- function( listModels=NULL, free.proportions=TRUE, equal
       }
     }
 }
-###################################################################################
 
-
-###################################################################################
-##' @rdname extract-methods
-##' @aliases [,MultinomialModel-method
-##'
+#' @rdname extract-methods
+#' @aliases [,MultinomialModel-method
+#'
 setMethod(
   f="[", 
   signature(x = "MultinomialModel"),
@@ -317,16 +307,11 @@ setMethod(
     }
   }
 )
-###################################################################################
 
-
-###################################################################################
-##' 
-##'
-##' @name [
-##' @rdname extract-methods
-##' @aliases [<-,MultinomialModel-method
-##'
+# ' @name [
+#' @rdname extract-methods
+#' @aliases [<-,MultinomialModel-method
+#'
 setReplaceMethod(
   f="[", 
   signature(x = "MultinomialModel"), 
@@ -350,5 +335,3 @@ setReplaceMethod(
     return(x)
   }
 )
-###################################################################################
-

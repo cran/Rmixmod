@@ -74,7 +74,7 @@ void ClusteringInputHandling::setAlgo()
     }
     else{
       //exception because wrong criterionName
-      throw(std::runtime_error("In InputHandling::setAlgo Invalid algo"));
+      Rcpp::stop("In InputHandling::setAlgo Invalid algo");
     }
     
     // set nbIteration value
@@ -168,8 +168,8 @@ void ClusteringInputHandling::setInitAlgo()
       paramArray1[0] = new XEM::BinaryEkjhParameter(nbCluster, pbDim, cInput_->getModelType()[0], cFactor.get(), proportions.get(), cCenter.get(), cScatter.get() );
       cStrategy_->setTabInitParameter (paramArray1, 1);
     } else {
-      throw(std::runtime_error("Error in InputHandling::run"
-                             " parameter initialization for heterogeneous data  his not implemented"));      
+      Rcpp::stop("Error in InputHandling::run"
+                             " parameter initialization for heterogeneous data  his not implemented");      
     }
   }
   else if (init == "partition")
@@ -177,9 +177,9 @@ void ClusteringInputHandling::setInitAlgo()
       Rcpp::IntegerVector rLabels(algoOptions_.slot("labels"));
       int64_t nbSample = cInput_->getNbSample();
       if(rLabels.size() != nbSample){
-        throw(std::runtime_error("Error in InputHandling::run"
+        Rcpp::stop("Error in InputHandling::run"
                                  "The size of labels vector doesn't match "
-                                 "the number of samples "));      
+                                 "the number of samples ");      
       }
       std::vector<int64_t> cLabelArray;
       Rcpp::IntegerVector::iterator it;
@@ -284,7 +284,7 @@ void ClusteringInputHandling::run()
   }
   catch(...)
   {
-    throw(std::runtime_error("InputHandling::run get a mixmod error"));
+    Rcpp::stop("InputHandling::run get a mixmod error");
   }
 }
 

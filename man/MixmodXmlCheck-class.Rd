@@ -7,4 +7,3 @@
 \description{
 This is a class to handle XML files (TODO: describe...)
 }
-

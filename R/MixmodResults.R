@@ -1,37 +1,34 @@
-###################################################################################
-##                                MixmodResults.R                                ##
-###################################################################################
+##################################################################################
+#                                MixmodResults.R                                ##
+##################################################################################
 
-###################################################################################
-##' @include global.R
-##' @include Parameter.R
+#' @include global.R
+#' @include Parameter.R
 NULL
-###################################################################################
 
-###################################################################################
-##' Constructor of [\code{\linkS4class{MixmodResults}}] class
-##'
-##' This is a class to contain results from MIXMOD library.
-##'  
-##' \describe{
-##'   \item{nbCluster}{integer. It indicates the number of components.}
-##'   \item{model}{character. Name of the model.}
-##'   \item{criterion}{list of character. This option permits to select the criterion giving the best configuration of an execution.}
-##'   \item{criterionValue}{numeric. Values of the criterion.}
-##'   \item{parameters}{a S4 [\code{\linkS4class{Parameter}}] object. The best model parameters.}
-##'   \item{likelihood}{numeric. The model likelihood.}
-##'   \item{partition}{vector of integers defining the partition.}
-##'   \item{proba}{a matrix of probabilities.}
-##'   \item{error}{a character. The mixmod error.}
-##' }
-##'
-##' @examples
-##'   getSlots("MixmodResults")
-##'
-##' @name MixmodResults-class
-##' @rdname MixmodResults-class
-##' @exportClass MixmodResults
-##'
+#' Constructor of [\code{\linkS4class{MixmodResults}}] class
+#'
+#' This is a class to contain results from MIXMOD library.
+#'  
+#' \describe{
+#'   \item{nbCluster}{integer. It indicates the number of components.}
+#'   \item{model}{character. Name of the model.}
+#'   \item{criterion}{list of character. This option permits to select the criterion giving the best configuration of an execution.}
+#'   \item{criterionValue}{numeric. Values of the criterion.}
+#'   \item{parameters}{a S4 [\code{\linkS4class{Parameter}}] object. The best model parameters.}
+#'   \item{likelihood}{numeric. The model likelihood.}
+#'   \item{partition}{vector of integers defining the partition.}
+#'   \item{proba}{a matrix of probabilities.}
+#'   \item{error}{a character. The mixmod error.}
+#' }
+#'
+#' @examples
+#'   getSlots("MixmodResults")
+#'
+#' @name MixmodResults-class
+#' @rdname MixmodResults-class
+#' @exportClass MixmodResults
+#'
 setClass(
     Class="MixmodResults",
     representation=representation(
@@ -56,12 +53,10 @@ setClass(
         error = character(0)
     )
 )
-###################################################################################
 
-###################################################################################
-##' @rdname print-methods
-##' @aliases print print,MixmodResults-method
-##'
+#' @rdname print-methods
+#' @aliases print print,MixmodResults-method
+#'
 setMethod(
   f="print",
   signature=c("MixmodResults"),
@@ -77,12 +72,10 @@ setMethod(
     }
   }
 )
-###################################################################################
 
-###################################################################################
-##' @rdname show-methods
-##' @aliases show show,MixmodResults-method
-##'
+#' @rdname show-methods
+#' @aliases show show,MixmodResults-method
+#'
 setMethod(
   f="show",
   signature=c("MixmodResults"),
@@ -98,12 +91,10 @@ setMethod(
     }
   }
 )
-###################################################################################
 
-###################################################################################
-##' @rdname summary-methods
-##' @aliases summary summary,MixmodResults-method
-##'
+#' @rdname summary-methods
+#' @aliases summary summary,MixmodResults-method
+#'
 setMethod(
   f="summary",
   signature=c("MixmodResults"),
@@ -122,17 +113,15 @@ setMethod(
     cat("**************************************************************\n")
   }
 )
-###################################################################################
 
-###################################################################################
-##' Define function to draw an ellipse
-##'
-##' @param x an object of class [\code{\linkS4class{MixmodResults}}]
-##' @param i an index of one variable from data
-##' @param j an index of one variable from data
-##' 
-##' @keywords internal
-##'
+#' Define function to draw an ellipse
+#'
+#' @param x an object of class [\code{\linkS4class{MixmodResults}}]
+#' @param i an index of one variable from data
+#' @param j an index of one variable from data
+#' 
+#' @keywords internal
+#'
 ellipse<-function(x, i, j){
   parameters = x@parameters;
   factor = NULL;
@@ -162,43 +151,40 @@ ellipse<-function(x, i, j){
     points(ctr[1], ctr[2], pch=4, lwd=3)
   }
 }
-###################################################################################
 
-
-###################################################################################
-##' Plotting of a class [\code{\linkS4class{MixmodResults}}]  
-##' 
-##' Biplot of two variables from a quantitative data set. Use parameters and partition from a [\code{\linkS4class{MixmodResults}}] object to distinguish the different clusters.
-##'
-##' Ellipsoids (i.e. linear transformations of hyperspheres) 
-##' centered at the mean can be drawn using the parameters computed by MIXMOD.
-##' The directions of the principal axes of the ellipsoids are given by the eigenvectors of the covariance matrix \eqn{\Sigma}. 
-##' The squared relative lengths of the principal axes are given by the corresponding eigenvalues.
-##'
-##' @param x an object of class [\code{\linkS4class{MixmodResults}}]
-##' @param data a data frame containing a quantitative data set.
-##' @param variable1 index or character containing the name of the first variable. First column of data by default.
-##' @param variable2 index or character containing the name of the second variable. Second column of data by default.
-##' @param col a specification for the default plotting color. By default partition is used to separate clusters with different colors.
-##' @param pch either an integer specifying a symbol or a single character to be used as the default in plotting points. By default partition is used to seperate clusters with different symbols.
-##' @param xlab a title for the x axis. Variable1 by default.
-##' @param ylab a title for the y axis. Variable2 by default.
-##' @param add.ellipse a boolean. Add ellipses to graph. TRUE by default.
-##' @param ... further arguments passed to or from other methods
-##'
-##' @examples
-##'   data(geyser)
-##'   xem1 <- mixmodCluster(geyser,3)
-##'   plotCluster(xem1["bestResult"], geyser)
-##'
-##'   data(iris)
-##'   xem2 <- mixmodCluster(iris[1:4],2:6)
-##'   plotCluster(xem2["bestResult"], iris, variable1="Sepal.Length", variable2="Sepal.Width")
-##'   plotCluster(xem2["bestResult"], iris, variable1=1, variable2=4)
-##'
-##' @seealso \code{\link{plot}}
-##' @export
-##'
+#' Plotting of a class [\code{\linkS4class{MixmodResults}}]  
+#' 
+#' Biplot of two variables from a quantitative data set. Use parameters and partition from a [\code{\linkS4class{MixmodResults}}] object to distinguish the different clusters.
+#'
+#' Ellipsoids (i.e. linear transformations of hyperspheres) 
+#' centered at the mean can be drawn using the parameters computed by MIXMOD.
+#' The directions of the principal axes of the ellipsoids are given by the eigenvectors of the covariance matrix \eqn{\Sigma}. 
+#' The squared relative lengths of the principal axes are given by the corresponding eigenvalues.
+#'
+#' @param x an object of class [\code{\linkS4class{MixmodResults}}]
+#' @param data a data frame containing a quantitative data set.
+#' @param variable1 index or character containing the name of the first variable. First column of data by default.
+#' @param variable2 index or character containing the name of the second variable. Second column of data by default.
+#' @param col a specification for the default plotting color. By default partition is used to separate clusters with different colors.
+#' @param pch either an integer specifying a symbol or a single character to be used as the default in plotting points. By default partition is used to seperate clusters with different symbols.
+#' @param xlab a title for the x axis. Variable1 by default.
+#' @param ylab a title for the y axis. Variable2 by default.
+#' @param add.ellipse a boolean. Add ellipses to graph. TRUE by default.
+#' @param ... further arguments passed to or from other methods
+#'
+#' @examples
+#'   data(geyser)
+#'   xem1 <- mixmodCluster(geyser,3)
+#'   plotCluster(xem1["bestResult"], geyser)
+#'
+#'   data(iris)
+#'   xem2 <- mixmodCluster(iris[1:4],2:6)
+#'   plotCluster(xem2["bestResult"], iris, variable1="Sepal.Length", variable2="Sepal.Width")
+#'   plotCluster(xem2["bestResult"], iris, variable1=1, variable2=4)
+#'
+#' @seealso \code{\link{plot}}
+#' @export
+#'
 plotCluster <- function(x, data, variable1=colnames(data)[1], variable2=colnames(data)[2], col=x@partition+1, pch=x@partition, xlab=variable1, ylab=variable2, add.ellipse=TRUE, ...){
   if ( !is(x,"MixmodResults") )
     stop("x must be a MixmodResults object!")
@@ -243,34 +229,31 @@ plotCluster <- function(x, data, variable1=colnames(data)[1], variable2=colnames
   plot(data[,index1],data[,index2],col=col,pch=pch, xlab=xlab, ylab=ylab, ...)
   if ( add.ellipse ) ellipse(x,index1,index2)
 }
-###################################################################################
 
-
-###################################################################################
-##' Histogram of a class [\code{\linkS4class{MixmodResults}}]  
-##' 
-##' Histograms of data object using parameters from a [\code{\linkS4class{MixmodResults}}]
-##' to plot densities.
-##'
-##' Data with the density of each cluster and the mixture density are drawn for each variable.
-##'
-##' @param x an object of class [\code{\linkS4class{MixmodResults}}]
-##' @param data a vector or data frame containing a quantitative data set.
-##' @param variables list of variables names (or indices) to compute a histogram. All variables from data by default.
-##' @param xlab a list of title for the x axis. xlab must have the same length than variables.
-##' @param main a list of title for the histogram. main must have the same length than variables.
-##' @param hist_x_dim Dimension of the histogram (???)
-##' @param ... further arguments passed to or from other methods
-##'
-##' @examples
-##'   data(geyser)
-##'   xem1 <- mixmodCluster(geyser,3)
-##'   \dontrun{ histCluster(xem1["bestResult"], geyser) }
-##'   histCluster(xem1["bestResult"], geyser, variables=1)
-##'
-##' @seealso \code{\link{hist}}
-##' @export
-##'
+#' Histogram of a class [\code{\linkS4class{MixmodResults}}]  
+#' 
+#' Histograms of data object using parameters from a [\code{\linkS4class{MixmodResults}}]
+#' to plot densities.
+#'
+#' Data with the density of each cluster and the mixture density are drawn for each variable.
+#'
+#' @param x an object of class [\code{\linkS4class{MixmodResults}}]
+#' @param data a vector or data frame containing a quantitative data set.
+#' @param variables list of variables names (or indices) to compute a histogram. All variables from data by default.
+#' @param xlab a list of title for the x axis. xlab must have the same length than variables.
+#' @param main a list of title for the histogram. main must have the same length than variables.
+#' @param hist_x_dim Dimension of the histogram (???)
+#' @param ... further arguments passed to or from other methods
+#'
+#' @examples
+#'   data(geyser)
+#'   xem1 <- mixmodCluster(geyser,3)
+#'   \dontrun{ histCluster(xem1["bestResult"], geyser) }
+#'   histCluster(xem1["bestResult"], geyser, variables=1)
+#'
+#' @seealso \code{\link{hist}}
+#' @export
+#'
 histCluster <- function(x, data, variables=colnames(data), xlab=rep("",length(variables)), main=paste("Histogram of",variables), hist_x_dim=10000, ...){
   # check the options
   if ( !is(x,"MixmodResults") )
@@ -370,35 +353,31 @@ histCluster <- function(x, data, variables=colnames(data), xlab=rep("",length(va
   }
   par(op)
 }
-###################################################################################
 
-
-
-###################################################################################
-##' Barplot of a class [\code{\linkS4class{MixmodResults}}]  
-##' 
-##' Barplot of qualitative data object using parameters from a [\code{\linkS4class{MixmodResults}}]
-##' to plot probablities of modalities.
-##'
-##' Each line corresponds to one variable. A barplot is drawn for each cluster with the probabilities for 
-##' each modality to be in that cluster.
-##'
-##' @param x an object of class [\code{\linkS4class{MixmodResults}}]
-##' @param data a vector or data frame containing a qualitative data set.
-##' @param variables list of variables names (or indices) to compute a barplot. All variables from data by default.
-##' @param main a list of title for the barplot. main must have the same length than variables.
-##' @param ... further arguments passed to or from other methods
-##'
-##' @examples
-##'   data(birds)
-##'   xem <- mixmodCluster(birds,2)
-##'   barplotCluster(xem["bestResult"], birds)
-##'   barplotCluster(xem["bestResult"], birds, variables=c(2,3,4))
-##'   barplotCluster(xem["bestResult"], birds, variables=c("eyebrow","collar"))
-##'
-##' @seealso \code{\link{barplot}}
-##' @export
-##'
+#' Barplot of a class [\code{\linkS4class{MixmodResults}}]  
+#' 
+#' Barplot of qualitative data object using parameters from a [\code{\linkS4class{MixmodResults}}]
+#' to plot probablities of modalities.
+#'
+#' Each line corresponds to one variable. A barplot is drawn for each cluster with the probabilities for 
+#' each modality to be in that cluster.
+#'
+#' @param x an object of class [\code{\linkS4class{MixmodResults}}]
+#' @param data a vector or data frame containing a qualitative data set.
+#' @param variables list of variables names (or indices) to compute a barplot. All variables from data by default.
+#' @param main a list of title for the barplot. main must have the same length than variables.
+#' @param ... further arguments passed to or from other methods
+#'
+#' @examples
+#'   data(birds)
+#'   xem <- mixmodCluster(birds,2)
+#'   barplotCluster(xem["bestResult"], birds)
+#'   barplotCluster(xem["bestResult"], birds, variables=c(2,3,4))
+#'   barplotCluster(xem["bestResult"], birds, variables=c("eyebrow","collar"))
+#'
+#' @seealso \code{\link{barplot}}
+#' @export
+#'
 barplotCluster <- function(x, data, variables=colnames(data), main=paste("Barplot of",variables), ...){
   # check the options
   if ( !is(x,"MixmodResults") )
@@ -508,14 +487,10 @@ barplotCluster <- function(x, data, variables=colnames(data), main=paste("Barplo
   }
   par(op)
 }
-###################################################################################
 
-
-
-###################################################################################
-##' @rdname extract-methods
-##' @aliases [,MixmodResults-method
-##'
+#' @rdname extract-methods
+#' @aliases [,MixmodResults-method
+#'
 setMethod(
   f="[", 
   signature(x = "MixmodResults"),
@@ -542,4 +517,3 @@ setMethod(
     }
   }
 )
-##################################################################################

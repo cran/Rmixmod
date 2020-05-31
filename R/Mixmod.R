@@ -1,25 +1,21 @@
-###################################################################################
-##                               Mixmod.R                                        ##
-###################################################################################
+##################################################################################
+#                               Mixmod.R                                        ##
+##################################################################################
 
-###################################################################################
-##' @include global.R
-##' @include MixmodResults.R
-##' @include GaussianModel.R
-##' @include MultinomialModel.R
+#' @include global.R
+#' @include MixmodResults.R
+#' @include GaussianModel.R
+#' @include MultinomialModel.R
 NULL
-###################################################################################
 
-
-###################################################################################
-##' Constructor of [\code{\linkS4class{MixmodXmlInput}}] class
-##' 
-##' This is ...
-##'
-##' @name MixmodXmlInput-class
-##' @rdname MixmodXmlInput-class
-##' @exportClass MixmodXmlInput
-##'
+#' Constructor of [\code{\linkS4class{MixmodXmlInput}}] class
+#' 
+#' This is ...
+#'
+#' @name MixmodXmlInput-class
+#' @rdname MixmodXmlInput-class
+#' @exportClass MixmodXmlInput
+#'
 setClass(
   Class="MixmodXmlInput",
   representation=representation(
@@ -70,32 +66,31 @@ mixmodXmlInput <- function(...){
   return(new("MixmodXmlInput", ...))
 }
 
-###################################################################################
-##' Constructor of [\code{\linkS4class{Mixmod}}] class
-##' 
-##' This is a class to run mixmod library.
-##'
-##' \describe{
-##'   \item{data}{numeric vector or a data frame of observations. Can be qualitative,quantitative or both(heterogeneous)}
-##'   \item{dataType}{character. Type of data. It defines whether data is quantitative, qualitative or composite}
-##'   \item{nbCluster}{integer. It indicates the number of classes.}
-##'   \item{knownLabels}{numeric. It contains the known labels.}
-##'   \item{weight}{numeric vector with n (number of individuals) rows. Weight is optionnal. This option is to be used when weight is associated to the data.}
-##'   \item{nbVariable}{integer. The number of variables.}
-##'   \item{nbSample}{integer. The number of observations.}
-##'   \item{criterion}{list of character. This option permits to select the criterion giving the best configuration of an execution.}
-##'   \item{models}{a S4 [\code{\linkS4class{Model}}] object. Defining the list of models to be tested.}
-##'   \item{error}{logical. Say if at least one model finished with no error in MIXMOD.}
-##'   \item{results}{a list of S4 [\code{\linkS4class{MixmodResults}}] object containing all results. Results are sorted into a ascending order according to the first criterion (descending order for the CV criterion). This order can be changed by using the sortByCriterion() method.}
-##' }
-##'
-##' @examples
-##'   getSlots("Mixmod")
-##'
-##' @name Mixmod-class
-##' @rdname Mixmod-class
-##' @exportClass Mixmod
-##'
+#' Constructor of [\code{\linkS4class{Mixmod}}] class
+#' 
+#' This is a class to run mixmod library.
+#'
+#' \describe{
+#'   \item{data}{numeric vector or a data frame of observations. Can be qualitative,quantitative or both(heterogeneous)}
+#'   \item{dataType}{character. Type of data. It defines whether data is quantitative, qualitative or composite}
+#'   \item{nbCluster}{integer. It indicates the number of classes.}
+#'   \item{knownLabels}{numeric. It contains the known labels.}
+#'   \item{weight}{numeric vector with n (number of individuals) rows. Weight is optionnal. This option is to be used when weight is associated to the data.}
+#'   \item{nbVariable}{integer. The number of variables.}
+#'   \item{nbSample}{integer. The number of observations.}
+#'   \item{criterion}{list of character. This option permits to select the criterion giving the best configuration of an execution.}
+#'   \item{models}{a S4 [\code{\linkS4class{Model}}] object. Defining the list of models to be tested.}
+#'   \item{error}{logical. Say if at least one model finished with no error in MIXMOD.}
+#'   \item{results}{a list of S4 [\code{\linkS4class{MixmodResults}}] object containing all results. Results are sorted into a ascending order according to the first criterion (descending order for the CV criterion). This order can be changed by using the sortByCriterion() method.}
+#' }
+#'
+#' @examples
+#'   getSlots("Mixmod")
+#'
+#' @name Mixmod-class
+#' @rdname Mixmod-class
+#' @exportClass Mixmod
+#'
 setClass(
   Class="Mixmod",
   representation=representation(
@@ -193,20 +188,17 @@ setClass(
     return(TRUE)
   }
 )
-###################################################################################
 
-
-###################################################################################
-##' Create an instance of the [\code{\linkS4class{Mixmod}}] class using new/initialize.
-##' 
-##' Initialization method. Used internally in the `Rmixmod' package.
-##' 
-##' @seealso \code{\link{initialize}}
-##'
-##' @keywords internal
-##'
-##' @rdname initialize-methods
-##'
+#' Create an instance of the [\code{\linkS4class{Mixmod}}] class using new/initialize.
+#' 
+#' Initialization method. Used internally in the `Rmixmod' package.
+#' 
+#' @seealso \code{\link{initialize}}
+#'
+#' @keywords internal
+#'
+#' @rdname initialize-methods
+#'
 setMethod(
   f="initialize",
   signature=c("Mixmod"),
@@ -307,14 +299,10 @@ setMethod(
     return(.Object)
   }
 )
-###################################################################################
 
-
-
-###################################################################################
-##' @rdname print-methods
-##' @aliases print print,Mixmod-method
-##'
+#' @rdname print-methods
+#' @aliases print print,Mixmod-method
+#'
 setMethod(
   f="print",
   signature=c("Mixmod"),
@@ -335,12 +323,10 @@ setMethod(
     }
   }
 )
-###################################################################################
 
-###################################################################################
-##' @rdname show-methods
-##' @aliases show show,Mixmod-method
-##'
+#' @rdname show-methods
+#' @aliases show show,Mixmod-method
+#'
 setMethod(
   f="show",
   signature=c("Mixmod"),
@@ -367,15 +353,12 @@ setMethod(
     }
   }
 )
-###################################################################################
 
-
-###################################################################################
-##' @param object An object (???)
-##
-##' @rdname summary-methods
-##' @aliases summary summary,Mixmod-method
-##'
+#' @param object An object (???)
+#
+#' @rdname summary-methods
+#' @aliases summary summary,Mixmod-method
+#'
 setMethod(
   f="summary",
   signature=c("Mixmod"),
@@ -389,52 +372,50 @@ setMethod(
     return(invisible())
   }
 )
-###################################################################################
 
-###################################################################################
-##' Plotting of a class [\code{\linkS4class{Mixmod}}]  
-##' 
-##' Plotting data from a [\code{\linkS4class{Mixmod}}] object using parameters and partition
-##' to distinguish the different clusters.
-##'
-##' For quantitative case, ellipsoids (i.e. linear transformations of hyperspheres) 
-##' centered at the mean are drawn using the parameters computed by MIXMOD.
-##' The directions of the principal axes of the ellipsoids are given by the eigenvectors of the covariance matrix \eqn{\Sigma}. 
-##' The squared relative lengths of the principal axes are given by the corresponding eigenvalues.
-##' A 1-dimensional representation of variables with the densities is drawn on the diagonal.
-##'
-##' For qualitative case, a Multiple Correspondance Analysis is performed to get a
-##' 2-dimensional representation of the data set. Bigger symbol means that observations are similar.
-##'
-##' @param x an object of class [\code{\linkS4class{Mixmod}}]
-##' @param y a list of variables to plot (subset). Variables names or indices. Only in a quantitative case.
-##' @param showOnly show only (...)
-##' @param withResult with result (...)
-##' @param hist_x_dim Histogram dimension (???)
-##' @param ... further arguments passed to or from other methods
-##'
-##' @importFrom graphics plot
-##' @name plot
-##' @aliases plot plot,Mixmod-method
-##' @docType methods
-##' @rdname plot-methods
-##' @exportMethod plot
-##'
-##' @seealso \code{\link{plot}}
-##' @examples
-##'   ## for quantitative case
-##'   data(iris)
-##'   xem <- mixmodCluster(iris[1:4],3)
-##'   plot(xem)
-##'   plot(xem,c(1,3))
-##'   plot(xem,c("Sepal.Length","Sepal.Width"))
-##'
-##'   ## for qualitative case
-##'   data(birds)
-##'   xem2 <- mixmodCluster(birds,2)
-##'   plot(xem2)
-##'   legend("bottomleft",c("Cluster1","Cluster2"),col=c(2,3),pch=c(1,2))
-##'
+#' Plotting of a class [\code{\linkS4class{Mixmod}}]  
+#' 
+#' Plotting data from a [\code{\linkS4class{Mixmod}}] object using parameters and partition
+#' to distinguish the different clusters.
+#'
+#' For quantitative case, ellipsoids (i.e. linear transformations of hyperspheres) 
+#' centered at the mean are drawn using the parameters computed by MIXMOD.
+#' The directions of the principal axes of the ellipsoids are given by the eigenvectors of the covariance matrix \eqn{\Sigma}. 
+#' The squared relative lengths of the principal axes are given by the corresponding eigenvalues.
+#' A 1-dimensional representation of variables with the densities is drawn on the diagonal.
+#'
+#' For qualitative case, a Multiple Correspondance Analysis is performed to get a
+#' 2-dimensional representation of the data set. Bigger symbol means that observations are similar.
+#'
+#' @param x an object of class [\code{\linkS4class{Mixmod}}]
+#' @param y a list of variables to plot (subset). Variables names or indices. Only in a quantitative case.
+#' @param showOnly show only (...)
+#' @param withResult with result (...)
+#' @param hist_x_dim Histogram dimension (???)
+#' @param ... further arguments passed to or from other methods
+#'
+#' @importFrom graphics plot
+#' @name plot
+#' @aliases plot plot,Mixmod-method
+#' @docType methods
+#' @rdname plot-methods
+#' @exportMethod plot
+#'
+#' @seealso \code{\link{plot}}
+#' @examples
+#'   ## for quantitative case
+#'   data(iris)
+#'   xem <- mixmodCluster(iris[1:4],3)
+#'   plot(xem)
+#'   plot(xem,c(1,3))
+#'   plot(xem,c("Sepal.Length","Sepal.Width"))
+#'
+#'   ## for qualitative case
+#'   data(birds)
+#'   xem2 <- mixmodCluster(birds,2)
+#'   plot(xem2)
+#'   legend("bottomleft",c("Cluster1","Cluster2"),col=c(2,3),pch=c(1,2))
+#'
 setMethod(
   f="plot",
   signature=c("Mixmod"),
@@ -660,37 +641,33 @@ setMethod(
     invisible()
   }
 )
-###################################################################################
 
-
-
-###################################################################################
-##' Histograms of a class [\code{\linkS4class{Mixmod}}]  
-##'
-##' Histograms of quantitative data from a [\code{\linkS4class{Mixmod}}] object using parameters
-##' to plot densities.
-##'
-##' Data with the density of each cluster and the mixture density are drawn for each variable.
-##'  
-##' @param x an object of class [\code{\linkS4class{Mixmod}}]
-##' @param hist_x_dim Dimension of the histogram (???)
-##' @param ... further arguments passed to or from other methods
-##'
-##' @importFrom graphics hist
-##' @name hist
-##' @aliases hist hist,Mixmod-method
-##' @docType methods
-##' @rdname hist-methods
-##' @exportMethod hist
-##'
-##' @seealso \code{\link{hist}}
-##' @examples
-##'   data(iris)
-##'   xem <- mixmodCluster(iris[1:4],3)
-##'   hist(xem)
-##'   hist(xem,variables=c(1,3))
-##'   hist(xem,variables=c("Sepal.Length","Sepal.Width"))
-##'
+#' Histograms of a class [\code{\linkS4class{Mixmod}}]  
+#'
+#' Histograms of quantitative data from a [\code{\linkS4class{Mixmod}}] object using parameters
+#' to plot densities.
+#'
+#' Data with the density of each cluster and the mixture density are drawn for each variable.
+#'  
+#' @param x an object of class [\code{\linkS4class{Mixmod}}]
+#' @param hist_x_dim Dimension of the histogram (???)
+#' @param ... further arguments passed to or from other methods
+#'
+#' @importFrom graphics hist
+#' @name hist
+#' @aliases hist hist,Mixmod-method
+#' @docType methods
+#' @rdname hist-methods
+#' @exportMethod hist
+#'
+#' @seealso \code{\link{hist}}
+#' @examples
+#'   data(iris)
+#'   xem <- mixmodCluster(iris[1:4],3)
+#'   hist(xem)
+#'   hist(xem,variables=c(1,3))
+#'   hist(xem,variables=c("Sepal.Length","Sepal.Width"))
+#'
 setMethod(
   f="hist",
   signature=c("Mixmod"),
@@ -699,36 +676,33 @@ setMethod(
     invisible()
   }
 )
-###################################################################################
 
-
-###################################################################################
-##' Barplot of a class [\code{\linkS4class{Mixmod}}]  
-##'
-##' Barplot of qualitative data from a [\code{\linkS4class{Mixmod}}] object using parameters
-##' to plot probablities of modalities.
-##'
-##' Each line corresponds to one variable. Barplot is drawn for each cluster with the probabilities for 
-##' each modality to be in that cluster.
-##'  
-##' @param height an object of class [\code{\linkS4class{Mixmod}}] (???)
-##' @param ... further arguments passed to or from other methods
-##'
-##' @importFrom graphics barplot
-##' @name barplot
-##' @aliases barplot barplot,Mixmod-method
-##' @docType methods
-##' @rdname barplot-methods
-##' @exportMethod barplot
-##'
-##' @seealso \code{\link{barplot}}
-##' @examples
-##'   data(birds)
-##'   xem2 <- mixmodCluster(birds,2)
-##'   barplot(xem2)
-##'   barplot(xem2,variables=c(2,3,4))
-##'   barplot(xem2,variables=c("eyebrow","collar"))
-##'
+#' Barplot of a class [\code{\linkS4class{Mixmod}}]  
+#'
+#' Barplot of qualitative data from a [\code{\linkS4class{Mixmod}}] object using parameters
+#' to plot probablities of modalities.
+#'
+#' Each line corresponds to one variable. Barplot is drawn for each cluster with the probabilities for 
+#' each modality to be in that cluster.
+#'  
+#' @param height an object of class [\code{\linkS4class{Mixmod}}] (???)
+#' @param ... further arguments passed to or from other methods
+#'
+#' @importFrom graphics barplot
+#' @name barplot
+#' @aliases barplot barplot,Mixmod-method
+#' @docType methods
+#' @rdname barplot-methods
+#' @exportMethod barplot
+#'
+#' @seealso \code{\link{barplot}}
+#' @examples
+#'   data(birds)
+#'   xem2 <- mixmodCluster(birds,2)
+#'   barplot(xem2)
+#'   barplot(xem2,variables=c(2,3,4))
+#'   barplot(xem2,variables=c("eyebrow","collar"))
+#'
 setMethod(
   f="barplot",
   signature=c("Mixmod"),
@@ -737,13 +711,10 @@ setMethod(
     invisible()
 }
 )
-###################################################################################
 
-
-###################################################################################
-##' @rdname sortByCriterion-methods
-##' @aliases sortByCriterion,Mixmod,character-method
-##'
+#' @rdname sortByCriterion-methods
+#' @aliases sortByCriterion,Mixmod,character-method
+#'
 setMethod(
   f="sortByCriterion",
   signature=c("Mixmod","character"),
@@ -792,5 +763,3 @@ setMethod(
     return(object)
   }
 )
-###################################################################################
-

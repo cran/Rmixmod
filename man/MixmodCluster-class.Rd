@@ -22,4 +22,3 @@ This is a class to run clustering with mixmod. Inherits the [\code{\linkS4class{
   getSlots("MixmodCluster")
 
 }
-

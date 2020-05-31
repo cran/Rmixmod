@@ -1,30 +1,27 @@
-###################################################################################
-##                                   Model.R                                     ##
-###################################################################################
+##################################################################################
+#                                   Model.R                                     ##
+##################################################################################
 
-###################################################################################
-##' @include global.R
+#' @include global.R
 NULL
-###################################################################################
 
-###################################################################################
-##' Constructor of [\code{\linkS4class{Model}}] class
-##'
-##' This class defines the Mixmod models.
-##'
-##' \describe{
-##'   \item{listModels}{character containing a list of models.}
-##'   \item{free.proportions}{logical to include models with free proportions. Default is TRUE.}
-##'   \item{equal.proportions}{logical to include models with equal proportions. Default is FALSE.}
-##' }
-##'
-##' @examples
-##'   getSlots("Model")
-##'
-##' @name Model-class
-##' @rdname Model-class
-##' @exportClass Model
-##'
+#' Constructor of [\code{\linkS4class{Model}}] class
+#'
+#' This class defines the Mixmod models.
+#'
+#' \describe{
+#'   \item{listModels}{character containing a list of models.}
+#'   \item{free.proportions}{logical to include models with free proportions. Default is TRUE.}
+#'   \item{equal.proportions}{logical to include models with equal proportions. Default is FALSE.}
+#' }
+#'
+#' @examples
+#'   getSlots("Model")
+#'
+#' @name Model-class
+#' @rdname Model-class
+#' @exportClass Model
+#'
 setClass(
     Class="Model",
     representation=representation(
@@ -39,13 +36,10 @@ setClass(
         equal.proportions = logical(0)
     )
 )
-###################################################################################
 
-
-###################################################################################
-##' @rdname print-methods
-##' @aliases print print,Model-method
-##'
+#' @rdname print-methods
+#' @aliases print print,Model-method
+#'
 setMethod(
   f="print",
   signature=c("Model"),
@@ -62,13 +56,10 @@ setMethod(
     cat("****************************************\n")
   }
 )
-###################################################################################
 
-
-###################################################################################
-##' @rdname show-methods
-##' @aliases show show,Model-method
-##'
+#' @rdname show-methods
+#' @aliases show show,Model-method
+#'
 setMethod(
   f="show",
   signature=c("Model"),
@@ -85,5 +76,3 @@ setMethod(
     cat("****************************************\n")
   }
 )
-###################################################################################
-

@@ -3,11 +3,13 @@
 \docType{class}
 \name{MultinomialModel-class}
 \alias{MultinomialModel-class}
-\title{Constructor of [\code{\linkS4class{MultinomialModel}}] class}
+\title{MultinomialModel}
 \description{
-This class defines a multinomial Model. Inherits the [\code{\linkS4class{Model}}] class.
+Constructor of [\code{\linkS4class{MultinomialModel}}] class
 }
 \details{
+This class defines a multinomial Model. Inherits the [\code{\linkS4class{Model}}] class.
+
 \describe{
   \item{variable.independency}{logical}
   \item{component.independency}{logical}
@@ -21,4 +23,3 @@ This class defines a multinomial Model. Inherits the [\code{\linkS4class{Model}}
   getSlots("MultinomialModel")
 
 }
-

@@ -4,7 +4,8 @@
 \name{finance}
 \alias{finance}
 \title{Composite data : Financial health of companies}
-\format{A data frame with 889 companies (rows) and 6 variables (columns).
+\format{
+A data frame with 889 companies (rows) and 6 variables (columns).
 
 \describe{
 
@@ -19,7 +20,8 @@
   \item{\code{Quick.Ratio}}{numeric variable.}
 
   \item{\code{Accounts.Payable.Total.Sales}}{numeric variable.}
-}}
+}
+}
 \source{
 Lourme A, Biernacki C (2011). \emph{Simultaneous t-Model-Based Clustering for Data Differing over Time Period: Application for Understanding Companies Financial Health.} Case Studies in Business, Industry and Government Statistics, 4(2), 73-82.
 
@@ -33,4 +35,3 @@ data(finance)
 summary(finance)
 }
 \keyword{datasets}
-

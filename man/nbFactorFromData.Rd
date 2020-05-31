@@ -15,4 +15,3 @@ a vector containing the number of modalities for each column
 \description{
 Get the number of modalities for each column of a categorical data set
 }
-

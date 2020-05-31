@@ -12,4 +12,3 @@ mixmodLearn(...)
 \description{
 TODO: describe...
 }
-

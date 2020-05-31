@@ -21,4 +21,3 @@ This class defines a Composite Model. Inherits the [\code{\linkS4class{Model}}] 
   getSlots("CompositeModel")
 
 }
-

@@ -15,4 +15,3 @@ a qualitative data set with factors
 \description{
 Convert a data frame containing integers to a qualitative data set with factors.
 }
-

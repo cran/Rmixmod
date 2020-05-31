@@ -20,4 +20,3 @@ This is a class to run discriminant analysis with mixmod. Inherits the [\code{\l
   getSlots("MixmodLearn")
 
 }
-

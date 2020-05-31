@@ -1,101 +1,89 @@
-###################################################################################
-##                               Strategy.R                                      ##
-###################################################################################
+##################################################################################
+#                               Strategy.R                                      ##
+##################################################################################
 
-###################################################################################
-##' @include global.R
-##' @include Parameter.R
+#' @include global.R
+#' @include Parameter.R
 NULL
-###################################################################################
 
-###################################################################################
-##' Create an instance of [\code{\linkS4class{Strategy}}] class 
-##'
-##' This class will contain all the parameters needed by the estimation algorithms.
-##'
-##' There are different ways to initialize an algorithm :
-##'
-##'    \describe{
-##'
-##'        \item{random}{Initialization from a random position is a standard way to
-##'        initialize an algorithm. This random initial position is obtained by
-##'        choosing at random centers in the data set. This simple strategy is
-##'        repeated \eqn{5} times (the user can choose the number of times) from
-##'        different random positions and the position that maximises the
-##'        likelihood is selected.}
-##'
-##'        \item{smallEM}{A maximum of \eqn{50} iterations of the EM algorithm according to the process : \eqn{n_i} numbers of iterations
-##'        of EM are done (with random initialization) until the \code{smallEM} stop criterion value has been reached. 
-##'        This action is repeated until the sum of \eqn{n_i}
-##'
-##'        reaches \eqn{50} iterations (or if in one action \eqn{50} iterations are reached before the stop criterion value).\\
-##'        It appears that repeating runs of EM is generally profitable since using a single run
-##'        of EM can often lead to suboptimal solutions.}
-##'
-##'        \item{CEM}{\eqn{10} repetitions of \eqn{50} iterations of the CEM algorithm are done.
-##'        One advantage of initializing an algorithm with CEM lies in the fact
-##'        that CEM converges generally in a small number of iterations. Thus,
-##'        without consuming a large amount of CPU times, several runs of CEM are
-##'        performed. Then EM is run with the best solution among the \eqn{10} repetitions.}
-##'
-##'        \item{SEMMax}{A run of \eqn{500} iterations of SEM. The idea is that an SEM sequence is
-##'        expected to enter rapidly in the neighbourhood of the global maximum
-##'        of the likelihood function.}
-##'
-##'    }
-##'
-##' Defining the algorithms used in the strategy, the stopping rule and when to stop.
-##'    \itemize{
-##'        \item Algorithms :
-##'           \describe{
-##'               \item{EM}{Expectation Maximisation}
-##'               \item{CEM}{Classification EM}
-##'               \item{SEM}{Stochastic EM}
-##'           }
-##'        \item Stopping rules for the algorithm :
-##'           \describe{
-##'               \item{nbIterationInAlgo}{Sets the maximum number of iterations}
-##'               \item{epsilonInAlgo}{Sets relative increase of the log-likelihood criterion}
-##'           }
-##'        \item Default values are \eqn{200} \code{nbIterationInAlgo} of \code{EM} with an \code{epsilonInAlgo} value of \eqn{10-3}.
-##'    }
-##'
+#' Create an instance of [\code{\linkS4class{Strategy}}] class 
+#'
+#' This class will contain all the parameters needed by the estimation algorithms.
+#'
+#' There are different ways to initialize an algorithm :
+#'
+#'    \describe{
+#'
+#'        \item{random}{Initialization from a random position is a standard way to
+#'        initialize an algorithm. This random initial position is obtained by
+#'        choosing at random centers in the data set. This simple strategy is
+#'        repeated \eqn{5} times (the user can choose the number of times) from
+#'        different random positions and the position that maximises the
+#'        likelihood is selected.}
+#'
+#'        \item{smallEM}{A maximum of \eqn{50} iterations of the EM algorithm according to the process : \eqn{n_i} numbers of iterations
+#'        of EM are done (with random initialization) until the \code{smallEM} stop criterion value has been reached. 
+#'        This action is repeated until the sum of \eqn{n_i}
+#'
+#'        reaches \eqn{50} iterations (or if in one action \eqn{50} iterations are reached before the stop criterion value).\\
+#'        It appears that repeating runs of EM is generally profitable since using a single run
+#'        of EM can often lead to suboptimal solutions.}
+#'
+#'        \item{CEM}{\eqn{10} repetitions of \eqn{50} iterations of the CEM algorithm are done.
+#'        One advantage of initializing an algorithm with CEM lies in the fact
+#'        that CEM converges generally in a small number of iterations. Thus,
+#'        without consuming a large amount of CPU times, several runs of CEM are
+#'        performed. Then EM is run with the best solution among the \eqn{10} repetitions.}
+#'
+#'        \item{SEMMax}{A run of \eqn{500} iterations of SEM. The idea is that an SEM sequence is
+#'        expected to enter rapidly in the neighbourhood of the global maximum
+#'        of the likelihood function.}
+#'
+#'    }
+#'
+#' Defining the algorithms used in the strategy, the stopping rule and when to stop.
+#'    \itemize{
+#'        \item Algorithms :
+#'           \describe{
+#'               \item{EM}{Expectation Maximisation}
+#'               \item{CEM}{Classification EM}
+#'               \item{SEM}{Stochastic EM}
+#'           }
+#'        \item Stopping rules for the algorithm :
+#'           \describe{
+#'               \item{nbIterationInAlgo}{Sets the maximum number of iterations}
+#'               \item{epsilonInAlgo}{Sets relative increase of the log-likelihood criterion}
+#'           }
+#'        \item Default values are \eqn{200} \code{nbIterationInAlgo} of \code{EM} with an \code{epsilonInAlgo} value of \eqn{10-3}.
+#'    }
+#'
 
-##' @param ... all arguments are transfered to the Strategy constructor. Valid arguments are:
-##'    \describe{
-##'   \item{algo:}{list of character string with the estimation algorithm.  Possible values: "EM", "SEM", "CEM", c("EM","SEM"). Default value is "EM".}
-##'   \item{nbTry:}{integer defining the number of tries. Default value: 1.}
-##'   \item{initMethod:}{a character string with the method of initialization of the algorithm specified in the \code{algo} argument. Possible values: "random", "smallEM", "CEM", "SEMMax", "parameter", "label". Default value: "smallEM".}
-##'   \item{nbTryInInit:}{integer defining number of tries in \code{initMethod} algorithm. Default value: 50.}
-##'   \item{nbIterationInInit:}{integer defining the number of "EM" or "SEM" iterations in \code{initMethod}. Default values: 5 if \code{initMethod} is "smallEM" and 100 if \code{initMethod} is "SEMMax".}
-##'   \item{nbIterationInAlgo:}{list of integers defining the number of iterations if user want to use nbIteration as rule to stop the algorithm(s). Default value: 200.} 
-##'   \item{epsilonInInit:}{real defining the epsilon value in the initialization step. Only available if \code{initMethod} is "smallEM". Default value: 0.001.}
-##'   \item{epsilonInAlgo:}{list of reals defining the epsilon value for the algorithm. Warning: epsilonInAlgo doesn't have any sens if \code{algo} is SEM, so it needs to be set as NaN in that case. Default value: 0.001.}
-##'   \item{seed:}{integer defining the seed of the random number generator. Setting a particular seed allows the user to (re)-generate a particular serie of random numbers. Default value is NULL, i.e. a random seed.}
-##'      \item{parameter:}{instance of "Parameter" subclass. Required if initMethod is "parameter", forbidden otherwise.}
-##'      \item{labels:}{vector of integers containing labels. Required if initMethod is "label", forbidden otherwise.}           
-##'    }
-###` #param algo list of character string with the estimation algorithm.  Possible values: "EM", "SEM", "CEM", c("EM","SEM"). Default value is "EM".
-###` #param nbTry integer defining the number of tries. nbTry must be a positive integer. Option available only if \code{init} is "random" or "smallEM" or "CEM" or "SEMMax". Default value: 1.
-###` #param initMethod a character string with the method of initialization of the algorithm specified in the \code{algo} argument. Possible values: "random", "smallEM", "CEM", "SEMMax". Default value: "smallEM".
-###` #param nbTryInInit integer defining number of tries in \code{initMethod} algorithm. nbTryInInit must be a positive integer. Option available only if \code{init} is "random", "smallEM" or "CEM". Default value: 10.
-###` #param nbIterationInInit integer defining the number of "EM" or "SEM" iterations in \code{initMethod}. nbIterationInInit must be a positive integer. Only available if \code{initMethod} is "smallEM" or "SEMMax". Default values: 5 if \code{initMethod} is "smallEM" and 100 if \code{initMethod} is "SEMMax".
-###` #param nbIterationInAlgo list of integers defining the number of iterations if you want to use nbIteration as rule to stop the algorithm(s). Default value: 200. 
-###` #param epsilonInInit real defining the epsilon value in the initialization step. Only available if \code{initMethod} is "smallEM". Default value: 0.001.
-###` #param epsilonInAlgo list of reals defining the epsilon value for the algorithm. Warning: epsilonInAlgo doesn't have any sens if \code{algo} is SEM, so it needs to be set as NaN in that case. Default value: 0.001.
-###` #param seed a positive integer defining the seed of the random number generator. Setting a particular seed allows the user to (re)-generate a particular serie of random numbers. NULL or negative value for a random seed.
-##'
-##' @examples
-##'    mixmodStrategy()
-##'    mixmodStrategy(algo="CEM",initMethod="random",nbTry=10,epsilonInInit=0.00001)
-##'    mixmodStrategy(algo=c("SEM","EM"), nbIterationInAlgo=c(200,100), epsilonInAlgo=c(NA,0.000001))
-##'
-##' @references  Biernacki, C., Celeux, G., Govaert, G., 2003. "Choosing starting values for the EM algorithm for getting the highest likelihood in multivariate gaussian mixture models". Computational Statistics and Data Analysis 41, 561-575.
-##'
-##' @return a [\code{\linkS4class{Strategy}}] object
-##' @author Florent Langrognet and Remi Lebret and Christian Poli ans Serge Iovleff, with contributions from C. Biernacki and G. Celeux and G. Govaert \email{contact@@mixmod.org}
-##' @export
-##'
+#' @param ... all arguments are transfered to the Strategy constructor. Valid arguments are:
+#'    \describe{
+#'   \item{algo:}{list of character string with the estimation algorithm.  Possible values: "EM", "SEM", "CEM", c("EM","SEM"). Default value is "EM".}
+#'   \item{nbTry:}{integer defining the number of tries. Default value: 1.}
+#'   \item{initMethod:}{a character string with the method of initialization of the algorithm specified in the \code{algo} argument. Possible values: "random", "smallEM", "CEM", "SEMMax", "parameter", "label". Default value: "smallEM".}
+#'   \item{nbTryInInit:}{integer defining number of tries in \code{initMethod} algorithm. Default value: 50.}
+#'   \item{nbIterationInInit:}{integer defining the number of "EM" or "SEM" iterations in \code{initMethod}. Default values: 5 if \code{initMethod} is "smallEM" and 100 if \code{initMethod} is "SEMMax".}
+#'   \item{nbIterationInAlgo:}{list of integers defining the number of iterations if user want to use nbIteration as rule to stop the algorithm(s). Default value: 200.} 
+#'   \item{epsilonInInit:}{real defining the epsilon value in the initialization step. Only available if \code{initMethod} is "smallEM". Default value: 0.001.}
+#'   \item{epsilonInAlgo:}{list of reals defining the epsilon value for the algorithm. Warning: epsilonInAlgo doesn't have any sens if \code{algo} is SEM, so it needs to be set as NaN in that case. Default value: 0.001.}
+#'   \item{seed:}{integer defining the seed of the random number generator. Setting a particular seed allows the user to (re)-generate a particular serie of random numbers. Default value is NULL, i.e. a random seed.}
+#'      \item{parameter:}{instance of "Parameter" subclass. Required if initMethod is "parameter", forbidden otherwise.}
+#'      \item{labels:}{vector of integers containing labels. Required if initMethod is "label", forbidden otherwise.}           
+#'    }
+#'
+#' @examples
+#'    mixmodStrategy()
+#'    mixmodStrategy(algo="CEM",initMethod="random",nbTry=10,epsilonInInit=0.00001)
+#'    mixmodStrategy(algo=c("SEM","EM"), nbIterationInAlgo=c(200,100), epsilonInAlgo=c(NA,0.000001))
+#'
+#' @references  Biernacki, C., Celeux, G., Govaert, G., 2003. "Choosing starting values for the EM algorithm for getting the highest likelihood in multivariate gaussian mixture models". Computational Statistics and Data Analysis 41, 561-575.
+#'
+#' @return a [\code{\linkS4class{Strategy}}] object
+#' @author Florent Langrognet and Remi Lebret and Christian Poli ans Serge Iovleff, with contributions from C. Biernacki and G. Celeux and G. Govaert \email{contact@@mixmod.org}
+#' @export
+#'
 #old_mixmodStrategy <- function( algo="EM", nbTry=1, initMethod="smallEM", nbTryInInit=10, nbIterationInInit=0, nbIterationInAlgo=200, epsilonInInit=0.001, epsilonInAlgo=0.001, seed=NULL ){
 #  if(missing(nbIterationInInit)){
 #    if(initMethod=="smallEM"){
@@ -112,39 +100,34 @@ mixmodStrategy <- function(...){
   new("Strategy", ...)
 }
 
-###################################################################################
-
-
-###################################################################################
-##' Constructor of [\code{\linkS4class{Strategy}}] class
-##'
-##' This class defines the Mixmod strategies.
-##'
-##' \describe{
-##'   \item{algo:}{list of character string with the estimation algorithm.  Possible values: "EM", "SEM", "CEM", c("EM","SEM"). Default value is "EM".}
-##'   \item{nbTry:}{integer defining the number of tries. Default value: 1.}
-##'   \item{initMethod:}{a character string with the method of initialization of the algorithm specified in the \code{algo} argument. Possible values: "random", "smallEM", "CEM", "SEMMax", "parameter", "label". Default value: "smallEM".}
-##'   \item{nbTryInInit:}{integer defining number of tries in \code{initMethod} algorithm. Default value: 50.}
-##'   \item{nbIterationInInit:}{integer defining the number of "EM" or "SEM" iterations in \code{initMethod}. Default values: 5 if \code{initMethod} is "smallEM" and 100 if \code{initMethod} is "SEMMax".}
-##'   \item{nbIterationInAlgo:}{list of integers defining the number of iterations if user want to use nbIteration as rule to stop the algorithm(s). Default value: 200.} 
-##'   \item{epsilonInInit:}{real defining the epsilon value in the initialization step. Only available if \code{initMethod} is "smallEM". Default value: 0.001.}
-##'   \item{epsilonInAlgo:}{list of reals defining the epsilon value for the algorithm. Warning: epsilonInAlgo doesn't have any sens if \code{algo} is SEM, so it needs to be set as NaN in that case. Default value: 0.001.}
-##'   \item{seed:}{integer defining the seed of the random number generator. Setting a particular seed allows the user to (re)-generate a particular serie of random numbers. Default value is NULL, i.e. a random seed.}
-##'      \item{parameter:}{instance of "Parameter" subclass. Required if initMethod is "parameter", forbidden otherwise.}
-##'      \item{labels:}{vector of integers containing labels. Required if initMethod is "label", forbidden otherwise.}           
-
-##' }
-##'
-##' @examples
-##'   new("Strategy")
-##'   new("Strategy", algo="SEM", initMethod="SEMMax")
-##'
-##'   getSlots("Strategy")
-##'
-##' @name Strategy-class
-##' @rdname Strategy-class
-##' @exportClass Strategy
-##'
+#' Constructor of [\code{\linkS4class{Strategy}}] class
+#'
+#' This class defines the Mixmod strategies.
+#'
+#' \describe{
+#'   \item{algo:}{list of character string with the estimation algorithm.  Possible values: "EM", "SEM", "CEM", c("EM","SEM"). Default value is "EM".}
+#'   \item{nbTry:}{integer defining the number of tries. Default value: 1.}
+#'   \item{initMethod:}{a character string with the method of initialization of the algorithm specified in the \code{algo} argument. Possible values: "random", "smallEM", "CEM", "SEMMax", "parameter", "label". Default value: "smallEM".}
+#'   \item{nbTryInInit:}{integer defining number of tries in \code{initMethod} algorithm. Default value: 50.}
+#'   \item{nbIterationInInit:}{integer defining the number of "EM" or "SEM" iterations in \code{initMethod}. Default values: 5 if \code{initMethod} is "smallEM" and 100 if \code{initMethod} is "SEMMax".}
+#'   \item{nbIterationInAlgo:}{list of integers defining the number of iterations if user want to use nbIteration as rule to stop the algorithm(s). Default value: 200.} 
+#'   \item{epsilonInInit:}{real defining the epsilon value in the initialization step. Only available if \code{initMethod} is "smallEM". Default value: 0.001.}
+#'   \item{epsilonInAlgo:}{list of reals defining the epsilon value for the algorithm. Warning: epsilonInAlgo doesn't have any sens if \code{algo} is SEM, so it needs to be set as NaN in that case. Default value: 0.001.}
+#'   \item{seed:}{integer defining the seed of the random number generator. Setting a particular seed allows the user to (re)-generate a particular serie of random numbers. Default value is NULL, i.e. a random seed.}
+#'      \item{parameter:}{instance of "Parameter" subclass. Required if initMethod is "parameter", forbidden otherwise.}
+#'      \item{labels:}{vector of integers containing labels. Required if initMethod is "label", forbidden otherwise.}           
+#' }
+#'
+#' @examples
+#'   new("Strategy")
+#'   new("Strategy", algo="SEM", initMethod="SEMMax")
+#'
+#'   getSlots("Strategy")
+#'
+#' @name Strategy-class
+#' @rdname Strategy-class
+#' @exportClass Strategy
+#'
 setClass(
     Class="Strategy",
     representation=representation(
@@ -253,20 +236,17 @@ setClass(
       return(TRUE)
     }
 )
-###################################################################################
 
-
-###################################################################################
-##' Create an instance of the [\code{\linkS4class{Strategy}}] class using new/initialize.
-##' 
-##' Initialization method. Used internally in the `Rmixmod' package.
-##' 
-##' @seealso \code{\link{initialize}}
-##'
-##' @keywords internal
-##'
-##' @rdname initialize-methods
-##'
+#' Create an instance of the [\code{\linkS4class{Strategy}}] class using new/initialize.
+#' 
+#' Initialization method. Used internally in the `Rmixmod' package.
+#' 
+#' @seealso \code{\link{initialize}}
+#'
+#' @keywords internal
+#'
+#' @rdname initialize-methods
+#'
 setMethod(
   f="initialize",
   signature=c("Strategy"),
@@ -376,13 +356,10 @@ setMethod(
     return(.Object)
   }
 )
-###################################################################################
 
-
-###################################################################################
-##' @rdname print-methods
-##' @aliases print print,Strategy-method
-##'
+#' @rdname print-methods
+#' @aliases print print,Strategy-method
+#'
 setMethod(
   f="print",
   signature=c("Strategy"),
@@ -402,13 +379,10 @@ setMethod(
     cat("****************************************\n")
   }
 )
-###################################################################################
 
-
-###################################################################################
-##' @rdname show-methods
-##' @aliases show show,Strategy-method
-##'
+#' @rdname show-methods
+#' @aliases show show,Strategy-method
+#'
 setMethod(
   f="show",
   signature=c("Strategy"),
@@ -428,13 +402,10 @@ setMethod(
     cat("****************************************\n")
   }
 )
-###################################################################################
 
-
-###################################################################################
-##' @rdname extract-methods
-##' @aliases [,Strategy-method
-##'
+#' @rdname extract-methods
+#' @aliases [,Strategy-method
+#'
 setMethod(
   f="[", 
   signature(x = "Strategy"),
@@ -457,17 +428,11 @@ setMethod(
     }
   }
 )
-###################################################################################
 
-
-
-###################################################################################
-##' 
-##'
-##' @name [
-##' @rdname extract-methods
-##' @aliases [<-,Strategy-method
-##'
+# ' @name [
+#' @rdname extract-methods
+#' @aliases [<-,Strategy-method
+#'
 setReplaceMethod(
   f="[", 
   signature(x = "Strategy"), 
@@ -492,5 +457,3 @@ setReplaceMethod(
     return(x)
   }
 )
-###################################################################################
-

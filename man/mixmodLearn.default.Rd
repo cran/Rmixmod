@@ -4,8 +4,15 @@
 \alias{mixmodLearn.default}
 \title{Create an instance of the [\code{\linkS4class{MixmodLearn}}] class}
 \usage{
-mixmodLearn.default(data, knownLabels, dataType = NULL, models = NULL,
-  criterion = "CV", nbCVBlocks = 10, weight = NULL)
+mixmodLearn.default(
+  data,
+  knownLabels,
+  dataType = NULL,
+  models = NULL,
+  criterion = "CV",
+  nbCVBlocks = 10,
+  weight = NULL
+)
 }
 \arguments{
 \item{data}{frame containing quantitative,qualitative or heterogeneous data. Rows correspond to observations and columns correspond to variables.}
@@ -55,4 +62,3 @@ This function computes the first step of a discriminant analysis. It will find t
 \author{
 Florent Langrognet and Remi Lebret and Christian Poli ans Serge Iovleff, with contributions from C. Biernacki and G. Celeux and G. Govaert \email{contact@mixmod.org}
 }
-

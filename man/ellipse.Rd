@@ -17,4 +17,3 @@ ellipse(x, i, j)
 Define function to draw an ellipse
 }
 \keyword{internal}
-

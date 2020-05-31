@@ -18,4 +18,3 @@ This class defines the Mixmod models.
   getSlots("Model")
 
 }
-

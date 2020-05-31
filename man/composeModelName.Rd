@@ -17,4 +17,3 @@ name of heterogeneous model
 \description{
 Get the heterogeneous model name using Gaussian and Multnomial model name
 }
-

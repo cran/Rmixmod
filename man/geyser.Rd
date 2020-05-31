@@ -4,7 +4,8 @@
 \name{geyser}
 \alias{geyser}
 \title{Quantitative data: Old Faithful Geyser}
-\format{A data frame with 272 observations on the following 2 variables.
+\format{
+A data frame with 272 observations on the following 2 variables.
 
 \describe{
 
@@ -12,9 +13,10 @@
 
   \item{\code{Waiting.Time}}{a numeric vector containing the waiting time (in minutes) to the next eruption}
 
-}}
+}
+}
 \source{
-\url{http://www.geyserstudy.org/geyser.aspx?pGeyserNo=OLDFAITHFUL}
+\url{https://web.archive.org/web/20191110083004/http://www.geyserstudy.org/geyser.aspx?pGeyserNo=OLDFAITHFUL}
 }
 \description{
 The file geyser.rda contains 272 observations from the Old Faithful Geyser in the Yellowstone National Park. Each observation consists of two measurements : the duration (in minutes) of the eruption and the waiting time (in minutes) to the next eruption.
@@ -30,4 +32,3 @@ Hardle, W. (1991). "Smoothing Techniques with Implementation in S". Springer-Ver
 Azzalini, A. and Bowman, A. W. (1990). "A look at some data on the Old Faithful geyser". Applied Statistics 39, 357-365.
 }
 \keyword{datasets}
-

@@ -4,7 +4,8 @@
 \name{titanic}
 \alias{titanic}
 \title{Qualitative data: Survival of passengers on the Titanic}
-\format{A data frame with 2201 observations on the following 4 variables.
+\format{
+A data frame with 2201 observations on the following 4 variables.
 
 \describe{
 
@@ -16,7 +17,8 @@
 
   \item{\code{Survived}}{1 = yes, 0 = no, which denote if the subject lived through the fatal maiden voyage of the ocean liner Titanic} 
 
-}}
+}
+}
 \source{
 The source provides a data set recording class, sex, age, and survival status for each person on board of the Titanic, and is based on data originally collected by the British Board of Trade and reprinted in:
 British Board of Trade (1990), "Report on the Loss of the Titanic (S.S.)".  British Board of Trade Inquiry Report (reprint).  Gloucester, UK: Allan Sutton Publishing.
@@ -36,4 +38,3 @@ Due in particular to the very successful film "Titanic", the last years saw a ri
   data(titanic)
 }
 \keyword{datasets}
-

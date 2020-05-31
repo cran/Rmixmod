@@ -32,4 +32,3 @@ each modality to be in that cluster.
 \seealso{
 \code{\link{barplot}}
 }
-

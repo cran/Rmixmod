@@ -31,34 +31,34 @@ This class will contain all the parameters needed by the estimation algorithms.
 \details{
 There are different ways to initialize an algorithm :
 
-\describe{
+   \describe{
 
-\item{random}{Initialization from a random position is a standard way to
+       \item{random}{Initialization from a random position is a standard way to
        initialize an algorithm. This random initial position is obtained by
        choosing at random centers in the data set. This simple strategy is
        repeated \eqn{5} times (the user can choose the number of times) from
        different random positions and the position that maximises the
        likelihood is selected.}
 
-\item{smallEM}{A maximum of \eqn{50} iterations of the EM algorithm according to the process : \eqn{n_i} numbers of iterations
+       \item{smallEM}{A maximum of \eqn{50} iterations of the EM algorithm according to the process : \eqn{n_i} numbers of iterations
        of EM are done (with random initialization) until the \code{smallEM} stop criterion value has been reached. 
        This action is repeated until the sum of \eqn{n_i}
 
-reaches \eqn{50} iterations (or if in one action \eqn{50} iterations are reached before the stop criterion value).\\
+       reaches \eqn{50} iterations (or if in one action \eqn{50} iterations are reached before the stop criterion value).\\
        It appears that repeating runs of EM is generally profitable since using a single run
        of EM can often lead to suboptimal solutions.}
 
-\item{CEM}{\eqn{10} repetitions of \eqn{50} iterations of the CEM algorithm are done.
+       \item{CEM}{\eqn{10} repetitions of \eqn{50} iterations of the CEM algorithm are done.
        One advantage of initializing an algorithm with CEM lies in the fact
        that CEM converges generally in a small number of iterations. Thus,
        without consuming a large amount of CPU times, several runs of CEM are
        performed. Then EM is run with the best solution among the \eqn{10} repetitions.}
 
-\item{SEMMax}{A run of \eqn{500} iterations of SEM. The idea is that an SEM sequence is
+       \item{SEMMax}{A run of \eqn{500} iterations of SEM. The idea is that an SEM sequence is
        expected to enter rapidly in the neighbourhood of the global maximum
        of the likelihood function.}
 
-}
+   }
 
 Defining the algorithms used in the strategy, the stopping rule and when to stop.
    \itemize{
@@ -82,10 +82,9 @@ Defining the algorithms used in the strategy, the stopping rule and when to stop
    mixmodStrategy(algo=c("SEM","EM"), nbIterationInAlgo=c(200,100), epsilonInAlgo=c(NA,0.000001))
 
 }
-\author{
-Florent Langrognet and Remi Lebret and Christian Poli ans Serge Iovleff, with contributions from C. Biernacki and G. Celeux and G. Govaert \email{contact@mixmod.org}
-}
 \references{
 Biernacki, C., Celeux, G., Govaert, G., 2003. "Choosing starting values for the EM algorithm for getting the highest likelihood in multivariate gaussian mixture models". Computational Statistics and Data Analysis 41, 561-575.
 }
-
+\author{
+Florent Langrognet and Remi Lebret and Christian Poli ans Serge Iovleff, with contributions from C. Biernacki and G. Celeux and G. Govaert \email{contact@mixmod.org}
+}

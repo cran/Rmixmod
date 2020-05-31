@@ -1,5 +1,4 @@
 include $(R_HOME)/etc${R_ARCH}/Makeconf
-include ../XmlMakevars
 
 #-----------------------------------------------------------------------
 # Variables

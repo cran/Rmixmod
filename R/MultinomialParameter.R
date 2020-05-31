@@ -1,33 +1,30 @@
-###################################################################################
-##                        MultinomialParameter.R                                 ##
-###################################################################################
+##################################################################################
+#                        MultinomialParameter.R                                 ##
+##################################################################################
 
-###################################################################################
-##' @include global.R
-##' @include Parameter.R
+#' @include global.R
+#' @include Parameter.R
 NULL
-###################################################################################
 
-###################################################################################
-##' Constructor of [\code{\linkS4class{MultinomialParameter}}] class
-##' 
-##' This class defines parameters of a Multinomial Mixture Model. Inherits the [\code{\linkS4class{Parameter}}] class.
-##' 
-##' \describe{
-##'   \item{center}{a numeric vector containing center of each cluster.}
-##'   \item{scatter}{a vector of matrix containing dispersion matrix of each cluster.}
-##'   \item{factor}{a character vector containing the modalities.}
-##' }
-##'
-##' @examples
-##'   new("MultinomialParameter")
-##'
-##'   getSlots("MultinomialParameter")
-##' 
-##' @name MultinomialParameter-class
-##' @rdname MultinomialParameter-class
-##' @exportClass MultinomialParameter
-##'
+#' Constructor of [\code{\linkS4class{MultinomialParameter}}] class
+#' 
+#' This class defines parameters of a Multinomial Mixture Model. Inherits the [\code{\linkS4class{Parameter}}] class.
+#' 
+#' \describe{
+#'   \item{center}{a numeric vector containing center of each cluster.}
+#'   \item{scatter}{a vector of matrix containing dispersion matrix of each cluster.}
+#'   \item{factor}{a character vector containing the modalities.}
+#' }
+#'
+#' @examples
+#'   new("MultinomialParameter")
+#'
+#'   getSlots("MultinomialParameter")
+#' 
+#' @name MultinomialParameter-class
+#' @rdname MultinomialParameter-class
+#' @exportClass MultinomialParameter
+#'
 setClass(
     Class="MultinomialParameter",
     representation=representation(
@@ -42,14 +39,10 @@ setClass(
     ),
     contains=c("Parameter")
 )
-###################################################################################
 
-
-
-###################################################################################
-##' @rdname print-methods
-##' @aliases print print,MultinomialParameter-method
-##'
+#' @rdname print-methods
+#' @aliases print print,MultinomialParameter-method
+#'
 setMethod(
     f="print",
     signature=c("MultinomialParameter"),
@@ -70,13 +63,10 @@ setMethod(
       }
     }
 )
-###################################################################################
 
-
-###################################################################################
-##' @rdname show-methods
-##' @aliases show show,MultinomialParameter-method
-##'
+#' @rdname show-methods
+#' @aliases show show,MultinomialParameter-method
+#'
 setMethod(
     f="show",
     signature=c("MultinomialParameter"),
@@ -111,13 +101,10 @@ setMethod(
       }
     }
 )
-###################################################################################
 
-
-###################################################################################
-##' @rdname summary-methods
-##' @aliases summary summary,MultinomialParameter-method
-##'
+#' @rdname summary-methods
+#' @aliases summary summary,MultinomialParameter-method
+#'
 setMethod(
   f="summary",
   signature=c("MultinomialParameter"),
@@ -149,13 +136,10 @@ setMethod(
     }
   }
 )
-###################################################################################
 
-
-###################################################################################
-##' @rdname extract-methods
-##' @aliases [,MultinomialParameter-method
-##'
+#' @rdname extract-methods
+#' @aliases [,MultinomialParameter-method
+#'
 setMethod(
   f="[", 
   signature(x = "MultinomialParameter"),
@@ -177,15 +161,11 @@ setMethod(
     }
   }
 )
-###################################################################################
 
-
-###################################################################################
-##'
-##' @name [
-##' @rdname extract-methods
-##' @aliases [<-,MultinomialParameter-method
-##'
+# ' @name [
+#' @rdname extract-methods
+#' @aliases [<-,MultinomialParameter-method
+#'
 setReplaceMethod(
   f="[", 
   signature(x = "MultinomialParameter"), 
@@ -209,5 +189,3 @@ setReplaceMethod(
     return(x)
   }
 )
-###################################################################################
-

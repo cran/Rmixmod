@@ -15,4 +15,3 @@ A MixmodPredict object
 \description{
 TODO: describe
 }
-

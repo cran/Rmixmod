@@ -4,7 +4,8 @@
 \name{heterodatatest}
 \alias{heterodatatest}
 \title{Composite data: A testing set}
-\format{A data frame with 100 individuals (rows) and 5 variables (columns).
+\format{
+A data frame with 100 individuals (rows) and 5 variables (columns).
 
 \describe{
 
@@ -17,7 +18,8 @@
   \item{\code{V4}}{numeric variable.}
 
   \item{\code{V5}}{numeric variable.}
-}}
+}
+}
 \description{
 The data set is made up of 5 variables: 3 categorical variables and 2 quantitative variables.
 The testing data set has 100 individuals.
@@ -30,4 +32,3 @@ summary(heterodatatest)
 \code{\link{heterodatatrain}}
 }
 \keyword{datasets}
-

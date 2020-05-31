@@ -4,8 +4,12 @@
 \alias{mixmodGaussianModel}
 \title{Create an instance of the [\code{\linkS4class{GaussianModel}}] class}
 \usage{
-mixmodGaussianModel(family = "all", listModels = NULL,
-  free.proportions = TRUE, equal.proportions = TRUE)
+mixmodGaussianModel(
+  family = "all",
+  listModels = NULL,
+  free.proportions = TRUE,
+  equal.proportions = TRUE
+)
 }
 \arguments{
 \item{family}{character defining a family of models. "general" for the general family, "diagonal" for the diagonal family, "spherical" for the spherical family and "all" for all families. Default is "general".}
@@ -71,10 +75,9 @@ In spherical family, we assume spherical shapes, namely \eqn{A_{k}=I}, \eqn{I} d
   mixmodGaussianModel(listModels=c("Gaussian_p_L_C","Gaussian_p_L_Ck","Gaussian_pk_L_I"))
 
 }
-\author{
-Florent Langrognet and Remi Lebret and Christian Poli ans Serge Iovleff, with contributions from C. Biernacki and G. Celeux and G. Govaert \email{contact@mixmod.org}
-}
 \references{
 C. Biernacki, G. Celeux, G. Govaert, F. Langrognet. "Model-Based Cluster and Discriminant Analysis with the MIXMOD Software". Computational Statistics and Data Analysis, vol. 51/2, pp. 587-600. (2006)
 }
-
+\author{
+Florent Langrognet and Remi Lebret and Christian Poli ans Serge Iovleff, with contributions from C. Biernacki and G. Celeux and G. Govaert \email{contact@mixmod.org}
+}

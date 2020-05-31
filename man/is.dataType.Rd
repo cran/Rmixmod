@@ -15,4 +15,3 @@ a string with the data type
 \description{
 Say if a data frame is quantitative, qualitative or composite
 }
-

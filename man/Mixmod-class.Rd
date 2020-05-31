@@ -26,4 +26,3 @@ This is a class to run mixmod library.
   getSlots("Mixmod")
 
 }
-

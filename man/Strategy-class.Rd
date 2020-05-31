@@ -29,4 +29,3 @@ This class defines the Mixmod strategies.
   getSlots("Strategy")
 
 }
-

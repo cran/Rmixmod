@@ -1,32 +1,29 @@
-###################################################################################
-##                                MixmodDAResults.R                              ##
-###################################################################################
+##################################################################################
+#                                MixmodDAResults.R                              ##
+##################################################################################
 
-###################################################################################
-##' @include global.R
-##' @include MixmodResults.R
+#' @include global.R
+#' @include MixmodResults.R
 NULL
-###################################################################################
 
-###################################################################################
-##' Constructor of [\code{\linkS4class{MixmodDAResults}}] class
-##'
-##' This is a class to contain results after a discriminant analysis with MIXMOD. Inherits the [\code{\linkS4class{MixmodResults}}] class.
-##'  
-##' \describe{
-##'   \item{CVLabel}{vector of integers containing labels defined by cross validation.}
-##'   \item{CVClassification}{classification table after cross validation.}
-##'   \item{MAPErrorRate}{error rate done by MAP algorithm.}
-##'   \item{MAPClassification}{classification table after MAP algorithm.}
-##' }
-##'
-##' @examples
-##'   getSlots("MixmodDAResults")
-##'
-##' @name MixmodDAResults-class
-##' @rdname MixmodDAResults-class
-##' @exportClass MixmodDAResults
-##'
+#' Constructor of [\code{\linkS4class{MixmodDAResults}}] class
+#'
+#' This is a class to contain results after a discriminant analysis with MIXMOD. Inherits the [\code{\linkS4class{MixmodResults}}] class.
+#'  
+#' \describe{
+#'   \item{CVLabel}{vector of integers containing labels defined by cross validation.}
+#'   \item{CVClassification}{classification table after cross validation.}
+#'   \item{MAPErrorRate}{error rate done by MAP algorithm.}
+#'   \item{MAPClassification}{classification table after MAP algorithm.}
+#' }
+#'
+#' @examples
+#'   getSlots("MixmodDAResults")
+#'
+#' @name MixmodDAResults-class
+#' @rdname MixmodDAResults-class
+#' @exportClass MixmodDAResults
+#'
 setClass(
   Class="MixmodDAResults",
   representation=representation(
@@ -43,12 +40,10 @@ setClass(
     MAPClassification = matrix(nrow=0,ncol=0)
   )
 )
-###################################################################################
 
-###################################################################################
-##' @rdname print-methods
-##' @aliases print print,MixmodDAResults-method
-##'
+#' @rdname print-methods
+#' @aliases print print,MixmodDAResults-method
+#'
 setMethod(
   f="print",
   signature=c("MixmodDAResults"),
@@ -94,12 +89,10 @@ setMethod(
     cat("****************************************\n")
   }
 )
-###################################################################################
 
-###################################################################################
-##' @rdname show-methods
-##' @aliases show show,MixmodDAResults-method
-##'
+#' @rdname show-methods
+#' @aliases show show,MixmodDAResults-method
+#'
 setMethod(
   f="show",
   signature=c("MixmodDAResults"),
@@ -145,8 +138,3 @@ setMethod(
     cat("****************************************\n")
   }
 )
-###################################################################################
-
-
-
-

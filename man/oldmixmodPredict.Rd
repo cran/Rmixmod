@@ -37,14 +37,8 @@ This function computes the second step of a discriminant analysis. The aim of th
   data(heterodatatrain)
   ## Learning with training data
   learn <- mixmodLearn(heterodatatrain[-1],knownLabels=heterodatatrain$V1)
-  ## Prediction on the testing data
-  data(heterodatatest)
-  prediction <- mixmodPredict(heterodatatest[-1],learn["bestResult"])
-  # compare prediction with real results
-  paste("accuracy= ",mean(heterodatatest$V1 == prediction["partition"])*100,"\%",sep="")
 
 }
 \author{
 Florent Langrognet and Remi Lebret and Christian Poli ans Serge Iovleff, with contributions from C. Biernacki and G. Celeux and G. Govaert \email{contact@mixmod.org}
 }
-

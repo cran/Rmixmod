@@ -6,8 +6,7 @@
 \alias{plot,Mixmod-method}
 \title{Plotting of a class [\code{\linkS4class{Mixmod}}]}
 \usage{
-\S4method{plot}{Mixmod}(x, y, showOnly = NULL, withResult = NULL,
-  hist_x_dim = 10000, ...)
+\S4method{plot}{Mixmod}(x, y, showOnly = NULL, withResult = NULL, hist_x_dim = 10000, ...)
 }
 \arguments{
 \item{x}{an object of class [\code{\linkS4class{Mixmod}}]}
@@ -54,4 +53,3 @@ For qualitative case, a Multiple Correspondance Analysis is performed to get a
 \seealso{
 \code{\link{plot}}
 }
-

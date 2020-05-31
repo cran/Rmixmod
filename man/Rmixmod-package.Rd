@@ -2,8 +2,8 @@
 % Please edit documentation in R/Rmixmod.R
 \docType{package}
 \name{Rmixmod-package}
-\alias{Rmixmod}
 \alias{Rmixmod-package}
+\alias{Rmixmod}
 \title{Rmixmod a MIXture MODelling package}
 \description{
 Rmixmod is a package based on the existing MIXMOD software. MIXMOD is a tool for fitting a mixture model of multivariate gaussian or multinomial components to a given data set with either a clustering, a density estimation or a discriminant analysis point of view.
@@ -11,7 +11,7 @@ Rmixmod is a package based on the existing MIXMOD software. MIXMOD is a tool for
 \details{
 The general purpose of the package is to discover, or explain, group structures in multivariate data sets with unknown (cluster analysis or clustering) or known class discriminant analysis or classification). It is an exploratory data analysis tool for solving clustering and classification problems. But it can also be regarded as a semi-parametric tool to estimate densities with Gaussian mixture distributions and multinomial distributions.
 
-Mathematically, mixture probability density function (pdf) \eqn{f} is a weighted sum of \eqn{K} components densities :
+Mathematically, mixture probability density function (pdf) \eqn{f} is a weighted sum of \eqn{K} components densities : 
 
 \deqn{
   f({\bf x}_i|\theta) = \sum_{k=1}^{K}p_kh({\bf x}_i|\lambda_k)
@@ -28,7 +28,7 @@ It is possible to constrain some input parameters. For example, dispersions can 
 
 In the Gaussian case, fourteen models are implemented. They are based on the eigenvalue decomposition, are most generally used. They depend on constraints on the variance matrix such as same variance matrix between clusters, spherical variance matrix... and they are suitable for data sets in any dimension.
 
-In the qualitative case, five multinomial models are available. They are based on a reparametrization of the multinomial probabilities.
+In the qualitative case, five multinomial models are available. They are based on a reparametrization of the multinomial probabilities. 
 
 In both cases, the models and the number of clusters can be chosen by different criteria : BIC (Bayesian Information Criterion), ICL (Integrated Completed Likelihood, a classification version of BIC), NEC (Entropy Criterion), or Cross-Validation (CV).
 }
@@ -71,11 +71,10 @@ In both cases, the models and the number of clusters can be chosen by different 
   }
 
 }
-\author{
-Author: Florent Langrognet and Remi Lebret and Christian Poli ans Serge Iovleff, with contributions from C. Biernacki and G. Celeux and G. Govaert \email{contact@mixmod.org}
-}
 \references{
 Biernacki C., Celeux G., Govaert G., Langrognet F., 2006. "Model-Based Cluster and Discriminant Analysis with the MIXMOD Software". Computational Statistics and Data Analysis, vol. 51/2, pp. 587-600.
 }
+\author{
+Author: Florent Langrognet and Remi Lebret and Christian Poli ans Serge Iovleff, with contributions from C. Biernacki and G. Celeux and G. Govaert \email{contact@mixmod.org}
+}
 \keyword{package}
-

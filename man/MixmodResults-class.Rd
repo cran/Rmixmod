@@ -23,4 +23,3 @@ This is a class to contain results from MIXMOD library.
   getSlots("MixmodResults")
 
 }
-

@@ -1,45 +1,42 @@
-###################################################################################
-##                            MixmodPredict.R                                    ##
-###################################################################################
+##################################################################################
+#                            MixmodPredict.R                                    ##
+##################################################################################
 
-###################################################################################
-##' @include global.R
-##' @include MixmodResults.R
-##' @include Mixmod.R
+#' @include global.R
+#' @include MixmodResults.R
+#' @include Mixmod.R
 NULL
-###################################################################################
 
-###################################################################################
-##' Constructor of [\code{\linkS4class{MixmodPredict}}] class
-##'
-##' This is a class to run discriminant analysis with mixmod.
-##' 
-##' \describe{
-##'   \item{data}{numeric vector, matrix, or data frame of observations. Either qualitative or quantitative.}
-##'   \item{dataType}{character. It defines whether data are quantitative or qualitative.}
-##'   \item{nbVariable}{integer. The number of variables.}
-##'   \item{nbSample}{integer. The number of observations.}
-##'   \item{error}{a character. The mixmod error.}
-##'   \item{classificationRule}{a [\code{\linkS4class{MixmodResults}}] object containing the classification rule.}
-##'   \item{partition}{a matrix containing observations to predict.}
-##'   \item{proba}{a matrix of probabilities.}
-##' }
-##'
-##' @examples
-##'   # start by extract 10 observations from iris data set
-##'   remaining.obs<-sample(1:nrow(iris),10)
-##'
-##'   # then run a mixmodLearn() analysis without those 10 observations
-##'   learn<-mixmodLearn(iris[-remaining.obs,1:4], iris$Species[-remaining.obs])
-##'   # create a MixmodPredict to predict those 10 observations
-##'   new("MixmodPredict", data=iris[remaining.obs,1:4], classificationRule=learn["bestResult"])
-##'
-##'   getSlots("MixmodPredict")
-##'
-##' @name MixmodPredict-class
-##' @rdname MixmodPredict-class
-##' @exportClass MixmodPredict
-##'
+#' Constructor of [\code{\linkS4class{MixmodPredict}}] class
+#'
+#' This is a class to run discriminant analysis with mixmod.
+#' 
+#' \describe{
+#'   \item{data}{numeric vector, matrix, or data frame of observations. Either qualitative or quantitative.}
+#'   \item{dataType}{character. It defines whether data are quantitative or qualitative.}
+#'   \item{nbVariable}{integer. The number of variables.}
+#'   \item{nbSample}{integer. The number of observations.}
+#'   \item{error}{a character. The mixmod error.}
+#'   \item{classificationRule}{a [\code{\linkS4class{MixmodResults}}] object containing the classification rule.}
+#'   \item{partition}{a matrix containing observations to predict.}
+#'   \item{proba}{a matrix of probabilities.}
+#' }
+#'
+#' @examples
+#'   # start by extract 10 observations from iris data set
+#'   remaining.obs<-sample(1:nrow(iris),10)
+#'
+#'   # then run a mixmodLearn() analysis without those 10 observations
+#'   learn<-mixmodLearn(iris[-remaining.obs,1:4], iris$Species[-remaining.obs])
+#'   # create a MixmodPredict to predict those 10 observations
+#'   new("MixmodPredict", data=iris[remaining.obs,1:4], classificationRule=learn["bestResult"])
+#'
+#'   getSlots("MixmodPredict")
+#'
+#' @name MixmodPredict-class
+#' @rdname MixmodPredict-class
+#' @exportClass MixmodPredict
+#'
 setClass(
   Class="MixmodPredict",
   representation=representation(
@@ -77,48 +74,38 @@ setClass(
     return(TRUE)
   }
 )
-###################################################################################
 
-
-
-
-###################################################################################
-##' Create an instance of the [\code{\linkS4class{MixmodPredict}}] class
-##'
-##' This function computes the second step of a discriminant analysis. The aim of this step is to assign remaining observations to one of the groups.
-##' 
-##' @param data matrix or data frame containing quantitative,qualitative or composite data. Rows correspond to observations and columns correspond to variables.
-##' @param classificationRule a [\code{\linkS4class{MixmodResults}}] object which contains the classification rule computed in the mixmodLearn() or mixmodCluster() step.
-##' @param ... ...
-##'
-##' @examples
-##'
-##'   # start by extract 10 observations from iris data set
-##'   remaining.obs<-sample(1:nrow(iris),10)
-##'   # then run a mixmodLearn() analysis without those 10 observations
-##'   learn<-mixmodLearn(iris[-remaining.obs,1:4], iris$Species[-remaining.obs])
-##'   # create a MixmodPredict to predict those 10 observations
-##'   prediction <- mixmodPredict(data=iris[remaining.obs,1:4], classificationRule=learn["bestResult"])
-##'   # show results
-##'   prediction
-##'   # compare prediction with real results
-##'   paste("accuracy= ",mean(as.integer(iris$Species[remaining.obs]) == prediction["partition"])*100
-##'         ,"%",sep="")
-##'
-##'   ## A composite example with a heterogeneous data set
-##'   data(heterodatatrain)
-##'   ## Learning with training data
-##'   learn <- mixmodLearn(heterodatatrain[-1],knownLabels=heterodatatrain$V1)
-##'   ## Prediction on the testing data
-##'   data(heterodatatest)
-##'   prediction <- mixmodPredict(heterodatatest[-1],learn["bestResult"])
-##'   # compare prediction with real results
-##'   paste("accuracy= ",mean(heterodatatest$V1 == prediction["partition"])*100,"%",sep="")
-##'
-##' @author Florent Langrognet and Remi Lebret and Christian Poli ans Serge Iovleff, with contributions from C. Biernacki and G. Celeux and G. Govaert \email{contact@@mixmod.org}
-##' @return Returns an instance of the [\code{\linkS4class{MixmodPredict}}] class which contains predicted partition and probabilities.
-##' @export
-##'
+#' Create an instance of the [\code{\linkS4class{MixmodPredict}}] class
+#'
+#' This function computes the second step of a discriminant analysis. The aim of this step is to assign remaining observations to one of the groups.
+#' 
+#' @param data matrix or data frame containing quantitative,qualitative or composite data. Rows correspond to observations and columns correspond to variables.
+#' @param classificationRule a [\code{\linkS4class{MixmodResults}}] object which contains the classification rule computed in the mixmodLearn() or mixmodCluster() step.
+#' @param ... ...
+#'
+#' @examples
+#'
+#'   # start by extract 10 observations from iris data set
+#'   remaining.obs<-sample(1:nrow(iris),10)
+#'   # then run a mixmodLearn() analysis without those 10 observations
+#'   learn<-mixmodLearn(iris[-remaining.obs,1:4], iris$Species[-remaining.obs])
+#'   # create a MixmodPredict to predict those 10 observations
+#'   prediction <- mixmodPredict(data=iris[remaining.obs,1:4], classificationRule=learn["bestResult"])
+#'   # show results
+#'   prediction
+#'   # compare prediction with real results
+#'   paste("accuracy= ",mean(as.integer(iris$Species[remaining.obs]) == prediction["partition"])*100
+#'         ,"%",sep="")
+#' 
+#'   ## A composite example with a heterogeneous data set
+#'   data(heterodatatrain)
+#'   ## Learning with training data
+#'   learn <- mixmodLearn(heterodatatrain[-1],knownLabels=heterodatatrain$V1)
+#'
+#' @author Florent Langrognet and Remi Lebret and Christian Poli ans Serge Iovleff, with contributions from C. Biernacki and G. Celeux and G. Govaert \email{contact@@mixmod.org}
+#' @return Returns an instance of the [\code{\linkS4class{MixmodPredict}}] class which contains predicted partition and probabilities.
+#' @export
+#'
 oldmixmodPredict <- function(data, classificationRule, ...) {
   # non documented params
   dots <- list(...)
@@ -169,20 +156,17 @@ mixmodPredict <- function(...) {
   if ( xem@error != "No error" ) warning( paste("Mixmod error: ", xem@error) )
   return(xem)
 }
-###################################################################################
 
-
-###################################################################################
-##' Create an instance of the [\code{\linkS4class{MixmodPredict}}] class using new/initialize.
-##' 
-##' Initialization method. Used internally in the `Rmixmod' package.
-##' 
-##' @seealso \code{\link{initialize}}
-##'
-##' @keywords internal
-##'
-##' @rdname initialize-methods
-##'
+#' Create an instance of the [\code{\linkS4class{MixmodPredict}}] class using new/initialize.
+#' 
+#' Initialization method. Used internally in the `Rmixmod' package.
+#' 
+#' @seealso \code{\link{initialize}}
+#'
+#' @keywords internal
+#'
+#' @rdname initialize-methods
+#'
 setMethod(
   f="initialize",
   signature=c("MixmodPredict"),
@@ -243,13 +227,10 @@ setMethod(
     return(.Object)
   }
 )
-###################################################################################
 
-
-###################################################################################
-##' @rdname print-methods
-##' @aliases print print,MixmodPredict-method
-##'
+#' @rdname print-methods
+#' @aliases print print,MixmodPredict-method
+#'
 setMethod(
   f="print",
   signature=c("MixmodPredict"),
@@ -287,12 +268,10 @@ setMethod(
     }
   }
 )
-###################################################################################
 
-###################################################################################
-##' @rdname show-methods
-##' @aliases show show,MixmodPredict-method
-##'
+#' @rdname show-methods
+#' @aliases show show,MixmodPredict-method
+#'
 setMethod(
   f="show",
   signature=c("MixmodPredict"),
@@ -333,12 +312,10 @@ setMethod(
     }
   }
 )
-###################################################################################
 
-###################################################################################
-##' @rdname summary-methods
-##' @aliases summary summary,MixmodPredict-method
-##'
+#' @rdname summary-methods
+#' @aliases summary summary,MixmodPredict-method
+#'
 setMethod(
   f="summary",
   signature=c("MixmodPredict"),
@@ -359,13 +336,10 @@ setMethod(
     return(invisible())
   }
 )
-###################################################################################
 
-
-###################################################################################
-##' @rdname extract-methods
-##' @aliases [,MixmodPredict-method
-##'
+#' @rdname extract-methods
+#' @aliases [,MixmodPredict-method
+#'
 setMethod(
   f="[", 
   signature(x = "MixmodPredict"),
@@ -391,6 +365,3 @@ setMethod(
     }
   }
 )
-##################################################################################
-
-

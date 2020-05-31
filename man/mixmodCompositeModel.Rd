@@ -4,9 +4,13 @@
 \alias{mixmodCompositeModel}
 \title{Create an instance of the [\code{\linkS4class{CompositeModel}}] class}
 \usage{
-mixmodCompositeModel(listModels = NULL, free.proportions = TRUE,
-  equal.proportions = TRUE, variable.independency = NULL,
-  component.independency = NULL)
+mixmodCompositeModel(
+  listModels = NULL,
+  free.proportions = TRUE,
+  equal.proportions = TRUE,
+  variable.independency = NULL,
+  component.independency = NULL
+)
 }
 \arguments{
 \item{listModels}{a list of characters containing a list of models. It is optional.}
@@ -82,10 +86,9 @@ The multinomial distribution is associated to the \eqn{j}th variable of the \eqn
   mixmodCompositeModel( listModels=c("Heterogeneous_pk_Ekjh_L_Bk","Heterogeneous_pk_Ekjh_Lk_B") )
 
 }
-\author{
-Florent Langrognet and Remi Lebret and Christian Poli ans Serge Iovleff, with contributions from C. Biernacki and G. Celeux and G. Govaert \email{contact@mixmod.org}
-}
 \references{
 C. Biernacki, G. Celeux, G. Govaert, F. Langrognet. "Model-Based Cluster and Discriminant Analysis with the MIXMOD Software". Computational Statistics and Data Analysis, vol. 51/2, pp. 587-600. (2006)
 }
-
+\author{
+Florent Langrognet and Remi Lebret and Christian Poli ans Serge Iovleff, with contributions from C. Biernacki and G. Celeux and G. Govaert \email{contact@mixmod.org}
+}

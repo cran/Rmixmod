@@ -4,8 +4,13 @@
 \alias{barplotCluster}
 \title{Barplot of a class [\code{\linkS4class{MixmodResults}}]}
 \usage{
-barplotCluster(x, data, variables = colnames(data),
-  main = paste("Barplot of", variables), ...)
+barplotCluster(
+  x,
+  data,
+  variables = colnames(data),
+  main = paste("Barplot of", variables),
+  ...
+)
 }
 \arguments{
 \item{x}{an object of class [\code{\linkS4class{MixmodResults}}]}
@@ -37,4 +42,3 @@ each modality to be in that cluster.
 \seealso{
 \code{\link{barplot}}
 }
-

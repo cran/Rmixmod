@@ -15,4 +15,3 @@ Object of type MixmodXmlCheck
 \description{
 TODO: describe...
 }
-

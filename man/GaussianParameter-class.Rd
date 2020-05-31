@@ -19,4 +19,3 @@ This class defines parameters of a Gaussian Mixture Model. Inherits the [\code{\
   getSlots("GaussianParameter")
 
 }
-

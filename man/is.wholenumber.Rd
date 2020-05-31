@@ -18,4 +18,3 @@ a logical. TRUE if \code{x} is an integer, FALSE otherwise.
 Define function to check an integer
 }
 \keyword{internal}
-

@@ -20,4 +20,3 @@ This class defines parameters of a Heterogeneous Mixture Model. Inherits the [\c
   getSlots("CompositeParameter")
 
 }
-

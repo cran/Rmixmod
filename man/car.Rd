@@ -4,7 +4,8 @@
 \name{car}
 \alias{car}
 \title{Qualitative data : Car Evaluation}
-\format{A data frame with 1728 observations on the following 6 variables.
+\format{
+A data frame with 1728 observations on the following 6 variables.
 
 \describe{
 
@@ -21,7 +22,8 @@
   \item{\code{safety}}{the estimated safety of the car (3 modalities: low, med, high).}
 
   \item{\code{acceptability}}{the car acceptability (4 modalities: unacc, acc, good, vgood).}
-}}
+}
+}
 \source{
 Creator: Marko Bohanec 
 Donors: Marko Bohanec & Blaz Zupan
@@ -34,4 +36,3 @@ Car Evaluation Database was derived from a simple hierarchical decision model or
   data(car)
 }
 \keyword{datasets}
-

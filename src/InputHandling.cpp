@@ -44,7 +44,7 @@ void InputHandling::setModel( Rcpp::S4& model)
     if (name != XEM::UNKNOWN_MODEL_NAME)
     { modelName.push_back(name); }
     else
-      throw (std::runtime_error("Invalid modelName in setModel : "));
+      Rcpp::stop("Invalid modelName in setModel : ");
   }
   // add those models
   cInput_->setModel(modelName);
@@ -99,6 +99,6 @@ void InputHandling::setCriterionName(Rcpp::CharacterVector & criterion)
     { cInput_->addCriterion(XEM::CV); }
     //exception because wrong criterionName
     else 
-    { throw(std::runtime_error("In InputHandling::setCriterionName invalid criterion name")); }
+    { Rcpp::stop("In InputHandling::setCriterionName invalid criterion name"); }
   }
 }

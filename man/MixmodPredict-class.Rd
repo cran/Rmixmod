@@ -31,4 +31,3 @@ This is a class to run discriminant analysis with mixmod.
   getSlots("MixmodPredict")
 
 }
-

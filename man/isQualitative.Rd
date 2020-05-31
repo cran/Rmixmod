@@ -15,4 +15,3 @@ a boolean
 \description{
 Say if a data frame contains only qualitative variables.
 }
-

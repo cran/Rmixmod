@@ -12,4 +12,3 @@ mixmodXmlInput(...)
 \description{
 TODO: describe..
 }
-

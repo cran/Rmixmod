@@ -17,4 +17,3 @@ XML output of mixmod methods
 \description{
 TODO: describe...
 }
-

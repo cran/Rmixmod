@@ -29,4 +29,3 @@ This method is able to reorder the list of results according to a given criterio
   icl["results"]
 
 }
-

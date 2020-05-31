@@ -2,31 +2,28 @@
 ##                          GaussianModel.R                                      ##
 ###################################################################################
 
-###################################################################################
-##' @include global.R
-##' @include Model.R
+#' @include global.R
+#' @include Model.R
 NULL
-###################################################################################
 
-###################################################################################
-##' Constructor of [\code{\linkS4class{GaussianModel}}] class
-##'
-##' This class defines a gaussian Model. Inherits the [\code{\linkS4class{Model}}] class.
-##' 
-##' \describe{
-##'   \item{family}{character defining a family of models.}
-##' }
-##'
-##' @examples
-##'   new("GaussianModel")
-##'   new("GaussianModel",family="general")
-##'
-##'   getSlots("GaussianModel")
-##' 
-##' @name GaussianModel-class
-##' @rdname GaussianModel-class
-##' @exportClass GaussianModel
-##'
+#' Constructor of [\code{\linkS4class{GaussianModel}}] class
+#'
+#' This class defines a gaussian Model. Inherits the [\code{\linkS4class{Model}}] class.
+#' 
+#' \describe{
+#'   \item{family}{character defining a family of models.}
+#' }
+#'
+#' @examples
+#'   new("GaussianModel")
+#'   new("GaussianModel",family="general")
+#'
+#'   getSlots("GaussianModel")
+#' 
+#' @name GaussianModel-class
+#' @rdname GaussianModel-class
+#' @exportClass GaussianModel
+#'
 setClass(
     Class="GaussianModel",
     representation=representation(
@@ -79,19 +76,17 @@ setClass(
       return(TRUE)
     }
 )
-###################################################################################
 
-###################################################################################
-##' Create an instance of the [\code{\linkS4class{GaussianModel}}] class using new/initialize.
-##' 
-##' Initialization method. Used internally in the `Rmixmod' package.
-##' 
-##' @seealso \code{\link{initialize}}
-##'
-##' @keywords internal
-##'
-##' @rdname initialize-methods
-##'
+#' Create an instance of the [\code{\linkS4class{GaussianModel}}] class using new/initialize.
+#' 
+#' Initialization method. Used internally in the `Rmixmod' package.
+#' 
+#' @seealso \code{\link{initialize}}
+#'
+#' @keywords internal
+#'
+#' @rdname initialize-methods
+#'
 setMethod(
   f="initialize",
   signature=c("GaussianModel"),
@@ -207,72 +202,69 @@ setMethod(
     return(.Object)
   }
 )
-###################################################################################
 
-
-###################################################################################
-##' Create an instance of the [\code{\linkS4class{GaussianModel}}] class
-##'
-##' Define a list of Gaussian model to test in MIXMOD.
-##' 
-##' In the Gaussian mixture model, following Banfield and Raftery (1993) and Celeux and Govaert (1995), we consider a parameterization of the variance matrices of the mixture components consisting of expressing the variance matrix \eqn{\Sigma_{k}} in terms of its eigenvalue decomposition \deqn{ \Sigma_{k}= \lambda_{k} D_{k} A_{k}D'_{k}} where \eqn{\lambda_{k}=|\Sigma_{k}|^{1/d}, D_{k}} is the matrix of eigenvectors of \eqn{\Sigma_{k}} and \eqn{A_{k}} is a diagonal matrix, such that \eqn{| A_{k} |=1}, with the normalized eigenvalues of \eqn{\Sigma_{k}} on the diagonal in a decreasing order. The parameter \eqn{\lambda_{k}} determines the \emph{volume} of the \eqn{k}th cluster, \eqn{D_{k}} its \emph{orientation} and \eqn{A_{k}} its \emph{shape}.  By allowing some but not all of these quantities to vary between clusters, we obtain parsimonious and easily interpreted models which are appropriate to describe various clustering situations.
-##' 
-##' In general family, we can allow the volumes, the shapes and the orientations of clusters to vary or to be equal between clusters. Variations on assumptions on the parameters \eqn{\lambda_{k}, D_{k}} and \eqn{A_{k}} \eqn{(1 \leq k \leq K)} lead to 8 general models of interest. For instance, we can assume different volumes and keep the shapes and orientations equal by requiring that \eqn{A_{k}=A} (\eqn{A} unknown) and \eqn{D_{k}=D} (\eqn{D} unknown) for \eqn{k=1,\ldots,K}. We denote this model \eqn{[\lambda_{k}DAD']}. With this convention, writing \eqn{[\lambda D_{k}AD'_{k}]} means that we consider the mixture model with equal volumes, equal shapes and different orientations.
-##' In diagonal family, we assume that the variance matrices \eqn{\Sigma_{k}} are diagonal. In the parameterization, it means that the orientation matrices \eqn{D_{k}} are permutation matrices. We write \eqn{\Sigma_{k}=\lambda_{k}B_{k}} where \eqn{B_{k}} is a diagonal matrix with \eqn{| B_{k}|=1}.  This particular parameterization gives rise to 4 models: \eqn{[\lambda B]}, \eqn{[\lambda_{k}B]}, \eqn{[\lambda B_{k}]} and \eqn{[\lambda_{k}B_{k}]}.
-##' 
-##' In spherical family, we assume spherical shapes, namely \eqn{A_{k}=I}, \eqn{I} denoting the identity matrix. In such a case, two parsimonious models are in competition: \eqn{[\lambda I]} and \eqn{[\lambda_{k}I]}.
-##'
-##' @param family character defining a family of models. "general" for the general family, "diagonal" for the diagonal family, "spherical" for the spherical family and "all" for all families. Default is "general".
-##' @param listModels a list of characters containing a list of models. It is optional.
-##' @param free.proportions logical to include models with free proportions. Default is TRUE.
-##' @param equal.proportions logical to include models with equal proportions. Default is TRUE.
-##'
-##' @return an object of [\code{\linkS4class{GaussianModel}}] which contains some of the 28 Gaussian Models:
-##' \tabular{rlllll}{
-##'     Model  \tab Family \tab Prop. \tab Volume \tab Shape \tab Orient. \cr
-##'     Gaussian_p_L_C         \tab General \tab Equal \tab Equal \tab Equal  \tab Equal \cr
-##'     Gaussian_p_Lk_C        \tab \tab \tab Free \tab Equal \tab Equal \cr
-##'     Gaussian_p_L_D_Ak_D    \tab  \tab \tab Equal \tab Free \tab Equal \cr
-##'     Gaussian_p_Lk_D_Ak_D   \tab  \tab \tab Free \tab Free \tab Equal \cr
-##'     Gaussian_p_L_Dk_A_Dk   \tab  \tab \tab Equal \tab Equal \tab Free \cr
-##'     Gaussian_p_Lk_Dk_A_Dk  \tab  \tab \tab Free \tab Equal \tab Free \cr
-##'     Gaussian_p_L_Ck        \tab  \tab \tab Equal \tab Free \tab Free \cr
-##'     Gaussian_p_Lk_Ck       \tab  \tab \tab Free \tab Free \tab Free \cr
-##'     Gaussian_p_L_B         \tab Diagonal  \tab Equal \tab Equal \tab Equal \tab Axes \cr
-##'     Gaussian_p_Lk_B        \tab  \tab \tab Free \tab Equal \tab Axes \cr
-##'     Gaussian_p_L_Bk        \tab  \tab \tab Equal \tab Free \tab Axes \cr
-##'     Gaussian_p_Lk_Bk       \tab  \tab \tab Free \tab Free \tab Axes \cr
-##'     Gaussian_p_L_I         \tab Spherical \tab Equal \tab Equal \tab Equal \tab NA \cr
-##'     Gaussian_p_Lk_I        \tab \tab \tab Free \tab Equal \tab NA \cr
-##'     Gaussian_pk_L_C        \tab General  \tab Free \tab Equal \tab Equal \tab Equal \cr
-##'     Gaussian_pk_Lk_C       \tab \tab \tab Free \tab Equal \tab Equal \cr
-##'     Gaussian_pk_L_D_Ak_D   \tab \tab \tab Equal \tab Free \tab Equal \cr
-##'     Gaussian_pk_Lk_D_Ak_D  \tab \tab \tab Free \tab Free \tab Equal \cr
-##'     Gaussian_pk_L_Dk_A_Dk  \tab \tab \tab Equal \tab Equal \tab Free \cr
-##'     Gaussian_pk_Lk_Dk_A_Dk \tab \tab \tab Free \tab Equal \tab Free \cr
-##'     Gaussian_pk_L_Ck       \tab \tab \tab Equal \tab Free \tab Free \cr
-##'     Gaussian_pk_Lk_Ck      \tab \tab \tab Free \tab Free \tab Free \cr
-##'     Gaussian_pk_L_B        \tab  Diagonal  \tab Free \tab Equal \tab Equal \tab Axes \cr
-##'     Gaussian_pk_Lk_B       \tab \tab \tab Free \tab Equal \tab Axes \cr
-##'     Gaussian_pk_L_Bk       \tab \tab \tab Equal \tab Free \tab Axes \cr
-##'     Gaussian_pk_Lk_Bk      \tab \tab \tab Free \tab Free \tab Axes \cr
-##'     Gaussian_pk_L_I        \tab Spherical  \tab Free \tab Equal \tab Equal \tab NA \cr
-##'     Gaussian_pk_Lk_I       \tab \tab \tab Free \tab Equal \tab NA \cr 
-##' }
-##'
-##' @references C. Biernacki, G. Celeux, G. Govaert, F. Langrognet. "Model-Based Cluster and Discriminant Analysis with the MIXMOD Software". Computational Statistics and Data Analysis, vol. 51/2, pp. 587-600. (2006)
-##' @examples
-##'   mixmodGaussianModel()
-##'   # all Gaussian models with equal proportions
-##'   mixmodGaussianModel(family="all",free.proportions=FALSE)
-##'   # Diagonal and Spherical Gaussian models
-##'   mixmodGaussianModel(family=c("diagonal","spherical"))
-##'   # Gaussian models with a pre-defined list
-##'   mixmodGaussianModel(listModels=c("Gaussian_p_L_C","Gaussian_p_L_Ck","Gaussian_pk_L_I"))
-##'
-##' @author  Florent Langrognet and Remi Lebret and Christian Poli ans Serge Iovleff, with contributions from C. Biernacki and G. Celeux and G. Govaert \email{contact@@mixmod.org}
-##' @export
-##'
+#' Create an instance of the [\code{\linkS4class{GaussianModel}}] class
+#'
+#' Define a list of Gaussian model to test in MIXMOD.
+#' 
+#' In the Gaussian mixture model, following Banfield and Raftery (1993) and Celeux and Govaert (1995), we consider a parameterization of the variance matrices of the mixture components consisting of expressing the variance matrix \eqn{\Sigma_{k}} in terms of its eigenvalue decomposition \deqn{ \Sigma_{k}= \lambda_{k} D_{k} A_{k}D'_{k}} where \eqn{\lambda_{k}=|\Sigma_{k}|^{1/d}, D_{k}} is the matrix of eigenvectors of \eqn{\Sigma_{k}} and \eqn{A_{k}} is a diagonal matrix, such that \eqn{| A_{k} |=1}, with the normalized eigenvalues of \eqn{\Sigma_{k}} on the diagonal in a decreasing order. The parameter \eqn{\lambda_{k}} determines the \emph{volume} of the \eqn{k}th cluster, \eqn{D_{k}} its \emph{orientation} and \eqn{A_{k}} its \emph{shape}.  By allowing some but not all of these quantities to vary between clusters, we obtain parsimonious and easily interpreted models which are appropriate to describe various clustering situations.
+#' 
+#' In general family, we can allow the volumes, the shapes and the orientations of clusters to vary or to be equal between clusters. Variations on assumptions on the parameters \eqn{\lambda_{k}, D_{k}} and \eqn{A_{k}} \eqn{(1 \leq k \leq K)} lead to 8 general models of interest. For instance, we can assume different volumes and keep the shapes and orientations equal by requiring that \eqn{A_{k}=A} (\eqn{A} unknown) and \eqn{D_{k}=D} (\eqn{D} unknown) for \eqn{k=1,\ldots,K}. We denote this model \eqn{[\lambda_{k}DAD']}. With this convention, writing \eqn{[\lambda D_{k}AD'_{k}]} means that we consider the mixture model with equal volumes, equal shapes and different orientations.
+#' In diagonal family, we assume that the variance matrices \eqn{\Sigma_{k}} are diagonal. In the parameterization, it means that the orientation matrices \eqn{D_{k}} are permutation matrices. We write \eqn{\Sigma_{k}=\lambda_{k}B_{k}} where \eqn{B_{k}} is a diagonal matrix with \eqn{| B_{k}|=1}.  This particular parameterization gives rise to 4 models: \eqn{[\lambda B]}, \eqn{[\lambda_{k}B]}, \eqn{[\lambda B_{k}]} and \eqn{[\lambda_{k}B_{k}]}.
+#' 
+#' In spherical family, we assume spherical shapes, namely \eqn{A_{k}=I}, \eqn{I} denoting the identity matrix. In such a case, two parsimonious models are in competition: \eqn{[\lambda I]} and \eqn{[\lambda_{k}I]}.
+#'
+#' @param family character defining a family of models. "general" for the general family, "diagonal" for the diagonal family, "spherical" for the spherical family and "all" for all families. Default is "general".
+#' @param listModels a list of characters containing a list of models. It is optional.
+#' @param free.proportions logical to include models with free proportions. Default is TRUE.
+#' @param equal.proportions logical to include models with equal proportions. Default is TRUE.
+#'
+#' @return an object of [\code{\linkS4class{GaussianModel}}] which contains some of the 28 Gaussian Models:
+#' \tabular{rlllll}{
+#'     Model  \tab Family \tab Prop. \tab Volume \tab Shape \tab Orient. \cr
+#'     Gaussian_p_L_C         \tab General \tab Equal \tab Equal \tab Equal  \tab Equal \cr
+#'     Gaussian_p_Lk_C        \tab \tab \tab Free \tab Equal \tab Equal \cr
+#'     Gaussian_p_L_D_Ak_D    \tab  \tab \tab Equal \tab Free \tab Equal \cr
+#'     Gaussian_p_Lk_D_Ak_D   \tab  \tab \tab Free \tab Free \tab Equal \cr
+#'     Gaussian_p_L_Dk_A_Dk   \tab  \tab \tab Equal \tab Equal \tab Free \cr
+#'     Gaussian_p_Lk_Dk_A_Dk  \tab  \tab \tab Free \tab Equal \tab Free \cr
+#'     Gaussian_p_L_Ck        \tab  \tab \tab Equal \tab Free \tab Free \cr
+#'     Gaussian_p_Lk_Ck       \tab  \tab \tab Free \tab Free \tab Free \cr
+#'     Gaussian_p_L_B         \tab Diagonal  \tab Equal \tab Equal \tab Equal \tab Axes \cr
+#'     Gaussian_p_Lk_B        \tab  \tab \tab Free \tab Equal \tab Axes \cr
+#'     Gaussian_p_L_Bk        \tab  \tab \tab Equal \tab Free \tab Axes \cr
+#'     Gaussian_p_Lk_Bk       \tab  \tab \tab Free \tab Free \tab Axes \cr
+#'     Gaussian_p_L_I         \tab Spherical \tab Equal \tab Equal \tab Equal \tab NA \cr
+#'     Gaussian_p_Lk_I        \tab \tab \tab Free \tab Equal \tab NA \cr
+#'     Gaussian_pk_L_C        \tab General  \tab Free \tab Equal \tab Equal \tab Equal \cr
+#'     Gaussian_pk_Lk_C       \tab \tab \tab Free \tab Equal \tab Equal \cr
+#'     Gaussian_pk_L_D_Ak_D   \tab \tab \tab Equal \tab Free \tab Equal \cr
+#'     Gaussian_pk_Lk_D_Ak_D  \tab \tab \tab Free \tab Free \tab Equal \cr
+#'     Gaussian_pk_L_Dk_A_Dk  \tab \tab \tab Equal \tab Equal \tab Free \cr
+#'     Gaussian_pk_Lk_Dk_A_Dk \tab \tab \tab Free \tab Equal \tab Free \cr
+#'     Gaussian_pk_L_Ck       \tab \tab \tab Equal \tab Free \tab Free \cr
+#'     Gaussian_pk_Lk_Ck      \tab \tab \tab Free \tab Free \tab Free \cr
+#'     Gaussian_pk_L_B        \tab  Diagonal  \tab Free \tab Equal \tab Equal \tab Axes \cr
+#'     Gaussian_pk_Lk_B       \tab \tab \tab Free \tab Equal \tab Axes \cr
+#'     Gaussian_pk_L_Bk       \tab \tab \tab Equal \tab Free \tab Axes \cr
+#'     Gaussian_pk_Lk_Bk      \tab \tab \tab Free \tab Free \tab Axes \cr
+#'     Gaussian_pk_L_I        \tab Spherical  \tab Free \tab Equal \tab Equal \tab NA \cr
+#'     Gaussian_pk_Lk_I       \tab \tab \tab Free \tab Equal \tab NA \cr 
+#' }
+#'
+#' @references C. Biernacki, G. Celeux, G. Govaert, F. Langrognet. "Model-Based Cluster and Discriminant Analysis with the MIXMOD Software". Computational Statistics and Data Analysis, vol. 51/2, pp. 587-600. (2006)
+#' @examples
+#'   mixmodGaussianModel()
+#'   # all Gaussian models with equal proportions
+#'   mixmodGaussianModel(family="all",free.proportions=FALSE)
+#'   # Diagonal and Spherical Gaussian models
+#'   mixmodGaussianModel(family=c("diagonal","spherical"))
+#'   # Gaussian models with a pre-defined list
+#'   mixmodGaussianModel(listModels=c("Gaussian_p_L_C","Gaussian_p_L_Ck","Gaussian_pk_L_I"))
+#'
+#' @author  Florent Langrognet and Remi Lebret and Christian Poli ans Serge Iovleff, with contributions from C. Biernacki and G. Celeux and G. Govaert \email{contact@@mixmod.org}
+#' @export
+#'
 mixmodGaussianModel<- function( family="all", listModels=NULL, free.proportions=TRUE, equal.proportions=TRUE ){
     if ( is.null(listModels) ){
       new("GaussianModel", family=family, free.proportions=free.proportions, equal.proportions=equal.proportions)
@@ -280,14 +272,10 @@ mixmodGaussianModel<- function( family="all", listModels=NULL, free.proportions=
       new("GaussianModel", listModels=listModels)
     }
 }
-###################################################################################
 
-
-
-###################################################################################
-##' @rdname extract-methods
-##' @aliases [,GaussianModel-method
-##'
+#' @rdname extract-methods
+#' @aliases [,GaussianModel-method
+#'
 setMethod(
   f="[", 
   signature(x = "GaussianModel"),
@@ -308,17 +296,13 @@ setMethod(
     }
   }
 )
-###################################################################################
 
-
-
-###################################################################################
-##' 
-##'
-##' @name [
-##' @rdname extract-methods
-##' @aliases [<-,GaussianModel-method
-##'
+#' 
+#'
+# ' @name [
+#' @rdname extract-methods
+#' @aliases [<-,GaussianModel-method
+#'
 setReplaceMethod(
   f="[", 
   signature(x = "GaussianModel"), 
@@ -341,4 +325,3 @@ setReplaceMethod(
     return(x)
   }
 )
-###################################################################################

@@ -16,4 +16,3 @@ a matrix of binary data.
 Define function to transform a matrix of modalities into matrix of binary data
 }
 \keyword{internal}
-

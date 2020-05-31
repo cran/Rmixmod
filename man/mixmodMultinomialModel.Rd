@@ -4,9 +4,13 @@
 \alias{mixmodMultinomialModel}
 \title{Create an instance of the [\code{\linkS4class{MultinomialModel}}] class}
 \usage{
-mixmodMultinomialModel(listModels = NULL, free.proportions = TRUE,
-  equal.proportions = TRUE, variable.independency = NULL,
-  component.independency = NULL)
+mixmodMultinomialModel(
+  listModels = NULL,
+  free.proportions = TRUE,
+  equal.proportions = TRUE,
+  variable.independency = NULL,
+  component.independency = NULL
+)
 }
 \arguments{
 \item{listModels}{a list of characters containing a list of models. It is optional.}
@@ -51,10 +55,9 @@ In the multinomial mixture model, the multinomial distribution is associated to 
   mixmodMultinomialModel(free.proportions=FALSE, variable.independency=TRUE)
 
 }
-\author{
-Florent Langrognet and Remi Lebret and Christian Poli ans Serge Iovleff, with contributions from C. Biernacki and G. Celeux and G. Govaert \email{contact@mixmod.org}
-}
 \references{
 C. Biernacki, G. Celeux, G. Govaert, F. Langrognet. "Model-Based Cluster and Discriminant Analysis with the MIXMOD Software". Computational Statistics and Data Analysis, vol. 51/2, pp. 587-600. (2006)
 }
-
+\author{
+Florent Langrognet and Remi Lebret and Christian Poli ans Serge Iovleff, with contributions from C. Biernacki and G. Celeux and G. Govaert \email{contact@mixmod.org}
+}

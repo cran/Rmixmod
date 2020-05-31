@@ -4,7 +4,8 @@
 \name{birds}
 \alias{birds}
 \title{Qualitative data : morphological description of birds}
-\format{A data frame with 69 observations on the following 5 variables.
+\format{
+A data frame with 69 observations on the following 5 variables.
 
 \describe{
 
@@ -18,7 +19,8 @@
 
   \item{\code{border}}{a numeric vector describing the border (3 modalities).}
 
-}}
+}
+}
 \source{
 Bretagnolle, V., 2007. Personal communication, source: Museum.
 }
@@ -29,4 +31,3 @@ The dataset contains details on the morphology of birds (puffins). Each individu
   data(birds)
 }
 \keyword{datasets}
-

@@ -18,4 +18,3 @@ This is a class to contain results after a discriminant analysis with MIXMOD. In
   getSlots("MixmodDAResults")
 
 }
-

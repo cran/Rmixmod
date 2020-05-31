@@ -2,31 +2,28 @@
 ##                             GaussianParameter.R                               ##
 ###################################################################################
 
-###################################################################################
-##' @include global.R
-##' @include Parameter.R
+#' @include global.R
+#' @include Parameter.R
 NULL
-###################################################################################
 
-###################################################################################
-##' Constructor of [\code{\linkS4class{GaussianParameter}}] class
-##' 
-##' This class defines parameters of a Gaussian Mixture Model. Inherits the [\code{\linkS4class{Parameter}}] class.
-##' 
-##' \describe{
-##'   \item{mean}{a numeric vector containing mean of each cluster.}
-##'   \item{variance}{a vector of matrix containing variance matrix of each cluster.}
-##' }
-##'
-##' @examples
-##'   new("GaussianParameter")
-##'
-##'   getSlots("GaussianParameter")
-##' 
-##' @name GaussianParameter-class
-##' @rdname GaussianParameter-class
-##' @exportClass GaussianParameter
-##'
+#' Constructor of [\code{\linkS4class{GaussianParameter}}] class
+#' 
+#' This class defines parameters of a Gaussian Mixture Model. Inherits the [\code{\linkS4class{Parameter}}] class.
+#' 
+#' \describe{
+#'   \item{mean}{a numeric vector containing mean of each cluster.}
+#'   \item{variance}{a vector of matrix containing variance matrix of each cluster.}
+#' }
+#'
+#' @examples
+#'   new("GaussianParameter")
+#'
+#'   getSlots("GaussianParameter")
+#' 
+#' @name GaussianParameter-class
+#' @rdname GaussianParameter-class
+#' @exportClass GaussianParameter
+#'
 setClass(
     Class="GaussianParameter",
     representation=representation(
@@ -39,13 +36,10 @@ setClass(
     ),
     contains=c("Parameter")
 )
-###################################################################################
 
-
-###################################################################################
-##' @rdname print-methods
-##' @aliases print print,GaussianParameter-method
-##'
+#' @rdname print-methods
+#' @aliases print print,GaussianParameter-method
+#'
 setMethod(
     f="print",
     signature=c("GaussianParameter"),
@@ -69,13 +63,10 @@ setMethod(
       }
     }
 )
-###################################################################################
 
-
-###################################################################################
-##' @rdname show-methods
-##' @aliases show show,GaussianParameter-method
-##'
+#' @rdname show-methods
+#' @aliases show show,GaussianParameter-method
+#'
 setMethod(
     f="show",
     signature=c("GaussianParameter"),
@@ -99,13 +90,10 @@ setMethod(
       }
     }
 )
-###################################################################################
 
-
-###################################################################################
-##' @rdname summary-methods
-##' @aliases summary summary,GaussianParameter-method
-##'
+#' @rdname summary-methods
+#' @aliases summary summary,GaussianParameter-method
+#'
 setMethod(
   f="summary",
   signature=c("GaussianParameter"),
@@ -127,13 +115,10 @@ setMethod(
     }
   }
 )
-###################################################################################
 
-
-###################################################################################
-##' @rdname extract-methods
-##' @aliases [,GaussianParameter-method
-##'
+#' @rdname extract-methods
+#' @aliases [,GaussianParameter-method
+#'
 setMethod(
   f="[", 
   signature(x = "GaussianParameter"),
@@ -155,17 +140,11 @@ setMethod(
     }
   }
 )
-###################################################################################
 
-
-
-###################################################################################
-##' 
-##'
-##' @name [
-##' @rdname extract-methods
-##' @aliases [<-,GaussianParameter-method
-##'
+# ' @name [
+#' @rdname extract-methods
+#' @aliases [<-,GaussianParameter-method
+#'
 setReplaceMethod(
   f="[", 
   signature(x = "GaussianParameter"), 
@@ -189,5 +168,3 @@ setReplaceMethod(
     return(x)
   }
 )
-###################################################################################
-

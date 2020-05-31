@@ -33,4 +33,3 @@ Data with the density of each cluster and the mixture density are drawn for each
 \seealso{
 \code{\link{hist}}
 }
-

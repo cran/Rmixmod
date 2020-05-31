@@ -59,4 +59,3 @@ and the list of model defined in [\code{\linkS4class{Model}}], using the algorit
 \author{
 Florent Langrognet and Remi Lebret and Christian Poli ans Serge Iovleff, with contributions from C. Biernacki and G. Celeux and G. Govaert \email{contact@mixmod.org}
 }
-

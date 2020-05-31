@@ -3,5 +3,5 @@
 #' @importFrom stats dnorm
 #'
 #' @useDynLib Rmixmod, .registration = TRUE
-#'
+#' @exportPattern "^[[:alpha:]]+"
 NULL

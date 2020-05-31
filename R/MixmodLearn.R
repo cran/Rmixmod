@@ -1,37 +1,34 @@
-###################################################################################
-##                              MixmodLearn.R                                    ##
-###################################################################################
+##################################################################################
+#                              MixmodLearn.R                                    ##
+##################################################################################
 
-###################################################################################
-##' @include global.R
-##' @include Mixmod.R
-##' @include MixmodDAResults.R
-##' @include GaussianParameter.R
-##' @include MultinomialParameter.R
-##' @include GaussianModel.R
-##' @include MultinomialModel.R
+#' @include global.R
+#' @include Mixmod.R
+#' @include MixmodDAResults.R
+#' @include GaussianParameter.R
+#' @include MultinomialParameter.R
+#' @include GaussianModel.R
+#' @include MultinomialModel.R
 NULL
-###################################################################################
 
-###################################################################################
-##' Constructor of [\code{\linkS4class{MixmodLearn}}] class
-##'
-##' This is a class to run discriminant analysis with mixmod. Inherits the [\code{\linkS4class{Mixmod}}] class.
-##'
-##' \describe{
-##'   \item{bestResult}{a S4 [\code{\linkS4class{MixmodDAResults}}] object containing the best model results.}
-##'   \item{nbCVBlocks}{integer which defines the number of block to perform the Cross Validation.}
-##' }
-##' @examples
-##'   ## A quantitative example with the famous iris data set
-##'   new("MixmodLearn", data=iris[1:4], knownLabels=iris$Species)
-##'
-##'   getSlots("MixmodLearn")
-##'
-##' @name MixmodLearn-class
-##' @rdname MixmodLearn-class
-##' @exportClass MixmodLearn
-##'
+#' Constructor of [\code{\linkS4class{MixmodLearn}}] class
+#'
+#' This is a class to run discriminant analysis with mixmod. Inherits the [\code{\linkS4class{Mixmod}}] class.
+#'
+#' \describe{
+#'   \item{bestResult}{a S4 [\code{\linkS4class{MixmodDAResults}}] object containing the best model results.}
+#'   \item{nbCVBlocks}{integer which defines the number of block to perform the Cross Validation.}
+#' }
+#' @examples
+#'   ## A quantitative example with the famous iris data set
+#'   new("MixmodLearn", data=iris[1:4], knownLabels=iris$Species)
+#'
+#'   getSlots("MixmodLearn")
+#'
+#' @name MixmodLearn-class
+#' @rdname MixmodLearn-class
+#' @exportClass MixmodLearn
+#'
 setClass(
   Class="MixmodLearn",
   representation=representation(
@@ -63,20 +60,17 @@ setClass(
     return(TRUE)
   }
 )
-###################################################################################
 
-
-###################################################################################
-##' Create an instance of the [\code{\linkS4class{MixmodLearn}}] class using new/initialize.
-##' 
-##' Initialization method. Used internally in the `Rmixmod' package.
-##' 
-##' @seealso \code{\link{initialize}}
-##'
-##' @keywords internal
-##'
-##' @rdname initialize-methods
-##'
+#' Create an instance of the [\code{\linkS4class{MixmodLearn}}] class using new/initialize.
+#' 
+#' Initialization method. Used internally in the `Rmixmod' package.
+#' 
+#' @seealso \code{\link{initialize}}
+#'
+#' @keywords internal
+#'
+#' @rdname initialize-methods
+#'
 setMethod(
     f="initialize",
     signature=c("MixmodLearn"),
@@ -135,17 +129,15 @@ setMethod(
       return(.Object)
     }
 )
-###################################################################################
 
-
-##' mixmodLearn
-##'
-##' TODO: describe...
-##'
-##' @param ... ...
-##'
-##' @export
-##'
+#' mixmodLearn
+#'
+#' TODO: describe...
+#'
+#' @param ... ...
+#'
+#' @export
+#'
 mixmodLearn <- function(...) {
 
   # create Mixmod object
@@ -159,44 +151,43 @@ mixmodLearn <- function(...) {
   return(xem)
 }
 
-###################################################################################
-##' Create an instance of the [\code{\linkS4class{MixmodLearn}}] class
-##'
-##' This function computes the first step of a discriminant analysis. It will find the best classification rule by running an M step from the training observations.
-##' 
-##' @param data frame containing quantitative,qualitative or heterogeneous data. Rows correspond to observations and columns correspond to variables.
-##' @param knownLabels an integer vector or a factor of size number of observations. Each cell corresponds to a cluster affectation. So the maximum value is the number of clusters.
-##' @param dataType character. Type of data is "quantitative", "qualitative" or "composite". Set as NULL by default, type will be guessed depending on variables type (in case of homogeneous data). 'composite' type must be specified explicitly.
-##' @param models a [\code{\linkS4class{Model}}] object defining the list of models to run. For quantitative data, the model "Gaussian_pk_Lk_C" is called (see mixmodGaussianModel() to specify other models). For qualitative data, the model "Binary_pk_Ekjh" is called (see mixmodMultinomialModel() to specify other models).
-##' @param criterion list of character defining the criterion to select the best model. Possible values: "BIC", "CV" or c("CV","BIC"). Default is "CV".
-##' @param nbCVBlocks integer which defines the number of block to perform the Cross Validation. This value will be ignored if the CV criterion is not choosen. Default value is 10.
-##' @param weight numeric vector with n (number of individuals) rows. Weight is optionnal. This option is to be used when weight is associated to the data.
-##'
-##' @examples
-##'   ## A quantitative example with the famous iris data set
-##'   learn.iris<-mixmodLearn(iris[1:4], iris$Species)
-##'   ## get summary
-##'   summary(learn.iris)
-##'
-##'   ## A qualitative example with the famous birds data set
-##'   data(birds)
-##'   birds.partition<-as.integer(c(rep(1,34),rep(2,35)))
-##'   learn.birds<-mixmodLearn(data=birds, knownLabels=birds.partition)
-##'   ## get summary
-##'   summary(learn.birds)
-##'
-##'   ## A composite example with a heterogeneous data set
-##'   data(heterodatatrain)
-##'   learn.hetero<-mixmodLearn(heterodatatrain[-1],knownLabels=heterodatatrain$V1)
-##'   ## get summary
-##'   summary(learn.hetero)
-##'
-##' @author Florent Langrognet and Remi Lebret and Christian Poli ans Serge Iovleff, with contributions from C. Biernacki and G. Celeux and G. Govaert \email{contact@@mixmod.org}
-##' @return Returns an instance of the [\code{\linkS4class{MixmodLearn}}] class. Those two attributes will contain all outputs:
-##' \describe{
-##'   \item{results}{a list of [\code{\linkS4class{MixmodResults}}] object containing all the results sorted in ascending order according to the given criterion.}
-##'   \item{bestResult}{a S4 [\code{\linkS4class{MixmodResults}}] object containing the best model results.}
-##' }
+#' Create an instance of the [\code{\linkS4class{MixmodLearn}}] class
+#'
+#' This function computes the first step of a discriminant analysis. It will find the best classification rule by running an M step from the training observations.
+#' 
+#' @param data frame containing quantitative,qualitative or heterogeneous data. Rows correspond to observations and columns correspond to variables.
+#' @param knownLabels an integer vector or a factor of size number of observations. Each cell corresponds to a cluster affectation. So the maximum value is the number of clusters.
+#' @param dataType character. Type of data is "quantitative", "qualitative" or "composite". Set as NULL by default, type will be guessed depending on variables type (in case of homogeneous data). 'composite' type must be specified explicitly.
+#' @param models a [\code{\linkS4class{Model}}] object defining the list of models to run. For quantitative data, the model "Gaussian_pk_Lk_C" is called (see mixmodGaussianModel() to specify other models). For qualitative data, the model "Binary_pk_Ekjh" is called (see mixmodMultinomialModel() to specify other models).
+#' @param criterion list of character defining the criterion to select the best model. Possible values: "BIC", "CV" or c("CV","BIC"). Default is "CV".
+#' @param nbCVBlocks integer which defines the number of block to perform the Cross Validation. This value will be ignored if the CV criterion is not choosen. Default value is 10.
+#' @param weight numeric vector with n (number of individuals) rows. Weight is optionnal. This option is to be used when weight is associated to the data.
+#'
+#' @examples
+#'   ## A quantitative example with the famous iris data set
+#'   learn.iris<-mixmodLearn(iris[1:4], iris$Species)
+#'   ## get summary
+#'   summary(learn.iris)
+#'
+#'   ## A qualitative example with the famous birds data set
+#'   data(birds)
+#'   birds.partition<-as.integer(c(rep(1,34),rep(2,35)))
+#'   learn.birds<-mixmodLearn(data=birds, knownLabels=birds.partition)
+#'   ## get summary
+#'   summary(learn.birds)
+#'
+#'   ## A composite example with a heterogeneous data set
+#'   data(heterodatatrain)
+#'   learn.hetero<-mixmodLearn(heterodatatrain[-1],knownLabels=heterodatatrain$V1)
+#'   ## get summary
+#'   summary(learn.hetero)
+#'
+#' @author Florent Langrognet and Remi Lebret and Christian Poli ans Serge Iovleff, with contributions from C. Biernacki and G. Celeux and G. Govaert \email{contact@@mixmod.org}
+#' @return Returns an instance of the [\code{\linkS4class{MixmodLearn}}] class. Those two attributes will contain all outputs:
+#' \describe{
+#'   \item{results}{a list of [\code{\linkS4class{MixmodResults}}] object containing all the results sorted in ascending order according to the given criterion.}
+#'   \item{bestResult}{a S4 [\code{\linkS4class{MixmodResults}}] object containing the best model results.}
+#' }
 mixmodLearn.default <- function(data, knownLabels, dataType=NULL, models=NULL, criterion="CV", nbCVBlocks=10, weight=NULL) {
  stop("mixmodLearn.default: not implemented\n");
 }
@@ -228,13 +219,9 @@ mixmodLearn.default <- function(data, knownLabels, dataType=NULL, models=NULL, c
 #  return(xem)
 #}
 
-###################################################################################
-
-
-###################################################################################
-##' @rdname print-methods
-##' @aliases print print,MixmodLearn-method
-##'
+#' @rdname print-methods
+#' @aliases print print,MixmodLearn-method
+#'
 setMethod(
   f="print",
   signature=c("MixmodLearn"),
@@ -260,12 +247,10 @@ setMethod(
     return(invisible())
   }
 )
-###################################################################################
 
-###################################################################################
-##' @rdname show-methods
-##' @aliases show show,MixmodLearn-method
-##'
+#' @rdname show-methods
+#' @aliases show show,MixmodLearn-method
+#'
 setMethod(
   f="show",
   signature=c("MixmodLearn"),
@@ -291,14 +276,10 @@ setMethod(
     return(invisible())
   }
 )
-###################################################################################
 
-
-
-###################################################################################
-##' @rdname extract-methods
-##' @aliases [,MixmodLearn-method
-##'
+#' @rdname extract-methods
+#' @aliases [,MixmodLearn-method
+#'
 setMethod(
   f="[", 
   signature(x = "MixmodLearn"),
@@ -330,16 +311,11 @@ setMethod(
     }
   }
 )
-##################################################################################
 
-
-###################################################################################
-##' 
-##'
-##' @name [
-##' @rdname extract-methods
-##' @aliases [<-,MixmodLearn-method
-##'
+# ' @name [
+#' @rdname extract-methods
+#' @aliases [<-,MixmodLearn-method
+#'
 setReplaceMethod(
   f="[", 
   signature(x = "MixmodLearn"), 
@@ -367,5 +343,3 @@ setReplaceMethod(
     return(x)
   }
 )
-###################################################################################
-

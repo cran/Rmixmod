@@ -19,4 +19,3 @@ This class defines a gaussian Model. Inherits the [\code{\linkS4class{Model}}] c
   getSlots("GaussianModel")
 
 }
-

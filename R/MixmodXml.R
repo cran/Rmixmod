@@ -1,22 +1,20 @@
-###################################################################################
-##                               MixmodXml.R                                     ##
-###################################################################################
+##################################################################################
+#                               MixmodXml.R                                     ##
+##################################################################################
 
-###################################################################################
-##' @include MixmodCluster.R
-##' @include MixmodLearn.R
-##' @include MixmodPredict.R
+#' @include MixmodCluster.R
+#' @include MixmodLearn.R
+#' @include MixmodPredict.R
 NULL
 
-###################################################################################
-##' Constructor of [\code{\linkS4class{MixmodXmlCheck}}] class
-##' 
-##' This is a class to handle XML files (TODO: describe...)
-##'
-##' @name MixmodXmlCheck-class
-##' @rdname MixmodXmlCheck-class
-##' @exportClass MixmodXmlCheck
-##'
+#' Constructor of [\code{\linkS4class{MixmodXmlCheck}}] class
+#' 
+#' This is a class to handle XML files (TODO: describe...)
+#'
+#' @name MixmodXmlCheck-class
+#' @rdname MixmodXmlCheck-class
+#' @exportClass MixmodXmlCheck
+#'
 setClass(
   Class="MixmodXmlCheck",
   representation=representation(

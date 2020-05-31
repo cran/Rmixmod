@@ -2,34 +2,31 @@
 ##                             CompositeParameter.R                               ##
 ###################################################################################
 
-###################################################################################
-##' @include global.R
-##' @include Parameter.R
-##' @include GaussianParameter.R
-##' @include MultinomialParameter.R
+#' @include global.R
+#' @include Parameter.R
+#' @include GaussianParameter.R
+#' @include MultinomialParameter.R
 NULL
-###################################################################################
 
-###################################################################################
-##' Constructor of [\code{\linkS4class{CompositeParameter}}] class
-##' 
-##' This class defines parameters of a Heterogeneous Mixture Model. Inherits the [\code{\linkS4class{Parameter}}] class.
-##' 
-##' \describe{
-##'   \item{g_parameter}{an object of class CompositeParameter}
-##'   \item{m_parameter}{an object of class MultinomialParameter}
-##'   \item{factor}{a numeric vector}
-##' }
-##'
-##' @examples
-##'   new("CompositeParameter")
-##'
-##'   getSlots("CompositeParameter")
-##' 
-##' @name CompositeParameter-class
-##' @rdname CompositeParameter-class
-##' @exportClass CompositeParameter
-##'
+#' Constructor of [\code{\linkS4class{CompositeParameter}}] class
+#' 
+#' This class defines parameters of a Heterogeneous Mixture Model. Inherits the [\code{\linkS4class{Parameter}}] class.
+#' 
+#' \describe{
+#'   \item{g_parameter}{an object of class CompositeParameter}
+#'   \item{m_parameter}{an object of class MultinomialParameter}
+#'   \item{factor}{a numeric vector}
+#' }
+#'
+#' @examples
+#'   new("CompositeParameter")
+#'
+#'   getSlots("CompositeParameter")
+#' 
+#' @name CompositeParameter-class
+#' @rdname CompositeParameter-class
+#' @exportClass CompositeParameter
+#'
 setClass(
   Class="CompositeParameter",
   representation=representation(
@@ -39,13 +36,10 @@ setClass(
   ),
   contains=c("Parameter")
 )
-###################################################################################
 
-
-###################################################################################
-##' @rdname print-methods
-##' @aliases print print,CompositeParameter-method
-##'
+#' @rdname print-methods
+#' @aliases print print,CompositeParameter-method
+#'
 setMethod(
   f="print",
   signature=c("CompositeParameter"),
@@ -58,13 +52,10 @@ setMethod(
     }
   }
 )
-###################################################################################
 
-
-###################################################################################
-##' @rdname show-methods
-##' @aliases show show,CompositeParameter-method
-##'
+#' @rdname show-methods
+#' @aliases show show,CompositeParameter-method
+#'
 setMethod(
   f="show",
   signature=c("CompositeParameter"),
@@ -77,13 +68,10 @@ setMethod(
     }
   }
 )
-###################################################################################
 
-
-###################################################################################
-##' @rdname summary-methods
-##' @aliases summary summary,CompositeParameter-method
-##'
+#' @rdname summary-methods
+#' @aliases summary summary,CompositeParameter-method
+#'
 setMethod(
   f="summary",
   signature=c("CompositeParameter"),
@@ -96,13 +84,10 @@ setMethod(
     }
   }
 )
-###################################################################################
 
-
-###################################################################################
-##' @rdname extract-methods
-##' @aliases [,CompositeParameter-method
-##'
+#' @rdname extract-methods
+#' @aliases [,CompositeParameter-method
+#'
 setMethod(
   f="[", 
   signature(x = "CompositeParameter"),
@@ -114,17 +99,11 @@ setMethod(
              )
   }
 )
-###################################################################################
 
-
-
-###################################################################################
-##' 
-##'
-##' @name [
-##' @rdname extract-methods
-##' @aliases [<-,CompositeParameter-method
-##'
+# ' @name [
+#' @rdname extract-methods
+#' @aliases [<-,CompositeParameter-method
+#'
 setReplaceMethod(
   f="[", 
   signature(x = "CompositeParameter"), 
@@ -138,4 +117,3 @@ setReplaceMethod(
     return(x)
   }
 )
-###################################################################################

@@ -4,9 +4,18 @@
 \alias{plotCluster}
 \title{Plotting of a class [\code{\linkS4class{MixmodResults}}]}
 \usage{
-plotCluster(x, data, variable1 = colnames(data)[1],
-  variable2 = colnames(data)[2], col = x@partition + 1, pch = x@partition,
-  xlab = variable1, ylab = variable2, add.ellipse = TRUE, ...)
+plotCluster(
+  x,
+  data,
+  variable1 = colnames(data)[1],
+  variable2 = colnames(data)[2],
+  col = x@partition + 1,
+  pch = x@partition,
+  xlab = variable1,
+  ylab = variable2,
+  add.ellipse = TRUE,
+  ...
+)
 }
 \arguments{
 \item{x}{an object of class [\code{\linkS4class{MixmodResults}}]}
@@ -52,4 +61,3 @@ The squared relative lengths of the principal axes are given by the correspondin
 \seealso{
 \code{\link{plot}}
 }
-

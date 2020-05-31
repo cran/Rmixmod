@@ -4,9 +4,15 @@
 \alias{histCluster}
 \title{Histogram of a class [\code{\linkS4class{MixmodResults}}]}
 \usage{
-histCluster(x, data, variables = colnames(data), xlab = rep("",
-  length(variables)), main = paste("Histogram of", variables),
-  hist_x_dim = 10000, ...)
+histCluster(
+  x,
+  data,
+  variables = colnames(data),
+  xlab = rep("", length(variables)),
+  main = paste("Histogram of", variables),
+  hist_x_dim = 10000,
+  ...
+)
 }
 \arguments{
 \item{x}{an object of class [\code{\linkS4class{MixmodResults}}]}
@@ -40,4 +46,3 @@ Data with the density of each cluster and the mixture density are drawn for each
 \seealso{
 \code{\link{hist}}
 }
-
