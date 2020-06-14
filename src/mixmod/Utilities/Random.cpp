@@ -27,7 +27,7 @@
 
 #include "mixmod/Utilities/Random.h" // prototypes
 #include "mixmod/Utilities/Util.h"
-#include <sys/timeb.h> // time_t
+#include <time.h>
 #include <fstream>
 
 namespace XEM {
@@ -70,10 +70,12 @@ void initRandomize(int seed)
 
 // Randomly initialize seeds (non-deterministic runs)
 void randomize() {
-	timeb q;
-	ftime(&q);
-	z = (uint32_t) q.millitm;
-	y = (uint32_t) q.time;
+	struct timespec tp;
+
+	clock_gettime(CLOCK_REALTIME, &tp);
+
+	z = (uint32_t) tp.tv_nsec/1000000; //milliseconds
+	y = (uint32_t) tp.tv_sec;
 	rnd();
 }
 
