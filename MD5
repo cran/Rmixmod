@@ -1,4 +1,4 @@
-0a01980aaa31f74855e74c8aed8120fd *DESCRIPTION
+80839eb66ae00d3c7db7178cb3f5c994 *DESCRIPTION
 000af3075c986bcda9028da03e1c8967 *NAMESPACE
 b3353b0556c4e08cb85c95b54b89e2b2 *R/A_NAMESPACE.R
 6273889631c896a8f3ac5de8b579364b *R/CompositeModel.R
@@ -22,7 +22,7 @@ f2d702db99baf086514c276bbdb7fd2a *R/Strategy.R
 ff74d0c149177e1f0dd99b43593a64f3 *R/zzz.R
 e3fd1eaf141a4889eecd1c3e47918c77 *cleanup
 86e1b74e2e31c8f288cd9abe02b9bd08 *configure
-26921a720c5e9cb594f7a8915a3ea7a1 *configure.ac
+62461d476a0c62cc4f28b8be0a0836b8 *configure.ac
 a2924121b4d88109f5fe43fcdb9331bb *data/birds.rda
 dcb2505b6ce6d0b6c1ed371fb530e6bb *data/car.rda
 939e8b7f2b7c7310bbc05b732ebda52f *data/finance.rda
@@ -248,7 +248,7 @@ d43cce72267e96cccfbedb1da730c385 *src/mixmod/Kernel/Parameter/CompositeParameter
 6859f2e018cf794d922368c7a44808fb *src/mixmod/Kernel/Parameter/CompositeParameter.h
 9c928c81ab2186273e4be76ad1e21288 *src/mixmod/Kernel/Parameter/GaussianDiagParameter.cpp
 054a628833f16de6db1db07bd8e422ca *src/mixmod/Kernel/Parameter/GaussianDiagParameter.h
-ff6494731a49d38c238c6555d9ddd3e6 *src/mixmod/Kernel/Parameter/GaussianEDDAParameter.cpp
+1fcefae66c20a46c607d4306d37417fe *src/mixmod/Kernel/Parameter/GaussianEDDAParameter.cpp
 1f9ea5094633e03f7b52ae1838894e46 *src/mixmod/Kernel/Parameter/GaussianEDDAParameter.h
 1efa6219a3f3136c46d9f64f9877cdda *src/mixmod/Kernel/Parameter/GaussianGeneralParameter.cpp
 4294cda6f7df6a30e2cc5cdd7d07b5d1 *src/mixmod/Kernel/Parameter/GaussianGeneralParameter.h
@@ -335,7 +335,7 @@ d945bd4cea7bff25de7d97cd17163123 *src/mixmod_iostream/to_be_removed/NodeClusteri
 bbd4c967aa42695123f3743c37b2390b *tests/clustering1test.R
 e0c1bbbeba7bcf7843790b20ad7ec1e0 *tests/clusteringParametertest.R
 96589bea5d3139cd89cc9246007d6ad4 *tests/clusteringPartitiontest.R
-7c0479b59e6ebec65eb5dfc4ab980f3f *tests/heterogeneousDAtest.R
+3b297900ee87e1f98a4105dbee198786 *tests/heterogeneousDAtest.R
 f5165fe9100946f39dc8cd72b291fee6 *tests/heterogeneousclusteringtest.R
 fb8ada5cbb7eaaf459b71e50de6326c9 *tests/ssupervised.R
 74d6b067f49b43c16ca7c576e40c614c *tests/test.R

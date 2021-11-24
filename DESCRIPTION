@@ -1,6 +1,6 @@
 Package: Rmixmod
-Version: 2.1.5
-Date: 2020-06-12
+Version: 2.1.6
+Date: 2021-11-22
 Title: Classification with Mixture Modelling
 Description: Interface of 'MIXMOD' software for supervised, unsupervised and
     semi-supervised classification with mixture modelling.
@@ -16,13 +16,11 @@ Authors@R: c(
     person("Christophe", "Biernacki", role = "ctb", email = "christophe.biernacki@math.univ-lille1.fr"),
     person("Gilles", "Celeux", role = "ctb", email = "gilles.celeux@math.u-psud.fr"),
     person("Gerard", "Govaert", role = "ctb", email = "gerard.govaert@utc.fr"),
-    person("Quentin", "Grimonprez", role = "cre", email = "quentin.grimonprez@inria.fr"))
+    person("Quentin", "Grimonprez", role = "cre", email = "quentingrim@yahoo.fr"))
 SystemRequirements: GNU make
 Copyright: Authors, and Mixmod use Eigen3 C++ library
-Contact: contact@mixmod.org
+BugReports: https://github.com/mixmod/mixmod/issues
 License: GPL-3
-URL: http://www.mixmod.org
-BugReports: http://www.mixmod.org/article.php3?id_article=23
 LinkingTo: Rcpp, RcppEigen
 Imports: methods
 Depends: R(>= 2.12.0), Rcpp(>= 0.8.0)
@@ -33,10 +31,10 @@ Collate: 'A_NAMESPACE.R' 'global.R' 'Model.R' 'MultinomialModel.R'
         'Strategy.R' 'MixmodCluster.R' 'MixmodDAResults.R'
         'MixmodLearn.R' 'MixmodPredict.R' 'MixmodXml.R' 'Rmixmod.R'
         'zzz.R'
-RoxygenNote: 7.1.0
+RoxygenNote: 7.1.2
 Encoding: UTF-8
 NeedsCompilation: yes
-Packaged: 2020-06-12 07:27:27 UTC; grimonprez
+Packaged: 2021-11-23 10:06:15 UTC; quentin
 Author: Florent Langrognet [aut],
   Remi Lebret [aut],
   Christian Poli [aut],
@@ -49,6 +47,6 @@ Author: Florent Langrognet [aut],
   Gilles Celeux [ctb],
   Gerard Govaert [ctb],
   Quentin Grimonprez [cre]
-Maintainer: Quentin Grimonprez <quentin.grimonprez@inria.fr>
+Maintainer: Quentin Grimonprez <quentingrim@yahoo.fr>
 Repository: CRAN
-Date/Publication: 2020-06-14 15:40:09 UTC
+Date/Publication: 2021-11-24 06:30:11 UTC

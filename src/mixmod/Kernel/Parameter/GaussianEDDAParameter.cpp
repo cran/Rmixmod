@@ -295,8 +295,6 @@ void GaussianEDDAParameter::initUSER(Parameter * iParam) {
 	// because of the implementation in class XEMStrategyType
 	// in gaussian cases the init parameters are allways General
 	GaussianGeneralParameter * param = (GaussianGeneralParameter *) iParam->getGaussianParameter();
-//GaussianParameter* paramTemp = iParam->getGaussianParameter();
-	//GaussianGeneralParameter * param = static_cast<GaussianGeneralParameter*>(iParam->getGaussianParameter(););
 	double ** iTabMean = param->getTabMean();
 	double * iTabProportion = param->getTabProportion();
 	Matrix ** iTabWk = param->getTabWk();

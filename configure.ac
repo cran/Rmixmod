@@ -1,5 +1,5 @@
 #https://nerdland.net/2009/07/detecting-c-libraries-with-autotools/
-AC_INIT(Rmixmod, 2.1.4)
+AC_INIT([Rmixmod],[2.1.4])
 AC_PATH_PROG([PKG_CONFIG], [pkg-config])
 if test "${RMIXMOD_WITH_XML}" = "1"  ; then
 	if test -z "${PKG_CONFIG}"; then
@@ -22,4 +22,5 @@ AC_CHECK_HEADER([omp.h], [AC_SUBST(OMP_STATUS,"${OMP_FLAGS}")], [AC_SUBST(OMP_ST
 AC_SUBST(LIBXMLXX_CFLAGS)
 AC_SUBST(LIBXMLXX_LIBS)
 AC_SUBST(RMIXMOD_XML)
-AC_OUTPUT(src/Makevars)
+AC_CONFIG_FILES([src/Makevars])
+AC_OUTPUT
