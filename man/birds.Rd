@@ -3,7 +3,7 @@
 \docType{data}
 \name{birds}
 \alias{birds}
-\title{Qualitative data : morphological description of birds}
+\title{Qualitative data: morphological description of birds}
 \format{
 A data frame with 69 observations on the following 5 variables.
 
@@ -25,9 +25,11 @@ A data frame with 69 observations on the following 5 variables.
 Bretagnolle, V., 2007. Personal communication, source: Museum.
 }
 \description{
-The dataset contains details on the morphology of birds (puffins). Each individual (bird) is described by 6 qualitative variables. One variable for the gender and 5 variables giving a morphological description of the birds. There is 69 puffins divided in 2 sub-classes: lherminieri (34) and subalaris (35).
+The dataset contains details on the morphology of birds (puffins). Each individual (bird) is described by 6 qualitative
+variables. One variable for the gender and 5 variables giving a morphological description of the birds.
+There is 69 puffins divided in 2 sub-classes: lherminieri (34) and subalaris (35).
 }
 \examples{
-  data(birds)
+data(birds)
 }
 \keyword{datasets}

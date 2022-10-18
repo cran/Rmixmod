@@ -13,9 +13,8 @@ This class defines a gaussian Model. Inherits the [\code{\linkS4class{Model}}] c
 }
 }
 \examples{
-  new("GaussianModel")
-  new("GaussianModel",family="general")
+new("GaussianModel")
+new("GaussianModel", family = "general")
 
-  getSlots("GaussianModel")
-
+getSlots("GaussianModel")
 }

@@ -52,16 +52,16 @@ public:
 
 
 	/// clone
-	virtual Algo * clone();
+	Algo * clone() override;
 
 	/// Run method
-	virtual void run(Model *& model);
+	void run(Model *& model) override;
 
-	virtual const AlgoName getAlgoName() const;
+	AlgoName getAlgoName() const override;
 
-	virtual void setEpsilon(double epsilon);
+	void setEpsilon(double epsilon) override;
 
-	virtual const double getEpsilon() const;
+	double getEpsilon() const override;
 
 protected:
 
@@ -69,15 +69,15 @@ protected:
 	int64_t _nbCluster;
 };
 
-inline const AlgoName MAPAlgo::getAlgoName() const {
+inline AlgoName MAPAlgo::getAlgoName() const {
 	return MAP;
 }
 
-inline const double MAPAlgo::getEpsilon() const {
+inline double MAPAlgo::getEpsilon() const {
 	THROW(OtherException, internalMixmodError);
 }
 
-inline void MAPAlgo::setEpsilon(double eps) {
+inline void MAPAlgo::setEpsilon(double /*eps*/) {
 	THROW(OtherException, internalMixmodError);
 }
 

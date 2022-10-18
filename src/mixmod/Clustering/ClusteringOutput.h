@@ -72,7 +72,7 @@ public:
 
 	bool atLeastOneEstimationNoError() const;
 
-	const int getNbEstimationWithNoError() const;
+	int getNbEstimationWithNoError() const;
 
 	/// sort vector of XEMClusteringModelOutput (with the ith criterion value)
 	void sort(CriterionName criterionName);
@@ -89,7 +89,7 @@ public:
 
 	void setClusteringModelOutput(std::vector<ClusteringModelOutput *> & clusteringModelOutput);
 
-	const int getCriterionSize() const;
+	int getCriterionSize() const;
 	const CriterionName & getCriterionName(const int index) const;
 	const std::vector<CriterionName> & getCriterionName() const;
 
@@ -114,7 +114,7 @@ inline int64_t ClusteringOutput::getNbClusteringModelOutput() const {
 	return _clusteringModelOutput.size();
 }
 
-inline const int ClusteringOutput::getCriterionSize() const {
+inline int ClusteringOutput::getCriterionSize() const {
 	return _criterionName.size();
 }
 

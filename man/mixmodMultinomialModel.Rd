@@ -19,9 +19,11 @@ mixmodMultinomialModel(
 
 \item{equal.proportions}{logical to include models with equal proportions. Default is FALSE.}
 
-\item{variable.independency}{logical to include models where \eqn{[\varepsilon_k^j]} is independent of the variable \eqn{j}. Optionnal.}
+\item{variable.independency}{logical to include models where \eqn{[\varepsilon_k^j]} is independent of the variable \eqn{j}.
+optional.}
 
-\item{component.independency}{logical to include models where \eqn{[\varepsilon_k^j]} is independent of the component \eqn{k}. Optionnal.}
+\item{component.independency}{logical to include models where \eqn{[\varepsilon_k^j]} is independent of the component
+\eqn{k}. optional.}
 }
 \value{
 an object of [\code{\linkS4class{MultinomialModel}}] containing some of the 10 Binary Models:
@@ -43,21 +45,30 @@ an object of [\code{\linkS4class{MultinomialModel}}] containing some of the 10 B
 Define a list of multinomial model to test in MIXMOD.
 }
 \details{
-In the multinomial mixture model, the multinomial distribution is associated to the \eqn{j}th variable of the \eqn{k}th component is reparameterized by a center \eqn{a_k^j} and the dispersion \eqn{\varepsilon_k^j} around this center. Thus, it allows us to give an interpretation similar to the center and the variance matrix used for continuous data in the Gaussian mixture context. In the following, this model will be denoted by \eqn{[\varepsilon_k^j]}. In this context, three other models can be easily deduced. We note \eqn{[\varepsilon_k]} the model where \eqn{\varepsilon_k^j} is independent of the variable \eqn{j}, \eqn{[\varepsilon^j]} the model where \eqn{\varepsilon_k^j} is independent of the component \eqn{k} and, finally, \eqn{[\varepsilon]} the model where \eqn{\varepsilon_k^j} is independent of both the variable $j$ and the component \eqn{k}.  In order to maintain some unity in the notation, we will denote also \eqn{[\varepsilon_k^{jh}]} the most general model introduced at the previous section.
+In the multinomial mixture model, the multinomial distribution is associated to the \eqn{j}th variable of the
+\eqn{k}th component is reparameterized by a center \eqn{a_k^j} and the dispersion \eqn{\varepsilon_k^j} around this center.
+Thus, it allows us to give an interpretation similar to the center and the variance matrix used for continuous data in the
+Gaussian mixture context. In the following, this model will be denoted by \eqn{[\varepsilon_k^j]}. In this context, three
+other models can be easily deduced. We note \eqn{[\varepsilon_k]} the model where \eqn{\varepsilon_k^j} is independent of
+the variable \eqn{j}, \eqn{[\varepsilon^j]} the model where \eqn{\varepsilon_k^j} is independent of the component \eqn{k}
+and, finally, \eqn{[\varepsilon]} the model where \eqn{\varepsilon_k^j} is independent of both the variable $j$ and the
+component \eqn{k}.  In order to maintain some unity in the notation, we will denote also \eqn{[\varepsilon_k^{jh}]} the most
+general model introduced at the previous section.
 }
 \examples{
-  mixmodMultinomialModel()
-  # multinomial models with equal proportions
-  mixmodMultinomialModel(equal.proportions=TRUE,free.proportions=FALSE)
-  # multinomial models with a pre-defined list
-  mixmodMultinomialModel( listModels=c("Binary_pk_E","Binary_p_E") )
-  # multinomial models with equal proportions and independent of the variable
-  mixmodMultinomialModel(free.proportions=FALSE, variable.independency=TRUE)
-
+mixmodMultinomialModel()
+# multinomial models with equal proportions
+mixmodMultinomialModel(equal.proportions = TRUE, free.proportions = FALSE)
+# multinomial models with a pre-defined list
+mixmodMultinomialModel(listModels = c("Binary_pk_E", "Binary_p_E"))
+# multinomial models with equal proportions and independent of the variable
+mixmodMultinomialModel(free.proportions = FALSE, variable.independency = TRUE)
 }
 \references{
-C. Biernacki, G. Celeux, G. Govaert, F. Langrognet. "Model-Based Cluster and Discriminant Analysis with the MIXMOD Software". Computational Statistics and Data Analysis, vol. 51/2, pp. 587-600. (2006)
+C. Biernacki, G. Celeux, G. Govaert, F. Langrognet. "Model-Based Cluster and Discriminant Analysis with the
+MIXMOD Software". Computational Statistics and Data Analysis, vol. 51/2, pp. 587-600. (2006)
 }
 \author{
-Florent Langrognet and Remi Lebret and Christian Poli ans Serge Iovleff, with contributions from C. Biernacki and G. Celeux and G. Govaert \email{contact@mixmod.org}
+Florent Langrognet and Remi Lebret and Christian Poli ans Serge Iovleff, with contributions from C. Biernacki and
+G. Celeux and G. Govaert \email{contact@mixmod.org}
 }

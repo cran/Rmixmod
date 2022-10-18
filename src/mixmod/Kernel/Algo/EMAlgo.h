@@ -51,15 +51,15 @@ public:
 	virtual ~EMAlgo();
 
 	/// clone
-	virtual Algo * clone();
+	Algo * clone() override;
 
 	/// Run method
-	virtual void run(Model *& model);
+	void run(Model *& model) override;
 
-	virtual const AlgoName getAlgoName() const;
+	AlgoName getAlgoName() const override;
 };
 
-inline const AlgoName EMAlgo::getAlgoName() const {
+inline AlgoName EMAlgo::getAlgoName() const {
 	return EM;
 }
 

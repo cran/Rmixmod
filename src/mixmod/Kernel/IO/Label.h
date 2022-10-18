@@ -83,7 +83,7 @@ public:
 	int64_t getNbSample() const;
 
 	// get Error Rate
-	const double getErrorRate(std::vector<int64_t> const & label) const;
+	double getErrorRate(std::vector<int64_t> const & label) const;
 
 	// get getClassificationTab
 	int64_t** getClassificationTab(std::vector<int64_t> const & label, int64_t nbCluster) const;

@@ -58,7 +58,7 @@ void ClusteringInputHandling::setAlgo()
     { 
       cStrategy_->addAlgo(XEM::EM);
       // set epsilon value
-      if ( (epsilonInAlgo[i]>0) & (epsilonInAlgo[i]<1) )
+      if ( (epsilonInAlgo[i]>0) && (epsilonInAlgo[i]<1) )
       { cStrategy_->setAlgoEpsilon(i, epsilonInAlgo[i]); }
     }
     // SEM Algo
@@ -69,7 +69,7 @@ void ClusteringInputHandling::setAlgo()
     { 
       cStrategy_->addAlgo(XEM::CEM);
       // set epsilon value
-      if ( (epsilonInAlgo[i]>0) & (epsilonInAlgo[i]<1) )
+      if ( (epsilonInAlgo[i]>0) && (epsilonInAlgo[i]<1) )
       { cStrategy_->setAlgoEpsilon(i, epsilonInAlgo[i]); }
     }
     else{

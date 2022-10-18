@@ -1,3 +1,3 @@
 library(Rmixmod)
 data(heterodata)
-out<-mixmodCluster(heterodata[-1],2)
+out <- mixmodCluster(heterodata[-1], 2)

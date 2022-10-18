@@ -429,7 +429,7 @@ bool LearnOutput::atLeastOneEstimationNoError() const {
 	return res;
 }
 
-const int LearnOutput::getNbEstimationWithNoError() const {
+int LearnOutput::getNbEstimationWithNoError() const {
 	int n = getNbLearnModelOutput();
 	for (unsigned int i = 0; i < _learnModelOutput.size(); i++) {
 		if (!((_learnModelOutput[i]->getStrategyRunError()) == NOERROR)) {

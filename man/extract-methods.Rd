@@ -95,7 +95,8 @@
 
 \item{j}{if the element designing by i is complex, j specifying elements to extract or replace.}
 
-\item{drop}{For matrices and arrays.  If TRUE the result is coerced to the lowest possible dimension (see the examples).  This only works for extracting elements, not for the replacement.  See drop for further details.}
+\item{drop}{For matrices and arrays.  If TRUE the result is coerced to the lowest possible dimension (see the examples).
+This only works for extracting elements, not for the replacement.  See drop for further details.}
 
 \item{value}{TODO...}
 }

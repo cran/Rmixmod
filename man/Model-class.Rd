@@ -15,6 +15,5 @@ This class defines the Mixmod models.
 }
 }
 \examples{
-  getSlots("Model")
-
+getSlots("Model")
 }

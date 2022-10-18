@@ -210,15 +210,15 @@ inline void SymmetricMatrix::setSymmetricStore(double * store) {
 	recopyTab(store, _store, _s_storeDim);
 }
 
-inline void SymmetricMatrix::setSphericalStore(double store) {
+inline void SymmetricMatrix::setSphericalStore(double /*store*/) {
 	THROW(OtherException, wrongMatrixType);
 }
 
-inline void SymmetricMatrix::setGeneralStore(double * store) {
+inline void SymmetricMatrix::setGeneralStore(double * /*store*/) {
 	THROW(OtherException, wrongMatrixType);
 }
 
-inline void SymmetricMatrix::setDiagonalStore(double * store) {
+inline void SymmetricMatrix::setDiagonalStore(double * /*store*/) {
 	THROW(OtherException, wrongMatrixType);
 }
 

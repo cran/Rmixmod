@@ -15,8 +15,7 @@ This class defines parameters of a Heterogeneous Mixture Model. Inherits the [\c
 }
 }
 \examples{
-  new("CompositeParameter")
+new("CompositeParameter")
 
-  getSlots("CompositeParameter")
-
+getSlots("CompositeParameter")
 }

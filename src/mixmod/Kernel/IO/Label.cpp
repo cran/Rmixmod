@@ -167,7 +167,7 @@ int64_t * Label::getTabLabel() const {
 //---------
 // get Error Rate
 //---------
-const double Label::getErrorRate(std::vector<int64_t> const & label) const {
+double Label::getErrorRate(std::vector<int64_t> const & label) const {
 	if (_nbSample != (int64_t) label.size()) {
 		THROW(InputException, badNumberOfValuesInLabelInput);
 	}

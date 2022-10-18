@@ -14,8 +14,7 @@ This class defines parameters of a Gaussian Mixture Model. Inherits the [\code{\
 }
 }
 \examples{
-  new("GaussianParameter")
+new("GaussianParameter")
 
-  getSlots("GaussianParameter")
-
+getSlots("GaussianParameter")
 }

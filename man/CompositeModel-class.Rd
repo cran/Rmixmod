@@ -14,10 +14,9 @@ This class defines a Composite Model. Inherits the [\code{\linkS4class{Model}}] 
 }
 }
 \examples{
-  new("CompositeModel")
-  new("CompositeModel", listModels=c("Heterogeneous_pk_E_L_B","Heterogeneous_pk_Ekj_L_B") )
-  new("CompositeModel", free.proportions=FALSE, variable.independency=TRUE )
+new("CompositeModel")
+new("CompositeModel", listModels = c("Heterogeneous_pk_E_L_B", "Heterogeneous_pk_Ekj_L_B"))
+new("CompositeModel", free.proportions = FALSE, variable.independency = TRUE)
 
-  getSlots("CompositeModel")
-
+getSlots("CompositeModel")
 }

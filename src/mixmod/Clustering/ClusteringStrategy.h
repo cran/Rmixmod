@@ -92,25 +92,25 @@ public:
 	void setTabPartition(Partition ** tabPartition, int64_t nbPartition);
 
 	/// getNbTryInInit
-	const int64_t getNbTryInInit() const;
+	int64_t getNbTryInInit() const;
 
 	/// setNbTryInInit
 	void setNbTryInInit(int64_t nbTry);
 
 	/// getNbIterationInInit
-	const int64_t getNbIterationInInit() const;
+	int64_t getNbIterationInInit() const;
 
 	/// set NbIterationInInit
 	void setNbIterationInInit(int64_t nbIteration);
 
 	/// getEpsilonInInit
-	const double getEpsilonInInit() const;
+	double getEpsilonInInit() const;
 
 	/// setEpsilonInInit
 	void setEpsilonInInit(double epsilon);
 
 	/// getStopNameInInit
-	const AlgoStopName getStopNameInInit() const;
+	AlgoStopName getStopNameInInit() const;
 
 	/// setStopNameInInit
 	void setStopNameInInit(AlgoStopName stopName);
@@ -144,10 +144,10 @@ public:
 	void setAlgoEpsilon( int64_t position, double epsilonValue);
 
 	///nbTry
-	const int64_t getNbTry()const;
+	int64_t getNbTry()const;
 	void setNbTry(int64_t nbTry);
 
-	const int64_t getNbAlgo() const;
+	int64_t getNbAlgo() const;
 
 	/// Input strategy (FLAT FORMAT)
 	// TODO XEMInput : a enlever
@@ -198,11 +198,11 @@ inline std::vector<Algo*> & ClusteringStrategy::getTabAlgo() {
 	return _tabAlgo;
 }
 
-inline const int64_t ClusteringStrategy::getNbAlgo() const {
+inline int64_t ClusteringStrategy::getNbAlgo() const {
 	return _nbAlgo;
 }
 
-inline const int64_t ClusteringStrategy::getNbTry()const {
+inline int64_t ClusteringStrategy::getNbTry() const {
 	return _nbTry;
 }
 

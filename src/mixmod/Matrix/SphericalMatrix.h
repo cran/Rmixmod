@@ -160,7 +160,7 @@ inline double SphericalMatrix::getStore() {
 	return _store;
 }
 
-inline void SphericalMatrix::setSymmetricStore(double * store) {
+inline void SphericalMatrix::setSymmetricStore(double * /*store*/) {
 	THROW(OtherException, wrongMatrixType);
 }
 
@@ -168,11 +168,11 @@ inline void SphericalMatrix::setSphericalStore(double store) {
 	_store = store;
 }
 
-inline void SphericalMatrix::setGeneralStore(double * store) {
+inline void SphericalMatrix::setGeneralStore(double * /*store*/) {
 	THROW(OtherException, wrongMatrixType);
 }
 
-inline void SphericalMatrix::setDiagonalStore(double * store) {
+inline void SphericalMatrix::setDiagonalStore(double * /*store*/) {
 	THROW(OtherException, wrongMatrixType);
 }
 

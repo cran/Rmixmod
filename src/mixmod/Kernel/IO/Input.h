@@ -188,7 +188,7 @@ public:
 	void removeKnownLabelDescription();
 
 	/// isBinaryData
-	const DataType getDataType() const;
+	DataType getDataType() const;
 
 	// finalize 
 	void finalize();
@@ -278,7 +278,7 @@ inline LabelDescription * Input::getKnownLabelDescriptionNC() const{
 	return _knownLabelDescription;
 }
 
-inline const DataType Input::getDataType() const {
+inline DataType Input::getDataType() const {
 	return _dataDescription.getDataType();
 }
 

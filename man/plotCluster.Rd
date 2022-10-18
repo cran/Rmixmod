@@ -26,9 +26,11 @@ plotCluster(
 
 \item{variable2}{index or character containing the name of the second variable. Second column of data by default.}
 
-\item{col}{a specification for the default plotting color. By default partition is used to separate clusters with different colors.}
+\item{col}{a specification for the default plotting color. By default partition is used to separate clusters with
+different colors.}
 
-\item{pch}{either an integer specifying a symbol or a single character to be used as the default in plotting points. By default partition is used to seperate clusters with different symbols.}
+\item{pch}{either an integer specifying a symbol or a single character to be used as the default in plotting points. By
+default partition is used to separate clusters with different symbols.}
 
 \item{xlab}{a title for the x axis. Variable1 by default.}
 
@@ -39,24 +41,24 @@ plotCluster(
 \item{...}{further arguments passed to or from other methods}
 }
 \description{
-Biplot of two variables from a quantitative data set. Use parameters and partition from a [\code{\linkS4class{MixmodResults}}] object to distinguish the different clusters.
+Biplot of two variables from a quantitative data set. Use parameters and partition from a
+[\code{\linkS4class{MixmodResults}}] object to distinguish the different clusters.
 }
 \details{
-Ellipsoids (i.e. linear transformations of hyperspheres) 
+Ellipsoids (i.e. linear transformations of hyperspheres)
 centered at the mean can be drawn using the parameters computed by MIXMOD.
-The directions of the principal axes of the ellipsoids are given by the eigenvectors of the covariance matrix \eqn{\Sigma}. 
+The directions of the principal axes of the ellipsoids are given by the eigenvectors of the covariance matrix \eqn{\Sigma}.
 The squared relative lengths of the principal axes are given by the corresponding eigenvalues.
 }
 \examples{
-  data(geyser)
-  xem1 <- mixmodCluster(geyser,3)
-  plotCluster(xem1["bestResult"], geyser)
+data(geyser)
+xem1 <- mixmodCluster(geyser, 3)
+plotCluster(xem1["bestResult"], geyser)
 
-  data(iris)
-  xem2 <- mixmodCluster(iris[1:4],2:6)
-  plotCluster(xem2["bestResult"], iris, variable1="Sepal.Length", variable2="Sepal.Width")
-  plotCluster(xem2["bestResult"], iris, variable1=1, variable2=4)
-
+data(iris)
+xem2 <- mixmodCluster(iris[1:4], 2:6)
+plotCluster(xem2["bestResult"], iris, variable1 = "Sepal.Length", variable2 = "Sepal.Width")
+plotCluster(xem2["bestResult"], iris, variable1 = 1, variable2 = 4)
 }
 \seealso{
 \code{\link{plot}}

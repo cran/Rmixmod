@@ -73,7 +73,7 @@ public:
 	const Label * getLabel() const;
 	Label * getLabel();
 
-	const int64_t getNbCluster() const;
+	int64_t getNbCluster() const;
 
 	void saveNumericValues(std::string fileName = "");
 
@@ -92,7 +92,7 @@ inline Label * LabelDescription::getLabel() {
 	return _label;
 }
 
-inline const int64_t LabelDescription::getNbCluster() const {
+inline int64_t LabelDescription::getNbCluster() const {
 	return _nbCluster;
 }
 

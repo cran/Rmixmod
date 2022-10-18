@@ -51,27 +51,27 @@ public:
 	virtual ~MAlgo();
 
 	/// clone
-	virtual Algo * clone();
+	Algo * clone() override;
 
 	/// Run method
-	virtual void run(Model *& model);
+	void run(Model *& model) override;
 
-	virtual const AlgoName getAlgoName() const;
+	AlgoName getAlgoName() const override;
 
-	virtual void setEpsilon(double epsilon);
+	void setEpsilon(double epsilon) override;
 
-	virtual const double getEpsilon() const;
+	double getEpsilon() const override;
 };
 
-inline const AlgoName MAlgo::getAlgoName() const {
+inline AlgoName MAlgo::getAlgoName() const {
 	return M;
 }
 
-inline const double MAlgo::getEpsilon() const {
+inline double MAlgo::getEpsilon() const {
 	THROW(OtherException, internalMixmodError);
 }
 
-inline void MAlgo::setEpsilon(double eps) {
+inline void MAlgo::setEpsilon(double /*eps*/) {
 	THROW(OtherException, internalMixmodError);
 }
 

@@ -22,7 +22,8 @@ A data frame with 200 individuals (rows) and 5 variables (columns).
 }
 \description{
 The data set is made up of 5 variables: 3 categorical variables and 2 quantitative variables.
-The original data set contains 200 individuals. The training data set has 300 individuals while the testing data set has 100 individuals.
+The original data set contains 200 individuals. The training data set has 300 individuals while the testing data set has
+100 individuals.
 }
 \examples{
 data(heterodata)

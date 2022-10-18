@@ -3,7 +3,7 @@
 \docType{data}
 \name{finance}
 \alias{finance}
-\title{Composite data : Financial health of companies}
+\title{Composite data: Financial health of companies}
 \format{
 A data frame with 889 companies (rows) and 6 variables (columns).
 
@@ -23,12 +23,18 @@ A data frame with 889 companies (rows) and 6 variables (columns).
 }
 }
 \source{
-Lourme A, Biernacki C (2011). \emph{Simultaneous t-Model-Based Clustering for Data Differing over Time Period: Application for Understanding Companies Financial Health.} Case Studies in Business, Industry and Government Statistics, 4(2), 73-82.
+Lourme A, Biernacki C (2011). \emph{Simultaneous t-Model-Based Clustering for Data Differing over Time Period: Application
+for Understanding Companies Financial Health.} Case Studies in Business, Industry and Government Statistics, 4(2), 73-82.
 
-Du Jardin P, S\'everin E (2010). \emph{Dynamic analysis of the business failure process: a study of bankruptcy trajectories.} In Portuguese Finance Network. Ponte Delgada, Portugual.
+Du Jardin P, S\'everin E (2010). \emph{Dynamic analysis of the business failure process: a study of bankruptcy
+trajectories.} In Portuguese Finance Network. Ponte Delgada, Portugal.
 }
 \description{
-This data set is made up of 216 healthy firms and 212 bankruptcy firms (year 2002) and also 241 healthy firms and 220 bankruptcy firms (year 2003). Companies are described by four financial ratios expected to provide some meaningful information about their health: EBITDA/Total Assets, Value Added/Total Sales, Quick Ratio, Accounts Payable/Total Sales. This data set offers the possibility to predict the company's ability to cover its financial obligations and also to study its stability over the years.
+This data set is made up of 216 healthy firms and 212 bankruptcy firms (year 2002) and also 241 healthy firms and 220
+bankruptcy firms (year 2003). Companies are described by four financial ratios expected to provide some meaningful
+information about their health: EBITDA/Total Assets, Value Added/Total Sales, Quick Ratio, Accounts Payable/Total Sales.
+This data set offers the possibility to predict the company's ability to cover its financial obligations and also to study
+its stability over the years.
 }
 \examples{
 data(finance)

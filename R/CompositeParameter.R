@@ -1,5 +1,5 @@
 ###################################################################################
-##                             CompositeParameter.R                               ##
+##                             CompositeParameter.R                              ##
 ###################################################################################
 
 #' @include global.R
@@ -9,9 +9,9 @@
 NULL
 
 #' Constructor of [\code{\linkS4class{CompositeParameter}}] class
-#' 
+#'
 #' This class defines parameters of a Heterogeneous Mixture Model. Inherits the [\code{\linkS4class{Parameter}}] class.
-#' 
+#'
 #' \describe{
 #'   \item{g_parameter}{an object of class CompositeParameter}
 #'   \item{m_parameter}{an object of class MultinomialParameter}
@@ -19,32 +19,31 @@ NULL
 #' }
 #'
 #' @examples
-#'   new("CompositeParameter")
+#' new("CompositeParameter")
 #'
-#'   getSlots("CompositeParameter")
-#' 
+#' getSlots("CompositeParameter")
 #' @name CompositeParameter-class
 #' @rdname CompositeParameter-class
 #' @exportClass CompositeParameter
 #'
 setClass(
-  Class="CompositeParameter",
-  representation=representation(
+  Class = "CompositeParameter",
+  representation = representation(
     g_parameter = "GaussianParameter",
     m_parameter = "MultinomialParameter",
     factor = "numeric"
   ),
-  contains=c("Parameter")
+  contains = c("Parameter")
 )
 
 #' @rdname print-methods
 #' @aliases print print,CompositeParameter-method
 #'
 setMethod(
-  f="print",
-  signature=c("CompositeParameter"),
-  function(x,...){
-    if(length(x@proportions)>0){
+  f = "print",
+  signature = c("CompositeParameter"),
+  function(x, ...) {
+    if (length(x@proportions) > 0) {
       cat("Gaussian Parameters\n")
       print(x@g_parameter)
       cat("Multinomial Parameters\n")
@@ -57,10 +56,10 @@ setMethod(
 #' @aliases show show,CompositeParameter-method
 #'
 setMethod(
-  f="show",
-  signature=c("CompositeParameter"),
-  function(object){
-    if(length(object@proportions)>0){
+  f = "show",
+  signature = c("CompositeParameter"),
+  function(object) {
+    if (length(object@proportions) > 0) {
       cat("Gaussian Parameters\n")
       show(object@g_parameter)
       cat("Multinomial Parameters\n")
@@ -73,10 +72,10 @@ setMethod(
 #' @aliases summary summary,CompositeParameter-method
 #'
 setMethod(
-  f="summary",
-  signature=c("CompositeParameter"),
-  function(object, ...){
-    if(length(object@proportions)>0){
+  f = "summary",
+  signature = c("CompositeParameter"),
+  function(object, ...) {
+    if (length(object@proportions) > 0) {
       cat("Gaussian Parameters\n")
       summary(object@g_parameter)
       cat("Multinomial Parameters\n")
@@ -89,14 +88,18 @@ setMethod(
 #' @aliases [,CompositeParameter-method
 #'
 setMethod(
-  f="[", 
+  f = "[",
   signature(x = "CompositeParameter"),
-  definition=function(x,i,j,drop){
-      switch(EXPR=i,
-             "g_parameter"={return(x@g_parameter)},
-             "m_parameter"={return(x@m_parameter)},
-             stop("This attribute doesn't exist !")
-             )
+  definition = function(x, i, j, drop) {
+    switch(EXPR = i,
+      "g_parameter" = {
+        return(x@g_parameter)
+      },
+      "m_parameter" = {
+        return(x@m_parameter)
+      },
+      stop("This attribute doesn't exist !")
+    )
   }
 )
 
@@ -105,14 +108,18 @@ setMethod(
 #' @aliases [<-,CompositeParameter-method
 #'
 setReplaceMethod(
-  f="[", 
-  signature(x = "CompositeParameter"), 
-  definition=function(x,i,j,value){
-      switch(EXPR=i,
-             "g_parameter"={return(x@g_parameter)},
-             "m_parameter"={return(x@m_parameter)},
-             stop("This attribute doesn't exist !")
-      )
+  f = "[",
+  signature(x = "CompositeParameter"),
+  definition = function(x, i, j, value) {
+    switch(EXPR = i,
+      "g_parameter" = {
+        return(x@g_parameter)
+      },
+      "m_parameter" = {
+        return(x@m_parameter)
+      },
+      stop("This attribute doesn't exist !")
+    )
     validObject(x)
     return(x)
   }

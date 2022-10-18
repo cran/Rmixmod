@@ -2,7 +2,7 @@
 % Please edit documentation in R/CompositeModel.R
 \name{composeModelName}
 \alias{composeModelName}
-\title{Get the heterogeneous model name using Gaussian and Multnomial model name}
+\title{Get the heterogeneous model name using Gaussian and Multinomial model name}
 \usage{
 composeModelName(g_modelname, m_modelname)
 }
@@ -15,5 +15,5 @@ composeModelName(g_modelname, m_modelname)
 name of heterogeneous model
 }
 \description{
-Get the heterogeneous model name using Gaussian and Multnomial model name
+Get the heterogeneous model name using Gaussian and Multinomial model name
 }

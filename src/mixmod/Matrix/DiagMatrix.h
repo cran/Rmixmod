@@ -154,11 +154,11 @@ inline double * DiagMatrix::getStore() {
 	return _store;
 }
 
-inline void DiagMatrix::setSymmetricStore(double * store) {
+inline void DiagMatrix::setSymmetricStore(double * /*store*/) {
 	THROW(OtherException, wrongMatrixType);
 }
 
-inline void DiagMatrix::setGeneralStore(double * store) {
+inline void DiagMatrix::setGeneralStore(double * /*store*/) {
 	THROW(OtherException, wrongMatrixType);
 }
 
@@ -167,7 +167,7 @@ inline void DiagMatrix::setDiagonalStore(double * store) {
 	recopyTab(store, _store, _s_pbDimension);
 }
 
-inline void DiagMatrix::setSphericalStore(double store) {
+inline void DiagMatrix::setSphericalStore(double /*store*/) {
 	THROW(OtherException, wrongMatrixType);
 }
 

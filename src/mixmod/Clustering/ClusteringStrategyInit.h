@@ -60,25 +60,25 @@ public:
 	void setStrategyInitName(StrategyInitName initName);
 
 	/// getNbTry
-	const int64_t getNbTry() const;
+	int64_t getNbTry() const;
 
 	/// setNbTry
 	void setNbTry(int64_t nbTry);
 
 	/// getNbIteration
-	const int64_t getNbIteration() const;
+	int64_t getNbIteration() const;
 
 	/// set NbIteration
 	void setNbIteration(int64_t nbIteration);
 
 	/// getEpsilon
-	const double getEpsilon() const;
+	double getEpsilon() const;
 
 	/// setEpsilon
 	void setEpsilon(double epsilon);
 
 	/// getStopName
-	const AlgoStopName getStopName() const;
+	AlgoStopName getStopName() const;
 
 	/// setStopName
 	void setStopName(AlgoStopName stopName);
@@ -139,7 +139,7 @@ public:
 			int64_t * tabNbCluster, ModelType * modelType, bool & alreadyRead);
 
 	// verification
-	bool  verify() const;
+	bool verify() const;
 
 	// print out strategy initialization
 	friend std::ostream & operator << (std::ostream & fo, ClusteringStrategyInit & strategyInit);
@@ -184,7 +184,7 @@ inline  const StrategyInitName & ClusteringStrategyInit::getStrategyInitName() c
 	return _strategyInitName;
 }
 
-inline const AlgoStopName ClusteringStrategyInit::getStopName() const {
+inline AlgoStopName ClusteringStrategyInit::getStopName() const {
 	return _stopName;
 }
 
@@ -212,15 +212,15 @@ inline Partition* ClusteringStrategyInit::getPartition(int64_t index) const {
 	return _tabPartition[index];
 }
 
-inline const int64_t ClusteringStrategyInit::getNbTry() const {
+inline int64_t ClusteringStrategyInit::getNbTry() const {
 	return _nbTry;
 }
 
-inline const int64_t ClusteringStrategyInit::getNbIteration() const {
+inline int64_t ClusteringStrategyInit::getNbIteration() const {
 	return _nbIteration;
 }
 
-inline const double ClusteringStrategyInit::getEpsilon() const {
+inline double ClusteringStrategyInit::getEpsilon() const {
 	return _epsilon;
 }
 

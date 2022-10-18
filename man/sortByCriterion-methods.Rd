@@ -20,12 +20,11 @@ a modified [\code{\linkS4class{Mixmod}}] object
 }
 \description{
 After calling the mixmodCluster() or mixmodLearn() method, results will be sorted
-into ascending order according to the first given criterion (descending order for CV criterion). 
+into ascending order according to the first given criterion (descending order for CV criterion).
 This method is able to reorder the list of results according to a given criterion.
 }
 \examples{
-  x<-mixmodCluster(iris[1:4],2:10,criterion=c("BIC","ICL"))
-  icl<-sortByCriterion(x,"ICL")
-  icl["results"]
-
+x <- mixmodCluster(iris[1:4], 2:10, criterion = c("BIC", "ICL"))
+icl <- sortByCriterion(x, "ICL")
+icl["results"]
 }

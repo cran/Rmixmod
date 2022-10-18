@@ -62,19 +62,19 @@ public:
 	//void edit(std::ofstream & oFile);
 	void edit(std::ostream & out);
 
-	virtual const AlgoStopName getAlgoStopName() const;
+	virtual AlgoStopName getAlgoStopName() const;
 
-	virtual const AlgoName getAlgoName() const = 0;
+	virtual AlgoName getAlgoName() const = 0;
 
 	virtual void setAlgoStopName(AlgoStopName algoStopName);
 
 	virtual void setNbIteration(int64_t nbIteration);
 
-	virtual const int64_t getNbIteration() const;
+	virtual int64_t getNbIteration() const;
 
 	virtual void setEpsilon(double epsilon);
 
-	virtual const double getEpsilon() const;
+	virtual double getEpsilon() const;
 
 	friend std::ostream & operator <<(std::ostream & fo, Algo & algo);
 
@@ -122,15 +122,15 @@ inline void Algo::setNbIteration(int64_t nbIteration) {
 	}
 }
 
-inline const int64_t Algo::getNbIteration() const {
+inline int64_t Algo::getNbIteration() const {
 	return _nbIteration;
 }
 
-inline const double Algo::getEpsilon() const {
+inline double Algo::getEpsilon() const {
 	return _epsilon;
 }
 
-inline const AlgoStopName Algo::getAlgoStopName() const {
+inline AlgoStopName Algo::getAlgoStopName() const {
 	return _algoStopName;
 }
 

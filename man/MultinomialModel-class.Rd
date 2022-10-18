@@ -16,10 +16,9 @@ This class defines a multinomial Model. Inherits the [\code{\linkS4class{Model}}
 }
 }
 \examples{
-  new("MultinomialModel")
-  new("MultinomialModel", listModels=c("Binary_pk_E","Binary_p_E") )
-  new("MultinomialModel", free.proportions=FALSE, variable.independency=TRUE )
+new("MultinomialModel")
+new("MultinomialModel", listModels = c("Binary_pk_E", "Binary_p_E"))
+new("MultinomialModel", free.proportions = FALSE, variable.independency = TRUE)
 
-  getSlots("MultinomialModel")
-
+getSlots("MultinomialModel")
 }

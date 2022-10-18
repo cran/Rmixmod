@@ -65,7 +65,7 @@ public:
 	virtual void initForInitRANDOM();
 	virtual void updateForInitRANDOMorUSER_PARTITION(Sample ** tabSampleForInit, bool * tabClusterToInitialze);
 
-	virtual void initForInitUSER_PARTITION(int64_t & nbInitializedCluster, bool * tabNotInitializedCluster, Partition * initPartition) {
+	virtual void initForInitUSER_PARTITION(int64_t & /*nbInitializedCluster*/, bool * /*tabNotInitializedCluster*/, Partition * /*initPartition*/) {
 		THROW(OtherException, FunctionNotYetImplemented);
 	}
 	virtual void MStep();

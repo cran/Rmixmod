@@ -666,15 +666,15 @@ std::ostream & operator << (std::ostream & fo, ClusteringStrategy & strategy) {
 	return fo;
 }
 
-const int64_t ClusteringStrategy::getNbTryInInit() const {
+int64_t ClusteringStrategy::getNbTryInInit() const {
 	return _strategyInit->getNbTry();
 }
 
-const int64_t ClusteringStrategy::getNbIterationInInit() const {
+int64_t ClusteringStrategy::getNbIterationInInit() const {
 	return _strategyInit->getNbIteration();
 }
 
-const double ClusteringStrategy::getEpsilonInInit() const {
+double ClusteringStrategy::getEpsilonInInit() const {
 	return _strategyInit->getEpsilon();
 }
 
@@ -694,7 +694,7 @@ void ClusteringStrategy::setEpsilonInInit(double epsilon) {
 	_strategyInit->setEpsilon(epsilon);
 }
 
-const AlgoStopName ClusteringStrategy::getStopNameInInit() const {
+AlgoStopName ClusteringStrategy::getStopNameInInit() const {
 	return (_strategyInit->getStopName());
 }
 

@@ -5,8 +5,10 @@
 \alias{MixmodDAResults-class}
 \title{Constructor of [\code{\linkS4class{MixmodDAResults}}] class}
 \description{
-This is a class to contain results after a discriminant analysis with MIXMOD. Inherits the [\code{\linkS4class{MixmodResults}}] class.
- 
+This is a class to contain results after a discriminant analysis with MIXMOD.
+Inherits the [\code{\linkS4class{MixmodResults}}] class.
+}
+\details{
 \describe{
   \item{CVLabel}{vector of integers containing labels defined by cross validation.}
   \item{CVClassification}{classification table after cross validation.}
@@ -15,6 +17,5 @@ This is a class to contain results after a discriminant analysis with MIXMOD. In
 }
 }
 \examples{
-  getSlots("MixmodDAResults")
-
+getSlots("MixmodDAResults")
 }

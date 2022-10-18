@@ -11,21 +11,20 @@
 #' }
 #'
 #' @examples
-#'   getSlots("Parameter")
-#'
+#' getSlots("Parameter")
 #' @name Parameter-class
 #' @rdname Parameter-class
 #' @exportClass Parameter
 #'
 setClass(
-    Class="Parameter",
-    representation=representation(
-        proportions = "numeric",
-        nbFreeParam = "numeric",
-        "VIRTUAL"
-    ),
-    prototype=prototype(
-        proportions = numeric(0),
-        nbFreeParam = numeric(0)        
-    )
+  Class = "Parameter",
+  representation = representation(
+    proportions = "numeric",
+    nbFreeParam = "numeric",
+    "VIRTUAL"
+  ),
+  prototype = prototype(
+    proportions = numeric(0),
+    nbFreeParam = numeric(0)
+  )
 )

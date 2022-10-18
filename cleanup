@@ -5,4 +5,3 @@ rm -f config.*
 rm -rf autom4te.cache
 rm -f src/Makevars
 rm -f aclocal.m4 tstmacos.ac
-

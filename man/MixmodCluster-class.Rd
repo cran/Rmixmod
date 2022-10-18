@@ -14,11 +14,10 @@ This is a class to run clustering with mixmod. Inherits the [\code{\linkS4class{
 }
 }
 \examples{
-  ## A quantitative example with the famous iris data set
-  data(iris)
-  ## with default values
-  new("MixmodCluster", data=iris[1:4], nbCluster=3)
+## A quantitative example with the famous iris data set
+data(iris)
+## with default values
+new("MixmodCluster", data = iris[1:4], nbCluster = 3)
 
-  getSlots("MixmodCluster")
-
+getSlots("MixmodCluster")
 }

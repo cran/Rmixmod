@@ -51,15 +51,15 @@ public:
 	virtual ~CEMAlgo();
 
 	/// clone
-	virtual Algo * clone();
+	Algo * clone() override;
 
 	/// Run method
-	virtual void run(Model *& model);
+	void run(Model *& model) override;
 
-	virtual const AlgoName getAlgoName() const;
+	AlgoName getAlgoName() const override;
 };
 
-inline const AlgoName CEMAlgo::getAlgoName() const {
+inline AlgoName CEMAlgo::getAlgoName() const {
 	return CEM;
 }
 

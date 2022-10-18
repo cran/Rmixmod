@@ -23,12 +23,11 @@ to plot densities.
 Data with the density of each cluster and the mixture density are drawn for each variable.
 }
 \examples{
-  data(iris)
-  xem <- mixmodCluster(iris[1:4],3)
-  hist(xem)
-  hist(xem,variables=c(1,3))
-  hist(xem,variables=c("Sepal.Length","Sepal.Width"))
-
+data(iris)
+xem <- mixmodCluster(iris[1:4], 3)
+hist(xem)
+hist(xem, variables = c(1, 3))
+hist(xem, variables = c("Sepal.Length", "Sepal.Width"))
 }
 \seealso{
 \code{\link{hist}}

@@ -68,10 +68,10 @@ public:
 	// get
 	//--------------
 	/// getCriterionName
-	CriterionName const getCriterionName() const;
+	CriterionName getCriterionName() const;
 
 	/// getValue
-	double const getValue() const;
+	double getValue() const;
 
 	/// getError
 	Exception & getError() const;
@@ -100,11 +100,11 @@ private:
 	CriterionName _criterionName;
 };
 
-inline CriterionName const CriterionOutput::getCriterionName() const {
+inline CriterionName CriterionOutput::getCriterionName() const {
 	return _criterionName;
 }
 
-inline double const CriterionOutput::getValue() const {
+inline double CriterionOutput::getValue() const {
 	return _value;
 }
 

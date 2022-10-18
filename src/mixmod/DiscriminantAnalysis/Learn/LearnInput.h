@@ -53,7 +53,7 @@ public:
 	virtual ~LearnInput();
 
 	// Accessors
-	const int64_t getNbCVBlock() const;
+	int64_t getNbCVBlock() const;
 
 	/// setCriterionName
 	virtual void setCriterion(std::vector<CriterionName> const & criterionName);
@@ -81,7 +81,7 @@ private:
 	int64_t _nbCVBlock;
 };
 
-inline const int64_t LearnInput::getNbCVBlock() const {
+inline int64_t LearnInput::getNbCVBlock() const {
 	return _nbCVBlock;
 }
 

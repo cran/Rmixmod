@@ -37,12 +37,11 @@ NULL. Summaries to standard out.
 Produce result summaries of a Rmixmod class
 }
 \examples{
-  data(geyser)
-  xem <- mixmodCluster(geyser,3)
-  summary(xem)
-  summary(xem["bestResult"])
-  summary(xem["bestResult"]["parameters"])
-
+data(geyser)
+xem <- mixmodCluster(geyser, 3)
+summary(xem)
+summary(xem["bestResult"])
+summary(xem["bestResult"]["parameters"])
 }
 \seealso{
 \code{\link{summary}}

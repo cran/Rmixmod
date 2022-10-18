@@ -25,19 +25,18 @@ barplotCluster(
 }
 \description{
 Barplot of qualitative data object using parameters from a [\code{\linkS4class{MixmodResults}}]
-to plot probablities of modalities.
+to plot probabilities of modalities.
 }
 \details{
-Each line corresponds to one variable. A barplot is drawn for each cluster with the probabilities for 
+Each line corresponds to one variable. A barplot is drawn for each cluster with the probabilities for
 each modality to be in that cluster.
 }
 \examples{
-  data(birds)
-  xem <- mixmodCluster(birds,2)
-  barplotCluster(xem["bestResult"], birds)
-  barplotCluster(xem["bestResult"], birds, variables=c(2,3,4))
-  barplotCluster(xem["bestResult"], birds, variables=c("eyebrow","collar"))
-
+data(birds)
+xem <- mixmodCluster(birds, 2)
+barplotCluster(xem["bestResult"], birds)
+barplotCluster(xem["bestResult"], birds, variables = c(2, 3, 4))
+barplotCluster(xem["bestResult"], birds, variables = c("eyebrow", "collar"))
 }
 \seealso{
 \code{\link{barplot}}

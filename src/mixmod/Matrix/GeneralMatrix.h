@@ -207,11 +207,11 @@ inline int64_t GeneralMatrix::getStoreDim() {
 	return _s_storeDim;
 }
 
-inline void GeneralMatrix::setSymmetricStore(double * store) {
+inline void GeneralMatrix::setSymmetricStore(double * /*store*/) {
 	THROW(OtherException, wrongMatrixType);
 }
 
-inline void GeneralMatrix::setSphericalStore(double store) {
+inline void GeneralMatrix::setSphericalStore(double /*store*/) {
 	THROW(OtherException, wrongMatrixType);
 }
 
@@ -220,7 +220,7 @@ inline void GeneralMatrix::setGeneralStore(double * store) {
 	recopyTab(store, _store, _s_storeDim);
 }
 
-inline void GeneralMatrix::setDiagonalStore(double * store) {
+inline void GeneralMatrix::setDiagonalStore(double * /*store*/) {
 	THROW(OtherException, wrongMatrixType);
 }
 

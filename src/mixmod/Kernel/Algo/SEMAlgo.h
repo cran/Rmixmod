@@ -51,29 +51,29 @@ public:
 	virtual ~SEMAlgo();
 
 	/// clone
-	virtual Algo * clone();
+	Algo * clone() override;
 
 	/// Run method
-	virtual void run(Model *& model);
+	void run(Model *& model) override;
 
-	virtual const AlgoName getAlgoName() const;
+	AlgoName getAlgoName() const override;
 
-	virtual void setNbIteration(int64_t nbIteration);
+	void setNbIteration(int64_t nbIteration) override;
 
-	virtual void setEpsilon(double epsilon);
+	void setEpsilon(double epsilon) override;
 
-	virtual const double getEpsilon() const;
+	double getEpsilon() const override;
 };
 
-inline const AlgoName SEMAlgo::getAlgoName() const {
+inline AlgoName SEMAlgo::getAlgoName() const {
 	return SEM;
 }
 
-inline const double SEMAlgo::getEpsilon() const {
+inline double SEMAlgo::getEpsilon() const {
 	THROW(OtherException, internalMixmodError);
 }
 
-inline void SEMAlgo::setEpsilon(double eps) {
+inline void SEMAlgo::setEpsilon(double /*eps*/) {
 	THROW(InputException, wrongAlgoStopName);
 }
 

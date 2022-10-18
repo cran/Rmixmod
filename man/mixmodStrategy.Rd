@@ -8,19 +8,26 @@ mixmodStrategy(...)
 }
 \arguments{
 \item{...}{all arguments are transfered to the Strategy constructor. Valid arguments are:
- \describe{
-\item{algo:}{list of character string with the estimation algorithm.  Possible values: "EM", "SEM", "CEM", c("EM","SEM"). Default value is "EM".}
-\item{nbTry:}{integer defining the number of tries. Default value: 1.}
-\item{initMethod:}{a character string with the method of initialization of the algorithm specified in the \code{algo} argument. Possible values: "random", "smallEM", "CEM", "SEMMax", "parameter", "label". Default value: "smallEM".}
-\item{nbTryInInit:}{integer defining number of tries in \code{initMethod} algorithm. Default value: 50.}
-\item{nbIterationInInit:}{integer defining the number of "EM" or "SEM" iterations in \code{initMethod}. Default values: 5 if \code{initMethod} is "smallEM" and 100 if \code{initMethod} is "SEMMax".}
-\item{nbIterationInAlgo:}{list of integers defining the number of iterations if user want to use nbIteration as rule to stop the algorithm(s). Default value: 200.} 
-\item{epsilonInInit:}{real defining the epsilon value in the initialization step. Only available if \code{initMethod} is "smallEM". Default value: 0.001.}
-\item{epsilonInAlgo:}{list of reals defining the epsilon value for the algorithm. Warning: epsilonInAlgo doesn't have any sens if \code{algo} is SEM, so it needs to be set as NaN in that case. Default value: 0.001.}
-\item{seed:}{integer defining the seed of the random number generator. Setting a particular seed allows the user to (re)-generate a particular serie of random numbers. Default value is NULL, i.e. a random seed.}
-   \item{parameter:}{instance of "Parameter" subclass. Required if initMethod is "parameter", forbidden otherwise.}
-   \item{labels:}{vector of integers containing labels. Required if initMethod is "label", forbidden otherwise.}           
- }}
+   \describe{
+  \item{algo:}{list of character string with the estimation algorithm.  Possible values: "EM", "SEM", "CEM", c("EM","SEM").
+Default value is "EM".}
+  \item{nbTry:}{integer defining the number of tries. Default value: 1.}
+  \item{initMethod:}{a character string with the method of initialization of the algorithm specified in the \code{algo}
+argument. Possible values: "random", "smallEM", "CEM", "SEMMax", "parameter", "label". Default value: "smallEM".}
+  \item{nbTryInInit:}{integer defining number of tries in \code{initMethod} algorithm. Default value: 50.}
+  \item{nbIterationInInit:}{integer defining the number of "EM" or "SEM" iterations in \code{initMethod}. Default values:
+5 if \code{initMethod} is "smallEM" and 100 if \code{initMethod} is "SEMMax".}
+  \item{nbIterationInAlgo:}{list of integers defining the number of iterations if user want to use nbIteration as rule to
+stop the algorithm(s). Default value: 200.}
+  \item{epsilonInInit:}{real defining the epsilon value in the initialization step. Only available if \code{initMethod} is
+ "smallEM". Default value: 0.001.}
+  \item{epsilonInAlgo:}{list of reals defining the epsilon value for the algorithm. Warning: epsilonInAlgo doesn't have any
+ sense if \code{algo} is SEM, so it needs to be set as NaN in that case. Default value: 0.001.}
+  \item{seed:}{integer defining the seed of the random number generator. Setting a particular seed allows the user to
+(re)-generate a particular sequence of random numbers. Default value is NULL, i.e. a random seed.}
+     \item{parameter:}{instance of "Parameter" subclass. Required if initMethod is "parameter", forbidden otherwise.}
+     \item{labels:}{vector of integers containing labels. Required if initMethod is "label", forbidden otherwise.}
+   }}
 }
 \value{
 a [\code{\linkS4class{Strategy}}] object
@@ -40,9 +47,9 @@ There are different ways to initialize an algorithm :
        different random positions and the position that maximises the
        likelihood is selected.}
 
-       \item{smallEM}{A maximum of \eqn{50} iterations of the EM algorithm according to the process : \eqn{n_i} numbers of iterations
-       of EM are done (with random initialization) until the \code{smallEM} stop criterion value has been reached. 
-       This action is repeated until the sum of \eqn{n_i}
+       \item{smallEM}{A maximum of \eqn{50} iterations of the EM algorithm according to the process : \eqn{n_i} numbers of
+       iterations of EM are done (with random initialization) until the \code{smallEM} stop criterion value has been
+       reached. This action is repeated until the sum of \eqn{n_i}
 
        reaches \eqn{50} iterations (or if in one action \eqn{50} iterations are reached before the stop criterion value).\\
        It appears that repeating runs of EM is generally profitable since using a single run
@@ -73,18 +80,23 @@ Defining the algorithms used in the strategy, the stopping rule and when to stop
               \item{nbIterationInAlgo}{Sets the maximum number of iterations}
               \item{epsilonInAlgo}{Sets relative increase of the log-likelihood criterion}
           }
-       \item Default values are \eqn{200} \code{nbIterationInAlgo} of \code{EM} with an \code{epsilonInAlgo} value of \eqn{10-3}.
+       \item Default values are \eqn{200} \code{nbIterationInAlgo} of \code{EM} with an \code{epsilonInAlgo} value
+       of \eqn{10-3}.
    }
 }
 \examples{
-   mixmodStrategy()
-   mixmodStrategy(algo="CEM",initMethod="random",nbTry=10,epsilonInInit=0.00001)
-   mixmodStrategy(algo=c("SEM","EM"), nbIterationInAlgo=c(200,100), epsilonInAlgo=c(NA,0.000001))
-
+mixmodStrategy()
+mixmodStrategy(algo = "CEM", initMethod = "random", nbTry = 10, epsilonInInit = 0.00001)
+mixmodStrategy(
+  algo = c("SEM", "EM"), nbIterationInAlgo = c(200, 100),
+  epsilonInAlgo = c(NA, 0.000001)
+)
 }
 \references{
-Biernacki, C., Celeux, G., Govaert, G., 2003. "Choosing starting values for the EM algorithm for getting the highest likelihood in multivariate gaussian mixture models". Computational Statistics and Data Analysis 41, 561-575.
+Biernacki, C., Celeux, G., Govaert, G., 2003. "Choosing starting values for the EM algorithm for getting the
+highest likelihood in multivariate gaussian mixture models". Computational Statistics and Data Analysis 41, 561-575.
 }
 \author{
-Florent Langrognet and Remi Lebret and Christian Poli ans Serge Iovleff, with contributions from C. Biernacki and G. Celeux and G. Govaert \email{contact@mixmod.org}
+Florent Langrognet and Remi Lebret and Christian Poli ans Serge Iovleff, with contributions from C. Biernacki
+and G. Celeux and G. Govaert \email{contact@mixmod.org}
 }

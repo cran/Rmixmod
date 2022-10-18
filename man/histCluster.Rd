@@ -37,11 +37,12 @@ to plot densities.
 Data with the density of each cluster and the mixture density are drawn for each variable.
 }
 \examples{
-  data(geyser)
-  xem1 <- mixmodCluster(geyser,3)
-  \dontrun{ histCluster(xem1["bestResult"], geyser) }
-  histCluster(xem1["bestResult"], geyser, variables=1)
-
+data(geyser)
+xem1 <- mixmodCluster(geyser, 3)
+\dontrun{
+histCluster(xem1["bestResult"], geyser)
+}
+histCluster(xem1["bestResult"], geyser, variables = 1)
 }
 \seealso{
 \code{\link{hist}}

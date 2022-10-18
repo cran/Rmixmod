@@ -97,7 +97,7 @@ inline Data * DataDescription::getData() const {
 	return _data;
 }
 
-inline void DataDescription::saveNumericValues(std::string fileName) {
+inline void DataDescription::saveNumericValues(std::string /*fileName*/) {
 	THROW(OtherException, internalMixmodError);
 }
 

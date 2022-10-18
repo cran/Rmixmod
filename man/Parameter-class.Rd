@@ -13,6 +13,5 @@ This class defines parameters of a Mixture Model.
 }
 }
 \examples{
-  getSlots("Parameter")
-
+getSlots("Parameter")
 }

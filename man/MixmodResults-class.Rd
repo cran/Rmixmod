@@ -6,11 +6,13 @@
 \title{Constructor of [\code{\linkS4class{MixmodResults}}] class}
 \description{
 This is a class to contain results from MIXMOD library.
- 
+}
+\details{
 \describe{
   \item{nbCluster}{integer. It indicates the number of components.}
   \item{model}{character. Name of the model.}
-  \item{criterion}{list of character. This option permits to select the criterion giving the best configuration of an execution.}
+  \item{criterion}{list of character. This option permits to select the criterion giving the best configuration of
+an execution.}
   \item{criterionValue}{numeric. Values of the criterion.}
   \item{parameters}{a S4 [\code{\linkS4class{Parameter}}] object. The best model parameters.}
   \item{likelihood}{numeric. The model likelihood.}
@@ -20,6 +22,5 @@ This is a class to contain results from MIXMOD library.
 }
 }
 \examples{
-  getSlots("MixmodResults")
-
+getSlots("MixmodResults")
 }

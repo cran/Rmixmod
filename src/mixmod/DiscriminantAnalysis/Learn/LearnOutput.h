@@ -62,7 +62,7 @@ public:
 	bool operator ==(const LearnOutput & output) const;
 
 	bool atLeastOneEstimationNoError() const;
-	const int getNbEstimationWithNoError() const;
+	int getNbEstimationWithNoError() const;
 
 	/// sort the model output
 	void sort(CriterionName criterionName);

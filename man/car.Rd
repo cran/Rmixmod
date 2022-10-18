@@ -3,7 +3,7 @@
 \docType{data}
 \name{car}
 \alias{car}
-\title{Qualitative data : Car Evaluation}
+\title{Qualitative data: Car Evaluation}
 \format{
 A data frame with 1728 observations on the following 6 variables.
 
@@ -25,14 +25,15 @@ A data frame with 1728 observations on the following 6 variables.
 }
 }
 \source{
-Creator: Marko Bohanec 
+Creator: Marko Bohanec
 Donors: Marko Bohanec & Blaz Zupan
 http://archive.ics.uci.edu/ml/datasets/Car+Evaluation
 }
 \description{
-Car Evaluation Database was derived from a simple hierarchical decision model originally developed for the demonstration of DEX, M. Bohanec, V. Rajkovic: Expert system for decision making.
+Car Evaluation Database was derived from a simple hierarchical decision model originally developed for the demonstration
+of DEX, M. Bohanec, V. Rajkovic: Expert system for decision making.
 }
 \examples{
-  data(car)
+data(car)
 }
 \keyword{datasets}

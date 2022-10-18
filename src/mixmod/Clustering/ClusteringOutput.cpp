@@ -447,7 +447,7 @@ bool ClusteringOutput::atLeastOneEstimationNoError() const {
 	return res;
 }
 
-const int ClusteringOutput::getNbEstimationWithNoError() const {
+int ClusteringOutput::getNbEstimationWithNoError() const {
 	int n = getNbClusteringModelOutput();
 	for ( unsigned int i = 0; i < _clusteringModelOutput.size(); i++ ) {
 		if (!((_clusteringModelOutput[i]->getStrategyRunError()) == NOERROR )) {

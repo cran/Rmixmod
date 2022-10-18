@@ -15,8 +15,7 @@ This class defines parameters of a Multinomial Mixture Model. Inherits the [\cod
 }
 }
 \examples{
-  new("MultinomialParameter")
+new("MultinomialParameter")
 
-  getSlots("MultinomialParameter")
-
+getSlots("MultinomialParameter")
 }

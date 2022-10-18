@@ -14,9 +14,8 @@ This is a class to run discriminant analysis with mixmod. Inherits the [\code{\l
 }
 }
 \examples{
-  ## A quantitative example with the famous iris data set
-  new("MixmodLearn", data=iris[1:4], knownLabels=iris$Species)
+## A quantitative example with the famous iris data set
+new("MixmodLearn", data = iris[1:4], knownLabels = iris$Species)
 
-  getSlots("MixmodLearn")
-
+getSlots("MixmodLearn")
 }
