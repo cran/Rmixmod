@@ -1,6 +1,6 @@
 Package: Rmixmod
-Version: 2.1.7
-Date: 2022-10-18
+Version: 2.1.8
+Date: 2023-01-17
 Title: Classification with Mixture Modelling
 Description: Interface of 'MIXMOD' software for supervised, unsupervised and
     semi-supervised classification with mixture modelling <doi: 10.18637/jss.v067.i06>.
@@ -31,10 +31,10 @@ Collate: 'A_NAMESPACE.R' 'global.R' 'Model.R' 'MultinomialModel.R'
         'Strategy.R' 'MixmodCluster.R' 'MixmodDAResults.R'
         'MixmodLearn.R' 'MixmodPredict.R' 'MixmodXml.R' 'Rmixmod.R'
         'zzz.R'
-RoxygenNote: 7.2.1
+RoxygenNote: 7.2.3
 Encoding: UTF-8
 NeedsCompilation: yes
-Packaged: 2022-10-18 07:19:49 UTC; quentin
+Packaged: 2023-01-17 12:58:41 UTC; quentin
 Author: Florent Langrognet [aut],
   Remi Lebret [aut],
   Christian Poli [aut],
@@ -49,4 +49,4 @@ Author: Florent Langrognet [aut],
   Quentin Grimonprez [cre]
 Maintainer: Quentin Grimonprez <quentingrim@yahoo.fr>
 Repository: CRAN
-Date/Publication: 2022-10-18 14:17:59 UTC
+Date/Publication: 2023-01-17 15:50:02 UTC

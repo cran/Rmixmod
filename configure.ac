@@ -1,6 +1,25 @@
-#https://nerdland.net/2009/07/detecting-c-libraries-with-autotools/
-AC_INIT([Rmixmod],[2.1.4])
+# https://nerdland.net/2009/07/detecting-c-libraries-with-autotools/
+AC_INIT([Rmixmod],[2.1.8])
+
+https://cran.r-project.org/doc/manuals/r-devel/R-exts.html#Configure-and-cleanup
+# Find the compiler and compiler flags used by R.
+: ${R_HOME=`R RHOME`}
+if test -z "${R_HOME}"; then
+  echo "could not determine R_HOME"
+  exit 1
+fi
+
+# pick up the details for the C++ compiler and switch the current language to C++
+CXX=`"${R_HOME}/bin/R" CMD config CXX`
+if test -z "$CXX"; then
+  AC_MSG_ERROR([No C++ compiler is available])
+fi
+CXXFLAGS=`"${R_HOME}/bin/R" CMD config CXXFLAGS`
+CPPFLAGS=`"${R_HOME}/bin/R" CMD config CPPFLAGS`
+AC_LANG(C++)
+
 AC_PATH_PROG([PKG_CONFIG], [pkg-config])
+
 if test "${RMIXMOD_WITH_XML}" = "1"  ; then
 	if test -z "${PKG_CONFIG}"; then
 		AC_MSG_WARN([cannot find pkg-config, Rmixmod will be installed without optional XML features])

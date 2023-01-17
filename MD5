@@ -1,4 +1,4 @@
-747d7b6bf06779b07b077eaf3e350536 *DESCRIPTION
+9dfc406f382a93fb8d785e6a3ccaed1f *DESCRIPTION
 000af3075c986bcda9028da03e1c8967 *NAMESPACE
 b3353b0556c4e08cb85c95b54b89e2b2 *R/A_NAMESPACE.R
 b38b1edd6f356bd44b28d01db5b600a9 *R/CompositeModel.R
@@ -21,8 +21,8 @@ f1e895abbc85eecc14c2b39fbdb85733 *R/Strategy.R
 f0f38c370ec360bcca6f5a4a82374bdc *R/global.R
 3efe8379d8df96f6afd83f095a8984c0 *R/zzz.R
 238e0de3219ddb181c40463669abc9f4 *cleanup
-86e1b74e2e31c8f288cd9abe02b9bd08 *configure
-62461d476a0c62cc4f28b8be0a0836b8 *configure.ac
+19a405dbe848b3a9ae5f724ea9c139ea *configure
+5c3b36582f572716c9e7aae253ff7f82 *configure.ac
 a2924121b4d88109f5fe43fcdb9331bb *data/birds.rda
 dcb2505b6ce6d0b6c1ed371fb530e6bb *data/car.rda
 939e8b7f2b7c7310bbc05b732ebda52f *data/finance.rda
