@@ -1,4 +1,4 @@
-9dfc406f382a93fb8d785e6a3ccaed1f *DESCRIPTION
+3ab334190af98a90eacbc7fabecf86f0 *DESCRIPTION
 000af3075c986bcda9028da03e1c8967 *NAMESPACE
 b3353b0556c4e08cb85c95b54b89e2b2 *R/A_NAMESPACE.R
 b38b1edd6f356bd44b28d01db5b600a9 *R/CompositeModel.R
@@ -21,8 +21,8 @@ f1e895abbc85eecc14c2b39fbdb85733 *R/Strategy.R
 f0f38c370ec360bcca6f5a4a82374bdc *R/global.R
 3efe8379d8df96f6afd83f095a8984c0 *R/zzz.R
 238e0de3219ddb181c40463669abc9f4 *cleanup
-19a405dbe848b3a9ae5f724ea9c139ea *configure
-5c3b36582f572716c9e7aae253ff7f82 *configure.ac
+4caf93751ab9fffcfcfdd64e42497a6a *configure
+0718e320e3d9efb42dde9e1f53707cc9 *configure.ac
 a2924121b4d88109f5fe43fcdb9331bb *data/birds.rda
 dcb2505b6ce6d0b6c1ed371fb530e6bb *data/car.rda
 939e8b7f2b7c7310bbc05b732ebda52f *data/finance.rda
@@ -31,7 +31,7 @@ fdbad659c688e42d82e6c6bd4efd6263 *data/geyser.rda
 755da48df19f994246765c1f2733a1e3 *data/heterodatatest.rda
 ac4c994c6114e4102b03a43a656266da *data/heterodatatrain.rda
 5a9bd11ea3d08e85ce21feec416f2bb5 *data/titanic.rda
-fc196f3e8ca51a330fe7c96365a94602 *inst/CITATION
+657e3db6dc54a444ef1577671a59f27b *inst/CITATION
 00fc43990a7a3165431dcc8324963abb *inst/XML_specs/data.xsd
 746b6c201a6f8f8a3994582852b27736 *inst/XML_specs/label_or_partition.xsd
 8a33af08cda469e789fa0f8f1ca687e8 *inst/XML_specs/parameter.xsd
@@ -112,8 +112,8 @@ e6fa449694d6c4eb92dd8ea473684bc3 *src/Conversion.cpp
 7227c7cc5b5f2aa44b17317768a2b098 *src/InputHandling.h
 af5294b481fbd8f918ad3ed388f26057 *src/LearnOutputHandling.cpp
 909460c368a8b03dd7a072e8db3e64bd *src/LearnOutputHandling.h
-89af66b7e9c6fec55e8f5eca7db312ae *src/Makevars.in
-30d6bd133e9aa5adf18694c453849e05 *src/Makevars.win
+efcb371a55d9463518dbb46a83129e54 *src/Makevars.in
+f2d93f5d98cc5c73fe24cef9ed7d58d6 *src/Makevars.win
 9489aaa89209611c4584981b7934e4cb *src/OutputHandling.cpp
 b30d08967de8073f607b17711c8a7f6a *src/OutputHandling.h
 9a3ddee0b412f31a5cbeb664bad4f1f7 *src/Rmixmod_init.c

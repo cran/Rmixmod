@@ -1,7 +1,7 @@
 # https://nerdland.net/2009/07/detecting-c-libraries-with-autotools/
 AC_INIT([Rmixmod],[2.1.8])
 
-https://cran.r-project.org/doc/manuals/r-devel/R-exts.html#Configure-and-cleanup
+# https://cran.r-project.org/doc/manuals/r-devel/R-exts.html#Configure-and-cleanup
 # Find the compiler and compiler flags used by R.
 : ${R_HOME=`R RHOME`}
 if test -z "${R_HOME}"; then

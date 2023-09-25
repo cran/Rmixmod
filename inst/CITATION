@@ -1,10 +1,12 @@
 citHeader("To cite Rmixmod, use:")
 
-citEntry(
-  entry    = "Article",
+bibentry(
+  bibtype    = "Article",
   title    = "Rmixmod: The R Package of the Model-Based Unsupervised, Supervised, and Semi-Supervised Classification Mixmod Library",
-  author   = personList(as.person("Rémi Lebret"), as.person("Serge Iovleff"), as.person("Florent Langrognet"),
-                        as.person("Christophe Biernacki"), as.person("Gilles Celeux"), as.person("Gérard Govaert")),
+  author   = c(
+    person("Rémi Lebret"), person("Serge Iovleff"), person("Florent Langrognet"), person("Christophe Biernacki"),
+    person("Gilles Celeux"), person("Gérard Govaert")
+  ),
   journal  = "Journal of Statistical Software",
   year     = "2015",
   volume   = "67",
@@ -12,6 +14,7 @@ citEntry(
   pages    = "1-29",
   url      = "https://www.jstatsoft.org/article/view/v067i06",
   doi      = "10.18637/jss.v067.i06",
-  textVersion = paste("Lebret, R., Iovleff, S., Langrognet, F., Biernacki, C., Celeux, G., & Govaert, G. (2015). Rmixmod: The R Package of the Model-Based Unsupervised, Supervised, and Semi-Supervised Classification Mixmod Library. Journal of Statistical Software, 67(6), 1–29. https://doi.org/10.18637/jss.v067.i06")
+  textVersion = paste("Lebret, R., Iovleff, S., Langrognet, F., Biernacki, C., Celeux, G., & Govaert, G. (2015).",
+  "Rmixmod: The R Package of the Model-Based Unsupervised, Supervised, and Semi-Supervised Classification Mixmod Library.",
+  "Journal of Statistical Software, 67(6), 1–29. https://doi.org/10.18637/jss.v067.i06")
 )
-

@@ -1,6 +1,6 @@
 #MkInclude = $(R_HOME)/etc${R_ARCH}/Makeconf
 
-CXX_STD = CXX11
+CXX_STD = CXX17
 
 ##
 ## MIXMOD AND EIGEN
