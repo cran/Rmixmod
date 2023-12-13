@@ -6,7 +6,7 @@
 
 /***************************************************************************
     This file is part of MIXMOD
-    
+
     MIXMOD is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -20,21 +20,23 @@
     You should have received a copy of the GNU General Public License
     along with MIXMOD.  If not, see <http://www.gnu.org/licenses/>.
 
-    All informations available on : http://www.mixmod.org                                                                                               
+    All informations available on : http://www.mixmod.org
 ***************************************************************************/
 
 #include "mixmod/Kernel/IO/Description.h"
 #include "mixmod/Kernel/IO/ColumnDescription.h"
-#include "mixmod/Kernel/IO/WeightColumnDescription.h"
 #include "mixmod/Kernel/IO/IndividualColumnDescription.h"
 #include "mixmod/Kernel/IO/QuantitativeColumnDescription.h"
+#include "mixmod/Kernel/IO/WeightColumnDescription.h"
 
-namespace XEM {
+namespace XEM
+{
 
 //------------
 // Constructor by default
 //------------
-Description::Description() {
+Description::Description()
+{
 	_fileName = "";
 	_format = FormatNumeric::defaultFormatNumericFile;
 	_infoName = "";
@@ -46,9 +48,8 @@ Description::Description() {
 //------------
 // Constructor by initialization
 //------------
-Description::Description(int64_t nbSample, int64_t nbColumn, 
-		std::vector<ColumnDescription *> columnDescription, 
-		FormatNumeric::FormatNumericFile format, std::string filename, std::string infoName)
+Description::Description(int64_t nbSample, int64_t nbColumn, std::vector<ColumnDescription *> columnDescription,
+                         FormatNumeric::FormatNumericFile format, std::string filename, std::string infoName)
 {
 	_fileName = filename;
 	_format = format;
@@ -68,14 +69,13 @@ Description::Description(int64_t nbSample, int64_t nbColumn,
 //------------
 // Constructor by copy
 //------------
-Description::Description(Description & description) {
-	*this = description;
-}
+Description::Description(Description &description) { *this = description; }
 
 //------------
 // operator =
 //------------
-Description & Description::operator=(const Description & description) {
+Description &Description::operator=(const Description &description)
+{
 	_fileName = description._fileName;
 	_format = description._format;
 	_infoName = description._infoName;
@@ -83,7 +83,7 @@ Description & Description::operator=(const Description & description) {
 	_nbColumn = description._nbColumn;
 	_columnDescription.resize(_nbColumn);
 	for (int64_t i = 0; i < _nbColumn; ++i) {
-		const ColumnDescription * cd = description.getColumnDescription(i);
+		const ColumnDescription *cd = description.getColumnDescription(i);
 		_columnDescription[i] = cd->clone();
 	}
 	return *this;
@@ -92,7 +92,8 @@ Description & Description::operator=(const Description & description) {
 //------------
 // Destructor
 //------------
-Description::~Description() {
+Description::~Description()
+{
 	if (_columnDescription.size() != 0) {
 		for (unsigned int i = 0; i < _columnDescription.size(); ++i) {
 			delete _columnDescription[i];
@@ -100,10 +101,11 @@ Description::~Description() {
 	}
 }
 
-void Description::initializationColumnDescription() {
+void Description::initializationColumnDescription()
+{
 	_columnDescription.resize(_nbColumn);
 	for (int64_t i = 0; i < _nbColumn; ++i) {
-		//auto_ptr<XEMQuantitativeColumnDescription> a (new XEMQuantitativeColumnDescription());
+		// auto_ptr<XEMQuantitativeColumnDescription> a (new XEMQuantitativeColumnDescription());
 		//_columnDescription[i] = a;
 		_columnDescription[i] = new QuantitativeColumnDescription(i);
 	}
@@ -112,13 +114,15 @@ void Description::initializationColumnDescription() {
 //------------------------------------------
 // return pbDimension (number of variables)
 //
-int64_t Description::getPbDimension() const {
+int64_t Description::getPbDimension() const
+{
 	int64_t nbVariable = _nbColumn;
 	for (int64_t i = 0; i < _nbColumn; i++) {
-		if (typeid (*(_columnDescription[i])) == typeid (IndividualColumnDescription)) {
+		auto descI = _columnDescription[i];
+		if (typeid(*descI) == typeid(IndividualColumnDescription)) {
 			nbVariable--;
 		}
-		if (typeid (*(_columnDescription[i])) == typeid (WeightColumnDescription)) {
+		if (typeid(*descI) == typeid(WeightColumnDescription)) {
 			nbVariable--;
 		}
 	}

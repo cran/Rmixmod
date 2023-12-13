@@ -6,7 +6,7 @@
 
 /***************************************************************************
     This file is part of MIXMOD
-    
+
     MIXMOD is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -20,29 +20,30 @@
     You should have received a copy of the GNU General Public License
     along with MIXMOD.  If not, see <http://www.gnu.org/licenses/>.
 
-    All informations available on : http://www.mixmod.org                                                                                               
+    All informations available on : http://www.mixmod.org
 ***************************************************************************/
 #ifndef XEMMAPALGO_H
 #define XEMMAPALGO_H
 
 #include "mixmod/Kernel/Algo/Algo.h"
 
-namespace XEM {
+namespace XEM
+{
 
 /**
   @brief Derived class of XEMAlgo for MAP Algorithm
   @author F Langrognet
  */
 
-class MAPAlgo : public Algo {
+class MAPAlgo : public Algo
+{
 
 public:
-
 	/// Default constructor
 	MAPAlgo();
 
 	// copy constructor
-	MAPAlgo(const MAPAlgo & mapAlgo);
+	MAPAlgo(const MAPAlgo &mapAlgo);
 
 	/// Constructor
 	MAPAlgo(AlgoStopName algoStopName, double epsilon, int64_t nbIteration);
@@ -50,12 +51,11 @@ public:
 	/// Destructor
 	virtual ~MAPAlgo();
 
-
 	/// clone
-	Algo * clone() override;
+	Algo *clone() override;
 
 	/// Run method
-	void run(Model *& model) override;
+	void run(Model *&model) override;
 
 	AlgoName getAlgoName() const override;
 
@@ -64,22 +64,15 @@ public:
 	double getEpsilon() const override;
 
 protected:
-
 	/// Number of clusters
 	int64_t _nbCluster;
 };
 
-inline AlgoName MAPAlgo::getAlgoName() const {
-	return MAP;
-}
+inline AlgoName MAPAlgo::getAlgoName() const { return MAP; }
 
-inline double MAPAlgo::getEpsilon() const {
-	THROW(OtherException, internalMixmodError);
-}
+inline double MAPAlgo::getEpsilon() const { THROW(OtherException, internalMixmodError); }
 
-inline void MAPAlgo::setEpsilon(double /*eps*/) {
-	THROW(OtherException, internalMixmodError);
-}
+inline void MAPAlgo::setEpsilon(double /*eps*/) { THROW(OtherException, internalMixmodError); }
 
 }
 

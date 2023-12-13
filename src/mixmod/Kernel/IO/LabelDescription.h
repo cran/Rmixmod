@@ -6,7 +6,7 @@
 
 /***************************************************************************
     This file is part of MIXMOD
-    
+
     MIXMOD is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -20,7 +20,7 @@
     You should have received a copy of the GNU General Public License
     along with MIXMOD.  If not, see <http://www.gnu.org/licenses/>.
 
-    All informations available on : http://www.mixmod.org                                                                                               
+    All informations available on : http://www.mixmod.org
 ***************************************************************************/
 
 #ifndef XEMLABELDESCRIPTION_H
@@ -28,73 +28,66 @@
 
 #include "mixmod/Kernel/IO/Description.h"
 
-namespace XEM {
+namespace XEM
+{
 
 // pre-declaration
 class Model;
 class Label;
 
-/** 
+/**
  \class XEMLabelDescription
  @author F. Langrognet
-		@date 2011
-		@brief XEMLabelDescription class derived from XEMDescription
+        @date 2011
+        @brief XEMLabelDescription class derived from XEMDescription
  */
-class LabelDescription : public Description {
+class LabelDescription : public Description
+{
 
 public:
 	/// Default constructor
 	LabelDescription();
 
-	///constructor by initilization
-	LabelDescription(int64_t nbSample, int64_t nbColumn, 
-			std::vector< ColumnDescription* > columnDescription, 
-			FormatNumeric::FormatNumericFile format, 
-			std::string filename, std::string infoName = "");
+	/// constructor by initilization
+	LabelDescription(int64_t nbSample, int64_t nbColumn, std::vector<ColumnDescription *> columnDescription,
+	                 FormatNumeric::FormatNumericFile format, std::string filename, std::string infoName = "");
 
 	/// constructor from a vector of int
 	LabelDescription(int64_t nbSample, std::vector<int64_t> vLabel);
 
-	///constructor after an estimation->run
-	LabelDescription(Model * estimation);
+	/// constructor after an estimation->run
+	LabelDescription(Model *estimation);
 
-	///constructor by copy
-	LabelDescription(LabelDescription & labelDescription);
+	/// constructor by copy
+	LabelDescription(LabelDescription &labelDescription);
 
 	/// Destructor
 	virtual ~LabelDescription();
 
 	/// Comparison operator
-	bool operator ==(const LabelDescription & labelDescription) const;
+	bool operator==(const LabelDescription &labelDescription) const;
 
-	///operator=    
-	LabelDescription & operator=(LabelDescription & labelDescription);
+	/// operator=
+	LabelDescription &operator=(LabelDescription &labelDescription);
 
-	const Label * getLabel() const;
-	Label * getLabel();
+	const Label *getLabel() const;
+	Label *getLabel();
 
 	int64_t getNbCluster() const;
 
 	void saveNumericValues(std::string fileName = "");
 
 private:
-
-	Label * _label;
-	Label * createLabel();
+	Label *_label;
+	Label *createLabel();
 	int64_t _nbCluster;
 };
 
-inline const Label * LabelDescription::getLabel() const {
-	return _label;
-}
+inline const Label *LabelDescription::getLabel() const { return _label; }
 
-inline Label * LabelDescription::getLabel() {
-	return _label;
-}
+inline Label *LabelDescription::getLabel() { return _label; }
 
-inline int64_t LabelDescription::getNbCluster() const {
-	return _nbCluster;
-}
+inline int64_t LabelDescription::getNbCluster() const { return _nbCluster; }
 
 }
 

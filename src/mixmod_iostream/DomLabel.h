@@ -6,7 +6,7 @@
 
 /***************************************************************************
     This file is part of MIXMOD
-    
+
     MIXMOD is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -20,42 +20,42 @@
     You should have received a copy of the GNU General Public License
     along with MIXMOD.  If not, see <http://www.gnu.org/licenses/>.
 
-    All informations available on : http://www.mixmod.org                                                                                               
+    All informations available on : http://www.mixmod.org
 ***************************************************************************/
 
 #ifndef XEM_DOMLABEL_H
 #define XEM_DOMLABEL_H
-#include "mixmod_iostream/IOStreamUtil.h"
 #include "mixmod/Clustering/ClusteringInput.h"
 #include "mixmod/Kernel/IO/LabelDescription.h"
+#include "mixmod_iostream/IOStreamUtil.h"
 
-namespace XEM {
+namespace XEM
+{
 
-  class DomLabel : public xmlpp::Document {
-	
+class DomLabel : public xmlpp::Document
+{
+
 public:
-
-	//constructor by default
+	// constructor by default
 	DomLabel();
 
-	//destructor
+	// destructor
 	~DomLabel();
 
-	DomLabel(string & sFilename);
-	DomLabel(LabelDescription * labelDescription, string str);
-	DomLabel(Partition * partition, string & sFilename);
+	DomLabel(string &sFilename);
+	DomLabel(LabelDescription *labelDescription, string str);
+	DomLabel(Partition *partition, string &sFilename);
 	DomLabel(xmlpp::Element *root);
 
-	unique_ptr<LabelDescription> readLabel(string sFilename); 
-	unique_ptr<LabelDescription> readLabelAsData(string sFilename);   
-	void writeListColumnNode(const vector<ColumnDescription *> & vColumnDescription);
+	unique_ptr<LabelDescription> readLabel(string sFilename);
+	unique_ptr<LabelDescription> readLabelAsData(string sFilename);
+	void writeListColumnNode(const vector<ColumnDescription *> &vColumnDescription);
 
 private:
-
-	//label
-    xmlpp::Element *_root;
+	// label
+	xmlpp::Element *_root;
 };
 
-} //end namespace
+} // end namespace
 
 #endif // XEM_DOMLABEL_H

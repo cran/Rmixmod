@@ -6,7 +6,7 @@
 
 /***************************************************************************
     This file is part of MIXMOD
-    
+
     MIXMOD is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -20,42 +20,34 @@
     You should have received a copy of the GNU General Public License
     along with MIXMOD.  If not, see <http://www.gnu.org/licenses/>.
 
-    All informations available on : http://www.mixmod.org                                                                                               
+    All informations available on : http://www.mixmod.org
 ***************************************************************************/
 
 #include "mixmod/Kernel/Model/BinaryModel.h"
 
-namespace XEM {
+namespace XEM
+{
 
 /// Default constructor
-BinaryModel::BinaryModel() {
-}
+BinaryModel::BinaryModel() {}
 
-Model* BinaryModel::clone() {
-	return new BinaryModel(this);
-}
+Model *BinaryModel::clone() { return new BinaryModel(this); }
 
 /// Constructor
-BinaryModel::BinaryModel(BinaryModel * iModel) 
-: Model(iModel)
-, _correspondenceOriginDataToReduceData(iModel->getCorrespondenceOriginDataToReduceData()) 
+BinaryModel::BinaryModel(BinaryModel *iModel)
+    : Model(iModel), _correspondenceOriginDataToReduceData(iModel->getCorrespondenceOriginDataToReduceData())
 {
 }
 
 /// Constructor
-BinaryModel::BinaryModel(
-		ModelType * modelType, 
-		int64_t nbCluster, 
-		Data *& data, 
-		Partition * knownPartition, 
-		std::vector<int64_t> const & correspondenceOriginDataToReduceData)
-: Model(modelType, nbCluster, data, knownPartition)
-, _correspondenceOriginDataToReduceData(correspondenceOriginDataToReduceData) 
+BinaryModel::BinaryModel(ModelType *modelType, int64_t nbCluster, Data *&data, Partition *knownPartition,
+                         std::vector<int64_t> const &correspondenceOriginDataToReduceData)
+    : Model(modelType, nbCluster, data, knownPartition),
+      _correspondenceOriginDataToReduceData(correspondenceOriginDataToReduceData)
 {
 }
 
 /// Destructor
-BinaryModel::~BinaryModel() {
-}
+BinaryModel::~BinaryModel() {}
 
 }

@@ -6,7 +6,7 @@
 
 /***************************************************************************
     This file is part of MIXMOD
-    
+
     MIXMOD is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -20,7 +20,7 @@
     You should have received a copy of the GNU General Public License
     along with MIXMOD.  If not, see <http://www.gnu.org/licenses/>.
 
-    All informations available on : http://www.mixmod.org                                                                                               
+    All informations available on : http://www.mixmod.org
 ***************************************************************************/
 
 #ifndef XEMQUALITATIVECOLUMNDESCRIPTION_H
@@ -28,25 +28,26 @@
 
 #include "mixmod/Kernel/IO/ColumnDescription.h"
 
-namespace XEM {
+namespace XEM
+{
 
-//Variable Description
+// Variable Description
 struct VariableDescription {
 
 	int64_t num;
 	std::string name;
 };
 
-/** 
+/**
  \class XEMQualitativeColumnDescription
  @author F. Langrognet
-		@date 2011
-		@brief XEMQualitativeColumnDescription class derived from XEMColumnDescription
+        @date 2011
+        @brief XEMQualitativeColumnDescription class derived from XEMColumnDescription
  */
-class QualitativeColumnDescription : public ColumnDescription {
+class QualitativeColumnDescription : public ColumnDescription
+{
 
 public:
-	
 	/// Default constructor
 	QualitativeColumnDescription();
 
@@ -58,25 +59,23 @@ public:
 
 	std::string editType();
 
-	ColumnDescription * clone()const;
+	ColumnDescription *clone() const;
 
-	const int64_t & getNbFactor()const;
+	const int64_t &getNbFactor() const;
 
-	const std::vector<VariableDescription> & getVariableDescription()const;
+	const std::vector<VariableDescription> &getVariableDescription() const;
 
-	void setVariableDescription(VariableDescription & variableDescription, unsigned int index);
+	void setVariableDescription(VariableDescription &variableDescription, unsigned int index);
 
 private:
-	
 	int64_t _nbFactor;
 	std::vector<VariableDescription> _variableDescription;
 };
 
-inline const int64_t & QualitativeColumnDescription::getNbFactor()const {
-	return _nbFactor;
-}
+inline const int64_t &QualitativeColumnDescription::getNbFactor() const { return _nbFactor; }
 
-inline const std::vector<VariableDescription> & QualitativeColumnDescription::getVariableDescription()const {
+inline const std::vector<VariableDescription> &QualitativeColumnDescription::getVariableDescription() const
+{
 	return _variableDescription;
 }
 

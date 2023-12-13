@@ -6,7 +6,7 @@
 
 /***************************************************************************
     This file is part of MIXMOD
-    
+
     MIXMOD is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -20,18 +20,17 @@
     You should have received a copy of the GNU General Public License
     along with MIXMOD.  If not, see <http://www.gnu.org/licenses/>.
 
-    All informations available on : http://www.mixmod.org                                                                                               
+    All informations available on : http://www.mixmod.org
 ***************************************************************************/
 
 #include "mixmod/Kernel/IO/QualitativeColumnDescription.h"
 
-namespace XEM {
+namespace XEM
+{
 
-QualitativeColumnDescription::QualitativeColumnDescription() : ColumnDescription() {
-}
+QualitativeColumnDescription::QualitativeColumnDescription() : ColumnDescription() {}
 
-QualitativeColumnDescription::QualitativeColumnDescription(int64_t index, int64_t nbFactor) 
-: ColumnDescription(index) 
+QualitativeColumnDescription::QualitativeColumnDescription(int64_t index, int64_t nbFactor) : ColumnDescription(index)
 {
 	_nbFactor = nbFactor;
 	_variableDescription.resize(nbFactor);
@@ -41,21 +40,19 @@ QualitativeColumnDescription::QualitativeColumnDescription(int64_t index, int64_
 	}
 }
 
-QualitativeColumnDescription::~QualitativeColumnDescription() {
-}
+QualitativeColumnDescription::~QualitativeColumnDescription() {}
 
-std::string QualitativeColumnDescription::editType() {
-	return "Qualitative";
-}
+std::string QualitativeColumnDescription::editType() { return "Qualitative"; }
 
-ColumnDescription * QualitativeColumnDescription::clone()const {
-	QualitativeColumnDescription * QCD = new QualitativeColumnDescription();
+ColumnDescription *QualitativeColumnDescription::clone() const
+{
+	QualitativeColumnDescription *QCD = new QualitativeColumnDescription();
 
 	QCD->_index = _index;
 	QCD->_name = _name;
 	QCD->_nbFactor = _nbFactor;
 
-	//filling of structure which describes variables
+	// filling of structure which describes variables
 	QCD->_variableDescription.resize(_variableDescription.size());
 	for (unsigned int i = 0; i < _variableDescription.size(); ++i) {
 		VariableDescription varDescription;
@@ -66,8 +63,7 @@ ColumnDescription * QualitativeColumnDescription::clone()const {
 	return QCD;
 }
 
-void QualitativeColumnDescription::setVariableDescription(
-		VariableDescription & variableDescription, unsigned int index) 
+void QualitativeColumnDescription::setVariableDescription(VariableDescription &variableDescription, unsigned int index)
 {
 	if (index < _variableDescription.size()) {
 		_variableDescription[index].name = variableDescription.name;

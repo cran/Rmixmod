@@ -94,15 +94,15 @@
 #' learn <- mixmodLearn(iris[-remaining.obs, 1:4], iris$Species[-remaining.obs])
 #' # create a MixmodPredict to predict those 10 observations
 #' prediction <- mixmodPredict(
-#'   data = iris[remaining.obs, 1:4],
-#'   classificationRule = learn["bestResult"]
+#'     data = iris[remaining.obs, 1:4],
+#'     classificationRule = learn["bestResult"]
 #' )
 #' # show results
 #' prediction
 #' # compare prediction with real results
 #' paste("accuracy= ", mean(as.integer(iris$Species[remaining.obs]) == prediction["partition"]) * 100,
-#'   "%",
-#'   sep = ""
+#'     "%",
+#'     sep = ""
 #' )
 #' }
 #'

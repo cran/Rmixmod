@@ -6,7 +6,7 @@
 
 /***************************************************************************
     This file is part of MIXMOD
-    
+
     MIXMOD is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -20,29 +20,25 @@
     You should have received a copy of the GNU General Public License
     along with MIXMOD.  If not, see <http://www.gnu.org/licenses/>.
 
-    All informations available on : http://www.mixmod.org                                                                                               
+    All informations available on : http://www.mixmod.org
 ***************************************************************************/
 
 #include "mixmod/Kernel/IO/QuantitativeColumnDescription.h"
 
-namespace XEM {
+namespace XEM
+{
 
-QuantitativeColumnDescription::QuantitativeColumnDescription() : ColumnDescription() {
-}
+QuantitativeColumnDescription::QuantitativeColumnDescription() : ColumnDescription() {}
 
-QuantitativeColumnDescription::QuantitativeColumnDescription(int64_t index) 
-: ColumnDescription(index) {
-}
+QuantitativeColumnDescription::QuantitativeColumnDescription(int64_t index) : ColumnDescription(index) {}
 
-QuantitativeColumnDescription::~QuantitativeColumnDescription() {
-}
+QuantitativeColumnDescription::~QuantitativeColumnDescription() {}
 
-std::string QuantitativeColumnDescription::editType() {
-	return "Quantitative";
-}
+std::string QuantitativeColumnDescription::editType() { return "Quantitative"; }
 
-ColumnDescription * QuantitativeColumnDescription::clone()const {
-	QuantitativeColumnDescription * QCD = new QuantitativeColumnDescription();
+ColumnDescription *QuantitativeColumnDescription::clone() const
+{
+	QuantitativeColumnDescription *QCD = new QuantitativeColumnDescription();
 	QCD->_index = _index;
 	QCD->_name = _name;
 	return QCD;

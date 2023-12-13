@@ -6,7 +6,7 @@
 
 /***************************************************************************
     This file is part of MIXMOD
-    
+
     MIXMOD is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -20,44 +20,44 @@
     You should have received a copy of the GNU General Public License
     along with MIXMOD.  If not, see <http://www.gnu.org/licenses/>.
 
-    All informations available on : http://www.mixmod.org                                                                                               
+    All informations available on : http://www.mixmod.org
 ***************************************************************************/
 
 #ifndef XEM_DOMDATA_H
 #define XEM_DOMDATA_H
 
-#include "mixmod_iostream/IOStreamUtil.h"
-#include "mixmod/Kernel/IO/DataDescription.h"
 #include "mixmod/Clustering/ClusteringInput.h"
+#include "mixmod/Kernel/IO/DataDescription.h"
+#include "mixmod_iostream/IOStreamUtil.h"
 
-namespace XEM {
+namespace XEM
+{
 
-///create a .mxd file
-class DomData : public xmlpp::Document {
+/// create a .mxd file
+class DomData : public xmlpp::Document
+{
 
 public:
-     
-	//constructor by default
+	// constructor by default
 	DomData();
 
-	//destructor
+	// destructor
 	~DomData();
 
-	DomData(string & sFilename);
-	DomData(const DataDescription & dataFile, string & sFilename);
-    DomData(xmlpp::Element *root);
+	DomData(string &sFilename);
+	DomData(const DataDescription &dataFile, string &sFilename);
+	DomData(xmlpp::Element *root);
 
-	DataDescription * readDataFile(const string & sFilename);
+	DataDescription *readDataFile(const string &sFilename);
 
 private:
+	// write node in .mxd
+	void writeListColumnNode(const vector<ColumnDescription *> &vColumnDescription);
 
-	//write node in .mxd
-    void writeListColumnNode(const vector<ColumnDescription *> & vColumnDescription);
-
-    //parameter
-    xmlpp::Element *_root;
+	// parameter
+	xmlpp::Element *_root;
 };
 
-} //end namespace
+} // end namespace
 
 #endif // XEM_DOMDATA_H

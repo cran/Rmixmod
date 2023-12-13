@@ -6,7 +6,7 @@
 
 /***************************************************************************
     This file is part of MIXMOD
-    
+
     MIXMOD is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -20,32 +20,33 @@
     You should have received a copy of the GNU General Public License
     along with MIXMOD.  If not, see <http://www.gnu.org/licenses/>.
 
-    All informations available on : http://www.mixmod.org                                                                                               
+    All informations available on : http://www.mixmod.org
 ***************************************************************************/
 #ifndef XEMALGO_H
 #define XEMALGO_H
 
 #include "mixmod/Utilities/Util.h"
 
-namespace XEM {
+namespace XEM
+{
 
 // pre-declaration
 class Model;
 
 /**
-		@brief Base class for Algorithm(s)
-		@author F Langrognet
+        @brief Base class for Algorithm(s)
+        @author F Langrognet
  */
 
-class Algo {
+class Algo
+{
 
 public:
-
 	/// Default constructor
 	Algo();
 
 	/// copy constructor
-	Algo(const Algo & algo);
+	Algo(const Algo &algo);
 
 	/// Constructor
 	Algo(AlgoStopName algoStopName, double epsilon, int64_t nbIteration);
@@ -54,13 +55,13 @@ public:
 	virtual ~Algo();
 
 	/// clone
-	virtual Algo * clone() = 0;
+	virtual Algo *clone() = 0;
 
 	/// Run method
-	virtual void run(Model *& model) = 0;
+	virtual void run(Model *&model) = 0;
 
-	//void edit(std::ofstream & oFile);
-	void edit(std::ostream & out);
+	// void edit(std::ofstream & oFile);
+	void edit(std::ostream &out);
 
 	virtual AlgoStopName getAlgoStopName() const;
 
@@ -76,10 +77,9 @@ public:
 
 	virtual double getEpsilon() const;
 
-	friend std::ostream & operator <<(std::ostream & fo, Algo & algo);
+	friend std::ostream &operator<<(std::ostream &fo, Algo &algo);
 
 protected:
-
 	/// Type of stopping rule of the algorithm
 	AlgoStopName _algoStopName;
 
@@ -102,40 +102,31 @@ protected:
 	double _xml;
 
 #if SAVE_ALL_MODELS
-	Model ** _tabModel; // aggregate
+	Model **_tabModel; // aggregate
 #endif
 };
 
-inline void Algo::setAlgoStopName(AlgoStopName algoStopName) {
-	_algoStopName = algoStopName;
-}
+inline void Algo::setAlgoStopName(AlgoStopName algoStopName) { _algoStopName = algoStopName; }
 
-inline void Algo::setNbIteration(int64_t nbIteration) {
+inline void Algo::setNbIteration(int64_t nbIteration)
+{
 	if (nbIteration < minNbIteration) {
 		THROW(InputException, nbIterationTooSmall);
-	}
-	else if (nbIteration > maxNbIteration) {
+	} else if (nbIteration > maxNbIteration) {
 		THROW(InputException, nbIterationTooLarge);
-	}
-	else {
+	} else {
 		_nbIteration = nbIteration;
 	}
 }
 
-inline int64_t Algo::getNbIteration() const {
-	return _nbIteration;
-}
+inline int64_t Algo::getNbIteration() const { return _nbIteration; }
 
-inline double Algo::getEpsilon() const {
-	return _epsilon;
-}
+inline double Algo::getEpsilon() const { return _epsilon; }
 
-inline AlgoStopName Algo::getAlgoStopName() const {
-	return _algoStopName;
-}
+inline AlgoStopName Algo::getAlgoStopName() const { return _algoStopName; }
 
 // others functions
-Algo * createDefaultClusteringAlgo();
+Algo *createDefaultClusteringAlgo();
 }
 
 #endif

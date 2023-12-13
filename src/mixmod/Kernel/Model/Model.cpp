@@ -6,7 +6,7 @@
 
 /***************************************************************************
     This file is part of MIXMOD
-    
+
     MIXMOD is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -20,69 +20,63 @@
     You should have received a copy of the GNU General Public License
     along with MIXMOD.  If not, see <http://www.gnu.org/licenses/>.
 
-    All informations available on : http://www.mixmod.org                                                                                               
+    All informations available on : http://www.mixmod.org
 ***************************************************************************/
 
 #include "mixmod/Kernel/Model/Model.h"
+#include "mixmod/Kernel/IO/BinaryData.h"
+#include "mixmod/Kernel/IO/BinarySample.h"
+#include "mixmod/Kernel/IO/CompositeData.h"
+#include "mixmod/Kernel/IO/GaussianData.h"
+#include "mixmod/Kernel/IO/LabelDescription.h"
+#include "mixmod/Kernel/IO/Partition.h"
+#include "mixmod/Kernel/IO/Sample.h"
 #include "mixmod/Kernel/Model/ModelType.h"
-#include "mixmod/Kernel/Parameter/GaussianDiagParameter.h"
-#include "mixmod/Kernel/Parameter/GaussianSphericalParameter.h"
-#include "mixmod/Kernel/Parameter/GaussianGeneralParameter.h"
-#include "mixmod/Kernel/Parameter/GaussianHDDAParameter.h"
 #include "mixmod/Kernel/Parameter/BinaryEParameter.h"
-#include "mixmod/Kernel/Parameter/BinaryEkParameter.h"
 #include "mixmod/Kernel/Parameter/BinaryEjParameter.h"
+#include "mixmod/Kernel/Parameter/BinaryEkParameter.h"
 #include "mixmod/Kernel/Parameter/BinaryEkjParameter.h"
 #include "mixmod/Kernel/Parameter/BinaryEkjhParameter.h"
 #include "mixmod/Kernel/Parameter/CompositeParameter.h"
-#include "mixmod/Utilities/Random.h"
-#include "mixmod/Kernel/IO/GaussianData.h"
-#include "mixmod/Kernel/IO/BinaryData.h"
-#include "mixmod/Kernel/IO/CompositeData.h"
-#include "mixmod/Kernel/IO/Partition.h"
-#include "mixmod/Kernel/IO/LabelDescription.h"
+#include "mixmod/Kernel/Parameter/GaussianDiagParameter.h"
+#include "mixmod/Kernel/Parameter/GaussianGeneralParameter.h"
+#include "mixmod/Kernel/Parameter/GaussianHDDAParameter.h"
+#include "mixmod/Kernel/Parameter/GaussianSphericalParameter.h"
 #include "mixmod/Matrix/Matrix.h"
-#include "mixmod/Kernel/IO/Sample.h"
-#include "mixmod/Kernel/IO/BinarySample.h"
+#include "mixmod/Utilities/Random.h"
 #include <string.h>
 
-namespace XEM {
+namespace XEM
+{
 
 //------------
 // Constructor
 //------------
-Model::Model() {
-	THROW(OtherException, internalMixmodError);
-}
+Model::Model() { THROW(OtherException, internalMixmodError); }
 
-Model* Model::clone() {
-	return new Model(this);
-}
+Model *Model::clone() { return new Model(this); }
 
 //------------
 // Constructor
 //------------
-Model::Model(Model * iModel)
-: _modelType(iModel->getModelType()), _nbCluster(iModel->getNbCluster()),
-  _nbSample(iModel->getNbSample()), _deleteData(true), _parameter(iModel->getParameter()->clone()),
-  _tabFik(copyTab(iModel->getTabFik(), _nbSample, _nbCluster)),
-  _tabSumF(copyTab(iModel->getTabSumF(), _nbSample)), _tabTik(copyTab(iModel->getTabTik(),
-  _nbSample, _nbCluster)), _tabZikKnown(copyTab(iModel->getTabZikKnown(), _nbSample,
-  _nbCluster)), _tabCik(copyTab(iModel->getTabCik(), _nbSample, _nbCluster)),
-  _tabZiKnown(copyTab(iModel->getTabZiKnown(), _nbSample)), _tabNk(copyTab(iModel->getTabNk(),
-  _nbCluster)), _algoName(iModel->getAlgoName())
+Model::Model(Model *iModel)
+    : _modelType(iModel->getModelType()), _nbCluster(iModel->getNbCluster()), _nbSample(iModel->getNbSample()),
+      _deleteData(true), _parameter(iModel->getParameter()->clone()),
+      _tabFik(copyTab(iModel->getTabFik(), _nbSample, _nbCluster)), _tabSumF(copyTab(iModel->getTabSumF(), _nbSample)),
+      _tabTik(copyTab(iModel->getTabTik(), _nbSample, _nbCluster)),
+      _tabZikKnown(copyTab(iModel->getTabZikKnown(), _nbSample, _nbCluster)),
+      _tabCik(copyTab(iModel->getTabCik(), _nbSample, _nbCluster)), _tabZiKnown(copyTab(iModel->getTabZiKnown(), _nbSample)),
+      _tabNk(copyTab(iModel->getTabNk(), _nbCluster)), _algoName(iModel->getAlgoName())
 {
 	if (isHeterogeneous(_modelType->_nameModel)) {
-		CompositeData * cD = (CompositeData *) iModel->getData();
+		CompositeData *cD = (CompositeData *)iModel->getData();
 		_data = new CompositeData(cD);
-	}
-	else {
+	} else {
 		if (isBinary(_modelType->_nameModel)) {
-			BinaryData * bD = (iModel->getBinaryData());
+			BinaryData *bD = (iModel->getBinaryData());
 			_data = new BinaryData(*bD);
-		}
-		else {
-			GaussianData * gD = iModel->getGaussianData();
+		} else {
+			GaussianData *gD = iModel->getGaussianData();
 			_data = new GaussianData(*gD);
 		}
 	}
@@ -93,17 +87,17 @@ Model::Model(Model * iModel)
 //------------
 // Constructor
 //------------
-Model::Model(ModelType * modelType, int64_t nbCluster, Data *& data, Partition * knownPartition)
-: _modelType(modelType), _nbCluster(nbCluster), _nbSample(data->_nbSample),
-  _data(data), _deleteData(false), _parameter(0), _algoName(UNKNOWN_ALGO_NAME)
+Model::Model(ModelType *modelType, int64_t nbCluster, Data *&data, Partition *knownPartition)
+    : _modelType(modelType), _nbCluster(nbCluster), _nbSample(data->_nbSample), _data(data), _deleteData(false), _parameter(0),
+      _algoName(UNKNOWN_ALGO_NAME)
 {
 	// initialize probabilities
 	int64_t k, i;
 
-	_tabFik = new double*[_nbSample];
-	_tabCik = new double*[_nbSample];
+	_tabFik = new double *[_nbSample];
+	_tabCik = new double *[_nbSample];
 	_tabSumF = new double[_nbSample];
-	_tabTik = new double*[_nbSample];
+	_tabTik = new double *[_nbSample];
 	_tabZikKnown = new int64_t *[_nbSample];
 	_tabZiKnown = new bool[_nbSample];
 	_tabNk = new double[_nbCluster];
@@ -111,7 +105,7 @@ Model::Model(ModelType * modelType, int64_t nbCluster, Data *& data, Partition *
 	for (i = 0; i < _nbSample; i++) {
 		_tabFik[i] = new double[_nbCluster];
 		_tabTik[i] = new double[_nbCluster];
-		_tabZikKnown[i] = new int64_t [_nbCluster];
+		_tabZikKnown[i] = new int64_t[_nbCluster];
 		_tabCik[i] = new double[_nbCluster];
 		for (k = 0; k < _nbCluster; k++) {
 			_tabFik[i][k] = 0.0;
@@ -136,62 +130,39 @@ Model::Model(ModelType * modelType, int64_t nbCluster, Data *& data, Partition *
 	// create Param
 	if (isSpherical(modelName)) {
 		_parameter = new GaussianSphericalParameter(this, _modelType);
-	}
-	else if (isDiagonal(modelName)) {
+	} else if (isDiagonal(modelName)) {
 		_parameter = new GaussianDiagParameter(this, _modelType);
-	}
-	else if (isGeneral(modelName)) {
+	} else if (isGeneral(modelName)) {
 		_parameter = new GaussianGeneralParameter(this, _modelType);
 	}
-		//HDDA models
+	// HDDA models
 	else if (isHD(modelName)) {
 		_parameter = new GaussianHDDAParameter(this, _modelType);
 	}
 	// Binary models
 	else {
 		if (modelName == Binary_p_E) {
-			_parameter = new BinaryEParameter(
-					this, _modelType, ((BinaryData*) _data)->getTabNbModality());
-		}
-		else if (modelName == Binary_p_Ek) {
-			_parameter = new BinaryEkParameter(
-					this, _modelType, ((BinaryData*) _data)->getTabNbModality());
-		}
-		else if (modelName == Binary_p_Ej) {
-			_parameter = new BinaryEjParameter(
-					this, _modelType, ((BinaryData*) _data)->getTabNbModality());
-		}
-		else if (modelName == Binary_p_Ekj) {
-			_parameter = new BinaryEkjParameter(
-					this, _modelType, ((BinaryData*) _data)->getTabNbModality());
-		}
-		else if (modelName == Binary_p_Ekjh) {
-			_parameter = new BinaryEkjhParameter(
-					this, _modelType, ((BinaryData*) _data)->getTabNbModality());
-		}
-		else if (modelName == Binary_pk_E) {
-			_parameter = new BinaryEParameter(
-					this, _modelType, ((BinaryData*) _data)->getTabNbModality());
-		}
-		else if (modelName == Binary_pk_Ek) {
-			_parameter = new BinaryEkParameter(
-					this, _modelType, ((BinaryData*) _data)->getTabNbModality());
-		}
-		else if (modelName == Binary_pk_Ej) {
-			_parameter = new BinaryEjParameter(
-					this, _modelType, ((BinaryData*) _data)->getTabNbModality());
-		}
-		else if (modelName == Binary_pk_Ekj) {
-			_parameter = new BinaryEkjParameter(
-					this, _modelType, ((BinaryData*) _data)->getTabNbModality());
-		}
-		else if (modelName == Binary_pk_Ekjh) {
-			_parameter = new BinaryEkjhParameter(
-					this, _modelType, ((BinaryData*) _data)->getTabNbModality());
-		}
-		else if (isHeterogeneous(modelName)) {
-			_parameter = new CompositeParameter(
-					this, _modelType, (_data->getBinaryData())->getTabNbModality());
+			_parameter = new BinaryEParameter(this, _modelType, ((BinaryData *)_data)->getTabNbModality());
+		} else if (modelName == Binary_p_Ek) {
+			_parameter = new BinaryEkParameter(this, _modelType, ((BinaryData *)_data)->getTabNbModality());
+		} else if (modelName == Binary_p_Ej) {
+			_parameter = new BinaryEjParameter(this, _modelType, ((BinaryData *)_data)->getTabNbModality());
+		} else if (modelName == Binary_p_Ekj) {
+			_parameter = new BinaryEkjParameter(this, _modelType, ((BinaryData *)_data)->getTabNbModality());
+		} else if (modelName == Binary_p_Ekjh) {
+			_parameter = new BinaryEkjhParameter(this, _modelType, ((BinaryData *)_data)->getTabNbModality());
+		} else if (modelName == Binary_pk_E) {
+			_parameter = new BinaryEParameter(this, _modelType, ((BinaryData *)_data)->getTabNbModality());
+		} else if (modelName == Binary_pk_Ek) {
+			_parameter = new BinaryEkParameter(this, _modelType, ((BinaryData *)_data)->getTabNbModality());
+		} else if (modelName == Binary_pk_Ej) {
+			_parameter = new BinaryEjParameter(this, _modelType, ((BinaryData *)_data)->getTabNbModality());
+		} else if (modelName == Binary_pk_Ekj) {
+			_parameter = new BinaryEkjParameter(this, _modelType, ((BinaryData *)_data)->getTabNbModality());
+		} else if (modelName == Binary_pk_Ekjh) {
+			_parameter = new BinaryEkjhParameter(this, _modelType, ((BinaryData *)_data)->getTabNbModality());
+		} else if (isHeterogeneous(modelName)) {
+			_parameter = new CompositeParameter(this, _modelType, (_data->getBinaryData())->getTabNbModality());
 		}
 	}
 }
@@ -199,7 +170,8 @@ Model::Model(ModelType * modelType, int64_t nbCluster, Data *& data, Partition *
 //-----------
 // Destructor
 //-----------
-Model::~Model() {
+Model::~Model()
+{
 	int64_t i;
 
 	if (_tabFik) {
@@ -267,14 +239,13 @@ Model::~Model() {
 //------------
 // get the log of N
 //------------
-double Model::getLogN() {
-	return log(_data->_weightTotal);
-}
+double Model::getLogN() { return log(_data->_weightTotal); }
 
 //------------
 // updateForCV
 //------------
-void Model::updateForCV(Model * originalModel, CVBlock & CVBlock) {
+void Model::updateForCV(Model *originalModel, CVBlock &CVBlock)
+{
 	int64_t k, i;
 
 	// _data
@@ -319,7 +290,8 @@ void Model::updateForCV(Model * originalModel, CVBlock & CVBlock) {
 //--------------
 // return a value in : 0, ..., K-1
 // i = 0 ... nbSample-1
-int64_t Model::getKnownLabel(int64_t i) {
+int64_t Model::getKnownLabel(int64_t i)
+{
 	int64_t res = -1;
 	int64_t k;
 	if (_tabZiKnown[i]) {
@@ -328,8 +300,7 @@ int64_t Model::getKnownLabel(int64_t i) {
 				res = k;
 			}
 		}
-	}
-	else {
+	} else {
 		THROW(OtherException, internalMixmodError);
 	}
 	return res;
@@ -339,8 +310,9 @@ int64_t Model::getKnownLabel(int64_t i) {
 // getLabelAndPartitionByMAPOrKnownPartition
 // label[i] = 1 ... nbSample
 //------------------------------------------
-void Model::getLabelAndPartitionByMAPOrKnownPartition(int64_t * label, int64_t ** partition) {
-	//if (!_isCikEqualToMapOrKnownPartition){
+void Model::getLabelAndPartitionByMAPOrKnownPartition(int64_t *label, int64_t **partition)
+{
+	// if (!_isCikEqualToMapOrKnownPartition){
 	if (_algoName == UNKNOWN_ALGO_NAME)
 		throw;
 
@@ -351,14 +323,13 @@ void Model::getLabelAndPartitionByMAPOrKnownPartition(int64_t * label, int64_t *
 		for (i = 0; i < _nbSample; i++) {
 			for (k = 0; k < _nbCluster; k++) {
 				// cast double to int64_t  (_tabCik[i][k] = 0.0 or 1.0)
-				partition[i][k] = (int64_t) _tabCik[i][k];
+				partition[i][k] = (int64_t)_tabCik[i][k];
 				if (partition[i][k] == 1) {
 					label[i] = k + 1;
 				}
 			}
 		}
-	}
-	else {
+	} else {
 		int64_t k, kMax;
 		int64_t i;
 		double tikMax = 0;
@@ -371,8 +342,7 @@ void Model::getLabelAndPartitionByMAPOrKnownPartition(int64_t * label, int64_t *
 						label[i] = k + 1;
 					}
 				}
-			}
-			else {
+			} else {
 				// !ziKnown
 				//---------
 				kMax = 0;
@@ -398,7 +368,8 @@ void Model::getLabelAndPartitionByMAPOrKnownPartition(int64_t * label, int64_t *
 //------------------------------
 // return a value in : 0, ..., K-1
 // i = 0 ... nbSample-1
-int64_t Model::getLabelByMAPOrKnownPartition(int64_t i) {
+int64_t Model::getLabelByMAPOrKnownPartition(int64_t i)
+{
 
 	int64_t k, kMax;
 	double tikMax = 0;
@@ -428,8 +399,7 @@ int64_t Model::getLabelByMAPOrKnownPartition(int64_t i) {
 					res = k;
 				}
 			}
-		}
-		else {
+		} else {
 			tikMax = _tabTik[i][0];
 			kMax = 0;
 			for (k = 0; k < _nbCluster; k++) {
@@ -457,14 +427,13 @@ int64_t Model::getLabelByMAPOrKnownPartition(int64_t i) {
 //-------------------------------------
 // get log-likelihood one (one cluster)
 //-------------------------------------
-double Model::getLogLikelihoodOne() {
-	return _parameter->getLogLikelihoodOne();
-}
+double Model::getLogLikelihoodOne() { return _parameter->getLogLikelihoodOne(); }
 
 //-------------------
 // get log-likelihood
 //-------------------
-double Model::getLogLikelihood(bool fikMustBeComputed) {
+double Model::getLogLikelihood(bool fikMustBeComputed)
+{
 	// Compute the log-likelihood (observed) //
 
 	if (fikMustBeComputed) {
@@ -473,21 +442,20 @@ double Model::getLogLikelihood(bool fikMustBeComputed) {
 
 	int64_t i;
 	double logLikelihood = 0.0;
-	double ** p_tabFik;
-	double * p_tabFik_i;
-	double * weight = _data->_weight;
+	double **p_tabFik;
+	double *p_tabFik_i;
+	double *weight = _data->_weight;
 	p_tabFik = _tabFik;
 	for (i = 0; i < _nbSample; i++) {
 		p_tabFik_i = *p_tabFik;
 		if (_tabZiKnown[i]) {
 			int64_t ki = getKnownLabel(i); // la classe de l'individu i
 			logLikelihood += log(p_tabFik_i[ki]) * weight[i];
-		}
-		else {
+		} else {
 			if (_tabSumF[i] > 0)
 				logLikelihood += log(_tabSumF[i]) * weight[i];
 		}
-		//cout<<"compute LL, with ind "<<i<<", LL = "<<logLikelihood<<endl;
+		// cout<<"compute LL, with ind "<<i<<", LL = "<<logLikelihood<<endl;
 		p_tabFik++;
 	}
 
@@ -497,15 +465,14 @@ double Model::getLogLikelihood(bool fikMustBeComputed) {
 //-----------------------------------------
 // get completed LL (if CEM) or LL (elseif)
 //-----------------------------------------
-double Model::getCompletedLogLikelihoodOrLogLikelihood() {
+double Model::getCompletedLogLikelihoodOrLogLikelihood()
+{
 	if (_algoName == UNKNOWN_ALGO_NAME) {
 		THROW(OtherException, internalMixmodError);
-	}
-	else {
+	} else {
 		if (_algoName == CEM) {
 			return getCompletedLogLikelihood();
-		}
-		else {
+		} else {
 			return getLogLikelihood(true);
 		}
 	}
@@ -514,7 +481,8 @@ double Model::getCompletedLogLikelihoodOrLogLikelihood() {
 //-----------------------------
 // get completed log-likelihood
 //-----------------------------
-double Model::getCompletedLogLikelihood() {
+double Model::getCompletedLogLikelihood()
+{
 	// Compute the observed completed log-likelihood
 
 	int64_t i;
@@ -533,7 +501,8 @@ double Model::getCompletedLogLikelihood() {
 //------------
 // get entropy
 //------------
-double Model::getEntropy() {
+double Model::getEntropy()
+{
 	// Entropy
 
 	// Initialization //
@@ -544,14 +513,14 @@ double Model::getEntropy() {
 	// Compute entropy: sum[tik * log(tik)] //
 	for (i = 0; i < _nbSample; i++) {
 		// ajout du 16/06/2004 : ligne suivante : on ajoute uniqt si le label est inconnu
-    if (!_tabZiKnown[i]) {
-      for (k = 0; k < _nbCluster; k++) {
-        if (_tabTik[i][k] > 0 && _tabTik[i][k] != 1) {
-          entropy += _tabTik[i][k] * log(_tabTik[i][k]) * _data->_weight[i];
-        }
-      }
-    }
-  }
+		if (!_tabZiKnown[i]) {
+			for (k = 0; k < _nbCluster; k++) {
+				if (_tabTik[i][k] > 0 && _tabTik[i][k] != 1) {
+					entropy += _tabTik[i][k] * log(_tabTik[i][k]) * _data->_weight[i];
+				}
+			}
+		}
+	}
 
 	return -entropy;
 }
@@ -559,176 +528,177 @@ double Model::getEntropy() {
 //------------
 // get entropy matrix (for massiccc's visualization)
 //------------
-vector< vector<double> > Model::getEntropyMatrix() {
+vector<vector<double>> Model::getEntropyMatrix()
+{
 
-  // Initialization //
-  int nbVariables = _parameter->getModel()->getData()->getPbDimension();
-  vector< vector<double> > entropyM(nbVariables, vector<double>(_nbCluster));
-  vector< vector<double> > tabTikj(_nbSample, vector<double>(_nbCluster));
-  double sum = 0.0;
-  double nlnk = _nbSample * log(_nbCluster);
+	// Initialization //
+	int nbVariables = _parameter->getModel()->getData()->getPbDimension();
+	vector<vector<double>> entropyM(nbVariables, vector<double>(_nbCluster));
+	vector<vector<double>> tabTikj(_nbSample, vector<double>(_nbCluster));
+	double sum = 0.0;
+	double nlnk = _nbSample * log(_nbCluster);
 
-  for (int64_t j = 0; j < nbVariables; j++) {
-    if (isHeterogeneous(_modelType->_nameModel)) {
-      CompositeParameter * cParameter = dynamic_cast<CompositeParameter*> (_parameter);
-      //Binary Parameter
-      BinaryParameter * bParameter = cParameter->getBinaryParameter();
-      int64_t bPbDimension = bParameter->getPbDimension();
-      if (j < bPbDimension) {
-        double *** scatter = bParameter->scatterToArray();
-        for (int64_t i = 0; i < _nbSample; i++) {
-          for (int64_t k = 0; k < _nbCluster; k++) {
-            int64_t tabNbModality = bParameter->getTabNbModality()[j];
-            int64_t tabDataValue = bParameter->getModel()->getBinaryData()->getDataMatrix()[i]->getBinarySample()->getTabValue()[j];
-            double prod = 1.0;
-            for (int64_t m = 0; m < tabNbModality; m++) {
-              if (tabDataValue == (m + 1)) {
-                if (bParameter->getTabCenter()[k][j] == (m + 1)) {
-                  prod = prod * ((1 - scatter[k][j][m]));
-                }
-                else {
-                  prod = prod * (scatter[k][j][m] / (tabNbModality - 1));
-                }
-              }
-            }
-            tabTikj[i][k] = bParameter->getTabProportion()[k] * prod;
-            sum += tabTikj[i][k];
-          }
-          for (int64_t k = 0; k < _nbCluster; k++) {
-            tabTikj[i][k] = tabTikj[i][k] / sum;
-          }
-          sum = 0.0;
-        }
-        for (int64_t l = 0; l < _nbCluster; l++) {
-          for (int64_t m = 0; m < bPbDimension; m++) {
-            delete[] scatter[l][m];
-          }
-          delete[] scatter[l];
-        }
-        delete[] scatter;
-      }
-      else {
-        //Gaussian Parameter
-        GaussianEDDAParameter * gParameter = dynamic_cast<GaussianEDDAParameter*> (cParameter->getGaussianParameter());
-        int gPbDimension = gParameter->getPbDimension();
-        double ** tabData = gParameter->getModel()->getGaussianData()->getYStore();
-        for (int64_t i = 0; i < _nbSample; i++) {
-          for (int64_t k = 0; k < _nbCluster; k++) {
-            double ** store = gParameter->getTabSigma()[k]->storeToArray();
-            tabTikj[i][k] = gParameter->getTabProportion()[k] * 1.0/(sqrt(2.0*XEMPI)*sqrt(store[j - bPbDimension][j - bPbDimension])) * exp(-pow(tabData[i][j - bPbDimension] - gParameter->getTabMean()[k][j - bPbDimension],2)/(2*store[j - bPbDimension][j - bPbDimension]));
-            sum += tabTikj[i][k];
-            for (int64_t l = 0; l < gPbDimension; l++) {
-              delete[] store[l];
-            }
-            delete[] store;
-          }
-          for (int k = 0; k < _nbCluster; k++) {
-            tabTikj[i][k] = tabTikj[i][k] / sum;
-          }
-          sum = 0.0;
-        }
-      }
-    }
-    else {
-      if (isBinary(_modelType->_nameModel)) {
-        BinaryParameter * bParameter = dynamic_cast<BinaryParameter*> (_parameter);
-        double *** scatter = bParameter->scatterToArray();
-        for (int64_t i = 0; i < _nbSample; i++) {
-          int tabNbModality = bParameter->getTabNbModality()[j];
-          int tabDataValue = bParameter->getModel()->getBinaryData()->getDataMatrix()[i]->getBinarySample()->getTabValue()[j];
-          for (int64_t k = 0; k < _nbCluster; k++) {
-            double prod = 1.0;
-            for (int64_t m = 0; m < tabNbModality; m++) {
-              if (tabDataValue == (m + 1)) {
-                if (bParameter->getTabCenter()[k][j] == (m + 1)) {
-                  prod = prod * ((1 - scatter[k][j][m]));
-                }
-                else { 
-                  prod = prod * (scatter[k][j][m] / (tabNbModality - 1));
-                }
-              }
-            }
-            tabTikj[i][k] = bParameter->getTabProportion()[k] * prod;
-            sum += tabTikj[i][k];
-          }
-          for (int64_t k = 0; k < _nbCluster; k++) {
-            tabTikj[i][k] = tabTikj[i][k] / sum;
-          }
-          sum = 0.0;
-        }
-        for (int64_t l = 0; l < _nbCluster; l++) {
-          for (int64_t m = 0; m < nbVariables; m++) {
-            delete[] scatter[l][m];
-          }
-          delete[] scatter[l];
-        }
-        delete[] scatter;
+	for (int64_t j = 0; j < nbVariables; j++) {
+		if (isHeterogeneous(_modelType->_nameModel)) {
+			CompositeParameter *cParameter = dynamic_cast<CompositeParameter *>(_parameter);
+			// Binary Parameter
+			BinaryParameter *bParameter = cParameter->getBinaryParameter();
+			int64_t bPbDimension = bParameter->getPbDimension();
+			if (j < bPbDimension) {
+				double ***scatter = bParameter->scatterToArray();
+				for (int64_t i = 0; i < _nbSample; i++) {
+					for (int64_t k = 0; k < _nbCluster; k++) {
+						int64_t tabNbModality = bParameter->getTabNbModality()[j];
+						int64_t tabDataValue =
+						    bParameter->getModel()->getBinaryData()->getDataMatrix()[i]->getBinarySample()->getTabValue()[j];
+						double prod = 1.0;
+						for (int64_t m = 0; m < tabNbModality; m++) {
+							if (tabDataValue == (m + 1)) {
+								if (bParameter->getTabCenter()[k][j] == (m + 1)) {
+									prod = prod * ((1 - scatter[k][j][m]));
+								} else {
+									prod = prod * (scatter[k][j][m] / (tabNbModality - 1));
+								}
+							}
+						}
+						tabTikj[i][k] = bParameter->getTabProportion()[k] * prod;
+						sum += tabTikj[i][k];
+					}
+					for (int64_t k = 0; k < _nbCluster; k++) {
+						tabTikj[i][k] = tabTikj[i][k] / sum;
+					}
+					sum = 0.0;
+				}
+				for (int64_t l = 0; l < _nbCluster; l++) {
+					for (int64_t m = 0; m < bPbDimension; m++) {
+						delete[] scatter[l][m];
+					}
+					delete[] scatter[l];
+				}
+				delete[] scatter;
+			} else {
+				// Gaussian Parameter
+				GaussianEDDAParameter *gParameter = dynamic_cast<GaussianEDDAParameter *>(cParameter->getGaussianParameter());
+				int gPbDimension = gParameter->getPbDimension();
+				double **tabData = gParameter->getModel()->getGaussianData()->getYStore();
+				for (int64_t i = 0; i < _nbSample; i++) {
+					for (int64_t k = 0; k < _nbCluster; k++) {
+						double **store = gParameter->getTabSigma()[k]->storeToArray();
+						tabTikj[i][k] =
+						    gParameter->getTabProportion()[k] * 1.0 /
+						    (sqrt(2.0 * XEMPI) * sqrt(store[j - bPbDimension][j - bPbDimension])) *
+						    exp(-pow(tabData[i][j - bPbDimension] - gParameter->getTabMean()[k][j - bPbDimension], 2) /
+						        (2 * store[j - bPbDimension][j - bPbDimension]));
+						sum += tabTikj[i][k];
+						for (int64_t l = 0; l < gPbDimension; l++) {
+							delete[] store[l];
+						}
+						delete[] store;
+					}
+					for (int k = 0; k < _nbCluster; k++) {
+						tabTikj[i][k] = tabTikj[i][k] / sum;
+					}
+					sum = 0.0;
+				}
+			}
+		} else {
+			if (isBinary(_modelType->_nameModel)) {
+				BinaryParameter *bParameter = dynamic_cast<BinaryParameter *>(_parameter);
+				double ***scatter = bParameter->scatterToArray();
+				for (int64_t i = 0; i < _nbSample; i++) {
+					int tabNbModality = bParameter->getTabNbModality()[j];
+					int tabDataValue =
+					    bParameter->getModel()->getBinaryData()->getDataMatrix()[i]->getBinarySample()->getTabValue()[j];
+					for (int64_t k = 0; k < _nbCluster; k++) {
+						double prod = 1.0;
+						for (int64_t m = 0; m < tabNbModality; m++) {
+							if (tabDataValue == (m + 1)) {
+								if (bParameter->getTabCenter()[k][j] == (m + 1)) {
+									prod = prod * ((1 - scatter[k][j][m]));
+								} else {
+									prod = prod * (scatter[k][j][m] / (tabNbModality - 1));
+								}
+							}
+						}
+						tabTikj[i][k] = bParameter->getTabProportion()[k] * prod;
+						sum += tabTikj[i][k];
+					}
+					for (int64_t k = 0; k < _nbCluster; k++) {
+						tabTikj[i][k] = tabTikj[i][k] / sum;
+					}
+					sum = 0.0;
+				}
+				for (int64_t l = 0; l < _nbCluster; l++) {
+					for (int64_t m = 0; m < nbVariables; m++) {
+						delete[] scatter[l][m];
+					}
+					delete[] scatter[l];
+				}
+				delete[] scatter;
 
-      }
-      else {
-        GaussianEDDAParameter * gParameter = dynamic_cast<GaussianEDDAParameter*> (_parameter);
-        double ** tabData = gParameter->getModel()->getGaussianData()->getYStore();
-        for (int64_t i = 0; i < _nbSample; i++) {
-          for (int64_t k = 0; k < _nbCluster; k++) {
-            double ** store = gParameter->getTabSigma()[k]->storeToArray();
-            tabTikj[i][k] = gParameter->getTabProportion()[k] * (1.0/(sqrt(2.0*XEMPI*store[j][j])) * exp(-pow(tabData[i][j] - gParameter->getTabMean()[k][j],2)/(2*store[j][j])));
-            sum += tabTikj[i][k];
-            for (int64_t l = 0; l < nbVariables; l++) {
-              delete[] store[l];
-            }
-            delete[] store;
-          }
-          for (int64_t k = 0; k < _nbCluster; k++) {
-            tabTikj[i][k] = tabTikj[i][k] / sum;
-          }
-          sum = 0.0;
-        }
+			} else {
+				GaussianEDDAParameter *gParameter = dynamic_cast<GaussianEDDAParameter *>(_parameter);
+				double **tabData = gParameter->getModel()->getGaussianData()->getYStore();
+				for (int64_t i = 0; i < _nbSample; i++) {
+					for (int64_t k = 0; k < _nbCluster; k++) {
+						double **store = gParameter->getTabSigma()[k]->storeToArray();
+						tabTikj[i][k] = gParameter->getTabProportion()[k] *
+						                (1.0 / (sqrt(2.0 * XEMPI * store[j][j])) *
+						                 exp(-pow(tabData[i][j] - gParameter->getTabMean()[k][j], 2) / (2 * store[j][j])));
+						sum += tabTikj[i][k];
+						for (int64_t l = 0; l < nbVariables; l++) {
+							delete[] store[l];
+						}
+						delete[] store;
+					}
+					for (int64_t k = 0; k < _nbCluster; k++) {
+						tabTikj[i][k] = tabTikj[i][k] / sum;
+					}
+					sum = 0.0;
+				}
+			}
+		}
 
-      }
-    }
-
-    for (int64_t k = 0; k < _nbCluster; k++) {
-      for (int64_t i = 0; i < _nbSample; i++) {
-        if (tabTikj[i][k] == 0.0) tabTikj[i][k] = 1.0;
-        entropyM[j][k] += - tabTikj[i][k] * log(tabTikj[i][k]);
-      }
-      entropyM[j][k] = entropyM[j][k] / nlnk;
-    }
-  }
-  return entropyM;
+		for (int64_t k = 0; k < _nbCluster; k++) {
+			for (int64_t i = 0; i < _nbSample; i++) {
+				if (tabTikj[i][k] == 0.0)
+					tabTikj[i][k] = 1.0;
+				entropyM[j][k] += -tabTikj[i][k] * log(tabTikj[i][k]);
+			}
+			entropyM[j][k] = entropyM[j][k] / nlnk;
+		}
+	}
+	return entropyM;
 }
 
 // set parameters
-void Model::setParameter(Parameter * parameter) {
-	if (_parameter) delete _parameter;
+void Model::setParameter(Parameter *parameter)
+{
+	if (_parameter)
+		delete _parameter;
 	_parameter = parameter;
 }
 
 // set name of the algorithm
-void Model::setAlgoName(AlgoName algoName) {
-	_algoName = algoName;
-}
+void Model::setAlgoName(AlgoName algoName) { _algoName = algoName; }
 
-AlgoName Model::getAlgoName() {
-	return _algoName;
-}
+AlgoName Model::getAlgoName() { return _algoName; }
 
 // set an error for the model
-void Model::setError(Exception& errorType) {
-	_error.setError(errorType);
-}
+void Model::setError(Exception &errorType) { _error.setError(errorType); }
 
 //----------------------------------
 // compute the probabilities _tabFik
 //----------------------------------
-void Model::computeFik() {
+void Model::computeFik()
+{
 	// updates _tabSumF, _tabFik
 
 	int64_t k;
 	int64_t i;
-	double * tabProportion = _parameter->getTabProportion();
-	double * p_tabSumF = _tabSumF; // parcours de _tabSum
-	double ** p_tabFik = _tabFik; // parcours de _tabFik
+	double *tabProportion = _parameter->getTabProportion();
+	double *p_tabSumF = _tabSumF; // parcours de _tabSum
+	double **p_tabFik = _tabFik;  // parcours de _tabFik
 
 	_parameter->getAllPdf(_tabFik, tabProportion);
 
@@ -745,13 +715,14 @@ void Model::computeFik() {
 //-------------------------------------
 // compute number of element by cluster
 //-------------------------------------
-void Model::computeNk() {
+void Model::computeNk()
+{
 	int64_t k;
 	int64_t i;
-	double ** p_tabCik = _tabCik; // parcours le tableau _tabCik
-	double * w = _data->_weight; // parcours des poids
-	double wi; // poids courant
-	double * p_tabCik_i;
+	double **p_tabCik = _tabCik; // parcours le tableau _tabCik
+	double *w = _data->_weight;  // parcours des poids
+	double wi;                   // poids courant
+	double *p_tabCik_i;
 
 	// initialisation
 	initToZero(_tabNk, _nbCluster);
@@ -774,26 +745,25 @@ void Model::computeNk() {
 }
 
 //----------------
-//getFreeParameter
+// getFreeParameter
 //----------------
-int64_t Model::getFreeParameter() {
-	return _parameter->getFreeParameter();
-}
+int64_t Model::getFreeParameter() { return _parameter->getFreeParameter(); }
 
 // compute label of samples in x  (res : 0 -> _nbCluster-1)
 //------------------------------
-int64_t Model::computeLabel(Sample * x) {
+int64_t Model::computeLabel(Sample *x)
+{
 	int64_t k, res = 0;
 	double sumfk = 0.0;
-	double * tk = new double[_nbCluster];
-	double * fk = new double[_nbCluster];
+	double *tk = new double[_nbCluster];
+	double *fk = new double[_nbCluster];
 	double max = 0.0;
-	double * tabProportion = _parameter->getTabProportion();
+	double *tabProportion = _parameter->getTabProportion();
 	double tmp;
 
 	// Compute the probabilities _tabFik
 	for (k = 0; k < _nbCluster; k++) {
-	  tmp = tabProportion[k] * _parameter->getPdf(x, k);
+		tmp = tabProportion[k] * _parameter->getPdf(x, k);
 		fk[k] = tmp;
 		// Compute the sum of probabilities sumfk
 		sumfk += tmp;
@@ -824,10 +794,11 @@ int64_t Model::computeLabel(Sample * x) {
 //-------------
 // compute the label of the i0-th point of the sample
 // i0 : 0 -> _nbSample-1  and res : 0 -> _nbCluster-1)
-int64_t Model::computeLabel(int64_t i0) {
+int64_t Model::computeLabel(int64_t i0)
+{
 	int64_t k, res = 0;
 	double max = 0.0;
-	double * Tik_i0 = _tabTik[i0];
+	double *Tik_i0 = _tabTik[i0];
 
 	for (k = 0; k < _nbCluster; k++) {
 		if (Tik_i0[k] > max) {
@@ -842,14 +813,15 @@ int64_t Model::computeLabel(int64_t i0) {
 //-----------------
 // Fix label Known
 //----------------
-void Model::FixKnownPartition(Partition *& knownPartition) {
+void Model::FixKnownPartition(Partition *&knownPartition)
+{
 	// update Nk if knownLabel
 	if (knownPartition != NULL) {
-		int64_t ** knownPartitionValue = knownPartition->_tabValue;
-		int64_t * knownPartition_i;
-		double ** p_cik = _tabCik;
-		int64_t ** p_zikKnown = _tabZikKnown;
-		//double ** p_tik = _tabTik;
+		int64_t **knownPartitionValue = knownPartition->getTabValue();
+		int64_t *knownPartition_i;
+		double **p_cik = _tabCik;
+		int64_t **p_zikKnown = _tabZikKnown;
+		// double ** p_tik = _tabTik;
 		int64_t k;
 		int64_t i;
 		double sumLabel = 0.0;
@@ -864,16 +836,16 @@ void Model::FixKnownPartition(Partition *& knownPartition) {
 				_tabZiKnown[i] = true;
 				recopyTab(knownPartition_i, *p_cik, _nbCluster);
 				recopyTab(knownPartition_i, *p_zikKnown, _nbCluster);
-				//recopyTab(knownLabel_i,*p_tik,_nbCluster);
+				// recopyTab(knownLabel_i,*p_tik,_nbCluster);
 			}
 			knownPartitionValue++;
 			p_cik++;
-			//p_tik++;
+			// p_tik++;
 			p_zikKnown++;
 		}
 
 		computeNk();
-	}//endif
+	} // endif
 }
 
 //----------------------------------------------------------------------------------
@@ -883,27 +855,28 @@ void Model::FixKnownPartition(Partition *& knownPartition) {
 //----------------------------------------------------------------------------------
 
 /*-------------------------------------------
-		initRANDOM
-		----------
+        initRANDOM
+        ----------
 
   updated in this method :
-	- _parameter
-	- _tabFik and _tabSumF (because bestParameter is choose
+    - _parameter
+    - _tabFik and _tabSumF (because bestParameter is choose
       with the best LL which is computed with fik (and sumF)
-	Note : _tabFik and sumF wil be 're'computed in the following EStep
-	So only _parameter have to be updated in this method
+    Note : _tabFik and sumF wil be 're'computed in the following EStep
+    So only _parameter have to be updated in this method
 -------------------------------------------*/
-void Model::initRANDOM(int64_t nbTry) {
+void Model::initRANDOM(int64_t nbTry)
+{
 	// cout<<"init RANDOM, nbTryInInit="<<nbTry<<endl;
 	_algoName = UNKNOWN_ALGO_NAME;
 	int64_t i, k;
 	double logLikelihood, bestLogLikelihood;
-	Parameter * bestParameter = _parameter->clone();
-	bool * tabIndividualCanBeUsedForInitRandom = new bool[_nbSample];
+	Parameter *bestParameter = _parameter->clone();
+	bool *tabIndividualCanBeUsedForInitRandom = new bool[_nbSample];
 	for (i = 0; i < _nbSample; i++) {
 		tabIndividualCanBeUsedForInitRandom[i] = true;
 	}
-	bool * tabClusterToInitialize = new bool[_nbCluster];
+	bool *tabClusterToInitialize = new bool[_nbCluster];
 	for (k = 0; k < _nbCluster; k++) {
 		tabClusterToInitialize[k] = true;
 	}
@@ -911,11 +884,10 @@ void Model::initRANDOM(int64_t nbTry) {
 	// 1. InitForInitRandom
 	//---------------------
 	_parameter->initForInitRANDOM();
-	
+
 	// 1rst RANDOM
 	//-------------
-	randomForInitRANDOMorUSER_PARTITION(
-			tabIndividualCanBeUsedForInitRandom, tabClusterToInitialize);
+	randomForInitRANDOMorUSER_PARTITION(tabIndividualCanBeUsedForInitRandom, tabClusterToInitialize);
 	// Compute log-likelihood
 	logLikelihood = getLogLikelihood(true); // true : to compute fik
 	bestLogLikelihood = logLikelihood;
@@ -927,8 +899,7 @@ void Model::initRANDOM(int64_t nbTry) {
 
 	// Others RANDOM
 	for (i = 1; i < nbTry; i++) {
-		randomForInitRANDOMorUSER_PARTITION(
-				tabIndividualCanBeUsedForInitRandom, tabClusterToInitialize);
+		randomForInitRANDOMorUSER_PARTITION(tabIndividualCanBeUsedForInitRandom, tabClusterToInitialize);
 		// Compute log-likelihood
 		logLikelihood = getLogLikelihood(true); // true : to compute fik
 		if (logLikelihood > bestLogLikelihood) {
@@ -948,28 +919,26 @@ void Model::initRANDOM(int64_t nbTry) {
 	_parameter->edit();
 	cout<<"LL : "<< bestLogLikelihood<<endl;*/
 
-	//cout<<"fin de init RANDOM, nb d'essais effectues="<<i<<endl;
-	delete [] tabIndividualCanBeUsedForInitRandom;
-	delete [] tabClusterToInitialize;
+	// cout<<"fin de init RANDOM, nb d'essais effectues="<<i<<endl;
+	delete[] tabIndividualCanBeUsedForInitRandom;
+	delete[] tabClusterToInitialize;
 }
 
 //-----------------------------------------------
 // random step for init RANDOM or USER_PARTITION
 //----------------------------------------------
-void Model::randomForInitRANDOMorUSER_PARTITION(
-		bool * tabIndividualCanBeUsedForInitRandom, bool * tabClusterToInitialize)
+void Model::randomForInitRANDOMorUSER_PARTITION(bool *tabIndividualCanBeUsedForInitRandom, bool *tabClusterToInitialize)
 {
-	int64_t * tabIdxSampleForInit = new int64_t [_nbCluster];
-	Sample ** tabSampleForInit = new Sample*[_nbCluster];
+	int64_t *tabIdxSampleForInit = new int64_t[_nbCluster];
+	Sample **tabSampleForInit = new Sample *[_nbCluster];
 	double totalWeight = _data->_weightTotal;
-	Sample ** tabSample = _data->_matrix;
-	double * tabWeight = _data->_weight;
+	Sample **tabSample = _data->_matrix;
+	double *tabWeight = _data->_weight;
 	int64_t k;
 
 	for (k = 0; k < _nbCluster; k++) {
 		if (tabClusterToInitialize[k]) {
-			tabIdxSampleForInit[k] = generateRandomIndex(
-					tabIndividualCanBeUsedForInitRandom, tabWeight, totalWeight);
+			tabIdxSampleForInit[k] = generateRandomIndex(tabIndividualCanBeUsedForInitRandom, tabWeight, totalWeight);
 			tabSampleForInit[k] = tabSample[tabIdxSampleForInit[k]];
 		}
 	} // end for k
@@ -982,29 +951,29 @@ void Model::randomForInitRANDOMorUSER_PARTITION(
 			tabIndividualCanBeUsedForInitRandom[tabIdxSampleForInit[k]] = true;
 		}
 	}
-	delete [] tabIdxSampleForInit;
-	delete [] tabSampleForInit;
+	delete[] tabIdxSampleForInit;
+	delete[] tabSampleForInit;
 }
 
 /*----------------------------------------
-			initUSER
-			--------
-	updated in this method :
-	- _parameter
+            initUSER
+            --------
+    updated in this method :
+    - _parameter
 -----------------------------------------*/
-void Model::initUSER(Parameter * initParameter) {
+void Model::initUSER(Parameter *initParameter)
+{
 	_algoName = UNKNOWN_ALGO_NAME;
 	if (initParameter) {
 		_parameter->initUSER(initParameter);
-	}
-	else {
+	} else {
 		THROW(InputException, errorInitParameter);
 	}
 }
 
 /*----------------------------------------
-			initUSER_PARTITION
-			------------------
+            initUSER_PARTITION
+            ------------------
 
     updated in this method :
         - _parameter
@@ -1024,25 +993,25 @@ On pourrait le faire si on a beaucoup d'information mais dans ce le cas ou l'on 
 On calcule donc la dispersion autour du centre (comme s'il y avait une seule classe)
 dans le cas gaussien et on tire la dispersion au hasard dans le cas binaire.
  */
-void Model::initUSER_PARTITION(Partition * initPartition, int64_t nbTryInInit) {
+void Model::initUSER_PARTITION(Partition *initPartition, int64_t nbTryInInit)
+{
 
 	_algoName = UNKNOWN_ALGO_NAME;
 	int64_t nbInitializedCluster;
-	bool * tabNotInitializedCluster = new bool[_nbCluster];
+	bool *tabNotInitializedCluster = new bool[_nbCluster];
 
 	// 1. InitForUSER_PARTITION
 	//-------------------------
-	_parameter->initForInitUSER_PARTITION(
-			nbInitializedCluster, tabNotInitializedCluster, initPartition);
+	_parameter->initForInitUSER_PARTITION(nbInitializedCluster, tabNotInitializedCluster, initPartition);
 
 	// 2.init random if needed
 	//------------------------
 	if (nbInitializedCluster != _nbCluster) {
 		// upadte tabIndividualCanBeUsedForInitRandom
 		int64_t i, k;
-		int64_t ** initLabelValue = initPartition->_tabValue;
+		int64_t **initLabelValue = initPartition->getTabValue();
 		int64_t nbSampleCanBeUsedForInitRandom = _nbSample;
-		bool * tabIndividualCanBeUsedForInitRandom = new bool[_nbSample];
+		bool *tabIndividualCanBeUsedForInitRandom = new bool[_nbSample];
 		for (i = 0; i < _nbSample; i++) {
 			tabIndividualCanBeUsedForInitRandom[i] = true;
 			k = 0;
@@ -1055,32 +1024,29 @@ void Model::initUSER_PARTITION(Partition * initPartition, int64_t nbTryInInit) {
 			}
 		}
 		if (nbSampleCanBeUsedForInitRandom < (_nbCluster - nbInitializedCluster)) {
-			THROW(InputException,
-					tooManySampleInInitPartitionAndTooManyClusterNotRepresented);
+			THROW(InputException, tooManySampleInInitPartitionAndTooManyClusterNotRepresented);
 		}
 
 		double logLikelihood, bestLogLikelihood;
-		Parameter * bestParameter = _parameter->clone();
+		Parameter *bestParameter = _parameter->clone();
 
 		// 1rst random
 		//-------------
-		//cout<<"1rst random"<<endl;
-		randomForInitRANDOMorUSER_PARTITION(
-				tabIndividualCanBeUsedForInitRandom, tabNotInitializedCluster);
+		// cout<<"1rst random"<<endl;
+		randomForInitRANDOMorUSER_PARTITION(tabIndividualCanBeUsedForInitRandom, tabNotInitializedCluster);
 		// Compute log-likelihood
 		logLikelihood = getLogLikelihood(true); // true : to compute fik
 		bestLogLikelihood = logLikelihood;
 		bestParameter->recopy(_parameter);
 		/*cout<<"initRandom"<<endl<<"1er essai : "<<endl<<"Parameter : "<<endl;
-			_parameter->edit();
-			cout<<"LL : "<< bestLogLikelihood<<endl;*/
+		    _parameter->edit();
+		    cout<<"LL : "<< bestLogLikelihood<<endl;*/
 
 		// Others RANDOM
 		//-------------
 		for (i = 1; i < nbTryInInit; i++) {
 			//		cout<<i+1<<" random"<<endl;
-			randomForInitRANDOMorUSER_PARTITION(
-					tabIndividualCanBeUsedForInitRandom, tabNotInitializedCluster);
+			randomForInitRANDOMorUSER_PARTITION(tabIndividualCanBeUsedForInitRandom, tabNotInitializedCluster);
 			// Compute log-likelihood
 			logLikelihood = getLogLikelihood(true); // true : to compute fik
 			if (logLikelihood > bestLogLikelihood) {
@@ -1088,8 +1054,8 @@ void Model::initUSER_PARTITION(Partition * initPartition, int64_t nbTryInInit) {
 				bestParameter->recopy(_parameter);
 			}
 			/*cout<<endl<<"initRandom"<<endl<<i+1<<" eme essai : "<<endl<<"Parameter : "<<endl;
-				_parameter->edit();
-				cout<<"LL : "<< logLikelihood<<endl;*/
+			    _parameter->edit();
+			    cout<<"LL : "<< logLikelihood<<endl;*/
 		}
 
 		// set best parameter
@@ -1097,25 +1063,25 @@ void Model::initUSER_PARTITION(Partition * initPartition, int64_t nbTryInInit) {
 		_parameter = bestParameter;
 		_parameter->setModel(this);
 		/*cout<<endl<<"initRandom"<<endl<<"meilleur essai : "<<endl<<"Parameter : "<<endl;
-			_parameter->edit();
-			cout<<"LL : "<< bestLogLikelihood<<endl;*/
+		    _parameter->edit();
+		    cout<<"LL : "<< bestLogLikelihood<<endl;*/
 
-		delete [] tabIndividualCanBeUsedForInitRandom;
+		delete[] tabIndividualCanBeUsedForInitRandom;
 	}
 
-	delete [] tabNotInitializedCluster;
+	delete[] tabNotInitializedCluster;
 }
 
 /*------------------------------------------------------
-					initSMALL_EM
-					------------
+                    initSMALL_EM
+                    ------------
 
   updated in this method :
-	- _parameter
-	- _tabFik, _tabSumF, _tabCik, _tabTik, _tabNk
+    - _parameter
+    - _tabFik, _tabSumF, _tabCik, _tabTik, _tabNk
       (because an Estep is called to choose the bestParameter)
-	Note : _tabFik, _tabSumF, _tabCik, _tabTik, _tabNk wil be 're'computed in the following EStep
-	So only _parameter have to be updated in this method
+    Note : _tabFik, _tabSumF, _tabCik, _tabTik, _tabNk wil be 're'computed in the following EStep
+    So only _parameter have to be updated in this method
 
 -------------------------------------------------------*/
 /*
@@ -1128,25 +1094,25 @@ void Model::initSMALL_EM(ClusteringStrategyInit * clusteringStrategyInit){
   int64_t  i, nbRunOfSmallEMOk = 0;
   bestLogLikelihood = 0.0;
   for (i=0; i<clusteringStrategyInit->getNbTry(); i++){
-	nbRunOfSmallEMOk++;
-	try{
-	  // one run of small EM
-	  _parameter->reset();
-	  oneRunOfSmallEM(clusteringStrategyInit, logLikelihood);
+    nbRunOfSmallEMOk++;
+    try{
+      // one run of small EM
+      _parameter->reset();
+      oneRunOfSmallEM(clusteringStrategyInit, logLikelihood);
 //cout<<"sortie de oneRunOfSmallEM, LL = "<<logLikelihood<<endl;
-	  if ((nbRunOfSmallEMOk == 1) || (logLikelihood > bestLogLikelihood)){
-		bestLogLikelihood = logLikelihood;
-		bestParameter->recopy(_parameter);
+      if ((nbRunOfSmallEMOk == 1) || (logLikelihood > bestLogLikelihood)){
+        bestLogLikelihood = logLikelihood;
+        bestParameter->recopy(_parameter);
 //       cout<<"best LL dans SMALL_EM : " <<bestLogLikelihood<<endl;
-	  }
-	}
-	catch (Exception&errorType){
-	  nbRunOfSmallEMOk--;
-	}
+      }
+    }
+    catch (Exception&errorType){
+      nbRunOfSmallEMOk--;
+    }
   }
 
   if (nbRunOfSmallEMOk == 0){
-	THROW(InputException,SMALL_EM_error);
+    THROW(InputException,SMALL_EM_error);
   }
 
   // set best parameter
@@ -1172,33 +1138,32 @@ void Model::oneRunOfSmallEM(ClusteringStrategyInit * clusteringStrategyInit, dou
   bool continueAgain = true;
   while (continueAgain){
 //    cout<<"while de oneRunOfSmallEM, nbIteration = "<<nbIteration<<endl;
-		 //(nbIteration < strategyInit->getNbIteration()) && (eps > strategyInit->getEpsilon())){
-	lastLogLikelihood = logLikelihood;
-	Estep();
-	Mstep();
-	nbIteration++;
-	// update continueAgain
-	switch (clusteringStrategyInit->getStopName()) {
-	  case NBITERATION :
-		continueAgain = (nbIteration < clusteringStrategyInit->getNbIteration());
-		break;
-	  case EPSILON :
-		logLikelihood = getLogLikelihood(true);  // true : to compute fik
-		eps = fabs(logLikelihood - lastLogLikelihood);
-		//continueAgain = (eps > strategyInit->getEpsilon());
-  		// on ajoute un test pour ne pas faire trop d'iterations quand meme ....
-		continueAgain = (eps > clusteringStrategyInit->getEpsilon() && (nbIteration < maxNbIterationInInit));
-		break;
-	  case NBITERATION_EPSILON :
-		logLikelihood = getLogLikelihood(true);  // true : to compute fi
-		eps = fabs(logLikelihood - lastLogLikelihood);
-		continueAgain = ((eps > clusteringStrategyInit->getEpsilon()) && (nbIteration < clusteringStrategyInit->getNbIteration()));
-		break;
-		default : THROW(OtherException,internalMixmodError);
-	}
+         //(nbIteration < strategyInit->getNbIteration()) && (eps > strategyInit->getEpsilon())){
+    lastLogLikelihood = logLikelihood;
+    Estep();
+    Mstep();
+    nbIteration++;
+    // update continueAgain
+    switch (clusteringStrategyInit->getStopName()) {
+      case NBITERATION :
+        continueAgain = (nbIteration < clusteringStrategyInit->getNbIteration());
+        break;
+      case EPSILON :
+        logLikelihood = getLogLikelihood(true);  // true : to compute fik
+        eps = fabs(logLikelihood - lastLogLikelihood);
+        //continueAgain = (eps > strategyInit->getEpsilon());
+        // on ajoute un test pour ne pas faire trop d'iterations quand meme ....
+        continueAgain = (eps > clusteringStrategyInit->getEpsilon() && (nbIteration < maxNbIterationInInit));
+        break;
+      case NBITERATION_EPSILON :
+        logLikelihood = getLogLikelihood(true);  // true : to compute fi
+        eps = fabs(logLikelihood - lastLogLikelihood);
+        continueAgain = ((eps > clusteringStrategyInit->getEpsilon()) && (nbIteration <
+clusteringStrategyInit->getNbIteration())); break; default : THROW(OtherException,internalMixmodError);
+    }
   }
   if (clusteringStrategyInit->getStopName() == NBITERATION){ // logLikelihood is an output
-	logLikelihood = getLogLikelihood(true);  // true : to compute fi
+    logLikelihood = getLogLikelihood(true);  // true : to compute fi
   }
 //cout<<"Fin de oneRunOfSmallEM, nb d'iterations effectuees = "<<nbIteration<<", logLikelihood = "<<logLikelihood<<endl;
 }
@@ -1209,10 +1174,10 @@ void Model::oneRunOfSmallEM(ClusteringStrategyInit * clusteringStrategyInit, dou
  initCEM_INIT
  ---------------------------------------------------
   updated in this method :
-	- _parameter
-	- _tabFik, _tabSumF, _tabCik, _tabTik, _tabNk (because an Estep and a CStep are called to choose the bestParameter)
-	Note : _tabFik, _tabSumF, _tabCik, _tabTik, _tabNk wil be 're'computed in the following EStep
-	So only _parameter have to be updated in this method
+    - _parameter
+    - _tabFik, _tabSumF, _tabCik, _tabTik, _tabNk (because an Estep and a CStep are called to choose the bestParameter)
+    Note : _tabFik, _tabSumF, _tabCik, _tabTik, _tabNk wil be 're'computed in the following EStep
+    So only _parameter have to be updated in this method
 
 ---------------------------------------------------*/
 /*
@@ -1226,51 +1191,51 @@ void Model::initCEM_INIT(ClusteringStrategyInit * clusteringStrategyInit){
   bestCLogLikelihood = 0.0;
 
   for (i=0; i<clusteringStrategyInit->getNbTry(); i++){
-	nbRunOfCEMOk++;
-	try{
-	  _parameter->reset(); // reset to default values
-	  initRANDOM(1);
-	  _algoName = CEM;
-	  int64_t  nbIter = 0;
-	  bool fin = false;
-	  while (!fin && nbIter<=maxNbIterationInCEM_INIT){
-		Estep();
-		Cstep();
-		Mstep();
-		nbIter++;
-		if (nbIter == 1){
-		  oldLogLikelihood = getCompletedLogLikelihood();
-		}
-		else{
-		  cLogLikelihood = getCompletedLogLikelihood();
-		  if (cLogLikelihood == oldLogLikelihood){
-			fin = true;
-		  }
-		  else{
-			oldLogLikelihood = cLogLikelihood;
-		  }
-		}
-	  }
-	  //cout<<"dans init CEM, nb d'iterations effectuées : "<<nbIter<<endl;
-	// Compute log-likelihood
-	  cLogLikelihood = getCompletedLogLikelihood();
-	// Comparaison of log-likelihood between step p and p-1
-	  if ((nbRunOfCEMOk==1) || (cLogLikelihood > bestCLogLikelihood)){
-		bestCLogLikelihood = cLogLikelihood;
-		bestParameter->recopy(_parameter);
-	  }
-	  //cout<<"nbIter : "<<nbIter<<endl;
-	}
-	catch (Exception&errorType){
-	  nbRunOfCEMOk--;
-	}
+    nbRunOfCEMOk++;
+    try{
+      _parameter->reset(); // reset to default values
+      initRANDOM(1);
+      _algoName = CEM;
+      int64_t  nbIter = 0;
+      bool fin = false;
+      while (!fin && nbIter<=maxNbIterationInCEM_INIT){
+        Estep();
+        Cstep();
+        Mstep();
+        nbIter++;
+        if (nbIter == 1){
+          oldLogLikelihood = getCompletedLogLikelihood();
+        }
+        else{
+          cLogLikelihood = getCompletedLogLikelihood();
+          if (cLogLikelihood == oldLogLikelihood){
+            fin = true;
+          }
+          else{
+            oldLogLikelihood = cLogLikelihood;
+          }
+        }
+      }
+      //cout<<"dans init CEM, nb d'iterations effectuées : "<<nbIter<<endl;
+    // Compute log-likelihood
+      cLogLikelihood = getCompletedLogLikelihood();
+    // Comparaison of log-likelihood between step p and p-1
+      if ((nbRunOfCEMOk==1) || (cLogLikelihood > bestCLogLikelihood)){
+        bestCLogLikelihood = cLogLikelihood;
+        bestParameter->recopy(_parameter);
+      }
+      //cout<<"nbIter : "<<nbIter<<endl;
+    }
+    catch (Exception&errorType){
+      nbRunOfCEMOk--;
+    }
   }
 
   if (nbRunOfCEMOk==0){
-	delete _parameter;
-	_parameter = bestParameter;
-	_parameter->setModel(this);
-	THROW(InputException,CEM_INIT_error);
+    delete _parameter;
+    _parameter = bestParameter;
+    _parameter->setModel(this);
+    THROW(InputException,CEM_INIT_error);
   }
 
   //cout<<"fin de init CEM, nb d'essais effectues="<<i<<endl;
@@ -1282,14 +1247,14 @@ void Model::initCEM_INIT(ClusteringStrategyInit * clusteringStrategyInit){
 }
  */
 /*---------------------------------------------------------
-					Initialization by SEM
-					---------------------
+                    Initialization by SEM
+                    ---------------------
 
   updated in this method :
-		- _parameter
-		- _tabFik, _tabSumF, _tabCik, _tabTik, _tabNk (because an Estep and a SStep are called to choose the bestParameter)
-	Note : _tabFik, _tabSumF, _tabCik, _tabTik, _tabNk wil be 're'computed in the following EStep
-	So, only _parameter have to be updated in this method
+        - _parameter
+        - _tabFik, _tabSumF, _tabCik, _tabTik, _tabNk (because an Estep and a SStep are called to choose the bestParameter)
+    Note : _tabFik, _tabSumF, _tabCik, _tabTik, _tabNk wil be 're'computed in the following EStep
+    So, only _parameter have to be updated in this method
 
 -------------------------------------------------------*//*
 void Model::initSEM_MAX(ClusteringStrategyInit * clusteringStrategyInit){
@@ -1335,7 +1300,6 @@ void Model::initSEM_MAX(ClusteringStrategyInit * clusteringStrategyInit){
 }
 */
 
-
 //-----------------------------------------------------------------------------------------------
 //-----------------------------------------------------------------------------------------------
 // 																	Algorithms
@@ -1343,58 +1307,59 @@ void Model::initSEM_MAX(ClusteringStrategyInit * clusteringStrategyInit){
 //-----------------------------------------------------------------------------------------------
 
 /*--------------------------------------------------------------------------------------------
-	MAP step : Maximum a Posteriori procedure
-	---------
+    MAP step : Maximum a Posteriori procedure
+    ---------
   MAP procedure consists in assigning a point to the group maximing this conditional probabiliy
 
-	Note : MAP follows an USER initialisation
-	----
+    Note : MAP follows an USER initialisation
+    ----
 
-	already updated :
-	- _parameter (by USER initialisation)
+    already updated :
+    - _parameter (by USER initialisation)
 
-	updated in this method :
-	- _tabFik, _tabCik, _tabTik, _tabNk (in Estep called in this method)
-	- _tabCik, _tabNk (called by Cstep in this method)
+    updated in this method :
+    - _tabFik, _tabCik, _tabTik, _tabNk (in Estep called in this method)
+    - _tabCik, _tabNk (called by Cstep in this method)
 ----------------------------------------------------------------------------------------------*/
-void Model::MAPstep() {
+void Model::MAPstep()
+{
 	Estep(); // to compute _tabFik, _tabTik, _tabCik, _tabNk
 	Cstep(); // to compute _tabCik (by MAP procedure) and _tabNk
 }
 
 /*--------------------------------------------------------------------------------------------
-	E step : Expectation
-	------
+    E step : Expectation
+    ------
 
-	Note : Estep follows a Mstep or an initialsation (so _parameter is updated)
-	----
+    Note : Estep follows a Mstep or an initialsation (so _parameter is updated)
+    ----
 
-	already updated :
-	- _parameter
+    already updated :
+    - _parameter
 
-	updated in this method :
-	- _tabFik, _tabCik, _tabTik, _tabNk
+    updated in this method :
+    - _tabFik, _tabCik, _tabTik, _tabNk
 
 --------------------------------------------------------------------------------------------*/
-void Model::Estep() {
+void Model::Estep()
+{
 
 	// 1. compute fik
 	//---------------
 	computeFik();
 
-	//2. compute tik (conditional probabilities (posteriori probabilities))
+	// 2. compute tik (conditional probabilities (posteriori probabilities))
 	//---------------
 	int64_t k;
 	int64_t i;
 
-	// Initialize timer info	
+	// Initialize timer info
 	ofstream progressFile;
 
 	for (i = 0; i < _nbSample; i++) {
 		if (_tabSumF[i] == 0.0) {
 			_parameter->computeTikUnderflow(i, _tabTik);
-		}
-		else {
+		} else {
 			for (k = 0; k < _nbCluster; k++) {
 				_tabTik[i][k] = _tabFik[i][k] / _tabSumF[i];
 			}
@@ -1406,55 +1371,53 @@ void Model::Estep() {
 			for (k = 0; k < _nbCluster; k++) {
 				_tabCik[i][k] = _tabTik[i][k];
 			}
-    }
-    //Write progress in file
-    if (MASSICCC == 11) {
-      progressFile.open ("progress.json");
-      progressFile << "{ \"Progress\" :  " << (((double)i + 1)/((double)_nbSample) * 100.0)/2.0 << " }";
-      progressFile.close();
-    }
-
-  }
-	//4. compute nk
+		}
+		// Write progress in file
+		if (MASSICCC == 11) {
+			progressFile.open("progress.json");
+			progressFile << "{ \"Progress\" :  " << (((double)i + 1) / ((double)_nbSample) * 100.0) / 2.0 << " }";
+			progressFile.close();
+		}
+	}
+	// 4. compute nk
 	//------------
 	computeNk();
 }
 
 /*--------------------------------------------------------------------------------------------
-	M step
-	------
+    M step
+    ------
 
-	Note : Mstep follows an Estep, Cstep, Step, or USER_PARTITION initialisation
-	----
+    Note : Mstep follows an Estep, Cstep, Step, or USER_PARTITION initialisation
+    ----
 
-	already updated :
-	- _tabFik, _tabCik, _tabTik, _tabNk
+    already updated :
+    - _tabFik, _tabCik, _tabTik, _tabNk
 
-	updated in this method :
-	- _parameter
+    updated in this method :
+    - _parameter
 --------------------------------------------------------------------------------------------*/
-void Model::Mstep() {
-	_parameter->MStep();
-}
+void Model::Mstep() { _parameter->MStep(); }
 
 /*--------------------------------------------------------------------------------------------
-	S step
-	------
+    S step
+    ------
   // S Step : Stochastic Classification
 
-	Note : Sstep follows an Estep
-	----
+    Note : Sstep follows an Estep
+    ----
 
-	already updated :
-	- _tabFik, _tabCik, _tabTik, _tabNk, _parameter
+    already updated :
+    - _tabFik, _tabCik, _tabTik, _tabNk, _parameter
 
-	updated in this method :
-	- _tabCik, _tabNk
+    updated in this method :
+    - _tabCik, _tabNk
 --------------------------------------------------------------------------------------------*/
-void Model::Sstep() {
+void Model::Sstep()
+{
 	int64_t i;
 	int64_t k;
-	double ** cumTabT = new double*[_nbSample];
+	double **cumTabT = new double *[_nbSample];
 
 	for (i = 0; i < _nbSample; i++) {
 		cumTabT[i] = new double[_nbCluster];
@@ -1466,7 +1429,7 @@ void Model::Sstep() {
 		}
 	}
 
-	double * tabRnd = new double[_nbSample];
+	double *tabRnd = new double[_nbSample];
 	for (i = 0; i < _nbSample; i++) {
 		tabRnd[i] = rnd();
 	}
@@ -1482,8 +1445,7 @@ void Model::Sstep() {
 			}
 			if (tabRnd[i] <= cumTabT[i][k]) {
 				_tabCik[i][k] = 1;
-			}
-			else {
+			} else {
 				THROW(OtherException, internalMixmodError);
 			}
 		}
@@ -1495,30 +1457,31 @@ void Model::Sstep() {
 	delete[] cumTabT;
 	delete[] tabRnd;
 
-	//update _tabNk
+	// update _tabNk
 	computeNk();
 }
 
 /*--------------------------------------------------------------------------------------------
-	C step
-	------
+    C step
+    ------
   Classification Step
 
-	Note : Cstep follows an Estep
-	----
+    Note : Cstep follows an Estep
+    ----
 
-	already updated :
-	- _tabFik, _tabCik, _tabTik, _tabNk, _parameter
+    already updated :
+    - _tabFik, _tabCik, _tabTik, _tabNk, _parameter
 
-	updated in this method :
-	- _tabCik, _tabNk
+    updated in this method :
+    - _tabCik, _tabNk
 --------------------------------------------------------------------------------------------*/
-void Model::Cstep() {
+void Model::Cstep()
+{
 	int64_t k, kMax;
 	int64_t i;
 	double tikMax = 0;
 
-	// Initialize timer info	
+	// Initialize timer info
 	ofstream progressFile;
 
 	for (i = 0; i < _nbSample; i++) {
@@ -1536,15 +1499,15 @@ void Model::Cstep() {
 			}
 			_tabCik[i][kMax] = 1;
 		}
-    //Write progress in file
-    if (MASSICCC == 11) {
-      progressFile.open ("progress.json");
-      progressFile << "{ \"Progress\" :  " << 50 + (((double)i + 1)/((double)_nbSample) * 100.0)/2.0 << " }";
-      progressFile.close();
-    }
+		// Write progress in file
+		if (MASSICCC == 11) {
+			progressFile.open("progress.json");
+			progressFile << "{ \"Progress\" :  " << 50 + (((double)i + 1) / ((double)_nbSample) * 100.0) / 2.0 << " }";
+			progressFile.close();
+		}
 	}
 
-	//update _tabNk
+	// update _tabNk
 	if (_algoName == UNKNOWN_ALGO_NAME)
 		throw;
 
@@ -1556,7 +1519,8 @@ void Model::Cstep() {
 //-----------------------
 //  debug information
 //-----------------------
-void Model::editDebugInformation() {
+void Model::editDebugInformation()
+{
 	if (DEBUG > 0) {
 		_parameter->edit();
 		if (DEBUG > 1) {
@@ -1569,7 +1533,8 @@ void Model::editDebugInformation() {
 //---------
 // edit Fik (debug)
 //---------
-void Model::editFik() {
+void Model::editFik()
+{
 	int64_t i, k;
 	for (i = 0; i < _nbSample; i++) {
 		for (k = 0; k < _nbCluster; k++) {
@@ -1582,7 +1547,8 @@ void Model::editFik() {
 //---------
 // edit Tik (debug)
 //---------
-void Model::editTik() {
+void Model::editTik()
+{
 	int64_t i, k;
 	for (i = 0; i < _nbSample; i++) {
 		for (k = 0; k < _nbCluster; k++) {
@@ -1595,7 +1561,8 @@ void Model::editTik() {
 //---------
 // edit Cik (debug)
 //---------
-void Model::editCik() {
+void Model::editCik()
+{
 	int64_t i, k;
 	for (i = 0; i < _nbSample; i++) {
 		for (k = 0; k < _nbCluster; k++) {
@@ -1608,7 +1575,8 @@ void Model::editCik() {
 //-----------
 // edit tabNk (debug)
 //-----------
-void Model::editNk() {
+void Model::editNk()
+{
 	int64_t k;
 	for (k = 0; k < _nbCluster; k++) {
 		cout << "\tnk[" << k << "]=" << _tabNk[k] << "\n";

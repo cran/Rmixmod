@@ -6,7 +6,7 @@
 
 /***************************************************************************
     This file is part of MIXMOD
-    
+
     MIXMOD is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -20,29 +20,30 @@
     You should have received a copy of the GNU General Public License
     along with MIXMOD.  If not, see <http://www.gnu.org/licenses/>.
 
-    All informations available on : http://www.mixmod.org                                                                                               
+    All informations available on : http://www.mixmod.org
 ***************************************************************************/
 #ifndef XEMCEMALGO_H
 #define XEMCEMALGO_H
 
 #include "mixmod/Kernel/Algo/Algo.h"
 
-namespace XEM {
+namespace XEM
+{
 
 /**
   @brief Derived class of XEMAlgo for CEM Algorithm(s)
   @author F Langrognet
  */
 
-class CEMAlgo : public Algo {
+class CEMAlgo : public Algo
+{
 
 public:
-
 	/// Default constructor
 	CEMAlgo();
 
 	/// Copy constructor
-	CEMAlgo(const CEMAlgo & cemAlgo);
+	CEMAlgo(const CEMAlgo &cemAlgo);
 
 	/// Constructor
 	CEMAlgo(AlgoStopName algoStopName, double epsilon, int64_t nbIteration);
@@ -51,17 +52,15 @@ public:
 	virtual ~CEMAlgo();
 
 	/// clone
-	Algo * clone() override;
+	Algo *clone() override;
 
 	/// Run method
-	void run(Model *& model) override;
+	void run(Model *&model) override;
 
 	AlgoName getAlgoName() const override;
 };
 
-inline AlgoName CEMAlgo::getAlgoName() const {
-	return CEM;
-}
+inline AlgoName CEMAlgo::getAlgoName() const { return CEM; }
 
 }
 

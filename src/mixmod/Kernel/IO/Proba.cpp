@@ -6,7 +6,7 @@
 
 /***************************************************************************
     This file is part of MIXMOD
-    
+
     MIXMOD is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -20,20 +20,22 @@
     You should have received a copy of the GNU General Public License
     along with MIXMOD.  If not, see <http://www.gnu.org/licenses/>.
 
-    All informations available on : http://www.mixmod.org                                                                                               
+    All informations available on : http://www.mixmod.org
 ***************************************************************************/
 
 #include "mixmod/Kernel/IO/Proba.h"
-#include "mixmod/Kernel/Model/Model.h"
 #include "mixmod/Kernel/Model/BinaryModel.h"
+#include "mixmod/Kernel/Model/Model.h"
 #include "mixmod/Kernel/Model/ModelType.h"
 
-namespace XEM {
+namespace XEM
+{
 
 //------------
 // Constructor
 //------------
-Proba::Proba() {
+Proba::Proba()
+{
 	_nbCluster = 0;
 	_nbSample = 0;
 }
@@ -41,7 +43,8 @@ Proba::Proba() {
 //------------
 // Constructor
 //------------
-Proba::Proba(int64_t nbSample, int64_t nbCluster) {
+Proba::Proba(int64_t nbSample, int64_t nbCluster)
+{
 	_nbCluster = nbCluster;
 	_nbSample = nbSample;
 	_proba.resize(_nbSample);
@@ -53,7 +56,8 @@ Proba::Proba(int64_t nbSample, int64_t nbCluster) {
 //------------
 // Constructor
 //------------
-Proba::Proba(Model * model) {
+Proba::Proba(Model *model)
+{
 	_nbCluster = model->getNbCluster();
 
 	if (model == NULL) {
@@ -62,30 +66,30 @@ Proba::Proba(Model * model) {
 
 	// compute tabProba
 	//-----------------
-	double ** tabProba = NULL;
-	ModelType * modelType = model->getModelType();
+	double **tabProba = NULL;
+	ModelType *modelType = model->getModelType();
 	bool binary = isBinary(modelType->_nameModel);
-	
+
 	if (!binary || (binary && !DATA_REDUCE)) {
 		_nbSample = model->getNbSample();
 		tabProba = copyTab(model->getPostProba(), _nbSample, _nbCluster); // copy
 	}
-	
+
 	else {
-		//binary + DATA_REDUCE case [currently deactivated ; see Util.h]
-		const std::vector<int64_t> & correspondenceOriginDataToReduceData = 
-				dynamic_cast<BinaryModel*> (model)->getCorrespondenceOriginDataToReduceData();
+		// binary + DATA_REDUCE case [currently deactivated ; see Util.h]
+		const std::vector<int64_t> &correspondenceOriginDataToReduceData =
+		    dynamic_cast<BinaryModel *>(model)->getCorrespondenceOriginDataToReduceData();
 		_nbSample = correspondenceOriginDataToReduceData.size();
-		tabProba = new double*[_nbSample];
+		tabProba = new double *[_nbSample];
 		for (int64_t i = 0; i < _nbSample; i++) {
 			tabProba[i] = new double[_nbCluster];
 		}
 		int64_t nbSampleOfDataReduce = model->getNbSample();
-		double ** tabPostProbaReduce = NULL;
+		double **tabPostProbaReduce = NULL;
 		// copy
 		tabPostProbaReduce = copyTab(model->getPostProba(), nbSampleOfDataReduce, _nbCluster);
-		//editTab<double>(tabPostProbaReduce,nbSampleOfDataReduce, _nbCluster);
-		// convert labelReduce, partitionReduce, postProbaReduce to label, partition, postProba
+		// editTab<double>(tabPostProbaReduce,nbSampleOfDataReduce, _nbCluster);
+		//  convert labelReduce, partitionReduce, postProbaReduce to label, partition, postProba
 		for (int64_t i = 0; i < _nbSample; i++) {
 			for (int64_t k = 0; k < _nbCluster; k++) {
 				int64_t index = correspondenceOriginDataToReduceData[i];
@@ -93,11 +97,11 @@ Proba::Proba(Model * model) {
 			}
 		}
 
-		//delete
+		// delete
 		for (int64_t i = 0; i < nbSampleOfDataReduce; i++) {
-			delete [] tabPostProbaReduce[i];
+			delete[] tabPostProbaReduce[i];
 		}
-		delete [] tabPostProbaReduce;
+		delete[] tabPostProbaReduce;
 	}
 
 	// compute _proba
@@ -105,13 +109,14 @@ Proba::Proba(Model * model) {
 	for (int64_t i = 0; i < _nbSample; i++) {
 		delete[] tabProba[i];
 	}
-	delete [] tabProba;
+	delete[] tabProba;
 }
 
 //------------
 // Constructor
 //------------
-Proba::Proba(const Proba & iProba) {
+Proba::Proba(const Proba &iProba)
+{
 	_nbSample = iProba.getNbSample();
 	_nbCluster = iProba.getNbCluster();
 	_proba = iProba.getProba();
@@ -120,18 +125,21 @@ Proba::Proba(const Proba & iProba) {
 //-----------
 // Destructor
 //-----------
-Proba::~Proba() {
-}
+Proba::~Proba() {}
 
 //--------------------
 /// Comparison operator
 //--------------------
-bool Proba::operator ==(const Proba & proba) const {
-	if (_nbSample != proba.getNbSample()) return false;
-	if (_nbCluster != proba.getNbCluster()) return false;
+bool Proba::operator==(const Proba &proba) const
+{
+	if (_nbSample != proba.getNbSample())
+		return false;
+	if (_nbCluster != proba.getNbCluster())
+		return false;
 	for (int64_t i = 0; i < _nbSample; i++) {
 		for (int64_t k = 0; k < _nbCluster; k++) {
-			if (_proba[i][k] != proba.getProba()[i][k]) return false;
+			if (_proba[i][k] != proba.getProba()[i][k])
+				return false;
 		}
 	}
 	return true;
@@ -140,7 +148,8 @@ bool Proba::operator ==(const Proba & proba) const {
 //----------
 // editProba
 //----------
-void Proba::edit(std::ostream & stream) {
+void Proba::edit(std::ostream &stream)
+{
 	stream.setf(ios::fixed, ios::floatfield);
 	for (int64_t i = 0; i < _nbSample; i++) {
 		for (int64_t k = 0; k < _nbCluster; k++)
@@ -152,16 +161,18 @@ void Proba::edit(std::ostream & stream) {
 //---------
 // getProba
 //---------
-double ** Proba::getTabProba() const {
-	double ** res;
+double **Proba::getTabProba() const
+{
+	double **res;
 	recopyVectorToTab(_proba, res);
 	return res;
 }
 
 // -----------
-//input stream
+// input stream
 // -----------
-void Proba::input(std::ifstream & flux) {
+void Proba::input(std::ifstream &flux)
+{
 	int64_t i = 0;
 	int64_t k = 0;
 

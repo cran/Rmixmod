@@ -6,7 +6,7 @@
 
 /***************************************************************************
     This file is part of MIXMOD
-    
+
     MIXMOD is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -20,58 +20,46 @@
     You should have received a copy of the GNU General Public License
     along with MIXMOD.  If not, see <http://www.gnu.org/licenses/>.
 
-    All informations available on : http://www.mixmod.org                                                                                               
+    All informations available on : http://www.mixmod.org
 ***************************************************************************/
 
 #include "mixmod/DiscriminantAnalysis/Predict/PredictModelOutput.h"
 
-namespace XEM {
+namespace XEM
+{
 
 //--------------------
 // Default Constructor
 //--------------------
-PredictModelOutput::PredictModelOutput() {
-}
+PredictModelOutput::PredictModelOutput() {}
 
 //-----------------
-//  Copy constructor
+//  Initialization Constructor
 //-----------------
-PredictModelOutput::PredictModelOutput(const PredictModelOutput & cModelOutput) {
-	THROW(OtherException, internalMixmodError);
+PredictModelOutput::PredictModelOutput(Model *estimation) : ModelOutput(estimation) {}
+
+//-----------------
+//  Initialization Constructor
+//-----------------
+PredictModelOutput::PredictModelOutput(ModelType &modelType, int64_t nbCluster,
+                                       std::vector<CriterionOutput *> &criterionOutput, double likelihood,
+                                       ParameterDescription &parameterDescription, LabelDescription &labelDescription,
+                                       ProbaDescription &probaDescription)
+    : ModelOutput(modelType, nbCluster, criterionOutput, likelihood, parameterDescription, labelDescription, probaDescription)
+{
 }
 
 //-----------------
 //  Initialization Constructor
 //-----------------
-PredictModelOutput::PredictModelOutput(Model * estimation) : ModelOutput(estimation) {
-}
-
-//-----------------
-//  Initialization Constructor
-//-----------------
-PredictModelOutput::PredictModelOutput(ModelType & modelType, 
-		int64_t nbCluster, 
-		std::vector< CriterionOutput* >& criterionOutput, 
-		double likelihood, 
-		ParameterDescription& parameterDescription, 
-		LabelDescription& labelDescription, 
-		ProbaDescription& probaDescription)
-: ModelOutput(modelType, nbCluster, criterionOutput, likelihood, 
-		parameterDescription, labelDescription, probaDescription) {
-}
-
-//-----------------
-//  Initialization Constructor
-//-----------------
-PredictModelOutput::PredictModelOutput(ModelType& modelType, int64_t nbCluster, Exception& error) 
-: ModelOutput(modelType, nbCluster, error) {
+PredictModelOutput::PredictModelOutput(ModelType &modelType, int64_t nbCluster, Exception &error)
+    : ModelOutput(modelType, nbCluster, error)
+{
 }
 
 //-----------
 // Destructor
 //-----------
-PredictModelOutput::~PredictModelOutput() {
-
-}
+PredictModelOutput::~PredictModelOutput() {}
 
 }

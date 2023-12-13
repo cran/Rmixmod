@@ -6,7 +6,7 @@
 
 /***************************************************************************
     This file is part of MIXMOD
-    
+
     MIXMOD is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -20,7 +20,7 @@
     You should have received a copy of the GNU General Public License
     along with MIXMOD.  If not, see <http://www.gnu.org/licenses/>.
 
-    All informations available on : http://www.mixmod.org                                                                                               
+    All informations available on : http://www.mixmod.org
 ***************************************************************************/
 #ifndef XEMLikelihoodOutput_H
 #define XEMLikelihoodOutput_H
@@ -28,38 +28,38 @@
 #include <fstream>
 #include <stdint.h>
 
-namespace XEM {
+namespace XEM
+{
 
 // pre-declaration
 class Model;
 
 /** @brief Base class for Label(s)
-	@author F Langrognet
+    @author F Langrognet
  */
 
-class LikelihoodOutput {
+class LikelihoodOutput
+{
 
 public:
-
 	/// Default constructor
 	LikelihoodOutput(double logLikelihood, double completeLogLikelihood, double entropy, int64_t nbFreeParam);
 
 	LikelihoodOutput();
 	/// Constructor
-	LikelihoodOutput(Model * model);
+	LikelihoodOutput(Model *model);
 
 	/// Destructor
 	virtual ~LikelihoodOutput();
 
 	/// Edit
-	void edit(std::ofstream & oFile, bool text = false);
+	void edit(std::ofstream &oFile, bool text = false);
 
-	///Selector
+	/// Selector
 	double getLogLikelihood() const;
 	double getCompleteLogLikelihood() const;
 
 private:
-
 	/// Value of logLikelihood
 	double _logLikelihood;
 
@@ -73,13 +73,9 @@ private:
 	int64_t _nbFreeParam;
 };
 
-inline double LikelihoodOutput::getLogLikelihood() const {
-	return _logLikelihood;
-}
+inline double LikelihoodOutput::getLogLikelihood() const { return _logLikelihood; }
 
-inline double LikelihoodOutput::getCompleteLogLikelihood() const {
-	return _completeLogLikelihood;
-}
+inline double LikelihoodOutput::getCompleteLogLikelihood() const { return _completeLogLikelihood; }
 
 }
 

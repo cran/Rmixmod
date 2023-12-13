@@ -6,7 +6,7 @@
 
 /***************************************************************************
     This file is part of MIXMOD
-    
+
     MIXMOD is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -20,29 +20,29 @@
     You should have received a copy of the GNU General Public License
     along with MIXMOD.  If not, see <http://www.gnu.org/licenses/>.
 
-    All informations available on : http://www.mixmod.org                                                                                               
+    All informations available on : http://www.mixmod.org
 ***************************************************************************/
 #include "mixmod/Kernel/IO/Label.h"
-#include "mixmod/Kernel/IO/LabelDescription.h"
-#include "mixmod/Kernel/Model/Model.h"
-#include "mixmod/Kernel/Model/BinaryModel.h"
-#include "mixmod/Kernel/Model/ModelType.h"
 #include "mixmod/Kernel/IO/IndividualColumnDescription.h"
+#include "mixmod/Kernel/IO/LabelDescription.h"
+#include "mixmod/Kernel/Model/BinaryModel.h"
+#include "mixmod/Kernel/Model/Model.h"
+#include "mixmod/Kernel/Model/ModelType.h"
 #include <algorithm>
 
-namespace XEM {
+namespace XEM
+{
 
 //------------
 // Constructor
 //------------
-Label::Label() {
-	_nbSample = 0;
-}
+Label::Label() { _nbSample = 0; }
 
 //------------
 // Constructor
 //------------
-Label::Label(int64_t nbSample) {
+Label::Label(int64_t nbSample)
+{
 	_nbSample = nbSample;
 	_label.resize(_nbSample);
 }
@@ -50,7 +50,8 @@ Label::Label(int64_t nbSample) {
 //------------
 // Constructor
 //------------
-Label::Label(Model * model) {
+Label::Label(Model *model)
+{
 
 	if (model == NULL) {
 		THROW(OtherException, internalMixmodError);
@@ -58,41 +59,43 @@ Label::Label(Model * model) {
 
 	// compute tabLabel
 	//-----------------
-	//int64_t * tabLabel_p = NULL;
-    std::unique_ptr<int64_t[]>  tabLabel;
+	// int64_t * tabLabel_p = NULL;
+	std::unique_ptr<int64_t[]> tabLabel;
 	int64_t nbCluster = model->getNbCluster();
-	ModelType * modelType = model->getModelType();
+	ModelType *modelType = model->getModelType();
 	bool binary = isBinary(modelType->_nameModel);
 
 	if (!binary || (binary && !DATA_REDUCE)) {
 		_nbSample = model->getNbSample();
-		//int64_t ** tabPartition = new int64_t*[_nbSample];
-        std::unique_ptr<int64_t*[], TabDeleter<int64_t>>  tabPartition(new int64_t*[_nbSample], TabDeleter<int64_t>(_nbSample));
+		// int64_t ** tabPartition = new int64_t*[_nbSample];
+		std::unique_ptr<int64_t *[], TabDeleter<int64_t>> tabPartition(new int64_t *[_nbSample],
+		                                                               TabDeleter<int64_t>(_nbSample));
 		for (int64_t i = 0; i < _nbSample; i++) {
 			tabPartition[i] = new int64_t[nbCluster];
 		}
-		//tabLabel = new int64_t[_nbSample];
-        tabLabel.reset(new int64_t[_nbSample]); //provides exception-safe deletion
+		// tabLabel = new int64_t[_nbSample];
+		tabLabel.reset(new int64_t[_nbSample]); // provides exception-safe deletion
 		model->getLabelAndPartitionByMAPOrKnownPartition(tabLabel.get(), tabPartition.get());
-		//for (int64_t i = 0; i < _nbSample; i++) {
+		// for (int64_t i = 0; i < _nbSample; i++) {
 		//	delete [] tabPartition[i];
-		//}
-		//delete [] tabPartition;
+		// }
+		// delete [] tabPartition;
 	}
 
 	else {
-		//binary case
-		const vector<int64_t> & correspondenceOriginDataToReduceData =
-				dynamic_cast<BinaryModel*> (model)->getCorrespondenceOriginDataToReduceData();
+		// binary case
+		const vector<int64_t> &correspondenceOriginDataToReduceData =
+		    dynamic_cast<BinaryModel *>(model)->getCorrespondenceOriginDataToReduceData();
 		_nbSample = correspondenceOriginDataToReduceData.size();
-		//tabLabel = new int64_t[_nbSample];
-        tabLabel.reset(new int64_t[_nbSample]); //provides exception-safe deletion
-		//label et partition on reduceData
+		// tabLabel = new int64_t[_nbSample];
+		tabLabel.reset(new int64_t[_nbSample]); // provides exception-safe deletion
+		// label et partition on reduceData
 		int64_t nbSampleOfDataReduce = model->getNbSample();
-		//int64_t * tabLabelReduce = new int64_t[nbSampleOfDataReduce];
-		std::unique_ptr<int64_t[]> tabLabelReduce(new int64_t[nbSampleOfDataReduce]);        
-		//int64_t ** tabPartitionReduce = new int64_t*[nbSampleOfDataReduce];
-        std::unique_ptr<int64_t*[], TabDeleter<int64_t>>  tabPartitionReduce(new int64_t*[nbSampleOfDataReduce], TabDeleter<int64_t>(nbSampleOfDataReduce));
+		// int64_t * tabLabelReduce = new int64_t[nbSampleOfDataReduce];
+		std::unique_ptr<int64_t[]> tabLabelReduce(new int64_t[nbSampleOfDataReduce]);
+		// int64_t ** tabPartitionReduce = new int64_t*[nbSampleOfDataReduce];
+		std::unique_ptr<int64_t *[], TabDeleter<int64_t>> tabPartitionReduce(new int64_t *[nbSampleOfDataReduce],
+		                                                                     TabDeleter<int64_t>(nbSampleOfDataReduce));
 		for (int64_t i = 0; i < nbSampleOfDataReduce; i++) {
 			tabPartitionReduce[i] = new int64_t[nbCluster];
 		}
@@ -107,23 +110,24 @@ Label::Label(Model * model) {
 			tabLabel[i] = tabLabelReduce[correspondenceOriginDataToReduceData[i]];
 		}
 
-		//delete //deletion is made by unique_ptr
-		//for (int64_t i = 0; i < nbSampleOfDataReduce; i++) {
+		// delete //deletion is made by unique_ptr
+		// for (int64_t i = 0; i < nbSampleOfDataReduce; i++) {
 		//	delete [] tabPartitionReduce[i];
-		//}
-		//delete [] tabPartitionReduce;
-		//delete[] tabLabelReduce;
+		// }
+		// delete [] tabPartitionReduce;
+		// delete[] tabLabelReduce;
 	}
 
 	// compute _label
 	recopyTabToVector(tabLabel.get(), _label, _nbSample);
-	//delete [] tabLabel; //deletion done by unique_ptr
+	// delete [] tabLabel; //deletion done by unique_ptr
 }
 
 //------------
 // Constructor
 //------------
-Label::Label(const Label & iLabel) {
+Label::Label(const Label &iLabel)
+{
 	_nbSample = iLabel.getNbSample();
 	_label = iLabel.getLabel();
 }
@@ -131,16 +135,18 @@ Label::Label(const Label & iLabel) {
 //-----------
 // Destructor
 //-----------
-Label::~Label() {
-}
+Label::~Label() {}
 
 //--------------------
 /// Comparison operator
 //--------------------
-bool Label::operator ==(const Label & label) const {
-	if (_nbSample != label.getNbSample()) return false;
+bool Label::operator==(const Label &label) const
+{
+	if (_nbSample != label.getNbSample())
+		return false;
 	for (int64_t i = 0; i < _nbSample; i++) {
-		if (_label[i] != label.getLabel()[i]) return false;
+		if (_label[i] != label.getLabel()[i])
+			return false;
 	}
 	return true;
 }
@@ -148,7 +154,8 @@ bool Label::operator ==(const Label & label) const {
 //----------
 // editProba
 //----------
-void Label::edit(std::ostream & stream) const {
+void Label::edit(std::ostream &stream) const
+{
 	stream.setf(ios::fixed, ios::floatfield);
 	for (int64_t i = 0; i < _nbSample; i++) {
 		stream << _label[i] << endl;
@@ -158,8 +165,9 @@ void Label::edit(std::ostream & stream) const {
 //---------
 // getProba
 //---------
-int64_t * Label::getTabLabel() const {
-	int64_t * res;
+int64_t *Label::getTabLabel() const
+{
+	int64_t *res;
 	recopyVectorToTab(_label, res);
 	return res;
 }
@@ -167,14 +175,16 @@ int64_t * Label::getTabLabel() const {
 //---------
 // get Error Rate
 //---------
-double Label::getErrorRate(std::vector<int64_t> const & label) const {
-	if (_nbSample != (int64_t) label.size()) {
+double Label::getErrorRate(std::vector<int64_t> const &label) const
+{
+	if (_nbSample != (int64_t)label.size()) {
 		THROW(InputException, badNumberOfValuesInLabelInput);
 	}
 
 	double missClass = 0.0;
 	for (int64_t i = 0; i < _nbSample; i++) {
-		if (_label[i] != label[i]) ++missClass;
+		if (_label[i] != label[i])
+			++missClass;
 	}
 	return missClass / _nbSample;
 }
@@ -182,13 +192,14 @@ double Label::getErrorRate(std::vector<int64_t> const & label) const {
 //---------
 // get getClassificationTab
 //---------
-int64_t** Label::getClassificationTab(std::vector<int64_t> const & label, int64_t nbCluster) const {
-	if (_nbSample != (int64_t) label.size()) {
+int64_t **Label::getClassificationTab(std::vector<int64_t> const &label, int64_t nbCluster) const
+{
+	if (_nbSample != (int64_t)label.size()) {
 		THROW(InputException, badNumberOfValuesInLabelInput);
 	}
 
 	// memory allocation
-	int64_t** classTab = new int64_t*[nbCluster];
+	int64_t **classTab = new int64_t *[nbCluster];
 	for (unsigned int i = 0; i < nbCluster; i++) {
 		classTab[i] = new int64_t[nbCluster];
 	}
@@ -199,20 +210,21 @@ int64_t** Label::getClassificationTab(std::vector<int64_t> const & label, int64_
 
 	// loop over labels
 	for (int64_t i = 0; i < _nbSample; i++) {
-	  //cout<<_label[i]<<endl;
-      if(label[i] > 0){
-		++classTab[_label[i] - 1][label[i] - 1];
-      }
+		// cout<<_label[i]<<endl;
+		if (label[i] > 0) {
+			++classTab[_label[i] - 1][label[i] - 1];
+		}
 	}
 
 	return classTab;
 }
 
 // -----------
-//input stream
+// input stream
 // read labels between 1 and nbCluster
 // -----------
-void Label::input(std::ifstream & flux, int64_t nbCluster) {
+void Label::input(std::ifstream &flux, int64_t nbCluster)
+{
 	int64_t i = 0;
 	int64_t read;
 
@@ -220,8 +232,7 @@ void Label::input(std::ifstream & flux, int64_t nbCluster) {
 		flux >> read;
 		if (read >= 1 && read <= nbCluster) {
 			_label[i] = read;
-		}
-		else {
+		} else {
 			THROW(InputException, badValueInLabelInput);
 		}
 		i++;
@@ -233,10 +244,11 @@ void Label::input(std::ifstream & flux, int64_t nbCluster) {
 }
 
 // -----------
-//input stream
+// input stream
 // read labels between 1 and nbCluster
 // -----------
-void Label::input(const LabelDescription & labelDescription) {
+void Label::input(const LabelDescription &labelDescription)
+{
 	int64_t i = 0;
 	int64_t readLabel;
 
@@ -254,14 +266,12 @@ void Label::input(const LabelDescription & labelDescription) {
 			if (fi.eof()) {
 				THROW(InputException, endDataFileReach);
 			}
-			if (typeid (*(labelDescription.getColumnDescription(j)))
-					== typeid (IndividualColumnDescription))
-			{
+			auto descJ = labelDescription.getColumnDescription(j);
+			if (typeid(*descJ) == typeid(IndividualColumnDescription)) {
 				std::string stringTmp;
 				fi >> stringTmp;
-				//cout<<stringTmp<<endl;
-			}
-			else {
+				// cout<<stringTmp<<endl;
+			} else {
 				fi >> readLabel;
 				_label.push_back(readLabel);
 			}

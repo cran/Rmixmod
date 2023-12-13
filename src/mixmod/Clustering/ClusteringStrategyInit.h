@@ -6,7 +6,7 @@
 
 /***************************************************************************
     This file is part of MIXMOD
-    
+
     MIXMOD is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -20,14 +20,15 @@
     You should have received a copy of the GNU General Public License
     along with MIXMOD.  If not, see <http://www.gnu.org/licenses/>.
 
-    All informations available on : http://www.mixmod.org                                                                                               
+    All informations available on : http://www.mixmod.org
 ***************************************************************************/
 #ifndef XEMClusteringStrategyInit_H
 #define XEMClusteringStrategyInit_H
 
 #include "mixmod/Utilities/Util.h"
 
-namespace XEM {
+namespace XEM
+{
 
 // pre-declaration
 class Data;
@@ -37,24 +38,24 @@ class Model;
 
 /**
   @brief Base class for StrategyInitType(s)
-  @author F Langrognet 
+  @author F Langrognet
  */
 
-class ClusteringStrategyInit {
+class ClusteringStrategyInit
+{
 
 public:
-
 	/// Default constructor
 	ClusteringStrategyInit();
 
 	/// Copy constructor
-	ClusteringStrategyInit(const ClusteringStrategyInit & strategyInit);
+	ClusteringStrategyInit(const ClusteringStrategyInit &strategyInit);
 
 	/// Destructor
 	virtual ~ClusteringStrategyInit();
 
 	/// getStrategyInitName
-	const StrategyInitName & getStrategyInitName() const;
+	const StrategyInitName &getStrategyInitName() const;
 
 	/// setStrategyInitName
 	void setStrategyInitName(StrategyInitName initName);
@@ -86,66 +87,65 @@ public:
 	/* Parameter */
 	//-----------//
 	/// getNbInitParameter
-	const int64_t & getNbInitParameter() const;
+	const int64_t &getNbInitParameter() const;
 
 	/// getTabInitParameter
-	const Parameter ** getTabInitParameter() const;
+	const Parameter **getTabInitParameter() const;
 
 	/// getTabInitParameter
-	Parameter * getInitParameter(int64_t index) const;
+	Parameter *getInitParameter(int64_t index) const;
 
 	/// setInitParam
-	void setInitParam(std::string & paramFileName, int64_t position);
+	void setInitParam(std::string &paramFileName, int64_t position);
 
 	/// setTabInitParam
-	void setTabInitParameter(Parameter ** tabInitParameter, int64_t nbInitParameter);
+	void setTabInitParameter(Parameter **tabInitParameter, int64_t nbInitParameter);
 
 	/* Partition */
 	//-----------//
 	///  getNbPartition
-	const int64_t & getNbPartition() const;
+	const int64_t &getNbPartition() const;
 
 	/// getTabPartition
-	const Partition ** getTabPartition() const;
+	const Partition **getTabPartition() const;
 
 	/// getTabPartition
-	Partition * getPartition(int64_t index) const;
+	Partition *getPartition(int64_t index) const;
 
-	///set Init Partition
-	void setPartition(Partition * part, int64_t position);
+	/// set Init Partition
+	void setPartition(Partition *part, int64_t position);
 
-	///set Init Partition
-	void setPartition(std::string & paramFileName, int64_t position);
+	/// set Init Partition
+	void setPartition(std::string &paramFileName, int64_t position);
 
 	/// setTabPartition
-	void setTabPartition(Partition ** tabPartition, int64_t nbPartition);
+	void setTabPartition(Partition **tabPartition, int64_t nbPartition);
 
 	/* Initialization */
 	//----------------//
 
 	/// Initialization by EM of the parameters of the model
-	void initSMALL_EM(Model*& model);
+	void initSMALL_EM(Model *&model);
 
 	/// Initialization by CEM of the parameters of the model
-	void initCEM_INIT(Model*& model);
+	void initCEM_INIT(Model *&model);
 
 	/// Initialization by SEM of the parameters of the model
-	void initSEM_MAX(Model*& model);
+	void initSEM_MAX(Model *&model);
 
 	/* Input / Output */
 	//----------------//
 	// input
-	void input(std::ifstream & fi, Data *& data, int64_t nbNbCluster,
-			int64_t * tabNbCluster, ModelType * modelType, bool & alreadyRead);
+	void input(std::ifstream &fi, Data *&data, int64_t nbNbCluster, int64_t *tabNbCluster, ModelType *modelType,
+	           bool &alreadyRead);
 
 	// verification
 	bool verify() const;
 
 	// print out strategy initialization
-	friend std::ostream & operator << (std::ostream & fo, ClusteringStrategyInit & strategyInit);
+	friend std::ostream &operator<<(std::ostream &fo, ClusteringStrategyInit &strategyInit);
 
 private:
-
 	/// Initialization strategy type
 	StrategyInitName _strategyInitName;
 
@@ -166,63 +166,47 @@ private:
 	int64_t _nbInitParameter;
 
 	/// Init Parameters to initialize strategy
-	Parameter ** _tabInitParameter;
+	Parameter **_tabInitParameter;
 
 	/* USER_PARTITION */
 	/// number of Partition
 	int64_t _nbPartition;
 
 	/// Labels to initialize strategy
-	Partition ** _tabPartition;
+	Partition **_tabPartition;
 
-	bool _deleteTabParameter ;
+	bool _deleteTabParameter;
 
-	void oneRunOfSmallEM(Model*& model, double & logLikelihood);
+	void oneRunOfSmallEM(Model *&model, double &logLikelihood);
 };
 
-inline  const StrategyInitName & ClusteringStrategyInit::getStrategyInitName() const {
-	return _strategyInitName;
+inline const StrategyInitName &ClusteringStrategyInit::getStrategyInitName() const { return _strategyInitName; }
+
+inline AlgoStopName ClusteringStrategyInit::getStopName() const { return _stopName; }
+
+inline const int64_t &ClusteringStrategyInit::getNbInitParameter() const { return _nbInitParameter; }
+
+inline const int64_t &ClusteringStrategyInit::getNbPartition() const { return _nbPartition; }
+
+inline const Parameter **ClusteringStrategyInit::getTabInitParameter() const
+{
+	return const_cast<const Parameter **>(_tabInitParameter);
 }
 
-inline AlgoStopName ClusteringStrategyInit::getStopName() const {
-	return _stopName;
+inline Parameter *ClusteringStrategyInit::getInitParameter(int64_t index) const { return _tabInitParameter[index]; }
+
+inline const Partition **ClusteringStrategyInit::getTabPartition() const
+{
+	return const_cast<const Partition **>(_tabPartition);
 }
 
-inline const int64_t & ClusteringStrategyInit::getNbInitParameter() const {
-	return _nbInitParameter;
-}
+inline Partition *ClusteringStrategyInit::getPartition(int64_t index) const { return _tabPartition[index]; }
 
-inline const int64_t & ClusteringStrategyInit::getNbPartition() const {
-	return _nbPartition;
-}
+inline int64_t ClusteringStrategyInit::getNbTry() const { return _nbTry; }
 
-inline const Parameter ** ClusteringStrategyInit::getTabInitParameter() const {
-	return const_cast<const Parameter**> (_tabInitParameter);
-}
+inline int64_t ClusteringStrategyInit::getNbIteration() const { return _nbIteration; }
 
-inline Parameter * ClusteringStrategyInit::getInitParameter(int64_t index) const {
-	return _tabInitParameter[index];
-}
-
-inline const Partition** ClusteringStrategyInit::getTabPartition() const {
-	return  const_cast<const Partition**> (_tabPartition);
-}
-
-inline Partition* ClusteringStrategyInit::getPartition(int64_t index) const {
-	return _tabPartition[index];
-}
-
-inline int64_t ClusteringStrategyInit::getNbTry() const {
-	return _nbTry;
-}
-
-inline int64_t ClusteringStrategyInit::getNbIteration() const {
-	return _nbIteration;
-}
-
-inline double ClusteringStrategyInit::getEpsilon() const {
-	return _epsilon;
-}
+inline double ClusteringStrategyInit::getEpsilon() const { return _epsilon; }
 
 }
 

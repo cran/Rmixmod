@@ -6,7 +6,7 @@
 
 /***************************************************************************
     This file is part of MIXMOD
-    
+
     MIXMOD is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -20,14 +20,15 @@
     You should have received a copy of the GNU General Public License
     along with MIXMOD.  If not, see <http://www.gnu.org/licenses/>.
 
-    All informations available on : http://www.mixmod.org                                                                                               
+    All informations available on : http://www.mixmod.org
 ***************************************************************************/
 #ifndef XEMGAUSSIANHDDAPARAMETER_H
 #define XEMGAUSSIANHDDAPARAMETER_H
 
 #include "mixmod/Kernel/Parameter/GaussianParameter.h"
 
-namespace XEM {
+namespace XEM
+{
 
 // pre-declaration
 class DiagMatrix;
@@ -38,24 +39,23 @@ class SymmetricMatrix;
   @brief Derived class of XEMGaussianParameter for HDDA Gaussian Model(s)
   @author F Langrognet
  */
-class GaussianHDDAParameter : public GaussianParameter {
+class GaussianHDDAParameter : public GaussianParameter
+{
 
 public:
-
 	/// Default constructor
 	GaussianHDDAParameter();
 
 	/// Constructor
 	// called by XEMModel
-	GaussianHDDAParameter(Model * iModel, ModelType * iModelType);
+	GaussianHDDAParameter(Model *iModel, ModelType *iModelType);
 
 	/// Constructor
 	// called by XEMStrategyType
-	GaussianHDDAParameter(int64_t iNbCluster, int64_t iPbDimension, 
-			ModelType * iModelType, std::string & iFileName);
+	GaussianHDDAParameter(int64_t iNbCluster, int64_t iPbDimension, ModelType *iModelType, std::string &iFileName);
 
 	/// Constructor
-	GaussianHDDAParameter(const GaussianHDDAParameter * iParameter);
+	GaussianHDDAParameter(const GaussianHDDAParameter *iParameter);
 
 	/// Destructor
 	virtual ~GaussianHDDAParameter();
@@ -64,149 +64,132 @@ public:
 	virtual void reset();
 
 	/** @brief Selector
-		@return A copy of the model
+	    @return A copy of the model
 	 */
-	Parameter * clone() const;
+	Parameter *clone() const;
 
 	/** @brief Selector
-		 @return Table of shape matrix for each cluster
+	     @return Table of shape matrix for each cluster
 	 */
-	DiagMatrix ** getTabShape() const;
+	DiagMatrix **getTabShape() const;
 
 	/** @brief Selector
-		@return Table of orientation matrix for each cluster
+	    @return Table of orientation matrix for each cluster
 	 */
-	GeneralMatrix ** getTabQ() const;
+	GeneralMatrix **getTabQ() const;
 
 	/** @brief Selector
-		@return Control the shape of the density in the subspace Ei
+	    @return Control the shape of the density in the subspace Ei
 	 */
-	double** getTabA() const;
+	double **getTabA() const;
 
 	/** @brief Selector
-		@return Control the shape of the density in the subspace orthogonal to Ei
+	    @return Control the shape of the density in the subspace orthogonal to Ei
 	 */
-	double* getTabB() const;
+	double *getTabB() const;
 
 	/** @brief Selector
-		@return Dimension of each subspace
+	    @return Dimension of each subspace
 	 */
-	int64_t * getTabD() const;
+	int64_t *getTabD() const;
 
-	SymmetricMatrix ** getTabGammak() const;
+	SymmetricMatrix **getTabGammak() const;
 
-	double ** getGamma() const;
+	double **getGamma() const;
 
 	void MStep();
 
-	
 	// init
 	//-----
 
-	/// initialize attributes before an InitRandom  
+	/// initialize attributes before an InitRandom
 	virtual void initForInitRANDOM();
 
 	/// initialize attributes for init USER_PARTITION
 	/// outputs :
 	/// -  nbInitializedCluster
 	/// - tabNotInitializedCluster (array of size _nbCluster)
-	void initForInitUSER_PARTITION(int64_t & nbInitializedCluster, 
-			bool * tabNotInitializedCluster, Partition * initPartition);
+	void initForInitUSER_PARTITION(int64_t &nbInitializedCluster, bool *tabNotInitializedCluster, Partition *initPartition);
 
 	/// User initialisation of the parameters of the model
-	virtual void initUSER(Parameter* iParam);
+	virtual void initUSER(Parameter *iParam);
 
 	double getLogLikelihoodOne() const;
 
 	void edit();
 
-	void edit(std::ofstream & oFile, bool text = false);
+	void edit(std::ofstream &oFile, bool text = false);
 
-	void recopy(Parameter * otherParameter);
+	void recopy(Parameter *otherParameter);
 
 	double getPdf(int64_t iSample, int64_t kCluster) const;
 
-	void getAllPdf(double ** tabFik, double * tabProportion) const;
+	void getAllPdf(double **tabFik, double *tabProportion) const;
 
-	double getPdf(Sample * x, int64_t kCluster)const;
+	double getPdf(Sample *x, int64_t kCluster) const;
 
-	double* computeLoglikelihoodK(double** K);
+	double *computeLoglikelihoodK(double **K);
 
-	void input(std::ifstream & fi);
+	void input(std::ifstream &fi);
 
 protected:
-	
 	/// Table of shape matrix of each cluster
-	DiagMatrix** _tabShape;
+	DiagMatrix **_tabShape;
 
 	/// Table of orientation matrix of each cluster
-	GeneralMatrix ** _tabQk;
+	GeneralMatrix **_tabQk;
 
 	int64_t __storeDim;
-	///Table of parameters Akj of each cluster
-	double ** _tabAkj;
-	///Table of parameters Bk of each cluster
-	double * _tabBk;
-	///Table of sub dimension of each cluster
-	int64_t * _tabDk;
+	/// Table of parameters Akj of each cluster
+	double **_tabAkj;
+	/// Table of parameters Bk of each cluster
+	double *_tabBk;
+	/// Table of sub dimension of each cluster
+	int64_t *_tabDk;
 
 	/// _tabGammak = _Gammak * _Gammak' replaces matrix Wk when tabNk smaller than _pbDimension
-	SymmetricMatrix ** _tabGammak; // matrice nk * p
+	SymmetricMatrix **_tabGammak; // matrice nk * p
 	/// Array of individuals * weight - mean[k] in class k
-	double ** _Gammak;
+	double **_Gammak;
 
-	int64_t getFreeParameter()const;
+	int64_t getFreeParameter() const;
 
 	void computeTabWkW();
 
-	///compute function of cost for each tabQk_k
-	double ** computeCost(GeneralMatrix ** tabQ)const;
+	/// compute function of cost for each tabQk_k
+	double **computeCost(GeneralMatrix **tabQ) const;
 
-	///compute parameters for the model AkjBkQk
+	/// compute parameters for the model AkjBkQk
 	void computeAkjBkQk();
-	///compute parameters for the model AkjBQk
+	/// compute parameters for the model AkjBQk
 	void computeAkjBQk();
-	///compute parameters for the model AjBkQk
+	/// compute parameters for the model AjBkQk
 	void computeAjBkQk();
-	///compute parameters for the model AjBQk
+	/// compute parameters for the model AjBQk
 	void computeAjBQk();
 
-	///compute parameters for the model AkBkQk
+	/// compute parameters for the model AkBkQk
 	void computeAkBkQk();
-	///compute parameters for the model AkBQk
+	/// compute parameters for the model AkBQk
 	void computeAkBQk();
 
 	/// compute the intrinsic dimension when non given
 	void computeTabDk();
 };
 
-inline DiagMatrix** GaussianHDDAParameter::getTabShape()const {
-	return _tabShape;
-}
+inline DiagMatrix **GaussianHDDAParameter::getTabShape() const { return _tabShape; }
 
-inline GeneralMatrix ** GaussianHDDAParameter::getTabQ() const {
-	return _tabQk;
-}
+inline GeneralMatrix **GaussianHDDAParameter::getTabQ() const { return _tabQk; }
 
-inline double** GaussianHDDAParameter::getTabA() const {
-	return _tabAkj;
-}
+inline double **GaussianHDDAParameter::getTabA() const { return _tabAkj; }
 
-inline double* GaussianHDDAParameter::getTabB() const {
-	return _tabBk;
-}
+inline double *GaussianHDDAParameter::getTabB() const { return _tabBk; }
 
-inline int64_t * GaussianHDDAParameter::getTabD() const {
-	return _tabDk;
-}
+inline int64_t *GaussianHDDAParameter::getTabD() const { return _tabDk; }
 
-inline SymmetricMatrix** GaussianHDDAParameter::getTabGammak() const {
-	return _tabGammak;
-}
+inline SymmetricMatrix **GaussianHDDAParameter::getTabGammak() const { return _tabGammak; }
 
-inline double ** GaussianHDDAParameter::getGamma() const {
-	return _Gammak;
-}
+inline double **GaussianHDDAParameter::getGamma() const { return _Gammak; }
 
 }
 

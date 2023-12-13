@@ -6,7 +6,7 @@
 
 /***************************************************************************
     This file is part of MIXMOD
-    
+
     MIXMOD is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -20,27 +20,25 @@
     You should have received a copy of the GNU General Public License
     along with MIXMOD.  If not, see <http://www.gnu.org/licenses/>.
 
-    All informations available on : http://www.mixmod.org                                                                                               
+    All informations available on : http://www.mixmod.org
 ***************************************************************************/
 
 #include "mixmod/Clustering/ClusteringInput.h"
 #include "mixmod/Clustering/ClusteringStrategy.h"
 #include "mixmod/Kernel/Model/ModelType.h"
 
-namespace XEM {
+namespace XEM
+{
 
 //--------------------
 // Default Constructor
 //--------------------
-ClusteringInput::ClusteringInput() {
-	_strategy = new ClusteringStrategy();
-}
+ClusteringInput::ClusteringInput() { _strategy = new ClusteringStrategy(); }
 
 //-----------------
 //  Copy constructor
 //-----------------
-ClusteringInput::ClusteringInput( const ClusteringInput & cInput )
-: Input(cInput)
+ClusteringInput::ClusteringInput(const ClusteringInput &cInput) : Input(cInput)
 {
 	_strategy = new ClusteringStrategy(*cInput.getStrategy());
 }
@@ -48,9 +46,8 @@ ClusteringInput::ClusteringInput( const ClusteringInput & cInput )
 //---------------------------
 // Initialisation Constructor
 //---------------------------
-ClusteringInput::ClusteringInput( const std::vector<int64_t> & iNbCluster,
-		const DataDescription & iDataDescription)
-: Input(iNbCluster, iDataDescription)
+ClusteringInput::ClusteringInput(const std::vector<int64_t> &iNbCluster, const DataDescription &iDataDescription)
+    : Input(iNbCluster, iDataDescription)
 {
 	_strategy = new ClusteringStrategy();
 }
@@ -58,8 +55,9 @@ ClusteringInput::ClusteringInput( const std::vector<int64_t> & iNbCluster,
 //-----------
 // Destructor
 //-----------
-ClusteringInput::~ClusteringInput() {
-	if ( _strategy ) {
+ClusteringInput::~ClusteringInput()
+{
+	if (_strategy) {
 		delete _strategy;
 		_strategy = NULL;
 	}
@@ -68,51 +66,62 @@ ClusteringInput::~ClusteringInput() {
 //-----------
 // setStrategy
 //-----------
-void ClusteringInput::setStrategy(ClusteringStrategy * strat) {
-	_strategy = new ClusteringStrategy(*strat);
-}
+void ClusteringInput::setStrategy(ClusteringStrategy *strat) { _strategy = new ClusteringStrategy(*strat); }
 
-//setCriterion
+// setCriterion
 //----------------
-void ClusteringInput::setCriterion(const CriterionName criterionName, unsigned int index) {
+void ClusteringInput::setCriterion(const CriterionName criterionName, unsigned int index)
+{
 	if (index < _criterionName.size()) {
 		switch (criterionName) {
-		case BIC: _criterionName[index] = BIC;
+		case BIC:
+			_criterionName[index] = BIC;
 			break;
-		case CV:  THROW(InputException, DAInput);
-		case ICL: _criterionName[index] = ICL;
+		case CV:
+			THROW(InputException, DAInput);
+		case ICL:
+			_criterionName[index] = ICL;
 			break;
-		case NEC: _criterionName[index] = NEC;
+		case NEC:
+			_criterionName[index] = NEC;
 			break;
-		case UNKNOWN_CRITERION_NAME: THROW(OtherException, internalMixmodError);
+		case UNKNOWN_CRITERION_NAME:
+			THROW(OtherException, internalMixmodError);
 			break;
-		default: THROW(OtherException, internalMixmodError);
+		default:
+			THROW(OtherException, internalMixmodError);
 		}
-	}
-	else {
+	} else {
 
 		THROW(InputException, wrongCriterionPositionInSet);
 	}
 	_finalized = false;
 }
 
-//setCriterion
+// setCriterion
 //----------------
-void ClusteringInput::setCriterion(std::vector<CriterionName> const & criterionName) {
+void ClusteringInput::setCriterion(std::vector<CriterionName> const &criterionName)
+{
 
 	// copy vector contents
 	_criterionName = criterionName;
 
 	// check vector contents
-	for ( unsigned int iCriterion = 0; iCriterion < _criterionName.size(); iCriterion++ ) {
+	for (unsigned int iCriterion = 0; iCriterion < _criterionName.size(); iCriterion++) {
 		switch (_criterionName[iCriterion]) {
-		case BIC: break;
-		case CV:  THROW(InputException, DAInput);
-		case ICL: break;
-		case NEC: break;
-		case UNKNOWN_CRITERION_NAME: THROW(OtherException, internalMixmodError);
+		case BIC:
 			break;
-		default: THROW(OtherException, internalMixmodError);
+		case CV:
+			THROW(InputException, DAInput);
+		case ICL:
+			break;
+		case NEC:
+			break;
+		case UNKNOWN_CRITERION_NAME:
+			THROW(OtherException, internalMixmodError);
+			break;
+		default:
+			THROW(OtherException, internalMixmodError);
 		}
 	}
 	_finalized = false;
@@ -128,30 +137,30 @@ When adding a new criterion via mixmodGUI, we do :
 so we have to remove criterionName tests in this method
 A new task 5290 has been created to try to do only a insert
  */
-void ClusteringInput::insertCriterion(const CriterionName criterionName, unsigned int index) {
-	if (index >= 0 && index <= _criterionName.size()) {
+void ClusteringInput::insertCriterion(const CriterionName criterionName, unsigned int index)
+{
+	if (index <= _criterionName.size()) {
 		switch (criterionName) {
 		case BIC:
-			_criterionName.insert(_criterionName.begin() + index , BIC);
+			_criterionName.insert(_criterionName.begin() + index, BIC);
 			break;
 		case CV:
 			THROW(InputException, DAInput);
 		case ICL:
-			_criterionName.insert(_criterionName.begin() + index , ICL);
+			_criterionName.insert(_criterionName.begin() + index, ICL);
 			break;
 		case NEC:
-			_criterionName.insert(_criterionName.begin() + index , NEC);
+			_criterionName.insert(_criterionName.begin() + index, NEC);
 			break;
 			/*Correction bug 15361
 			case UNKNOWN_CRITERION_NAME : THROW(XEMOtherException,internalMixmodError);break;*/
 		case UNKNOWN_CRITERION_NAME:
-			_criterionName.insert(_criterionName.begin() + index , UNKNOWN_CRITERION_NAME);
+			_criterionName.insert(_criterionName.begin() + index, UNKNOWN_CRITERION_NAME);
 			break;
 		default:
 			THROW(OtherException, internalMixmodError);
 		}
-	}
-	else {
+	} else {
 		THROW(InputException, wrongCriterionPositionInInsert);
 	}
 	_finalized = false;
@@ -159,24 +168,32 @@ void ClusteringInput::insertCriterion(const CriterionName criterionName, unsigne
 
 // add Criterion
 //-----------------
-void ClusteringInput::addCriterion(const CriterionName criterionName) {
+void ClusteringInput::addCriterion(const CriterionName criterionName)
+{
 
 	bool found = false;
-	for (unsigned int iCriterion = 0; iCriterion < _criterionName.size(); iCriterion++ ) {
-		if ( _criterionName[iCriterion] == criterionName ) found = true;
+	for (unsigned int iCriterion = 0; iCriterion < _criterionName.size(); iCriterion++) {
+		if (_criterionName[iCriterion] == criterionName)
+			found = true;
 	}
 	if (!found) {
 		switch (criterionName) {
-		case BIC: _criterionName.push_back(BIC);
+		case BIC:
+			_criterionName.push_back(BIC);
 			break;
-		case CV:  THROW(InputException, DAInput);
-		case ICL: _criterionName.push_back(ICL);
+		case CV:
+			THROW(InputException, DAInput);
+		case ICL:
+			_criterionName.push_back(ICL);
 			break;
-		case NEC: _criterionName.push_back(NEC);
+		case NEC:
+			_criterionName.push_back(NEC);
 			break;
-		case UNKNOWN_CRITERION_NAME: THROW(OtherException, internalMixmodError);
+		case UNKNOWN_CRITERION_NAME:
+			THROW(OtherException, internalMixmodError);
 			break;
-		default: THROW(OtherException, internalMixmodError);
+		default:
+			THROW(OtherException, internalMixmodError);
 		}
 	}
 	_finalized = false;
@@ -185,16 +202,17 @@ void ClusteringInput::addCriterion(const CriterionName criterionName) {
 //------------
 // print input
 //------------
-void ClusteringInput::edit(std::ostream & out ) const {
+void ClusteringInput::edit(std::ostream &out) const
+{
 	Input::edit(out);
 	_strategy->edit(out);
 }
 
-
 // ----------------
 // Verif
 //-----------------
-bool ClusteringInput::verif() {
+bool ClusteringInput::verif()
+{
 	bool res = Input::verif();
 	if (res) {
 		res = _strategy->verify();
@@ -203,53 +221,50 @@ bool ClusteringInput::verif() {
 }
 
 /// setModelType
-void ClusteringInput::setModelType(const ModelType * modelType, unsigned int index){
-	if (isHD(modelType->getModelName())){
+void ClusteringInput::setModelType(const ModelType *modelType, unsigned int index)
+{
+	if (isHD(modelType->getModelName())) {
 		THROW(InputException, HDModelsAreNotAvailableInClusteringContext);
-	}
-	else
+	} else
 		Input::setModelType(modelType, index);
 }
 
-
 /// insertModelType
-void ClusteringInput::insertModelType(const ModelType * modelType, unsigned int index){
-	if (isHD(modelType->getModelName())){
+void ClusteringInput::insertModelType(const ModelType *modelType, unsigned int index)
+{
+	if (isHD(modelType->getModelName())) {
 		THROW(InputException, HDModelsAreNotAvailableInClusteringContext);
-	}
-	else
+	} else
 		Input::insertModelType(modelType, index);
 }
 
-
 /// add new model type (at the end)
-void ClusteringInput::addModelType(const ModelType * modelType){
-	if (isHD(modelType->getModelName())){
+void ClusteringInput::addModelType(const ModelType *modelType)
+{
+	if (isHD(modelType->getModelName())) {
 		THROW(InputException, HDModelsAreNotAvailableInClusteringContext);
-	}
-	else
+	} else
 		Input::addModelType(modelType);
 }
 
 /// add new model (modelName -> modelType)
-void ClusteringInput::addModel(ModelName const modelName){
-	if (isHD(modelName)){
+void ClusteringInput::addModel(ModelName const modelName)
+{
+	if (isHD(modelName)) {
 		THROW(InputException, HDModelsAreNotAvailableInClusteringContext);
-	}
-	else
+	} else
 		Input::addModel(modelName);
 }
 
 /// setModel (modelName -> modelType)
-void ClusteringInput::setModel(std::vector<ModelName> const & modelName){
+void ClusteringInput::setModel(std::vector<ModelName> const &modelName)
+{
 	for (unsigned int iModel = 0; iModel < modelName.size(); iModel++) {
-		if (isHD(modelName[iModel])){
+		if (isHD(modelName[iModel])) {
 			THROW(InputException, HDModelsAreNotAvailableInClusteringContext);
 		}
 	}
 	Input::setModel(modelName);
 }
-
-
 
 }

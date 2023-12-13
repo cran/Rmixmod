@@ -6,7 +6,7 @@
 
 /***************************************************************************
     This file is part of MIXMOD
-    
+
     MIXMOD is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -20,30 +20,27 @@
     You should have received a copy of the GNU General Public License
     along with MIXMOD.  If not, see <http://www.gnu.org/licenses/>.
 
-    All informations available on : http://www.mixmod.org                                                                                               
+    All informations available on : http://www.mixmod.org
 ***************************************************************************/
 
 #include "mixmod/Kernel/IO/ColumnDescription.h"
 
-namespace XEM {
+namespace XEM
+{
 
 //------------
 // Constructor
 //------------
-ColumnDescription::ColumnDescription() : _index(0), _name("") {
-}
+ColumnDescription::ColumnDescription() : _index(0), _name("") {}
 
 //------------
 // Initialization Constructor
 //------------
-ColumnDescription::ColumnDescription(int64_t index) : _index(index), _name("") {
-}
+ColumnDescription::ColumnDescription(int64_t index) : _index(index), _name("") {}
 
 //------------
 // Destructor
 //------------
-ColumnDescription::~ColumnDescription() {
-
-}
+ColumnDescription::~ColumnDescription() {}
 
 }

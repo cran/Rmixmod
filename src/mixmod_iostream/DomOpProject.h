@@ -6,7 +6,7 @@
 
 /***************************************************************************
     This file is part of MIXMOD
-    
+
     MIXMOD is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -20,7 +20,7 @@
     You should have received a copy of the GNU General Public License
     along with MIXMOD.  If not, see <http://www.gnu.org/licenses/>.
 
-    All informations available on : http://www.mixmod.org                                                                                               
+    All informations available on : http://www.mixmod.org
 ***************************************************************************/
 
 #ifndef XEM_DOMOPPROJECT_H
@@ -28,46 +28,45 @@
 
 #include "mixmod_iostream/DomProject.h"
 
-namespace XEM {
-  class ClusteringMain;
-///use to create .mixmod file in Clustering case
-  class DomOpProject : public DomProject {
+namespace XEM
+{
+class ClusteringMain;
+/// use to create .mixmod file in Clustering case
+class DomOpProject : public DomProject
+{
 
-public : 
-    
-	///constructor by default
-	DomOpProject();    
+public:
+	/// constructor by default
+	DomOpProject();
 
-	///destructor
+	/// destructor
 	virtual ~DomOpProject();
 
-	///constructor by initialization
+	/// constructor by initialization
 	DomOpProject(xmlpp::Element *root);
 
-	///fill the xmlpp::Document to create the .mixmod file from a ClusteringInput and ClusteringOutput
-	//void writeClustering(string & s, ClusteringMain * cMain);    
-	void writeMixmodXml(string & s, ClusteringMain * cMain);
-	void writeMixmodXml(string & s, LearnMain * lMain);    
-    void writeMixmodXml(string& s, PredictMain * pMain);
-	///read a XML file and fill ClusteringInput
-	//void readClustering(ClusteringInput * cInput);
-	void readXmlFillIn(ClusteringInput * cInput);
-	//void readXmlFillIn(LearnInput * cInput);        
-    template<class T>
-    void readXmlFillIn(T  *cInput);
-    PredictInput * readXmlPredictInput();
-    //template<class ClusteringInput*>
-    //void readXmlFillIn(ClusteringInput *cInput);          
-	///read a XML file and fill ClusteringOutput
-	//void readClustering(ClusteringOutput * cOutput);
-    //void readXmlFillOut(ClusteringOutput * cOutput);
-    //void readXmlFillOut(LearnOutput * cOutput);
-    template<typename T, typename U>
-      void readXmlFillOut(T  * cOutput, Input *inp);
-    //template<typename T>    
-    //void readXmlFillOut(T * cOutput);    
+	/// fill the xmlpp::Document to create the .mixmod file from a ClusteringInput and ClusteringOutput
+	// void writeClustering(string & s, ClusteringMain * cMain);
+	void writeMixmodXml(string &s, ClusteringMain *cMain);
+	void writeMixmodXml(string &s, LearnMain *lMain);
+	void writeMixmodXml(string &s, PredictMain *pMain);
+	/// read a XML file and fill ClusteringInput
+	// void readClustering(ClusteringInput * cInput);
+	void readXmlFillIn(ClusteringInput *cInput);
+	// void readXmlFillIn(LearnInput * cInput);
+	template <class T> void readXmlFillIn(T *cInput);
+	PredictInput *readXmlPredictInput();
+	// template<class ClusteringInput*>
+	// void readXmlFillIn(ClusteringInput *cInput);
+	/// read a XML file and fill ClusteringOutput
+	// void readClustering(ClusteringOutput * cOutput);
+	// void readXmlFillOut(ClusteringOutput * cOutput);
+	// void readXmlFillOut(LearnOutput * cOutput);
+	template <typename T, typename U> void readXmlFillOut(T *cOutput, Input *inp);
+	// template<typename T>
+	// void readXmlFillOut(T * cOutput);
 };
 
-} //end namespace
+} // end namespace
 
 #endif // XEM_DOMOPPROJECT_H

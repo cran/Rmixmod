@@ -6,7 +6,7 @@
 
 /***************************************************************************
     This file is part of MIXMOD
-    
+
     MIXMOD is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -20,14 +20,15 @@
     You should have received a copy of the GNU General Public License
     along with MIXMOD.  If not, see <http://www.gnu.org/licenses/>.
 
-    All informations available on : http://www.mixmod.org                                                                                               
+    All informations available on : http://www.mixmod.org
 ***************************************************************************/
 #ifndef XEMPARTITION_H
 #define XEMPARTITION_H
 
 #include "mixmod/Utilities/Util.h"
 
-namespace XEM {
+namespace XEM
+{
 
 // pre-declaration
 class Label;
@@ -36,25 +37,25 @@ class Label;
 @author F Langrognet
  */
 
-class Partition {
+class Partition
+{
 
 public:
-
 	/// Default constructor
 	Partition();
 
 	/// Constructor
-	Partition(Partition * iPartition);
+	Partition(const Partition & iPartition);
 
-	/// Constructor 
-	Partition(int64_t nbSample, int64_t nbCluster, const NumericPartitionFile & partitionFile);
+	/// Constructor
+	Partition(int64_t nbSample, int64_t nbCluster, const NumericPartitionFile &partitionFile);
 
 	/// constructor from a XEMLabel
-	Partition(const Label * label, int64_t nbCluster);
+	Partition(const Label *label, int64_t nbCluster);
 
 	/// Constructor
 	// used in DCV context
-	Partition(Partition * originalPartition, CVBlock & block);
+	Partition(Partition *originalPartition, CVBlock &block);
 
 	/// Destructor
 	virtual ~Partition();
@@ -67,71 +68,72 @@ public:
 
 	int64_t getGroupNumber(int64_t idxSample);
 
-	/** verify if partition is complete 
+	/** verify if partition is complete
 	- each line has one (and only one) '1'
 	- each cluster appears at least one time
 	 */
 	bool isComplete();
-	int64_t** getTabValue() const;
-	int64_t* getTabValueI(int64_t index) const;
+	int64_t **getTabValue() const;
+	void setTabValue(int64_t ** tabValue);
 
-	///get Format
-	const NumericPartitionFile & getPartitionFile() const;
-    void setPartitionFile(std::string f, TypePartition::TypePartition type);
+	int64_t *getTabValueI(int64_t index) const;
+
+	/// get Format
+	const NumericPartitionFile &getPartitionFile() const;
+	void setPartitionFile(std::string f, TypePartition::TypePartition type);
 	/// get Number of samples
-	int64_t getNbSample()const;
+	int64_t getNbSample() const;
 
 	/// get Number of clusters
 	int64_t getNbCluster() const;
 
-	bool operator==(Partition & otherPartition);
+	bool operator==(Partition &otherPartition);
 
 	/** @brief Friend method
 	@return Operator >> overloaded to read Partition from input files
 	 */
-	friend std::ifstream & operator >>(std::ifstream & fi, Partition & partition);
+	friend std::ifstream &operator>>(std::ifstream &fi, Partition &partition);
 
 	/** @brief Friend method
-	@return Operator << overloaded to write Partition 
+	@return Operator << overloaded to write Partition
 	 */
-	friend std::ostream & operator <<(std::ostream & fo, const Partition & partition);
+	friend std::ostream &operator<<(std::ostream &fo, const Partition &partition);
 
-//TODO
-//private:
-	
+private:
+
 	/// Number of samples
-	int64_t _nbSample;
+	int64_t _nbSample = 0;
 
 	/// Number of clusters
-	int64_t _nbCluster;
+	int64_t _nbCluster = 0;
 
-	int64_t ** _tabValue; // aggregate
+	int64_t **_tabValue = nullptr; // aggregate
 
-	///name of partition
+	/// name of partition
 	NumericPartitionFile _partitionFile;
 
-	bool _deleteValues;
+	bool _deleteValues = true;
 };
 
-inline int64_t ** Partition::getTabValue() const {
-	return _tabValue;
+inline int64_t **Partition::getTabValue() const { return _tabValue; }
+
+inline void Partition::setTabValue(int64_t ** tabValue) {
+	if (_tabValue)
+	{
+		for (int64_t i = 0; i < _nbSample; ++ i)
+			delete[] _tabValue[i];
+		delete[] _tabValue;
+	}
+	_tabValue = tabValue;
 }
 
-inline int64_t * Partition::getTabValueI(int64_t index) const {
-	return _tabValue[index];
-}
+inline int64_t *Partition::getTabValueI(int64_t index) const { return _tabValue[index]; }
 
-inline const NumericPartitionFile & Partition::getPartitionFile() const {
-	return _partitionFile;
-}
+inline const NumericPartitionFile &Partition::getPartitionFile() const { return _partitionFile; }
 
-inline int64_t Partition::getNbSample()const {
-	return _nbSample;
-}
+inline int64_t Partition::getNbSample() const { return _nbSample; }
 
-inline int64_t Partition::getNbCluster() const {
-	return _nbCluster;
-}
+inline int64_t Partition::getNbCluster() const { return _nbCluster; }
 
 }
 

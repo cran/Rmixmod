@@ -6,7 +6,7 @@
 
 /***************************************************************************
     This file is part of MIXMOD
-    
+
     MIXMOD is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -20,31 +20,33 @@
     You should have received a copy of the GNU General Public License
     along with MIXMOD.  If not, see <http://www.gnu.org/licenses/>.
 
-    All informations available on : http://www.mixmod.org                                                                                               
+    All informations available on : http://www.mixmod.org
 ***************************************************************************/
 
 #include "mixmod/Clustering/ClusteringStrategyInit.h"
-#include "mixmod/Kernel/Parameter/GaussianSphericalParameter.h"
+#include "mixmod/Kernel/IO/BinaryData.h"
+#include "mixmod/Kernel/IO/Partition.h"
+#include "mixmod/Kernel/Model/Model.h"
+#include "mixmod/Kernel/Model/ModelType.h"
+#include "mixmod/Kernel/Parameter/BinaryEkjhParameter.h"
 #include "mixmod/Kernel/Parameter/GaussianDiagParameter.h"
 #include "mixmod/Kernel/Parameter/GaussianGeneralParameter.h"
 #include "mixmod/Kernel/Parameter/GaussianHDDAParameter.h"
-#include "mixmod/Kernel/Parameter/BinaryEkjhParameter.h"
-#include "mixmod/Kernel/IO/BinaryData.h"
-#include "mixmod/Kernel/Model/Model.h"
-#include "mixmod/Kernel/Model/ModelType.h"
-#include "mixmod/Kernel/IO/Partition.h"
+#include "mixmod/Kernel/Parameter/GaussianSphericalParameter.h"
 
-namespace XEM {
+namespace XEM
+{
 
 //------------
 // Constructor
 //------------
-ClusteringStrategyInit::ClusteringStrategyInit() {
-	_strategyInitName   = defaultStrategyInitName;
-	_nbInitParameter    = 0;
-	_tabInitParameter   = NULL;
-	_nbPartition        = 0;
-	_tabPartition       = NULL;
+ClusteringStrategyInit::ClusteringStrategyInit()
+{
+	_strategyInitName = defaultStrategyInitName;
+	_nbInitParameter = 0;
+	_tabInitParameter = NULL;
+	_nbPartition = 0;
+	_tabPartition = NULL;
 	_deleteTabParameter = false;
 
 	_nbTry = defaultNbTryInInit;
@@ -56,31 +58,32 @@ ClusteringStrategyInit::ClusteringStrategyInit() {
 //------------------
 // Copy constructor
 //------------------
-ClusteringStrategyInit::ClusteringStrategyInit(const ClusteringStrategyInit & strategyInit) {
+ClusteringStrategyInit::ClusteringStrategyInit(const ClusteringStrategyInit &strategyInit)
+{
 	_strategyInitName = strategyInit.getStrategyInitName();
-	_nbInitParameter  = strategyInit.getNbInitParameter();
-	_nbPartition      = strategyInit.getNbPartition();
-	_tabPartition     = NULL;
-	
+	_nbInitParameter = strategyInit.getNbInitParameter();
+	_nbPartition = strategyInit.getNbPartition();
+	_tabPartition = NULL;
+
 	if (_nbPartition != 0) {
-		_tabPartition = new Partition*[_nbPartition];
-		const Partition ** iPartition = strategyInit.getTabPartition();
+		_tabPartition = new Partition *[_nbPartition];
+		const Partition **iPartition = strategyInit.getTabPartition();
 		for (int64_t i = 0; i < _nbPartition; i++) {
-			_tabPartition[i] = new Partition(*(iPartition[i])); //copy constructor
+			_tabPartition[i] = new Partition(*(iPartition[i])); // copy constructor
 		}
 	}
 
 	_nbInitParameter = strategyInit.getNbInitParameter();
 	_tabInitParameter = NULL;
 	if (_nbInitParameter != 0) {
-		_tabInitParameter = new Parameter*[_nbInitParameter];
-		const Parameter ** iParameter = strategyInit.getTabInitParameter();
+		_tabInitParameter = new Parameter *[_nbInitParameter];
+		const Parameter **iParameter = strategyInit.getTabInitParameter();
 		for (int64_t i = 0; i < _nbInitParameter; i++) {
 			_tabInitParameter[i] = (iParameter[i])->clone();
 		}
 	}
 
-	_deleteTabParameter = false; // TODO ?
+	_deleteTabParameter = true;
 
 	_nbTry = strategyInit.getNbTry();
 	_nbIteration = strategyInit.getNbIteration();
@@ -91,29 +94,31 @@ ClusteringStrategyInit::ClusteringStrategyInit(const ClusteringStrategyInit & st
 //-----------
 // Destructor
 //-----------
-ClusteringStrategyInit::~ClusteringStrategyInit() {
+ClusteringStrategyInit::~ClusteringStrategyInit()
+{
 	if (_tabInitParameter && _deleteTabParameter) {
 		for (unsigned int i = 0; i < _nbInitParameter; i++) {
 			delete _tabInitParameter[i];
 		}
-		delete [] _tabInitParameter;
+		delete[] _tabInitParameter;
 		_tabInitParameter = NULL;
 	}
 
 	if (_tabPartition) {
-		for (unsigned  int i = 0; i < _nbPartition; i++) {
+		for (unsigned int i = 0; i < _nbPartition; i++) {
 			delete _tabPartition[i];
 			_tabPartition[i] = NULL;
 		}
-		delete [] _tabPartition;
+		delete[] _tabPartition;
 		_tabPartition = NULL;
 	}
 }
 
 //---------------------
-// setStrategyInitName 
+// setStrategyInitName
 //---------------------
-void ClusteringStrategyInit::setStrategyInitName(StrategyInitName initName) {
+void ClusteringStrategyInit::setStrategyInitName(StrategyInitName initName)
+{
 
 	// delete ?
 	int64_t i;
@@ -121,7 +126,7 @@ void ClusteringStrategyInit::setStrategyInitName(StrategyInitName initName) {
 		for (i = 0; i < _nbInitParameter; i++) {
 			delete _tabInitParameter[i];
 		}
-		delete [] _tabInitParameter;
+		delete[] _tabInitParameter;
 		_tabInitParameter = NULL;
 	}
 
@@ -130,15 +135,15 @@ void ClusteringStrategyInit::setStrategyInitName(StrategyInitName initName) {
 			delete _tabPartition[i];
 			_tabPartition[i] = NULL;
 		}
-		delete [] _tabPartition;
+		delete[] _tabPartition;
 		_tabPartition = NULL;
 	}
 
 	_strategyInitName = initName;
-	_nbInitParameter   = 0;
-	_tabInitParameter  = NULL;
-	_nbPartition           = 0;
-	_tabPartition          = NULL;
+	_nbInitParameter = 0;
+	_tabInitParameter = NULL;
+	_nbPartition = 0;
+	_tabPartition = NULL;
 	_deleteTabParameter = false;
 
 	_nbTry = defaultNbTryInInit;
@@ -151,22 +156,21 @@ void ClusteringStrategyInit::setStrategyInitName(StrategyInitName initName) {
 		_nbTry = 1;
 	}
 	_epsilon = defaultEpsilonInInit;
-
 }
 
 //-------------------
 // set init parameter
 //-------------------
-void ClusteringStrategyInit::setInitParam(std::string & paramFileName, int64_t position) {
+void ClusteringStrategyInit::setInitParam(std::string &paramFileName, int64_t position)
+{
 	std::ifstream paramFile(paramFileName.c_str(), ios::in);
-	if (! paramFile.is_open()) {
+	if (!paramFile.is_open()) {
 		THROW(InputException, wrongParamFileName);
 	}
 	if (_tabInitParameter != NULL) {
 		_tabInitParameter[position]->input(paramFile);
 		paramFile.close();
-	}
-	else {
+	} else {
 		THROW(OtherException, internalMixmodError);
 	}
 }
@@ -174,15 +178,14 @@ void ClusteringStrategyInit::setInitParam(std::string & paramFileName, int64_t p
 //----------------
 // setTabInitParam
 //----------------
-void ClusteringStrategyInit::setTabInitParameter(
-		Parameter ** tabInitParameter, int64_t nbInitParameter) 
+void ClusteringStrategyInit::setTabInitParameter(Parameter **tabInitParameter, int64_t nbInitParameter)
 {
 	int64_t i;
 	if (_tabInitParameter && _deleteTabParameter) {
 		for (i = 0; i < _nbInitParameter; i++) {
 			delete _tabInitParameter[i];
 		}
-		delete [] _tabInitParameter;
+		delete[] _tabInitParameter;
 		_tabInitParameter = NULL;
 	}
 
@@ -190,10 +193,11 @@ void ClusteringStrategyInit::setTabInitParameter(
 	_nbInitParameter = nbInitParameter;
 }
 
-//------------------  
-//set Init Partition
 //------------------
-void ClusteringStrategyInit::setPartition(Partition * part, int64_t position) {
+// set Init Partition
+//------------------
+void ClusteringStrategyInit::setPartition(Partition *part, int64_t position)
+{
 
 	if (position < 0) {
 		THROW(OtherException, internalMixmodError);
@@ -203,49 +207,44 @@ void ClusteringStrategyInit::setPartition(Partition * part, int64_t position) {
 		if (position < _nbPartition) {
 			delete _tabPartition[position];
 			_tabPartition[position] = part;
-		}
-		else {
+		} else {
 			if (position == 0) { // this is the only situation that will be maintained
 				_nbPartition = 1;
-				_tabPartition = new Partition*[1];
+				_tabPartition = new Partition *[1];
 				_tabPartition[0] = part;
-			}
-			else {
+			} else {
 				THROW(InputException, badInitPart);
 			}
 		}
-	}
-	else {
+	} else {
 		THROW(OtherException, internalMixmodError);
 	}
 }
 
 //------------------
-//set Init Partition
+// set Init Partition
 //----------------
-void ClusteringStrategyInit::setPartition(std::string & partitionFileName, int64_t position) {
+void ClusteringStrategyInit::setPartition(std::string &partitionFileName, int64_t position)
+{
 	std::ifstream partitionFile(partitionFileName.c_str(), ios::in);
-	if (! partitionFile.is_open()) {
+	if (!partitionFile.is_open()) {
 		THROW(InputException, wrongPartitionFileName);
 	}
 	try {
 		if (position < _nbPartition) {
 			delete _tabPartition[position];
 			partitionFile >> (*_tabPartition[position]);
-		}
-		else {
+		} else {
 			if (position == 0) { // this is the only situation that will be maintained
 				_nbPartition = 1;
-				_tabPartition = new Partition*[1];
+				_tabPartition = new Partition *[1];
 				partitionFile >> (*_tabPartition[0]);
-			}
-			else {
+			} else {
 				THROW(InputException, badInitPart);
 			}
 		}
 		partitionFile.close();
-	}
-	catch (...) {
+	} catch (...) {
 		THROW(InputException, badInitPart);
 	}
 }
@@ -253,14 +252,15 @@ void ClusteringStrategyInit::setPartition(std::string & partitionFileName, int64
 //----------------
 // setTabPartition
 //----------------
-void ClusteringStrategyInit::setTabPartition(Partition ** tabPartition, int64_t nbPartition) {
+void ClusteringStrategyInit::setTabPartition(Partition **tabPartition, int64_t nbPartition)
+{
 	int64_t i;
 	if (_tabPartition) {
 		for (i = 0; i < _nbPartition; i++) {
 			delete _tabPartition[i];
 			_tabPartition[i] = NULL;
 		}
-		delete [] _tabPartition;
+		delete[] _tabPartition;
 		_tabPartition = NULL;
 	}
 
@@ -268,17 +268,16 @@ void ClusteringStrategyInit::setTabPartition(Partition ** tabPartition, int64_t 
 	_nbPartition = nbPartition;
 }
 
-//------------  
+//------------
 // setStopName
 //-------------
-void ClusteringStrategyInit::setStopName(AlgoStopName stopName) {
+void ClusteringStrategyInit::setStopName(AlgoStopName stopName)
+{
 	if (_strategyInitName == SMALL_EM) {
 		_stopName = stopName;
-	}
-	else if (_strategyInitName == SEM_MAX && stopName == NBITERATION) {
+	} else if (_strategyInitName == SEM_MAX && stopName == NBITERATION) {
 		_stopName = NBITERATION;
-	}
-	else {
+	} else {
 		THROW(InputException, badSetStopNameInInit);
 	}
 }
@@ -286,21 +285,17 @@ void ClusteringStrategyInit::setStopName(AlgoStopName stopName) {
 //---------
 // setNbTry
 //---------
-void ClusteringStrategyInit::setNbTry(int64_t nbTry) {
-	if (_strategyInitName == SMALL_EM || _strategyInitName == CEM_INIT 
-			|| _strategyInitName == RANDOM)
-	{
+void ClusteringStrategyInit::setNbTry(int64_t nbTry)
+{
+	if (_strategyInitName == SMALL_EM || _strategyInitName == CEM_INIT || _strategyInitName == RANDOM) {
 		if (nbTry > maxNbTryInInit) {
 			THROW(InputException, nbTryInInitTooLarge);
-		}
-		else if (nbTry < minNbTryInInit) {
+		} else if (nbTry < minNbTryInInit) {
 			THROW(InputException, nbTryInInitTooSmall);
-		}
-		else {
+		} else {
 			_nbTry = nbTry;
 		}
-	}
-	else {
+	} else {
 		THROW(InputException, badSetNbTryInInit);
 	}
 }
@@ -308,19 +303,17 @@ void ClusteringStrategyInit::setNbTry(int64_t nbTry) {
 //----------------
 // set NbIteration
 //----------------
-void ClusteringStrategyInit::setNbIteration(int64_t nbIteration) {
+void ClusteringStrategyInit::setNbIteration(int64_t nbIteration)
+{
 	if (_strategyInitName == SMALL_EM || _strategyInitName == SEM_MAX) {
 		if (nbIteration > maxNbIterationInInit) {
 			THROW(InputException, nbIterationInInitTooLarge);
-		}
-		else if (nbIteration < minNbIterationInInit) {
+		} else if (nbIteration < minNbIterationInInit) {
 			THROW(InputException, nbIterationInInitTooSmall);
-		}
-		else {
+		} else {
 			_nbIteration = nbIteration;
 		}
-	}
-	else {
+	} else {
 		THROW(InputException, badSetNbIterationInInit);
 	}
 }
@@ -328,19 +321,17 @@ void ClusteringStrategyInit::setNbIteration(int64_t nbIteration) {
 //-----------
 // setEpsilon
 //-----------
-void ClusteringStrategyInit::setEpsilon(double epsilon) {
+void ClusteringStrategyInit::setEpsilon(double epsilon)
+{
 	if (_strategyInitName == SMALL_EM) {
 		if (epsilon > maxEpsilonInInit) {
 			THROW(InputException, epsilonInInitTooLarge);
-		}
-		else if (epsilon < minEpsilonInInit) {
+		} else if (epsilon < minEpsilonInInit) {
 			THROW(InputException, epsilonInInitTooSmall);
-		}
-		else {
+		} else {
 			_epsilon = epsilon;
 		}
-	}
-	else {
+	} else {
 		THROW(InputException, badSetEpsilonInInit);
 	}
 }
@@ -348,12 +339,11 @@ void ClusteringStrategyInit::setEpsilon(double epsilon) {
 //-------
 // verify
 //-------
-bool ClusteringStrategyInit::verify() const {
+bool ClusteringStrategyInit::verify() const
+{
 	bool res = true;
-	//if init is USER or PARTITION, nbTry must be 1
-	if ((_strategyInitName == USER_PARTITION || _strategyInitName == USER_PARTITION) 
-			&& _nbTry != 1) 
-	{
+	// if init is USER or PARTITION, nbTry must be 1
+	if ((_strategyInitName == USER_PARTITION || _strategyInitName == USER_PARTITION) && _nbTry != 1) {
 		res = false;
 		THROW(InputException, wrongNbStrategyTryValue);
 	}
@@ -372,14 +362,14 @@ bool ClusteringStrategyInit::verify() const {
 }
 
 // input
-void ClusteringStrategyInit::input(std::ifstream & fi, Data *& data, int64_t nbNbCluster, 
-		int64_t * tabNbCluster, ModelType * modelType, bool & alreadyRead) 
+void ClusteringStrategyInit::input(std::ifstream &fi, Data *&data, int64_t nbNbCluster, int64_t *tabNbCluster,
+                                   ModelType *modelType, bool &alreadyRead)
 {
 	std::string keyWord = "";
 	std::string a = "";
 	int64_t k;
-	int64_t pbDimension  = data->_pbDimension;
-	int64_t nbSample    = data->_nbSample;
+	int64_t pbDimension = data->_pbDimension;
+	int64_t nbSample = data->_nbSample;
 
 	moveUntilReach(fi, "inittype");
 	if (!fi.eof()) {
@@ -394,13 +384,12 @@ void ClusteringStrategyInit::input(std::ifstream & fi, Data *& data, int64_t nbN
 				int64_t nbTry;
 				fi >> nbTry;
 				setNbTry(nbTry);
-			}
-			else {
+			} else {
 				alreadyRead = true;
 			}
 		}
 
-			// USER init type //
+		// USER init type //
 		else if (a.compare("USER") == 0) {
 			setStrategyInitName(USER);
 
@@ -410,8 +399,8 @@ void ClusteringStrategyInit::input(std::ifstream & fi, Data *& data, int64_t nbN
 
 			if (keyWord.compare("initfile") == 0) {
 				// _strategyInit->_nbInitParameter  = nbNbCluster;
-				Parameter ** tabInitParameter = new Parameter * [nbNbCluster];
-				std::string * tabFileName = new std::string[nbNbCluster];
+				Parameter **tabInitParameter = new Parameter *[nbNbCluster];
+				std::string *tabFileName = new std::string[nbNbCluster];
 				for (k = 0; k < nbNbCluster; k++) {
 					tabFileName[k] = "";
 				}
@@ -420,48 +409,47 @@ void ClusteringStrategyInit::input(std::ifstream & fi, Data *& data, int64_t nbN
 
 				for (k = 0; k < nbNbCluster; k++) {
 					if (isEDDA(modelType->_nameModel)) {
-						tabInitParameter[k] = new GaussianGeneralParameter(
-								tabNbCluster[k], pbDimension, modelType, tabFileName[k]);
-                        tabInitParameter[k]->setFilename(tabFileName[k]); //to be factorized when isHeterogeneous is implemented
-					}
-					else if (isBinary(modelType->_nameModel)) {
-						int64_t * tabNbModality = (data->getBinaryData())->getTabNbModality();
-						tabInitParameter[k] = new BinaryEkjhParameter(
-								tabNbCluster[k], pbDimension, modelType, 
-								tabNbModality, tabFileName[k]);
-                        tabInitParameter[k]->setFilename(tabFileName[k]); //to be factorized when isHeterogeneous is implemented                       
-					}
-					else if (isHD(modelType->_nameModel)) {
-						tabInitParameter[k] = new GaussianHDDAParameter(
-								tabNbCluster[k], pbDimension, modelType, tabFileName[k]);
-                        tabInitParameter[k]->setFilename(tabFileName[k]); //to be factorized when isHeterogeneous is implemented                        
-					}
-					else if (isHeterogeneous(modelType->_nameModel)) {
-						//TODO
-//						tabInitParameter[k] = new CompositeParameter(
-//								tabNbCluster[k], pbDimension, modelType, (data->getBinaryData())->getTabNbModality());
-					}
-					else THROW(OtherException, internalMixmodError);
+						tabInitParameter[k] =
+						    new GaussianGeneralParameter(tabNbCluster[k], pbDimension, modelType, tabFileName[k]);
+						tabInitParameter[k]->setFilename(
+						    tabFileName[k]); // to be factorized when isHeterogeneous is implemented
+					} else if (isBinary(modelType->_nameModel)) {
+						int64_t *tabNbModality = (data->getBinaryData())->getTabNbModality();
+						tabInitParameter[k] =
+						    new BinaryEkjhParameter(tabNbCluster[k], pbDimension, modelType, tabNbModality, tabFileName[k]);
+						tabInitParameter[k]->setFilename(
+						    tabFileName[k]); // to be factorized when isHeterogeneous is implemented
+					} else if (isHD(modelType->_nameModel)) {
+						tabInitParameter[k] =
+						    new GaussianHDDAParameter(tabNbCluster[k], pbDimension, modelType, tabFileName[k]);
+						tabInitParameter[k]->setFilename(
+						    tabFileName[k]); // to be factorized when isHeterogeneous is implemented
+					} else if (isHeterogeneous(modelType->_nameModel)) {
+						// TODO
+						//						tabInitParameter[k] = new CompositeParameter(
+						//								tabNbCluster[k], pbDimension, modelType,
+						//(data->getBinaryData())->getTabNbModality());
+					} else
+						THROW(OtherException, internalMixmodError);
 				}
 				setTabInitParameter(tabInitParameter, nbNbCluster);
 				delete[] tabFileName;
-			}
-			else {
+			} else {
 				THROW(InputException, errorInitFile);
 			}
 		}
 
-			// USER_PARTITION init type //
+		// USER_PARTITION init type //
 		else if (a.compare("USER_PARTITION") == 0) {
 			setStrategyInitName(USER_PARTITION);
 
-			//label
+			// label
 			fi >> keyWord;
 			ConvertBigtoLowString(keyWord);
 			if (keyWord.compare("initfile") == 0) {
 				//_strategyInit->_nbPartition  = nbNbCluster;
-				Partition ** tabPartition = new Partition * [nbNbCluster];
-				std::string * tabFileName = new std::string[nbNbCluster];
+				Partition **tabPartition = new Partition *[nbNbCluster];
+				std::string *tabFileName = new std::string[nbNbCluster];
 				for (k = 0; k < nbNbCluster; k++) {
 					tabFileName[k] = "";
 				}
@@ -477,8 +465,7 @@ void ClusteringStrategyInit::input(std::ifstream & fi, Data *& data, int64_t nbN
 				}
 				setTabPartition(tabPartition, nbNbCluster);
 				delete[] tabFileName;
-			}
-			else {
+			} else {
 				THROW(InputException, errorInitFile);
 			}
 		}
@@ -492,14 +479,13 @@ void ClusteringStrategyInit::input(std::ifstream & fi, Data *& data, int64_t nbN
 				int64_t nbTry;
 				fi >> nbTry;
 				setNbTry(nbTry);
-			}
-			else {
+			} else {
 				alreadyRead = true;
 			}
 
 			bool nbIteration = false;
 			bool epsilon = false;
-			//nbIterationInInit
+			// nbIterationInInit
 			if (!alreadyRead) {
 				fi >> keyWord;
 			}
@@ -510,12 +496,11 @@ void ClusteringStrategyInit::input(std::ifstream & fi, Data *& data, int64_t nbN
 				fi >> nbIteration;
 				setNbIteration(nbIteration);
 				alreadyRead = false;
-			}
-			else {
+			} else {
 				alreadyRead = true;
 			}
 
-			//epsilonInInit
+			// epsilonInInit
 			if (!alreadyRead) {
 				fi >> keyWord;
 				alreadyRead = false;
@@ -527,8 +512,7 @@ void ClusteringStrategyInit::input(std::ifstream & fi, Data *& data, int64_t nbN
 				fi >> epsilon;
 				setEpsilon(epsilon);
 				alreadyRead = false;
-			}
-			else {
+			} else {
 				alreadyRead = true;
 			}
 			if (nbIteration && epsilon) {
@@ -553,8 +537,7 @@ void ClusteringStrategyInit::input(std::ifstream & fi, Data *& data, int64_t nbN
 				int64_t nbTry;
 				fi >> nbTry;
 				setNbTry(nbTry);
-			}
-			else {
+			} else {
 				alreadyRead = true;
 			}
 		}
@@ -567,8 +550,7 @@ void ClusteringStrategyInit::input(std::ifstream & fi, Data *& data, int64_t nbN
 				int64_t nbIteration;
 				fi >> nbIteration;
 				setNbIteration(nbIteration);
-			}
-			else {
+			} else {
 				alreadyRead = true;
 			}
 		}
@@ -581,8 +563,9 @@ void ClusteringStrategyInit::input(std::ifstream & fi, Data *& data, int64_t nbN
 
 // ostream <<
 //-----------
-std::ostream & operator << (std::ostream & fo, ClusteringStrategyInit & strategyInit) {
-	//strategyInitType
+std::ostream &operator<<(std::ostream &fo, ClusteringStrategyInit &strategyInit)
+{
+	// strategyInitType
 	std::string init = StrategyInitNameToString(strategyInit._strategyInitName);
 	fo << "\t strategyInitName : " << init << endl;
 
@@ -610,7 +593,7 @@ std::ostream & operator << (std::ostream & fo, ClusteringStrategyInit & strategy
 		/*int64_t nbInitParameter = strategyInit._nbInitParameter;
 		fo<<"\t nbInitParameter : "<<nbInitParameter<<endl;
 		for (int64_t p=0; p<nbInitParameter; p++){
-			(strategyInit.getTabInitParameter())[p]->edit();
+		    (strategyInit.getTabInitParameter())[p]->edit();
 		}
 		fo<<endl;	*/
 		break;
@@ -633,23 +616,24 @@ for (int64_t p=0; p<nbPartition; p++){
 /*------------------------------------------------------
  initSMALL_EM
  ------------
- 
- updated in this method : 
+
+ updated in this method :
  - _parameter
- - _tabFik, _tabSumF, _tabCik, _tabTik, _tabNk 
+ - _tabFik, _tabSumF, _tabCik, _tabTik, _tabNk
    (because an Estep is called to choose the bestParameter)
  Note : _tabFik, _tabSumF, _tabCik, _tabTik, _tabNk wil be 're'computed in the following EStep
  So only _parameter have to be updated in this method
- 
+
  -------------------------------------------------------*/
-void ClusteringStrategyInit::initSMALL_EM(Model*& model) {
+void ClusteringStrategyInit::initSMALL_EM(Model *&model)
+{
 	// cout<<"init SMALL_EM, nbTryInInit="<<strategyInit->getNbTry()<<",
 	// nbIteration = "<<strategyInit->getNbIteration()<<", epsilon = "<<strategyInit->getEpsilon()<<endl;
 	model->setAlgoName(EM);
 	double logLikelihood, bestLogLikelihood;
 	// get pointer to Parameter
-	Parameter * bestParameter = model->getParameter()->clone();
-	int64_t  i, nbRunOfSmallEMOk = 0;
+	Parameter *bestParameter = model->getParameter()->clone();
+	int64_t i, nbRunOfSmallEMOk = 0;
 	bestLogLikelihood = 0.0;
 	try {
 		for (i = 0; i < _nbTry; i++) {
@@ -658,19 +642,17 @@ void ClusteringStrategyInit::initSMALL_EM(Model*& model) {
 				// one run of small EM
 				model->getParameter()->reset();
 				oneRunOfSmallEM(model, logLikelihood);
-				//cout<<"sortie de oneRunOfSmallEM, LL = "<<logLikelihood<<endl;
+				// cout<<"sortie de oneRunOfSmallEM, LL = "<<logLikelihood<<endl;
 				if ((nbRunOfSmallEMOk == 1) || (logLikelihood > bestLogLikelihood)) {
 					bestLogLikelihood = logLikelihood;
 					bestParameter->recopy(model->getParameter());
-					//cout<<"best LL dans SMALL_EM : " <<bestLogLikelihood<<endl;
+					// cout<<"best LL dans SMALL_EM : " <<bestLogLikelihood<<endl;
 				}
-			}
-			catch (Exception& errorType) {
+			} catch (Exception &errorType) {
 				nbRunOfSmallEMOk--;
 			}
 		}
-	}
-	catch (Exception&errorType) {
+	} catch (Exception &errorType) {
 		throw;
 	}
 
@@ -682,21 +664,22 @@ void ClusteringStrategyInit::initSMALL_EM(Model*& model) {
 	model->setParameter(bestParameter);
 	model->getParameter()->setModel(model);
 
-	//delete bestParameter;
-	//  cout<<"fin de init SMALL_EM, nb d'essais effectues="<<i<<endl;
+	// delete bestParameter;
+	//   cout<<"fin de init SMALL_EM, nb d'essais effectues="<<i<<endl;
 }
 
 //---------------------
 // one run if small EM
 //--------------------
-void ClusteringStrategyInit::oneRunOfSmallEM(Model*& model, double & logLikelihood) {
+void ClusteringStrategyInit::oneRunOfSmallEM(Model *&model, double &logLikelihood)
+{
 	double lastLogLikelihood, eps;
 	eps = 1000;
 	model->initRANDOM(1);
 	model->Estep();
 	model->Mstep();
-	logLikelihood = model->getLogLikelihood(true);  // true : to compute fik
-	int64_t  nbIteration = 1;
+	logLikelihood = model->getLogLikelihood(true); // true : to compute fik
+	int64_t nbIteration = 1;
 	bool continueAgain = true;
 	while (continueAgain) {
 		//    cout<<"while de oneRunOfSmallEM, nbIteration = "<<nbIteration<<endl;
@@ -711,45 +694,47 @@ void ClusteringStrategyInit::oneRunOfSmallEM(Model*& model, double & logLikeliho
 			continueAgain = (nbIteration < _nbIteration);
 			break;
 		case EPSILON:
-			logLikelihood = model->getLogLikelihood(true);  // true : to compute fik
+			logLikelihood = model->getLogLikelihood(true); // true : to compute fik
 			eps = fabs(logLikelihood - lastLogLikelihood);
 			// on ajoute un test pour ne pas faire trop d'iterations quand meme ....
 			continueAgain = (eps > _epsilon && (nbIteration < maxNbIterationInInit));
-			//continueAgain = (eps > strategyInit->getEpsilon());
+			// continueAgain = (eps > strategyInit->getEpsilon());
 			break;
 		case NBITERATION_EPSILON:
-			logLikelihood = model->getLogLikelihood(true);  // true : to compute fi
+			logLikelihood = model->getLogLikelihood(true); // true : to compute fi
 			eps = fabs(logLikelihood - lastLogLikelihood);
 			continueAgain = ((eps > _epsilon) && (nbIteration < _nbIteration));
 			break;
-		default: THROW(OtherException, internalMixmodError);
+		default:
+			THROW(OtherException, internalMixmodError);
 		}
 	}
-	if (_stopName == NBITERATION) { // logLikelihood is an output
-		logLikelihood = model->getLogLikelihood(true);  // true : to compute fi
+	if (_stopName == NBITERATION) {                    // logLikelihood is an output
+		logLikelihood = model->getLogLikelihood(true); // true : to compute fi
 	}
-	//cout<<"Fin de oneRunOfSmallEM, nb d'iterations effectuees = "<<nbIteration<<", logLikelihood = "<<logLikelihood<<endl;
+	// cout<<"Fin de oneRunOfSmallEM, nb d'iterations effectuees = "<<nbIteration<<", logLikelihood = "<<logLikelihood<<endl;
 }
 
 /*---------------------------------------------------
  initCEM_INIT
  ---------------------------------------------------
- updated in this method : 
+ updated in this method :
  - _parameter
- - _tabFik, _tabSumF, _tabCik, _tabTik, _tabNk 
+ - _tabFik, _tabSumF, _tabCik, _tabTik, _tabNk
    (because an Estep and a CStep are called to choose the bestParameter)
  Note : _tabFik, _tabSumF, _tabCik, _tabTik, _tabNk wil be 're'computed in the following EStep
  So only _parameter have to be updated in this method
- 
+
  ---------------------------------------------------*/
-void ClusteringStrategyInit::initCEM_INIT(Model*& model) {
-	//cout<<"init CEM, nbTryInInit="<<strategyInit->getNbTry()<<endl;
+void ClusteringStrategyInit::initCEM_INIT(Model *&model)
+{
+	// cout<<"init CEM, nbTryInInit="<<strategyInit->getNbTry()<<endl;
 	model->setAlgoName(CEM);
 	int64_t i;
 	double cLogLikelihood = 0.0, oldLogLikelihood = 0.0;
 
 	// get pointer to Parameter
-	Parameter * bestParameter = model->getParameter()->clone();
+	Parameter *bestParameter = model->getParameter()->clone();
 	int64_t nbRunOfCEMOk = 0;
 	double bestCLogLikelihood = 0.0;
 
@@ -768,28 +753,25 @@ void ClusteringStrategyInit::initCEM_INIT(Model*& model) {
 				nbIter++;
 				if (nbIter == 1) {
 					oldLogLikelihood = model->getCompletedLogLikelihood();
-				}
-				else {
+				} else {
 					cLogLikelihood = model->getCompletedLogLikelihood();
 					if (cLogLikelihood == oldLogLikelihood) {
 						fin = true;
-					}
-					else {
+					} else {
 						oldLogLikelihood = cLogLikelihood;
 					}
 				}
 			}
-			//cout<<"dans init CEM, nb d'iterations effectuées : "<<nbIter<<endl;
-			// Compute log-likelihood 
+			// cout<<"dans init CEM, nb d'iterations effectuées : "<<nbIter<<endl;
+			//  Compute log-likelihood
 			cLogLikelihood = model->getCompletedLogLikelihood();
-			// Comparaison of log-likelihood between step p and p-1 
+			// Comparaison of log-likelihood between step p and p-1
 			if ((nbRunOfCEMOk == 1) || (cLogLikelihood > bestCLogLikelihood)) {
 				bestCLogLikelihood = cLogLikelihood;
 				bestParameter->recopy(model->getParameter());
 			}
-			//cout<<"nbIter : "<<nbIter<<endl;
-		}
-		catch (...) {
+			// cout<<"nbIter : "<<nbIter<<endl;
+		} catch (...) {
 			nbRunOfCEMOk--;
 		}
 	}
@@ -804,29 +786,30 @@ void ClusteringStrategyInit::initCEM_INIT(Model*& model) {
 	// set Best parameter
 	model->setParameter(bestParameter);
 	model->getParameter()->setModel(model);
-	//cout<<"fin de init CEM, nb d'essais effectues="<<i<<endl;
+	// cout<<"fin de init CEM, nb d'essais effectues="<<i<<endl;
 }
 
 /*---------------------------------------------------------
  Initialization by SEM
  ---------------------
- 
- updated in this method : 
+
+ updated in this method :
  - _parameter
- - _tabFik, _tabSumF, _tabCik, _tabTik, _tabNk 
+ - _tabFik, _tabSumF, _tabCik, _tabTik, _tabNk
    (because an Estep and a SStep are called to choose the bestParameter)
  Note : _tabFik, _tabSumF, _tabCik, _tabTik, _tabNk wil be 're'computed in the following EStep
  So, only _parameter have to be updated in this method
- 
+
  -------------------------------------------------------*/
-void ClusteringStrategyInit::initSEM_MAX(Model*& model) {
-	//cout<<"init SEM_MAX, nbTryInInit="<<strategyInit->getNbIteration()<<endl;
+void ClusteringStrategyInit::initSEM_MAX(Model *&model)
+{
+	// cout<<"init SEM_MAX, nbTryInInit="<<strategyInit->getNbIteration()<<endl;
 	model->setAlgoName(SEM);
-	int64_t  j;
+	int64_t j;
 	double logLikelihood, bestLogLikelihood;
 	// get pointer to Parameter
-	Parameter * bestParameter = model->getParameter()->clone();
-	int64_t  nbRunOfSEMMAXOk = 0;
+	Parameter *bestParameter = model->getParameter()->clone();
+	int64_t nbRunOfSEMMAXOk = 0;
 	bestLogLikelihood = 0.0;
 	//  int64_t  bestIndex=0;
 
@@ -838,15 +821,14 @@ void ClusteringStrategyInit::initSEM_MAX(Model*& model) {
 			model->Estep();
 			model->Sstep();
 			model->Mstep();
-			// Compute log-likelihood 
-			logLikelihood = model->getLogLikelihood(true);  // true : to compute fik
+			// Compute log-likelihood
+			logLikelihood = model->getLogLikelihood(true); // true : to compute fik
 			if ((nbRunOfSEMMAXOk == 1) || (logLikelihood > bestLogLikelihood)) {
 				bestLogLikelihood = logLikelihood;
 				bestParameter->recopy(model->getParameter());
 				//        bestIndex = j;
 			}
-		}
-		catch (...) {
+		} catch (...) {
 			nbRunOfSEMMAXOk--;
 		}
 	}
@@ -858,7 +840,7 @@ void ClusteringStrategyInit::initSEM_MAX(Model*& model) {
 	// set Best parameter
 	model->setParameter(bestParameter);
 	model->getParameter()->setModel(model);
-	//cout<<"fin de init SEM_MAX, nb d'iterations effectuees="<<j<<" meilleure solution : "<<bestIndex<<endl;
+	// cout<<"fin de init SEM_MAX, nb d'iterations effectuees="<<j<<" meilleure solution : "<<bestIndex<<endl;
 }
 
 }

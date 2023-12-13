@@ -6,7 +6,7 @@
 
 /***************************************************************************
     This file is part of MIXMOD
-    
+
     MIXMOD is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -20,69 +20,63 @@
     You should have received a copy of the GNU General Public License
     along with MIXMOD.  If not, see <http://www.gnu.org/licenses/>.
 
-    All informations available on : http://www.mixmod.org                                                                                               
+    All informations available on : http://www.mixmod.org
 ***************************************************************************/
 #include "mixmod/Kernel/Parameter/GaussianHDDAParameter.h"
-#include "mixmod/Kernel/Parameter/GaussianParameter.h"
 #include "mixmod/Kernel/IO/GaussianData.h"
 #include "mixmod/Kernel/IO/GaussianSample.h"
 #include "mixmod/Kernel/Model/Model.h"
 #include "mixmod/Kernel/Model/ModelType.h"
 #include "mixmod/Kernel/Parameter/GaussianGeneralParameter.h"
-#include "mixmod/Utilities/Util.h"
-#include "mixmod/Kernel/IO/GaussianData.h"
-#include "mixmod/Utilities/Random.h"
-#include "mixmod/Matrix/Matrix.h"
+#include "mixmod/Kernel/Parameter/GaussianParameter.h"
 #include "mixmod/Matrix/DiagMatrix.h"
+#include "mixmod/Matrix/GeneralMatrix.h"
+#include "mixmod/Matrix/Matrix.h"
 #include "mixmod/Matrix/SphericalMatrix.h"
 #include "mixmod/Matrix/SymmetricMatrix.h"
-#include "mixmod/Matrix/GeneralMatrix.h"
+#include "mixmod/Utilities/Random.h"
+#include "mixmod/Utilities/Util.h"
 
-namespace XEM {
+namespace XEM
+{
 
 /****************/
 /* Constructors */
 /****************/
 
-GaussianHDDAParameter::GaussianHDDAParameter() : GaussianParameter() {
-	THROW(OtherException, wrongConstructorType);
-}
+GaussianHDDAParameter::GaussianHDDAParameter() : GaussianParameter() { THROW(OtherException, wrongConstructorType); }
 
 //-------------------------------------------------------------------------------------
 // constructor called by XEMModel
 //-------------------------------------------------------------------------------------
-GaussianHDDAParameter::GaussianHDDAParameter(Model * iModel, ModelType * iModelType)
-: GaussianParameter(iModel, iModelType)
+GaussianHDDAParameter::GaussianHDDAParameter(Model *iModel, ModelType *iModelType) : GaussianParameter(iModel, iModelType)
 {
 	int64_t k;
 
-	_tabAkj = new double*[_nbCluster];
+	_tabAkj = new double *[_nbCluster];
 	_tabBk = new double[_nbCluster];
-	_tabShape = new DiagMatrix*[_nbCluster];
-	_tabQk = new GeneralMatrix*[_nbCluster];
-	_W = new SymmetricMatrix(_pbDimension); //Id
-	_tabDk = new int64_t [_nbCluster];
+	_tabShape = new DiagMatrix *[_nbCluster];
+	_tabQk = new GeneralMatrix *[_nbCluster];
+	_W = new SymmetricMatrix(_pbDimension); // Id
+	_tabDk = new int64_t[_nbCluster];
 	_tabGammak = NULL;
 	_Gammak = NULL;
 
 	for (k = 0; k < _nbCluster; k++) {
-		_tabShape[k] = new DiagMatrix(_pbDimension); //Id
-		_tabQk[k] = new GeneralMatrix(_pbDimension); //Id
+		_tabShape[k] = new DiagMatrix(_pbDimension);   // Id
+		_tabQk[k] = new GeneralMatrix(_pbDimension);   // Id
 		_tabWk[k] = new SymmetricMatrix(_pbDimension); // Id
 		_tabDk[k] = 0;
 	}
 	__storeDim = _pbDimension * (_pbDimension + 1) / 2;
 
-	if ((iModelType->_tabSubDimensionFree != NULL) &&
-			isFreeSubDimension(iModelType->_nameModel)) {
+	if ((iModelType->getTabSubDimensionFree() != NULL) && isFreeSubDimension(iModelType->_nameModel)) {
 		for (k = 0; k < _nbCluster; k++) {
-			_tabDk[k] = iModelType->_tabSubDimensionFree[k];
+			_tabDk[k] = iModelType->getTabSubDimensionFreeI(k);
 		}
-	}
-	else if ((iModelType->_subDimensionEqual != 0) &&
-			!isFreeSubDimension(iModelType->_nameModel)) {
+	} else if ((iModelType->getSubDimensionEqual() != 0) && !isFreeSubDimension(iModelType->_nameModel)) {
 		for (k = 0; k < _nbCluster; k++) {
-			_tabDk[k] = iModelType->_subDimensionEqual;
+			_tabDk[k] = iModelType->getSubDimensionEqual();
 		}
 	}
 
@@ -95,31 +89,31 @@ GaussianHDDAParameter::GaussianHDDAParameter(Model * iModel, ModelType * iModelT
 	}
 }
 
-//constructeur avec une initialisation USER
+// constructeur avec une initialisation USER
 //-------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------
-GaussianHDDAParameter::GaussianHDDAParameter(int64_t iNbCluster, int64_t iPbDimension,
-		ModelType * iModelType, std::string & iFileName)
-: GaussianParameter(iNbCluster, iPbDimension, iModelType)
+GaussianHDDAParameter::GaussianHDDAParameter(int64_t iNbCluster, int64_t iPbDimension, ModelType *iModelType,
+                                             std::string &iFileName)
+    : GaussianParameter(iNbCluster, iPbDimension, iModelType)
 {
 	int64_t k;
-	_tabAkj = new double*[_nbCluster];
+	_tabAkj = new double *[_nbCluster];
 	_tabBk = new double[_nbCluster];
-	_tabDk = new int64_t [_nbCluster];
+	_tabDk = new int64_t[_nbCluster];
 	_tabGammak = NULL;
 	_Gammak = NULL;
 	__storeDim = _pbDimension * (_pbDimension + 1) / 2;
 
-	_tabShape = new DiagMatrix*[_nbCluster];
-	_tabQk = new GeneralMatrix*[_nbCluster];
+	_tabShape = new DiagMatrix *[_nbCluster];
+	_tabQk = new GeneralMatrix *[_nbCluster];
 
 	for (k = 0; k < _nbCluster; k++) {
-		_tabShape[k] = new DiagMatrix(_pbDimension); //Id
-		_tabQk[k] = new GeneralMatrix(_pbDimension); //Id
-		_tabWk[k] = new SymmetricMatrix(_pbDimension); //Id
+		_tabShape[k] = new DiagMatrix(_pbDimension);   // Id
+		_tabQk[k] = new GeneralMatrix(_pbDimension);   // Id
+		_tabWk[k] = new SymmetricMatrix(_pbDimension); // Id
 		_tabAkj[k] = NULL;
 	}
-	_W = new SymmetricMatrix(_pbDimension); //Id
+	_W = new SymmetricMatrix(_pbDimension); // Id
 
 	// read parameters in file iFileName//
 	if (iFileName.compare("") != 0) {
@@ -132,32 +126,31 @@ GaussianHDDAParameter::GaussianHDDAParameter(int64_t iNbCluster, int64_t iPbDime
 	}
 }
 
-//constructeur par copie
+// constructeur par copie
 //-------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------
-GaussianHDDAParameter::GaussianHDDAParameter(const GaussianHDDAParameter * iParameter)
-: GaussianParameter(iParameter)
+GaussianHDDAParameter::GaussianHDDAParameter(const GaussianHDDAParameter *iParameter) : GaussianParameter(iParameter)
 {
 	int64_t k;
 	__storeDim = _pbDimension * (_pbDimension + 1) / 2;
-	int64_t * iTabD = iParameter->getTabD();
-	double ** iTabA = iParameter->getTabA();
+	int64_t *iTabD = iParameter->getTabD();
+	double **iTabA = iParameter->getTabA();
 	double *iTabB = iParameter->getTabB();
 
-	_tabShape = new DiagMatrix*[_nbCluster];
-	_tabQk = new GeneralMatrix*[_nbCluster];
-	_tabDk = new int64_t [_nbCluster];
-	_tabAkj = new double*[_nbCluster];
+	_tabShape = new DiagMatrix *[_nbCluster];
+	_tabQk = new GeneralMatrix *[_nbCluster];
+	_tabDk = new int64_t[_nbCluster];
+	_tabAkj = new double *[_nbCluster];
 	_tabBk = new double[_nbCluster];
 
-	DiagMatrix ** iTabShape = iParameter->getTabShape();
-	GeneralMatrix ** iTabQ = iParameter->getTabQ();
-	Matrix ** iTabWk = iParameter->getTabWk();
+	DiagMatrix **iTabShape = iParameter->getTabShape();
+	GeneralMatrix **iTabQ = iParameter->getTabQ();
+	Matrix **iTabWk = iParameter->getTabWk();
 
 	_tabGammak = NULL;
 	_Gammak = NULL;
-	_W = new SymmetricMatrix(_pbDimension); //Id
-	(* _W) = iParameter->getW();
+	_W = new SymmetricMatrix(_pbDimension); // Id
+	(*_W) = iParameter->getW();
 
 	recopyTab(iTabD, _tabDk, _nbCluster);
 	recopyTab(iTabB, _tabBk, _nbCluster);
@@ -166,16 +159,17 @@ GaussianHDDAParameter::GaussianHDDAParameter(const GaussianHDDAParameter * iPara
 		_tabAkj[k] = new double[_tabDk[k]];
 		recopyTab(iTabA[k], _tabAkj[k], _tabDk[k]);
 		_tabShape[k] = new DiagMatrix(iTabShape[k]);
-		_tabQk[k] = new GeneralMatrix(iTabQ[k]); // copy constructor
-		_tabWk[k] = new SymmetricMatrix(_pbDimension); //Id
-		(* _tabWk[k]) = iTabWk[k];
+		_tabQk[k] = new GeneralMatrix(iTabQ[k]);       // copy constructor
+		_tabWk[k] = new SymmetricMatrix(_pbDimension); // Id
+		(*_tabWk[k]) = iTabWk[k];
 	}
 }
 
 /**************/
 /* Destructor */
 /**************/
-GaussianHDDAParameter::~GaussianHDDAParameter() {
+GaussianHDDAParameter::~GaussianHDDAParameter()
+{
 	int64_t k;
 	if (_tabShape) {
 		for (k = 0; k < _nbCluster; k++) {
@@ -235,7 +229,8 @@ GaussianHDDAParameter::~GaussianHDDAParameter() {
 //------------------------
 // reset to default values
 //------------------------
-void GaussianHDDAParameter::reset() {
+void GaussianHDDAParameter::reset()
+{
 	THROW(OtherException, internalMixmodError);
 	// faire ensuite : XEMGaussianParameter::reset();
 }
@@ -243,15 +238,17 @@ void GaussianHDDAParameter::reset() {
 /*********/
 /* clone */
 /*********/
-Parameter * GaussianHDDAParameter::clone() const {
-	GaussianHDDAParameter * newParam = new GaussianHDDAParameter(this);
+Parameter *GaussianHDDAParameter::clone() const
+{
+	GaussianHDDAParameter *newParam = new GaussianHDDAParameter(this);
 	return (newParam);
 }
 
 /*********/
 /* MStep */
 /********/
-void GaussianHDDAParameter::MStep() {
+void GaussianHDDAParameter::MStep()
+{
 	GaussianParameter::MStep();
 
 	switch (_modelType->_nameModel) {
@@ -288,7 +285,8 @@ void GaussianHDDAParameter::MStep() {
 	case (Gaussian_HD_pk_AjBQkD):
 		computeAjBQk();
 		break;
-	default: THROW(OtherException, internalMixmodError);
+	default:
+		THROW(OtherException, internalMixmodError);
 	}
 }
 
@@ -296,25 +294,26 @@ void GaussianHDDAParameter::MStep() {
 /* getPdf */
 /**********/
 // returns the density of a sample using the cost function property Cost = -2LL
-double GaussianHDDAParameter::getPdf(int64_t iSample, int64_t kCluster)const {
+double GaussianHDDAParameter::getPdf(int64_t iSample, int64_t kCluster) const
+{
 
-	GaussianData * data = _model->getGaussianData();
-	double * ligne = (data->getYStore())[iSample];
+	GaussianData *data = _model->getGaussianData();
+	double *ligne = (data->getYStore())[iSample];
 	double normPdf = 0, K = 0;
 
-	Parameter * parameter = _model->getGaussianParameter();
-	GaussianParameter* gparameter = (GaussianParameter*) parameter;
-	double ** tabMean = gparameter->getTabMean();
-	double* tabProportion = gparameter->getTabProportion();
-	double * xiMoinsMuk = new double[_pbDimension];
-	double* tabShapek_store = new double[_pbDimension];
+	Parameter *parameter = _model->getGaussianParameter();
+	GaussianParameter *gparameter = (GaussianParameter *)parameter;
+	double **tabMean = gparameter->getTabMean();
+	double *tabProportion = gparameter->getTabProportion();
+	double *xiMoinsMuk = new double[_pbDimension];
+	double *tabShapek_store = new double[_pbDimension];
 
 	//----------------calcul le produit Q*t(Q)---------------
-	SymmetricMatrix* Pk = new SymmetricMatrix(_pbDimension); //Id
+	SymmetricMatrix *Pk = new SymmetricMatrix(_pbDimension); // Id
 	Pk->compute_as_M_tM(_tabQk[kCluster], _tabDk[kCluster]);
 
 	//---------------calcul du produit A = Qi_L^-1_t(Qi)------------------
-	SymmetricMatrix* A = new SymmetricMatrix(_pbDimension); //id
+	SymmetricMatrix *A = new SymmetricMatrix(_pbDimension); // id
 
 	double sum_lambda = 0.0;
 	for (int64_t j = 0; j < _tabDk[kCluster]; j++) {
@@ -326,8 +325,8 @@ double GaussianHDDAParameter::getPdf(int64_t iSample, int64_t kCluster)const {
 	}
 	A->compute_as_O_S_O(_tabQk[kCluster], tabShapek_store);
 
-	double constante = sum_lambda + (_pbDimension - _tabDk[kCluster]) * log(_tabBk[kCluster])
-			- 2 * log(tabProportion[kCluster]) + _pbDimension * log(2 * XEMPI);
+	double constante = sum_lambda + (_pbDimension - _tabDk[kCluster]) * log(_tabBk[kCluster]) -
+	                   2 * log(tabProportion[kCluster]) + _pbDimension * log(2 * XEMPI);
 
 	//-----------soustraction des moyennes
 	for (int64_t j = 0; j < _pbDimension; j++) {
@@ -335,9 +334,9 @@ double GaussianHDDAParameter::getPdf(int64_t iSample, int64_t kCluster)const {
 	}
 
 	//-----------produit Qt(Q)(x-muk)----------------------
-	SymmetricMatrix * Pi = new SymmetricMatrix(_pbDimension); //Id
+	SymmetricMatrix *Pi = new SymmetricMatrix(_pbDimension); // Id
 	Pi->compute_as_M_V(Pk, xiMoinsMuk);
-	double * storePi = Pi->getStore();
+	double *storePi = Pi->getStore();
 
 	//----------------norme(muk-Pi(x))_A = t(muk-Pi(x))_A_(muk-Pi(x))-----------
 	double normeA = A->norme(xiMoinsMuk);
@@ -346,14 +345,13 @@ double GaussianHDDAParameter::getPdf(int64_t iSample, int64_t kCluster)const {
 	double norme = 0.0;
 	for (int64_t i = 0; i < _pbDimension; i++) {
 		storePi[i] += tabMean[kCluster][i];
-		norme += (ligne[i] - storePi[i])*(ligne[i] - storePi[i]);
+		norme += (ligne[i] - storePi[i]) * (ligne[i] - storePi[i]);
 	}
 
 	//----------------calcul de normPdf---------
 	K = normeA + 1.0 / _tabBk[kCluster] * norme + constante;
-	//normPdf = exp(-1 / 2 * K);
+	// normPdf = exp(-1 / 2 * K);
 	normPdf = exp(-0.5 * K);
-
 
 	delete Pk;
 	delete A;
@@ -370,18 +368,19 @@ double GaussianHDDAParameter::getPdf(int64_t iSample, int64_t kCluster)const {
 /* getAllPdf */
 /*************/
 // returns the density of all the data (tabFik)
-void GaussianHDDAParameter::getAllPdf(double ** tabFik, double * tabProportion)const {
-	//cout<<"XEMGaussianHDDAParameter::getAllPdf"<<endl;
+void GaussianHDDAParameter::getAllPdf(double **tabFik, double *tabProportion) const
+{
+	// cout<<"XEMGaussianHDDAParameter::getAllPdf"<<endl;
 	/*cout<<"_tabBk : "<<_tabBk[0]<<endl;
 	cout<<"_tabBk : "<<_tabBk[1]<<endl;*/
-	double ** Cost = computeCost(_tabQk);
+	double **Cost = computeCost(_tabQk);
 	int64_t nbSample = _model->getNbSample();
 
 	for (int64_t i = 0; i < nbSample; i++) {
 		for (int64_t k = 0; k < _nbCluster; k++) {
 			tabFik[i][k] = exp(-0.5 * Cost[k][i]);
-			//cout<<" Cost[k][i] :  "<<Cost[k][i]<<endl;
-			//cout<<"tabFik[i][k] :  "<<tabFik[i][k]<<endl;
+			// cout<<" Cost[k][i] :  "<<Cost[k][i]<<endl;
+			// cout<<"tabFik[i][k] :  "<<tabFik[i][k]<<endl;
 		}
 	}
 
@@ -397,23 +396,24 @@ void GaussianHDDAParameter::getAllPdf(double ** tabFik, double * tabProportion)c
 /* getPdf */
 /*********/
 // returns the density of a sample using the cost function property Cost = -2LL
-double GaussianHDDAParameter::getPdf(Sample * x, int64_t kCluster)const {
+double GaussianHDDAParameter::getPdf(Sample *x, int64_t kCluster) const
+{
 
-	double * ligne = ((GaussianSample*) x)->getTabValue();
+	double *ligne = ((GaussianSample *)x)->getTabValue();
 	double normPdf = 0, K = 0;
-	Parameter * parameter = _model->getGaussianParameter();
-	GaussianParameter* gparameter = (GaussianParameter*) parameter;
-	double ** tabMean = gparameter->getTabMean();
-	double* tabProportion = gparameter->getTabProportion();
-	double * xiMoinsMuk = new double[_pbDimension];
-	double* tabShapek_store = new double[_pbDimension];
+	Parameter *parameter = _model->getGaussianParameter();
+	GaussianParameter *gparameter = (GaussianParameter *)parameter;
+	double **tabMean = gparameter->getTabMean();
+	double *tabProportion = gparameter->getTabProportion();
+	double *xiMoinsMuk = new double[_pbDimension];
+	double *tabShapek_store = new double[_pbDimension];
 
 	//----------------calcul le produit Q*t(Q)---------------
-	SymmetricMatrix* Pk = new SymmetricMatrix(_pbDimension); //Id
+	SymmetricMatrix *Pk = new SymmetricMatrix(_pbDimension); // Id
 	Pk->compute_as_M_tM(_tabQk[kCluster], _tabDk[kCluster]);
 
 	//---------------calcul du produit A = Qi_L^-1_t(Qi)------------------
-	SymmetricMatrix* A = new SymmetricMatrix(_pbDimension); //Id
+	SymmetricMatrix *A = new SymmetricMatrix(_pbDimension); // Id
 
 	double sum_lambda = 0.0;
 	for (int64_t j = 0; j < _tabDk[kCluster]; j++) {
@@ -426,8 +426,8 @@ double GaussianHDDAParameter::getPdf(Sample * x, int64_t kCluster)const {
 
 	A->compute_as_O_S_O(_tabQk[kCluster], tabShapek_store);
 
-	double constante = sum_lambda + (_pbDimension - _tabDk[kCluster]) * log(_tabBk[kCluster])
-			- 2 * log(tabProportion[kCluster]) + _pbDimension * log(2 * XEMPI);
+	double constante = sum_lambda + (_pbDimension - _tabDk[kCluster]) * log(_tabBk[kCluster]) -
+	                   2 * log(tabProportion[kCluster]) + _pbDimension * log(2 * XEMPI);
 
 	//-----------soustraction des moyennes
 	for (int64_t j = 0; j < _pbDimension; j++) {
@@ -435,9 +435,9 @@ double GaussianHDDAParameter::getPdf(Sample * x, int64_t kCluster)const {
 	}
 
 	//-----------produit Qt(Q)(x-muk)----------------------
-	SymmetricMatrix * Pi = new SymmetricMatrix(_pbDimension); //Id
+	SymmetricMatrix *Pi = new SymmetricMatrix(_pbDimension); // Id
 	Pi->compute_as_M_V(Pk, xiMoinsMuk);
-	double * storePi = Pi->getStore();
+	double *storePi = Pi->getStore();
 
 	//----------------norme(muk-Pi(x))_A = t(muk-Pi(x))_A_(muk-Pi(x))-----------
 	double normeA = A->norme(xiMoinsMuk);
@@ -446,13 +446,13 @@ double GaussianHDDAParameter::getPdf(Sample * x, int64_t kCluster)const {
 	double norme = 0.0;
 	for (int64_t i = 0; i < _pbDimension; i++) {
 		storePi[i] += tabMean[kCluster][i];
-		norme += (ligne[i] - storePi[i])*(ligne[i] - storePi[i]);
+		norme += (ligne[i] - storePi[i]) * (ligne[i] - storePi[i]);
 	}
 
 	//----------------calcul de normPdf---------
 	K = normeA + 1.0 / _tabBk[kCluster] * norme + constante;
-	//normPdf = exp(-1 / 2 * K);
-	normPdf = exp(-0.5*K);
+	// normPdf = exp(-1 / 2 * K);
+	normPdf = exp(-0.5 * K);
 
 	delete Pk;
 	delete A;
@@ -469,22 +469,23 @@ double GaussianHDDAParameter::getPdf(Sample * x, int64_t kCluster)const {
 /* input */
 /*********/
 // reads the input data file for HDDA models
-void GaussianHDDAParameter::input(std::ifstream & fi) {
+void GaussianHDDAParameter::input(std::ifstream &fi)
+{
 	int64_t j, k;
-  for (k = 0; k < _nbCluster; k++) {
-    // Proportions //
+	for (k = 0; k < _nbCluster; k++) {
+		// Proportions //
 		_tabProportion[k] = getDoubleFromStream(fi);
 
-    // Center (mean) //
-    for (j = 0; j < _pbDimension; j++)
-      _tabMean[k][j] = getDoubleFromStream(fi);
+		// Center (mean) //
+		for (j = 0; j < _pbDimension; j++)
+			_tabMean[k][j] = getDoubleFromStream(fi);
 
-    // Sub Dimension  //
-    fi >> _tabDk[k];
-    if (_tabAkj[k]) {
-      //cout<<_tabAkj[k][0]<<endl;
-			//cout<<"ok"<<endl;
-			delete [] _tabAkj[k];
+		// Sub Dimension  //
+		fi >> _tabDk[k];
+		if (_tabAkj[k]) {
+			// cout<<_tabAkj[k][0]<<endl;
+			// cout<<"ok"<<endl;
+			delete[] _tabAkj[k];
 			_tabAkj[k] = NULL;
 		}
 		_tabAkj[k] = new double[_tabDk[k]];
@@ -498,30 +499,30 @@ void GaussianHDDAParameter::input(std::ifstream & fi) {
 		fi >> _tabBk[k];
 		// Orientation matrix //
 		_tabQk[k]->input(fi, _tabDk[k]); // virtual method
-	} // end for k
+	}                                    // end for k
 }
 
 /*****************/
 /* computeTabWkW */
 /*****************/
-//computes W_k and W but also _tabGammak and Gammak
-void GaussianHDDAParameter::computeTabWkW() {
-	double* tabNk = _model->getTabNk();
-	double ** tabCik = _model->getTabCik();
+// computes W_k and W but also _tabGammak and Gammak
+void GaussianHDDAParameter::computeTabWkW()
+{
+	double *tabNk = _model->getTabNk();
+	double **tabCik = _model->getTabCik();
 	int64_t nbSample = _model->getNbSample();
-	GaussianData * data = _model->getGaussianData();
-	double * weight = data->_weight;
+	GaussianData *data = _model->getGaussianData();
+	double *weight = data->_weight;
 	int64_t i;
-	double ** matrix = data->getYStore(); // to store x_i i=1,...,n
+	double **matrix = data->getYStore(); // to store x_i i=1,...,n
 	int64_t j, k, l, dimStoreG;
 
 	k = 0;
 	while (k < _nbCluster) {
 		if (tabNk[k] < _pbDimension) {
-			_tabGammak = new SymmetricMatrix*[_nbCluster];
+			_tabGammak = new SymmetricMatrix *[_nbCluster];
 			k = _nbCluster;
-		}
-		else {
+		} else {
 			k++;
 		}
 	}
@@ -533,15 +534,15 @@ void GaussianHDDAParameter::computeTabWkW() {
 			l = 0;
 			double test = floor(tabNk[k]);
 			if (test == tabNk[k]) {
-				_Gammak = new double*[_nbCluster];
-				int64_t nk = (int64_t) tabNk[k];
-				_tabGammak[k] = new SymmetricMatrix(nk); //Id
+				_Gammak = new double *[_nbCluster];
+				int64_t nk = (int64_t)tabNk[k];
+				_tabGammak[k] = new SymmetricMatrix(nk); // Id
 				dimStoreG = nk * _pbDimension;
 				_Gammak[k] = new double[dimStoreG];
 				for (i = 0; i < nbSample; i++) {
 					if (tabCik[i][k] == 1) {
 						for (j = 0; j < _pbDimension; j++) {
-							//multiplier par le poids ?
+							// multiplier par le poids ?
 							_Gammak[k][l] = matrix[i][j] * weight[i] - _tabMean[k][j];
 							// _Gammak[k][l] = matrix[i][j] - _tabMean[k][j];
 							l += 1;
@@ -551,8 +552,7 @@ void GaussianHDDAParameter::computeTabWkW() {
 				//----------------calcul le produit Gamma*t(Gamma)---------------
 				*(_tabGammak[k]) = 0.0;
 				_tabGammak[k]->compute_M_tM(_Gammak[k], dimStoreG);
-			}
-			else {
+			} else {
 				THROW(NumericException, tabNkNotInteger);
 			} // end test
 		}
@@ -562,25 +562,22 @@ void GaussianHDDAParameter::computeTabWkW() {
 //-------------------------------------------
 // initialize attributes before an InitRandom
 //-------------------------------------------
-void GaussianHDDAParameter::initForInitRANDOM() {
-	THROW(OtherException, internalMixmodError);
-}
+void GaussianHDDAParameter::initForInitRANDOM() { THROW(OtherException, internalMixmodError); }
 
 //---------------------------
 // initForInitUSER_PARTITION
 //--------------------------
-void GaussianHDDAParameter::initForInitUSER_PARTITION(int64_t & nbInitializedCluster,
-		bool * tabNotInitializedCluster, Partition * initPartition)
+void GaussianHDDAParameter::initForInitUSER_PARTITION(int64_t &nbInitializedCluster, bool *tabNotInitializedCluster,
+                                                      Partition *initPartition)
 {
-	computeTabMeanInitUSER_PARTITION(
-			nbInitializedCluster, tabNotInitializedCluster, initPartition);
+	computeTabMeanInitUSER_PARTITION(nbInitializedCluster, tabNotInitializedCluster, initPartition);
 	// initialization of _tabAkj, ;... :
 
-	DiagMatrix * matrixDataVar = new DiagMatrix(_pbDimension, 0.0);
+	DiagMatrix *matrixDataVar = new DiagMatrix(_pbDimension, 0.0);
 	computeGlobalDiagDataVariance(matrixDataVar);
 	matrixDataVar->sortDiagMatrix();
 
-	double * store = matrixDataVar->getStore();
+	double *store = matrixDataVar->getStore();
 	double sum_lambda = 0.0;
 
 	for (int64_t k = 0; k < _nbCluster; k++) {
@@ -594,7 +591,7 @@ void GaussianHDDAParameter::initForInitUSER_PARTITION(int64_t & nbInitializedClu
 
 	double trace = matrixDataVar->computeTrace();
 
-	_tabBk[0] = 1.0 / (_pbDimension - _tabDk[0])*(trace - sum_lambda);
+	_tabBk[0] = 1.0 / (_pbDimension - _tabDk[0]) * (trace - sum_lambda);
 
 	for (int64_t k = 1; k < _nbCluster; k++) {
 		for (int64_t j = 0; j < _tabDk[k]; j++) {
@@ -619,72 +616,72 @@ void GaussianHDDAParameter::initForInitUSER_PARTITION(int64_t & nbInitializedClu
 /* initUSER_PARTITION */
 /**********************/
 /*void XEMGaussianHDDAParameter:: initUSER_PARTITION(){
-	computeTabMeanInitUSER_PARTITION();
+    computeTabMeanInitUSER_PARTITION();
 
    _model->computeNk();
    computeTabWkW();
    if (_tabDk[0]==0){
-	 computeTabDk();
+     computeTabDk();
    }
 
    switch(_modelType){
-	 case (Gaussian_HD_pk_AkjBkQkDk) :
-	 case (Gaussian_HD_p_AkjBkQkDk) :
-	 case (Gaussian_HD_pk_AkjBkQkD) :
-	 case (Gaussian_HD_p_AkjBkQkD) :
-	   computeAkjBkQk();
-	   break;
+     case (Gaussian_HD_pk_AkjBkQkDk) :
+     case (Gaussian_HD_p_AkjBkQkDk) :
+     case (Gaussian_HD_pk_AkjBkQkD) :
+     case (Gaussian_HD_p_AkjBkQkD) :
+       computeAkjBkQk();
+       break;
 
-	 case (Gaussian_HD_pk_AkBkQkDk) :
-	 case (Gaussian_HD_p_AkBkQkDk) :
-	 case (Gaussian_HD_pk_AkBkQkD) :
-	 case (Gaussian_HD_p_AkBkQkD) :
-	   computeAkBkQk();
-	   break;
+     case (Gaussian_HD_pk_AkBkQkDk) :
+     case (Gaussian_HD_p_AkBkQkDk) :
+     case (Gaussian_HD_pk_AkBkQkD) :
+     case (Gaussian_HD_p_AkBkQkD) :
+       computeAkBkQk();
+       break;
 
-	 case (Gaussian_HD_p_AkjBQkD):
-	 case (Gaussian_HD_pk_AkjBQkD):
-	   computeAkjBQk();
-	   break;
+     case (Gaussian_HD_p_AkjBQkD):
+     case (Gaussian_HD_pk_AkjBQkD):
+       computeAkjBQk();
+       break;
 
-	 case (Gaussian_HD_p_AkBQkD):
-	 case (Gaussian_HD_pk_AkBQkD):
-	   computeAkBQk();
-	   break;
+     case (Gaussian_HD_p_AkBQkD):
+     case (Gaussian_HD_pk_AkBQkD):
+       computeAkBQk();
+       break;
 
-	 case (Gaussian_HD_p_AjBkQkD):
-	 case (Gaussian_HD_pk_AjBkQkD):
-	   computeAjBkQk();
-	   break;
+     case (Gaussian_HD_p_AjBkQkD):
+     case (Gaussian_HD_pk_AjBkQkD):
+       computeAjBkQk();
+       break;
 
-	 case (Gaussian_HD_p_AjBQkD):
-	 case (Gaussian_HD_pk_AjBQkD):
-	   computeAjBQk();
-	   break;
+     case (Gaussian_HD_p_AjBQkD):
+     case (Gaussian_HD_pk_AjBQkD):
+       computeAjBQk();
+       break;
    }
 }*/
 
 /************/
 /* initUSER */
 /***********/
-void GaussianHDDAParameter::initUSER(Parameter * iParam) {
-	GaussianHDDAParameter * param = (GaussianHDDAParameter *) iParam;
+void GaussianHDDAParameter::initUSER(Parameter *iParam)
+{
+	GaussianHDDAParameter *param = (GaussianHDDAParameter *)iParam;
 
-	double ** iTabMean = param->getTabMean();
-	double * iTabProportion = param->getTabProportion();
-	Matrix ** iTabWk = param->getTabWk();
-	int64_t * iTabDk = param->getTabD();
-	double * iTabBk = param->getTabB();
-	double ** iTabAkj = param->getTabA();
-	GeneralMatrix** iTabQk = param->getTabQ();
+	double **iTabMean = param->getTabMean();
+	double *iTabProportion = param->getTabProportion();
+	Matrix **iTabWk = param->getTabWk();
+	int64_t *iTabDk = param->getTabD();
+	double *iTabBk = param->getTabB();
+	double **iTabAkj = param->getTabA();
+	GeneralMatrix **iTabQk = param->getTabQ();
 
 	int64_t k;
 	recopyTab(iTabBk, _tabBk, _nbCluster);
 	for (k = 0; k < _nbCluster; k++) {
 		if (_tabDk[k] != iTabDk[k]) {
 			THROW(InputException, differentSubDimensionsWithMAP);
-		}
-		else {
+		} else {
 			recopyTab(iTabMean[k], _tabMean[k], _pbDimension);
 			recopyTab(iTabAkj[k], _tabAkj[k], _tabDk[k]);
 			// recopy _tabWk
@@ -692,8 +689,7 @@ void GaussianHDDAParameter::initUSER(Parameter * iParam) {
 
 			if (!hasFreeProportion(_modelType->_nameModel)) {
 				_tabProportion[k] = 1.0 / _nbCluster;
-			}
-			else {
+			} else {
 				_tabProportion[k] = iTabProportion[k];
 			}
 			(*_tabQk[k]) = iTabQk[k];
@@ -704,27 +700,29 @@ void GaussianHDDAParameter::initUSER(Parameter * iParam) {
 /***********/
 /* recopy  */
 /***********/
-void GaussianHDDAParameter::recopy(Parameter * otherParameter) {
+void GaussianHDDAParameter::recopy(Parameter *otherParameter)
+{
 
-	GaussianParameter * iParameter = otherParameter->getGaussianParameter();
+	GaussianParameter *iParameter = otherParameter->getGaussianParameter();
 
 	recopyTab(iParameter->getTabMean(), _tabMean, _nbCluster, _pbDimension);
 	//_W->recopy(iParameter->getW());
-	(* _W) = iParameter->getW();
+	(*_W) = iParameter->getW();
 
 	int64_t k;
-	Matrix ** iTabWk = iParameter->getTabWk();
+	Matrix **iTabWk = iParameter->getTabWk();
 	for (k = 0; k < _nbCluster; k++) {
 		//_tabWk[k]->recopy(iTabWk[k]);
-		(* _tabWk[k]) = iTabWk[k];
+		(*_tabWk[k]) = iTabWk[k];
 	}
 }
 
 //-------------------
-//getLogLikelihoodOne
+// getLogLikelihoodOne
 //-------------------
-double GaussianHDDAParameter::getLogLikelihoodOne()const {
-	//cout<<"XEMGaussianHDDAParameter::getLogLikelihoodOne"<<endl;
+double GaussianHDDAParameter::getLogLikelihoodOne() const
+{
+	// cout<<"XEMGaussianHDDAParameter::getLogLikelihoodOne"<<endl;
 	/* Compute log-likelihood for one cluster
 	   useful for NEC criterion */
 	/* Initialization */
@@ -751,11 +749,11 @@ double GaussianHDDAParameter::getLogLikelihoodOne()const {
 	double * xiMoinsMuk = data->getTmpTabOfSizePbDimension();
 	double tmp;
 	  for(i=0; i<nbSample ; i++){
-		 yi = y[i];
-		 for(p=0 ; p<_pbDimension ; p++){
-			xiMoinsMuk[p] = yi[p] - Mean[p];
-		 }
-		 W->add(xiMoinsMuk, weight[i]);
+	     yi = y[i];
+	     for(p=0 ; p<_pbDimension ; p++){
+	        xiMoinsMuk[p] = yi[p] - Mean[p];
+	     }
+	     W->add(xiMoinsMuk, weight[i]);
 	  }
 
 	//Compute determinant of diag(W)
@@ -775,7 +773,7 @@ double GaussianHDDAParameter::getLogLikelihoodOne()const {
 	for (i=0; i<nbSample; i++){
 	  yi = y[i];
 	  for(p=0; p<_pbDimension; p++){
-		xiMoinsMuk[p] = yi[p] - Mean[p];
+	    xiMoinsMuk[p] = yi[p] - Mean[p];
 	  }
 
 	  norme             = SigmaMoins1->norme(xiMoinsMuk);   // virtual
@@ -795,16 +793,17 @@ double GaussianHDDAParameter::getLogLikelihoodOne()const {
 	return 0.0;
 }
 
-//Calcule la log-vraismeblance avec la fonction de coût
+// Calcule la log-vraismeblance avec la fonction de coût
 /*************************/
 /* computeLoglikelihoodK */
 /*************************/
-double* GaussianHDDAParameter::computeLoglikelihoodK(double**K) {
+double *GaussianHDDAParameter::computeLoglikelihoodK(double **K)
+{
 	int64_t i, k;
 	int64_t nbSample = _model->getNbSample();
-	int64_t ** tabZikKnown = _model->getTabZikKnown();
+	int64_t **tabZikKnown = _model->getTabZikKnown();
 
-	double* L = new double[_nbCluster];
+	double *L = new double[_nbCluster];
 	for (k = 0; k < _nbCluster; k++) {
 		L[k] = 0.0;
 	}
@@ -825,13 +824,14 @@ double* GaussianHDDAParameter::computeLoglikelihoodK(double**K) {
 /********************/
 /* getFreeParameter */
 /********************/
-int64_t GaussianHDDAParameter::getFreeParameter()const {
-	int64_t nbParameter; // Number of parameters
-	int64_t k = _nbCluster; // Sample size
+int64_t GaussianHDDAParameter::getFreeParameter() const
+{
+	int64_t nbParameter;      // Number of parameters
+	int64_t k = _nbCluster;   // Sample size
 	int64_t p = _pbDimension; // Sample dimension
 
 	int64_t roF = k * p + k - 1;
-	int64_t roR = k*p;
+	int64_t roR = k * p;
 	int64_t toEqual;
 	int64_t toFree = 0;
 	int64_t dMean = 0;
@@ -839,7 +839,7 @@ int64_t GaussianHDDAParameter::getFreeParameter()const {
 	switch (_modelType->_nameModel) {
 	case (Gaussian_HD_pk_AkjBkQkDk):
 		for (int64_t cls = 0; cls < k; cls++) {
-			toFree += _tabDk[cls]*(p - (_tabDk[cls] + 1) / 2);
+			toFree += _tabDk[cls] * (p - (_tabDk[cls] + 1) / 2);
 			dMean += _tabDk[cls];
 		}
 		toFree /= k;
@@ -849,7 +849,7 @@ int64_t GaussianHDDAParameter::getFreeParameter()const {
 
 	case (Gaussian_HD_pk_AkBkQkDk):
 		for (int64_t cls = 0; cls < k; cls++) {
-			toFree += _tabDk[cls]*(p - (_tabDk[cls] + 1) / 2);
+			toFree += _tabDk[cls] * (p - (_tabDk[cls] + 1) / 2);
 			dMean += _tabDk[cls];
 		}
 		toFree /= k;
@@ -858,62 +858,62 @@ int64_t GaussianHDDAParameter::getFreeParameter()const {
 		break;
 
 	case (Gaussian_HD_pk_AkjBkQkD):
-		toEqual = _tabDk[0]*(p - (_tabDk[0] + 1) / 2);
+		toEqual = _tabDk[0] * (p - (_tabDk[0] + 1) / 2);
 		nbParameter = roF + k * (toEqual + _tabDk[0] + 1) + 1;
 		break;
 	case (Gaussian_HD_p_AkjBkQkD):
-		toEqual = _tabDk[0]*(p - (_tabDk[0] + 1) / 2);
+		toEqual = _tabDk[0] * (p - (_tabDk[0] + 1) / 2);
 		nbParameter = roR + k * (toEqual + _tabDk[0] + 1) + 1;
 		break;
 
 	case (Gaussian_HD_pk_AkjBQkD):
-		toEqual = _tabDk[0]*(p - (_tabDk[0] + 1) / 2);
+		toEqual = _tabDk[0] * (p - (_tabDk[0] + 1) / 2);
 		nbParameter = roF + k * (toEqual + _tabDk[0]) + 2;
 		break;
 	case (Gaussian_HD_p_AkjBQkD):
-		toEqual = _tabDk[0]*(p - (_tabDk[0] + 1) / 2);
+		toEqual = _tabDk[0] * (p - (_tabDk[0] + 1) / 2);
 		nbParameter = roR + k * (toEqual + _tabDk[0]) + 3;
 		break;
 
 	case (Gaussian_HD_pk_AjBkQkD):
-		toEqual = _tabDk[0]*(p - (_tabDk[0] + 1) / 2);
+		toEqual = _tabDk[0] * (p - (_tabDk[0] + 1) / 2);
 		nbParameter = roF + k * (toEqual + 1) + 1;
 		break;
 	case (Gaussian_HD_p_AjBkQkD):
-		toEqual = _tabDk[0]*(p - (_tabDk[0] + 1) / 2);
+		toEqual = _tabDk[0] * (p - (_tabDk[0] + 1) / 2);
 		nbParameter = roR + k * (toEqual + 1) + 1;
 		break;
 
 	case (Gaussian_HD_pk_AjBQkD):
-		toEqual = _tabDk[0]*(p - (_tabDk[0] + 1) / 2);
+		toEqual = _tabDk[0] * (p - (_tabDk[0] + 1) / 2);
 		nbParameter = roF + k * toEqual + 2;
 		break;
 	case (Gaussian_HD_p_AjBQkD):
-		toEqual = _tabDk[0]*(p - (_tabDk[0] + 1) / 2);
+		toEqual = _tabDk[0] * (p - (_tabDk[0] + 1) / 2);
 		nbParameter = roR + k * toEqual + 2;
 		break;
 
 	case (Gaussian_HD_pk_AkBkQkD):
-		toEqual = _tabDk[0]*(p - (_tabDk[0] + 1) / 2);
+		toEqual = _tabDk[0] * (p - (_tabDk[0] + 1) / 2);
 		nbParameter = roF + k * (toEqual + 2) + 1;
 		break;
 	case (Gaussian_HD_p_AkBkQkD):
-		toEqual = _tabDk[0]*(p - (_tabDk[0] + 1) / 2);
+		toEqual = _tabDk[0] * (p - (_tabDk[0] + 1) / 2);
 		nbParameter = roR + k * (toEqual + 2) + 1;
 		break;
 
 	case (Gaussian_HD_pk_AkBQkD):
-		toEqual = _tabDk[0]*(p - (_tabDk[0] + 1) / 2);
+		toEqual = _tabDk[0] * (p - (_tabDk[0] + 1) / 2);
 		nbParameter = roF + k * (toEqual + 1) + 2;
 		break;
 	case (Gaussian_HD_p_AkBQkD):
-		toEqual = _tabDk[0]*(p - (_tabDk[0] + 1) / 2);
+		toEqual = _tabDk[0] * (p - (_tabDk[0] + 1) / 2);
 		nbParameter = roR + k * (toEqual + 1) + 2;
 		break;
 
 	case (Gaussian_HD_p_AkjBkQkDk):
 		for (int64_t cls = 0; cls < k; cls++) {
-			toFree += _tabDk[cls]*(p - (_tabDk[cls] + 1) / 2);
+			toFree += _tabDk[cls] * (p - (_tabDk[cls] + 1) / 2);
 			dMean += _tabDk[cls];
 		}
 		toFree /= k;
@@ -923,7 +923,7 @@ int64_t GaussianHDDAParameter::getFreeParameter()const {
 
 	case (Gaussian_HD_p_AkBkQkDk):
 		for (int64_t cls = 0; cls < k; cls++) {
-			toFree += _tabDk[cls]*(p - (_tabDk[cls] + 1) / 2);
+			toFree += _tabDk[cls] * (p - (_tabDk[cls] + 1) / 2);
 			dMean += _tabDk[cls];
 		}
 		toFree /= k;
@@ -939,9 +939,10 @@ int64_t GaussianHDDAParameter::getFreeParameter()const {
 }
 
 /********/
-/* edit */ //debug
+/* edit */ // debug
 /********/
-void GaussianHDDAParameter::edit() {
+void GaussianHDDAParameter::edit()
+{
 	int64_t k;
 	for (k = 0; k < _nbCluster; k++) {
 		cout << "\tcomponent : " << k << endl;
@@ -964,7 +965,8 @@ void GaussianHDDAParameter::edit() {
 /********/
 /* edit */
 /********/
-void GaussianHDDAParameter::edit(std::ofstream & oFile, bool text) {
+void GaussianHDDAParameter::edit(std::ofstream &oFile, bool text)
+{
 	int64_t k;
 
 	if (text) {
@@ -981,9 +983,8 @@ void GaussianHDDAParameter::edit(std::ofstream & oFile, bool text) {
 			oFile << endl;
 		}
 		oFile << endl;
-	}
-  else {
-    for (k = 0; k < _nbCluster; k++) {
+	} else {
+		for (k = 0; k < _nbCluster; k++) {
 			putDoubleInStream(oFile, _tabProportion[k]);
 			editTab(_tabMean + k, 1, _pbDimension, oFile, " ", "");
 			oFile << _tabDk[k] << endl;
@@ -991,7 +992,6 @@ void GaussianHDDAParameter::edit(std::ofstream & oFile, bool text) {
 			oFile << _tabBk[k] << endl;
 			_tabQk[k]->edit(oFile, "", " ", _tabDk[k]);
 			oFile << endl;
-
 		}
 		oFile << endl;
 	}
@@ -1001,9 +1001,10 @@ void GaussianHDDAParameter::edit(std::ofstream & oFile, bool text) {
 /* computeTabDk */
 /****************/
 //-------------------------------------------------------------------
-//compute parameters for each model
+// compute parameters for each model
 //-------------------------------------------------------------------
-void GaussianHDDAParameter::computeTabDk() {
+void GaussianHDDAParameter::computeTabDk()
+{
 	THROW(InputException, ungivenSubDimension);
 
 	/*XEMSymmetricMatrix* W_k;
@@ -1012,69 +1013,69 @@ void GaussianHDDAParameter::computeTabDk() {
   //   double* tabShapek_store = new double[_pbDimension];
 	 for (k=0;k<_nbCluster;k++){
 	   if (tabNk[k]<_pbDimension){
-		 int64_tnk = (int) tabNk[k];
-		 XEMGeneralMatrix * tabQk = new XEMGeneralMatrix(nk);
-		  tabQk->resetToZero();
-		  _tabQk[k]->resetToZero();
-		 //W_k = (XEMSymmetricMatrix* )(_tabGammak[k]);
-		 //W_k = _tabGammak[k];
-		 //W_k -> computeSVD(_tabShape[k], tabQk);
-		 _tabGammak[k] -> computeSVD(_tabShape[k], tabQk);
-		 _tabQk[k]->multiply(_Gammak[k], nk, tabQk);
-		 delete tabQk;
-		 delete _tabGammak[k];
-		 _tabGammak[k] = NULL;
+	     int64_tnk = (int) tabNk[k];
+	     XEMGeneralMatrix * tabQk = new XEMGeneralMatrix(nk);
+	      tabQk->resetToZero();
+	      _tabQk[k]->resetToZero();
+	     //W_k = (XEMSymmetricMatrix* )(_tabGammak[k]);
+	     //W_k = _tabGammak[k];
+	     //W_k -> computeSVD(_tabShape[k], tabQk);
+	     _tabGammak[k] -> computeSVD(_tabShape[k], tabQk);
+	     _tabQk[k]->multiply(_Gammak[k], nk, tabQk);
+	     delete tabQk;
+	     delete _tabGammak[k];
+	     _tabGammak[k] = NULL;
 	   }
 	   else{
-		 //W_k = (XEMSymmetricMatrix* )(_tabWk[k]);
-		 //W_k = _tabWk[k];
-		 //W_k -> computeSVD(_tabShape[k], _tabQk[k]);
-		  _tabWk[k] -> computeSVD(_tabShape[k], _tabQk[k]);
+	     //W_k = (XEMSymmetricMatrix* )(_tabWk[k]);
+	     //W_k = _tabWk[k];
+	     //W_k -> computeSVD(_tabShape[k], _tabQk[k]);
+	      _tabWk[k] -> computeSVD(_tabShape[k], _tabQk[k]);
 	   }
 	   double * tabShapek_store = _tabShape[k]->getStore();
 
-		double max_shape = (tabShapek_store[0] - tabShapek_store[1])/tabNk[k];
-		int64_ti = 2;
-		double seuil = 0.1; // to be decided
-		while (i<_pbDimension){
-		  double diff = (tabShapek_store[i-1] - tabShapek_store[i])/tabNk[k];
+	    double max_shape = (tabShapek_store[0] - tabShapek_store[1])/tabNk[k];
+	    int64_ti = 2;
+	    double seuil = 0.1; // to be decided
+	    while (i<_pbDimension){
+	      double diff = (tabShapek_store[i-1] - tabShapek_store[i])/tabNk[k];
 
-		  int64_tres = 0;
-		   if( diff < seuil*max_shape){
-			  int64_tr = i+1;
-			   while (r < _pbDimension){
-				double diff2 = (tabShapek_store[r-1] - tabShapek_store[r])/tabNk[k];
-				  if (diff2<seuil*max_shape){
-					res+=1;
-					r++;
-				  }
-				  else{
-					r = _pbDimension;
-				  }
-			   } // end while
-			   if (res==(_pbDimension-1-i)){
-				  _tabDk[k] = i-1;
-				  i = _pbDimension;
-			   }
-			   else{
-				  i++;
-			   }
-		   } // end if diff
-		   else{
-			i++;
-		   }
-		} //end while
+	      int64_tres = 0;
+	       if( diff < seuil*max_shape){
+	          int64_tr = i+1;
+	           while (r < _pbDimension){
+	            double diff2 = (tabShapek_store[r-1] - tabShapek_store[r])/tabNk[k];
+	              if (diff2<seuil*max_shape){
+	                res+=1;
+	                r++;
+	              }
+	              else{
+	                r = _pbDimension;
+	              }
+	           } // end while
+	           if (res==(_pbDimension-1-i)){
+	              _tabDk[k] = i-1;
+	              i = _pbDimension;
+	           }
+	           else{
+	              i++;
+	           }
+	       } // end if diff
+	       else{
+	        i++;
+	       }
+	    } //end while
 	 }
 
 	 if ((_modelType!=Gaussian_HD_pk_AkjBkQkDk)&(_modelType!=Gaussian_HD_pk_AkBkQkDk)
 	    &(_modelType!=Gaussian_HD_p_AkjBkQkDk) & (_modelType!=Gaussian_HD_p_AkBkQkDk)){
 	   int64_td_mean = 0;
 	   for (k=0;k<_nbCluster;k++){
-		 d_mean += _tabDk[k];
+	     d_mean += _tabDk[k];
 	   }
 	   d_mean /= _nbCluster;
 	   for (k=0;k<_nbCluster;k++){
-		_tabDk[k] = d_mean;
+	    _tabDk[k] = d_mean;
 	   }
 	 }
 
@@ -1087,40 +1088,40 @@ void GaussianHDDAParameter::computeTabDk() {
   int64_tk;
 
   for (k=0;k<_nbCluster;k++){
-	_tabDk[k] = 1;
+    _tabDk[k] = 1;
   }
 
   double nbFreeParameter;// = getFreeParameter();
 
    switch (_modelType){
-	 case Gaussian_HD_pk_AkjBkQkDk:
-	 case Gaussian_HD_p_AkjBkQkDk:
-	 case Gaussian_HD_pk_AkjBkQkD:
-	 case Gaussian_HD_p_AkjBkQkD:
-	   computeAkjBkQk();
-	   break;
-	 case Gaussian_HD_pk_AkBkQkDk:
-	 case Gaussian_HD_p_AkBkQkDk:
-	 case Gaussian_HD_pk_AkBkQkD:
-	 case Gaussian_HD_p_AkBkQkD:
-	   computeAkBkQk();
-	   break;
-	 case Gaussian_HD_pk_AkjBQkD:
-	 case Gaussian_HD_p_AkjBQkD:
-	   computeAkjBQk();
-	   break;
-	 case Gaussian_HD_pk_AkBQkD:
-	 case Gaussian_HD_p_AkBQkD:
-	   computeAkBQk();
-	   break;
-	 case Gaussian_HD_pk_AjBQkD:
-	 case Gaussian_HD_p_AjBQkD:
-	   computeAjBQk();
-	   break;
-	 case Gaussian_HD_pk_AjBkQkD:
-	 case Gaussian_HD_p_AjBkQkD:
-	   computeAjBkQk();
-	   break;
+     case Gaussian_HD_pk_AkjBkQkDk:
+     case Gaussian_HD_p_AkjBkQkDk:
+     case Gaussian_HD_pk_AkjBkQkD:
+     case Gaussian_HD_p_AkjBkQkD:
+       computeAkjBkQk();
+       break;
+     case Gaussian_HD_pk_AkBkQkDk:
+     case Gaussian_HD_p_AkBkQkDk:
+     case Gaussian_HD_pk_AkBkQkD:
+     case Gaussian_HD_p_AkBkQkD:
+       computeAkBkQk();
+       break;
+     case Gaussian_HD_pk_AkjBQkD:
+     case Gaussian_HD_p_AkjBQkD:
+       computeAkjBQk();
+       break;
+     case Gaussian_HD_pk_AkBQkD:
+     case Gaussian_HD_p_AkBQkD:
+       computeAkBQk();
+       break;
+     case Gaussian_HD_pk_AjBQkD:
+     case Gaussian_HD_p_AjBQkD:
+       computeAjBQk();
+       break;
+     case Gaussian_HD_pk_AjBkQkD:
+     case Gaussian_HD_p_AjBkQkD:
+       computeAjBkQk();
+       break;
    } // end switch
 
   double** Cost1 = computeCost(_tabQk);
@@ -1132,68 +1133,68 @@ void GaussianHDDAParameter::computeTabDk() {
   double** Cost;
 
   for (int64_tk=0;k<_nbCluster;k++){
-	nbFreeParameter = (_pbDimension+1.0-1.0/_nbCluster)
+    nbFreeParameter = (_pbDimension+1.0-1.0/_nbCluster)
              + _tabDk[k]*(_pbDimension-(_tabDk[k]+1.0)/2.0)+_tabDk[k]+2.0;
-	BIC_min[k] =  (-2*Lk_min[k] + nbFreeParameter * log(tabNk[k])) / (tabNk[k]);
+    BIC_min[k] =  (-2*Lk_min[k] + nbFreeParameter * log(tabNk[k])) / (tabNk[k]);
    // cout<<"d  :  "<<1<<"  BIC_min["<<k<<"] :  "<<BIC_min[k]<<endl;
-	tabD_min[k] = _tabDk[k];
+    tabD_min[k] = _tabDk[k];
   }
 
 for (int64_ti=2;i<_pbDimension;i++){
 
    for (k=0;k<_nbCluster;k++){
-	_tabDk[k] = i;
+    _tabDk[k] = i;
    }
-	switch (_modelType){
-	 case Gaussian_HD_pk_AkjBkQkDk:
-	 case Gaussian_HD_p_AkjBkQkDk:
-	 case Gaussian_HD_pk_AkjBkQkD:
-	 case Gaussian_HD_p_AkjBkQkD:
-	   computeAkjBkQk();
-	   break;
-	 case Gaussian_HD_pk_AkBkQkDk:
-	 case Gaussian_HD_p_AkBkQkDk:
-	 case Gaussian_HD_pk_AkBkQkD:
-	 case Gaussian_HD_p_AkBkQkD:
-	   computeAkBkQk();
-	   break;
-	 case Gaussian_HD_pk_AkjBQkD:
-	 case Gaussian_HD_p_AkjBQkD:
-	   computeAkjBQk();
-	   break;
-	 case Gaussian_HD_pk_AkBQkD:
-	 case Gaussian_HD_p_AkBQkD:
-	   computeAkBQk();
-	   break;
-	 case Gaussian_HD_pk_AjBQkD:
-	 case Gaussian_HD_p_AjBQkD:
-	   computeAjBQk();
-	   break;
-	case Gaussian_HD_pk_AjBkQkD:
-	case Gaussian_HD_p_AjBkQkD:
-	  computeAjBkQk();
-	  break;
+    switch (_modelType){
+     case Gaussian_HD_pk_AkjBkQkDk:
+     case Gaussian_HD_p_AkjBkQkDk:
+     case Gaussian_HD_pk_AkjBkQkD:
+     case Gaussian_HD_p_AkjBkQkD:
+       computeAkjBkQk();
+       break;
+     case Gaussian_HD_pk_AkBkQkDk:
+     case Gaussian_HD_p_AkBkQkDk:
+     case Gaussian_HD_pk_AkBkQkD:
+     case Gaussian_HD_p_AkBkQkD:
+       computeAkBkQk();
+       break;
+     case Gaussian_HD_pk_AkjBQkD:
+     case Gaussian_HD_p_AkjBQkD:
+       computeAkjBQk();
+       break;
+     case Gaussian_HD_pk_AkBQkD:
+     case Gaussian_HD_p_AkBQkD:
+       computeAkBQk();
+       break;
+     case Gaussian_HD_pk_AjBQkD:
+     case Gaussian_HD_p_AjBQkD:
+       computeAjBQk();
+       break;
+    case Gaussian_HD_pk_AjBkQkD:
+    case Gaussian_HD_p_AjBkQkD:
+      computeAjBkQk();
+      break;
 
-	} // end switch
+    } // end switch
 
-	Cost = computeCost(_tabQk);
-	Lk = computeLoglikelihoodK(Cost);
-	for (int64_tk=0;k<_nbCluster;k++){
-	 nbFreeParameter = (_pbDimension+1.0-1.0/_nbCluster)
+    Cost = computeCost(_tabQk);
+    Lk = computeLoglikelihoodK(Cost);
+    for (int64_tk=0;k<_nbCluster;k++){
+     nbFreeParameter = (_pbDimension+1.0-1.0/_nbCluster)
            + _tabDk[k]*(_pbDimension-(_tabDk[k]+1.0)/2.0)+_tabDk[k]+2.0;
-	 BIC[k] = (-2*Lk[k] + nbFreeParameter * log(tabNk[k])) / (tabNk[k]);
-	 //cout<<"d  : "<<i<<"  BIC["<<k<<"] :  "<<BIC[k]<<endl;
-	 if (BIC[k] < BIC_min[k]){
-	   tabD_min[k] = i;
-	   BIC_min[k] = BIC[k];
-	 }
-	}
-	delete[] Lk;
-	Lk = NULL;
+     BIC[k] = (-2*Lk[k] + nbFreeParameter * log(tabNk[k])) / (tabNk[k]);
+     //cout<<"d  : "<<i<<"  BIC["<<k<<"] :  "<<BIC[k]<<endl;
+     if (BIC[k] < BIC_min[k]){
+       tabD_min[k] = i;
+       BIC_min[k] = BIC[k];
+     }
+    }
+    delete[] Lk;
+    Lk = NULL;
 
    for (int64_tcls=0;cls<_nbCluster;cls++){
-	 delete[] Cost[cls];
-	 Cost[cls] = NULL;
+     delete[] Cost[cls];
+     Cost[cls] = NULL;
    }
    delete[] Cost;
    Cost = NULL;
@@ -1201,18 +1202,18 @@ for (int64_ti=2;i<_pbDimension;i++){
 
   if ((_modelType==Gaussian_HD_pk_AkjBkQkDk)||(_modelType==Gaussian_HD_pk_AkBkQkDk)
          ||(_modelType==Gaussian_HD_p_AkjBkQkDk) || (_modelType==Gaussian_HD_p_AkBkQkDk)){
-	 for (int64_tk=0;k<_nbCluster;k++){
-	   _tabDk[k] = tabD_min[k];
-	 }
+     for (int64_tk=0;k<_nbCluster;k++){
+       _tabDk[k] = tabD_min[k];
+     }
   }
   else{
    int64_t d_mean = 0;
    for (k=0;k<_nbCluster;k++){
-	d_mean += tabD_min[k];
+    d_mean += tabD_min[k];
    }
    d_mean /= _nbCluster;
    for (k=0;k<_nbCluster;k++){
-	_tabDk[k] = d_mean;
+    _tabDk[k] = d_mean;
    }
   }
 
@@ -1239,23 +1240,24 @@ for (int64_ti=2;i<_pbDimension;i++){
 /***************/
 /* computeCost */
 /***************/
-double** GaussianHDDAParameter::computeCost(GeneralMatrix ** tabQ)const {
-	double ** K = new double*[_nbCluster];
+double **GaussianHDDAParameter::computeCost(GeneralMatrix **tabQ) const
+{
+	double **K = new double *[_nbCluster];
 	int64_t j;
-	Parameter * parameter = _model->getGaussianParameter();
-	GaussianParameter* gparameter = (GaussianParameter*) parameter;
-	double ** tabMean = gparameter->getTabMean();
-	double* tabProportion = gparameter->getTabProportion();
+	Parameter *parameter = _model->getGaussianParameter();
+	GaussianParameter *gparameter = (GaussianParameter *)parameter;
+	double **tabMean = gparameter->getTabMean();
+	double *tabProportion = gparameter->getTabProportion();
 	int64_t nbSample = _model->getNbSample();
-	GaussianData * data = (GaussianData *) (_model->getData());
-	double ** matrix = data->getYStore();
-	double * xiMoinsMuk = new double[_pbDimension];
-	SymmetricMatrix* Pk = new SymmetricMatrix(_pbDimension); //Id
-	SymmetricMatrix* A = new SymmetricMatrix(_pbDimension); //Id
-	SymmetricMatrix * Pi = new SymmetricMatrix(_pbDimension); //id
+	GaussianData *data = (GaussianData *)(_model->getData());
+	double **matrix = data->getYStore();
+	double *xiMoinsMuk = new double[_pbDimension];
+	SymmetricMatrix *Pk = new SymmetricMatrix(_pbDimension); // Id
+	SymmetricMatrix *A = new SymmetricMatrix(_pbDimension);  // Id
+	SymmetricMatrix *Pi = new SymmetricMatrix(_pbDimension); // id
 
 	for (int64_t classe = 0; classe < _nbCluster; classe++) {
-		double* tabShapek_store = new double[_pbDimension];
+		double *tabShapek_store = new double[_pbDimension];
 		K[classe] = new double[nbSample];
 		//----------------calcul le produit Q*t(Q)---------------
 
@@ -1270,8 +1272,8 @@ double** GaussianHDDAParameter::computeCost(GeneralMatrix ** tabQ)const {
 			tabShapek_store[j] = 0.0;
 		}
 		A->compute_as_O_S_O(tabQ[classe], tabShapek_store);
-		double constante = sum_lambda + (_pbDimension - _tabDk[classe]) * log(_tabBk[classe])
-				- 2 * log(tabProportion[classe]) + _pbDimension * log(2 * XEMPI);
+		double constante = sum_lambda + (_pbDimension - _tabDk[classe]) * log(_tabBk[classe]) -
+		                   2 * log(tabProportion[classe]) + _pbDimension * log(2 * XEMPI);
 
 		for (int64_t sample = 0; sample < nbSample; sample++) {
 
@@ -1282,7 +1284,7 @@ double** GaussianHDDAParameter::computeCost(GeneralMatrix ** tabQ)const {
 			//-----------produit Pi = Qt(Q)(x-muk) (resultat vecteur)----------------------
 
 			Pi->compute_as_M_V(Pk, xiMoinsMuk);
-			double * storePi = Pi->getStore();
+			double *storePi = Pi->getStore();
 			//----------------norme(muk-Pi(x))_A = t(muk-Pi(x))_A_(muk-Pi(x))-----------
 
 			double normeA = A->norme(xiMoinsMuk);
@@ -1291,22 +1293,22 @@ double** GaussianHDDAParameter::computeCost(GeneralMatrix ** tabQ)const {
 			double norme = 0.0;
 			for (int64_t i = 0; i < _pbDimension; i++) {
 				storePi[i] += tabMean[classe][i];
-				norme += (matrix[sample][i] - storePi[i])*(matrix[sample][i] - storePi[i]);
+				norme += (matrix[sample][i] - storePi[i]) * (matrix[sample][i] - storePi[i]);
 			}
 
 			//----------------calcul de K(x)---------
 			K[classe][sample] = normeA + 1.0 / _tabBk[classe] * norme + constante;
-		}//fin sample
+		} // fin sample
 
 		delete[] tabShapek_store;
 		tabShapek_store = NULL;
-	}//fin classe
+	} // fin classe
 
 	delete Pk;
 	delete A;
 
 	delete Pi;
-	//delete[] storePi;
+	// delete[] storePi;
 
 	delete[] xiMoinsMuk;
 	xiMoinsMuk = NULL;
@@ -1318,75 +1320,75 @@ double** GaussianHDDAParameter::computeCost(GeneralMatrix ** tabQ)const {
 /* computeAkjBkQk */
 /*****************/
 // Dans mixmod, les matrices Wk ne sont pas divisees par nk alors que dans
-//le these de Charles elles le sont. L'expression des parametres dans le code
-//est differente de celle de la these car elle rectifie cette difference
-void GaussianHDDAParameter::computeAkjBkQk() {
-	Matrix* W_k;
-	double* tabNk = _model->getTabNk();
+// le these de Charles elles le sont. L'expression des parametres dans le code
+// est differente de celle de la these car elle rectifie cette difference
+void GaussianHDDAParameter::computeAkjBkQk()
+{
+	Matrix *W_k;
+	double *tabNk = _model->getTabNk();
 
 	for (int64_t k = 0; k < _nbCluster; k++) {
 		double sum_lambda = 0.0;
 		if (tabNk[k] < _pbDimension) {
-			int64_t nk = (int64_t) tabNk[k];
-			GeneralMatrix * tabQk = new GeneralMatrix(nk); //Id
+			int64_t nk = (int64_t)tabNk[k];
+			GeneralMatrix *tabQk = new GeneralMatrix(nk); // Id
 			W_k = _tabGammak[k];
-			W_k -> computeSVD(_tabShape[k], tabQk);
+			W_k->computeSVD(_tabShape[k], tabQk);
 			_tabQk[k]->multiply(_Gammak[k], nk, tabQk);
 			delete tabQk;
 			delete _tabGammak[k];
 			_tabGammak[k] = NULL;
-		}
-		else {
+		} else {
 			W_k = _tabWk[k];
-			W_k -> computeSVD(_tabShape[k], _tabQk[k]);
+			W_k->computeSVD(_tabShape[k], _tabQk[k]);
 		}
-		double * storeShapek = _tabShape[k]->getStore();
+		double *storeShapek = _tabShape[k]->getStore();
 		for (int64_t j = 0; j < _tabDk[k]; j++) {
 			_tabAkj[k][j] = storeShapek[j] / tabNk[k];
 			sum_lambda += _tabAkj[k][j];
-			//cout<<"tabA :  "<<_tabAkj[k][j]<<endl;
+			// cout<<"tabA :  "<<_tabAkj[k][j]<<endl;
 		}
 		double trace = W_k->computeTrace();
-		_tabBk[k] = 1.0 / (_pbDimension - _tabDk[k])*(trace / tabNk[k] - sum_lambda);
-		//cout<<"tabB :  "<<_tabBk[k]<<endl;
+		_tabBk[k] = 1.0 / (_pbDimension - _tabDk[k]) * (trace / tabNk[k] - sum_lambda);
+		// cout<<"tabB :  "<<_tabBk[k]<<endl;
 	}
 }
 
 /*****************/
 /* computeAkjBQk */
 /*****************/
-void GaussianHDDAParameter::computeAkjBQk() {
-	DiagMatrix* tabShapeW = new DiagMatrix(_pbDimension); //Id
-	GeneralMatrix* tabQW = new GeneralMatrix(_pbDimension); //Id
-	double* tabNk = _model->getTabNk();
+void GaussianHDDAParameter::computeAkjBQk()
+{
+	DiagMatrix *tabShapeW = new DiagMatrix(_pbDimension);   // Id
+	GeneralMatrix *tabQW = new GeneralMatrix(_pbDimension); // Id
+	double *tabNk = _model->getTabNk();
 
-	_W -> computeSVD(tabShapeW, tabQW);
+	_W->computeSVD(tabShapeW, tabQW);
 	double trace = _W->computeTrace() / _model->getNbSample();
 	double somme = 0.0;
 	for (int64_t k = 0; k < _nbCluster; k++) {
 		double sum_lambda = 0.0;
 		if (tabNk[k] < _pbDimension) {
-			int64_t nk = (int64_t) tabNk[k];
-			GeneralMatrix * tabQk = new GeneralMatrix(nk); //Id
-			_tabGammak[k]-> computeSVD(_tabShape[k], tabQk);
+			int64_t nk = (int64_t)tabNk[k];
+			GeneralMatrix *tabQk = new GeneralMatrix(nk); // Id
+			_tabGammak[k]->computeSVD(_tabShape[k], tabQk);
 			_tabQk[k]->multiply(_Gammak[k], nk, tabQk);
 			delete tabQk;
+		} else {
+			_tabWk[k]->computeSVD(_tabShape[k], _tabQk[k]);
 		}
-		else {
-			_tabWk[k] -> computeSVD(_tabShape[k], _tabQk[k]);
-		}
-		double * storeShapek = _tabShape[k]->getStore();
+		double *storeShapek = _tabShape[k]->getStore();
 		for (int64_t j = 0; j < _tabDk[k]; j++) {
 			_tabAkj[k][j] = storeShapek[j] / tabNk[k];
 			sum_lambda += _tabAkj[k][j];
-			//cout<<"tabA :  "<<_tabA[k][j]<<endl;
+			// cout<<"tabA :  "<<_tabA[k][j]<<endl;
 		}
 		somme += tabNk[k] * sum_lambda;
 	}
 	somme = somme / _model->getNbSample();
 	for (int64_t k = 0; k < _nbCluster; k++) {
-		_tabBk[k] = 1.0 / (_pbDimension - _tabDk[k])*(trace - somme);
-		//cout<<"tabB  :  "<<_tabB[k]<<endl;
+		_tabBk[k] = 1.0 / (_pbDimension - _tabDk[k]) * (trace - somme);
+		// cout<<"tabB  :  "<<_tabB[k]<<endl;
 	}
 	delete tabShapeW;
 	delete tabQW;
@@ -1395,37 +1397,37 @@ void GaussianHDDAParameter::computeAkjBQk() {
 /******************/
 /* computeAjBkQk */
 /*****************/
-void GaussianHDDAParameter::computeAjBkQk() {
-	Matrix * W_k;
-	DiagMatrix* tabShapeW = new DiagMatrix(_pbDimension); //Id
-	GeneralMatrix* tabQW = new GeneralMatrix(_pbDimension); //Id
+void GaussianHDDAParameter::computeAjBkQk()
+{
+	Matrix *W_k;
+	DiagMatrix *tabShapeW = new DiagMatrix(_pbDimension);   // Id
+	GeneralMatrix *tabQW = new GeneralMatrix(_pbDimension); // Id
 	double sum_lambda;
-	double* tabNk = _model->getTabNk();
-	_W -> computeSVD(tabShapeW, tabQW);
-	double * storeShape = tabShapeW->getStore();
+	double *tabNk = _model->getTabNk();
+	_W->computeSVD(tabShapeW, tabQW);
+	double *storeShape = tabShapeW->getStore();
 	for (int64_t k = 0; k < _nbCluster; k++) {
 		sum_lambda = 0.0;
 		if (tabNk[k] < _pbDimension) {
-			int64_t nk = (int64_t) tabNk[k];
-			GeneralMatrix * tabQk = new GeneralMatrix(nk); //Id
+			int64_t nk = (int64_t)tabNk[k];
+			GeneralMatrix *tabQk = new GeneralMatrix(nk); // Id
 			W_k = _tabGammak[k];
-			W_k -> computeSVD(_tabShape[k], tabQk);
+			W_k->computeSVD(_tabShape[k], tabQk);
 			_tabQk[k]->multiply(_Gammak[k], nk, tabQk);
 			delete tabQk;
-		}
-		else {
+		} else {
 			W_k = _tabWk[k];
 			W_k->computeSVD(_tabShape[k], _tabQk[k]);
 		}
-		double * storeShapek = _tabShape[k]->getStore();
+		double *storeShapek = _tabShape[k]->getStore();
 		for (int64_t j = 0; j < _tabDk[k]; j++) {
 			_tabAkj[k][j] = storeShape[j] / _model->getNbSample();
 			sum_lambda += storeShapek[j] / tabNk[k];
-			//cout<<"tabAij :  "<<_tabA[k][j]<<endl;
+			// cout<<"tabAij :  "<<_tabA[k][j]<<endl;
 		}
 		double trace = W_k->computeTrace() / tabNk[k];
-		_tabBk[k] = 1.0 / (_pbDimension - _tabDk[k])*(trace - sum_lambda);
-		//cout<<"tabB :  "<<_tabB[k]<<endl;
+		_tabBk[k] = 1.0 / (_pbDimension - _tabDk[k]) * (trace - sum_lambda);
+		// cout<<"tabB :  "<<_tabB[k]<<endl;
 	}
 	delete tabShapeW;
 	delete tabQW;
@@ -1434,38 +1436,38 @@ void GaussianHDDAParameter::computeAjBkQk() {
 /****************/
 /* computeAjBQk */
 /***************/
-void GaussianHDDAParameter::computeAjBQk() {
+void GaussianHDDAParameter::computeAjBQk()
+{
 	double somme = 0.0;
-	DiagMatrix* tabShapeW = new DiagMatrix(_pbDimension); //Id
-	GeneralMatrix* tabQW = new GeneralMatrix(_pbDimension); //Id
-	double* tabNk = _model->getTabNk();
+	DiagMatrix *tabShapeW = new DiagMatrix(_pbDimension);   // Id
+	GeneralMatrix *tabQW = new GeneralMatrix(_pbDimension); // Id
+	double *tabNk = _model->getTabNk();
 
 	double trace = _W->computeTrace() / _model->getNbSample();
-	_W -> computeSVD(tabShapeW, tabQW);
-	double * storeShape = tabShapeW->getStore();
+	_W->computeSVD(tabShapeW, tabQW);
+	double *storeShape = tabShapeW->getStore();
 	for (int64_t k = 0; k < _nbCluster; k++) {
 		double sum_lambda = 0.0;
 		if (tabNk[k] < _pbDimension) {
-			int64_t nk = (int64_t) tabNk[k];
-			GeneralMatrix * tabQk = new GeneralMatrix(nk); //Id
-			_tabGammak[k] -> computeSVD(_tabShape[k], tabQk);
+			int64_t nk = (int64_t)tabNk[k];
+			GeneralMatrix *tabQk = new GeneralMatrix(nk); // Id
+			_tabGammak[k]->computeSVD(_tabShape[k], tabQk);
 			_tabQk[k]->multiply(_Gammak[k], nk, tabQk);
 			delete tabQk;
+		} else {
+			_tabWk[k]->computeSVD(_tabShape[k], _tabQk[k]);
 		}
-		else {
-			_tabWk[k] -> computeSVD(_tabShape[k], _tabQk[k]);
-		}
-		double * storeShapek = _tabShape[k]->getStore();
+		double *storeShapek = _tabShape[k]->getStore();
 		for (int64_t j = 0; j < _tabDk[k]; j++) {
 			_tabAkj[k][j] = storeShape[j] / _model->getNbSample();
 			sum_lambda += storeShapek[j];
-			//cout<<"tabA :  "<<_tabA[k][j]<<endl;
+			// cout<<"tabA :  "<<_tabA[k][j]<<endl;
 		}
 		somme += sum_lambda;
 	}
 	somme = somme / _model->getNbSample();
 	for (int64_t k = 0; k < _nbCluster; k++) {
-		_tabBk[k] = 1.0 / (_pbDimension - _tabDk[k])*(trace - somme);
+		_tabBk[k] = 1.0 / (_pbDimension - _tabDk[k]) * (trace - somme);
 		// cout<<"tabB :  "<<_tabB[k]<<endl;
 	}
 	delete tabShapeW;
@@ -1475,76 +1477,76 @@ void GaussianHDDAParameter::computeAjBQk() {
 /*****************/
 /* computeAkBkQk */
 /****************/
-void GaussianHDDAParameter::computeAkBkQk() {
+void GaussianHDDAParameter::computeAkBkQk()
+{
 	double sum_lambda;
-	double* tabNk = _model->getTabNk();
-	Matrix * W_k;
+	double *tabNk = _model->getTabNk();
+	Matrix *W_k;
 	for (int64_t k = 0; k < _nbCluster; k++) {
 		sum_lambda = 0.0;
 		if (tabNk[k] < _pbDimension) {
-			int64_t nk = (int64_t) tabNk[k];
-			GeneralMatrix * tabQk = new GeneralMatrix(nk); //Id
+			int64_t nk = (int64_t)tabNk[k];
+			GeneralMatrix *tabQk = new GeneralMatrix(nk); // Id
 			W_k = _tabGammak[k];
-			W_k -> computeSVD(_tabShape[k], tabQk);
+			W_k->computeSVD(_tabShape[k], tabQk);
 			_tabQk[k]->multiply(_Gammak[k], nk, tabQk);
 			delete tabQk;
-		}
-		else {
+		} else {
 			W_k = _tabWk[k];
-			W_k -> computeSVD(_tabShape[k], _tabQk[k]);
+			W_k->computeSVD(_tabShape[k], _tabQk[k]);
 		}
-		double * storeShapek = _tabShape[k]->getStore();
+		double *storeShapek = _tabShape[k]->getStore();
 		for (int64_t j = 0; j < _tabDk[k]; j++) {
 			sum_lambda += storeShapek[j] / tabNk[k];
 		}
 		for (int64_t j = 0; j < _tabDk[k]; j++) {
 			_tabAkj[k][j] = 1.0 / _tabDk[k] * sum_lambda;
-			//cout<<"tabA : "<<_tabA[k][j]<<endl;
+			// cout<<"tabA : "<<_tabA[k][j]<<endl;
 		}
 		double trace = W_k->computeTrace() / tabNk[k];
 		_tabBk[k] = 1.0 / (_pbDimension - _tabDk[k]) * (trace - sum_lambda);
-		//cout<<"tabB : "<<_tabB[k]<<endl;
+		// cout<<"tabB : "<<_tabB[k]<<endl;
 	}
 }
 
 /****************/
 /* computeAkBQk */
 /****************/
-void GaussianHDDAParameter::computeAkBQk() {
+void GaussianHDDAParameter::computeAkBQk()
+{
 	double sum_lambda;
 	double somme = 0.0;
-	DiagMatrix* tabShapeW = new DiagMatrix(_pbDimension); //Id
-	GeneralMatrix* tabQW = new GeneralMatrix(_pbDimension); //Id
-	double* tabNk = _model->getTabNk();
+	DiagMatrix *tabShapeW = new DiagMatrix(_pbDimension);   // Id
+	GeneralMatrix *tabQW = new GeneralMatrix(_pbDimension); // Id
+	double *tabNk = _model->getTabNk();
 
 	double trace = _W->computeTrace() / _model->getNbSample();
-	_W -> computeSVD(tabShapeW, tabQW);
+	_W->computeSVD(tabShapeW, tabQW);
 	for (int64_t k = 0; k < _nbCluster; k++) {
 		sum_lambda = 0.0;
 		if (tabNk[k] < _pbDimension) {
-			int64_t nk = (int64_t) tabNk[k];
-			GeneralMatrix * tabQk = new GeneralMatrix(nk); //Id
-			_tabGammak[k] -> computeSVD(_tabShape[k], tabQk);
+			int64_t nk = (int64_t)tabNk[k];
+			GeneralMatrix *tabQk = new GeneralMatrix(nk); // Id
+			_tabGammak[k]->computeSVD(_tabShape[k], tabQk);
 			_tabQk[k]->multiply(_Gammak[k], nk, tabQk);
 			delete tabQk;
+		} else {
+			_tabWk[k]->computeSVD(_tabShape[k], _tabQk[k]);
 		}
-		else {
-			_tabWk[k] -> computeSVD(_tabShape[k], _tabQk[k]);
-		}
-		double * storeShapek = _tabShape[k]->getStore();
+		double *storeShapek = _tabShape[k]->getStore();
 		for (int64_t j = 0; j < _tabDk[k]; j++) {
 			sum_lambda += storeShapek[j] / tabNk[k];
 		}
 		for (int64_t j = 0; j < _tabDk[k]; j++) {
 			_tabAkj[k][j] = 1.0 / _tabDk[k] * sum_lambda;
-			//cout<<"tabA :  "<<_tabA[k][j]<<endl;
+			// cout<<"tabA :  "<<_tabA[k][j]<<endl;
 		}
 		somme += tabNk[k] * sum_lambda;
 	}
 	somme = somme / _model->getNbSample();
 	for (int64_t k = 0; k < _nbCluster; k++) {
-		_tabBk[k] = 1.0 / (_pbDimension - _tabDk[k])*(trace - somme);
-		//cout<<"tabB :  "<<_tabB[k]<<endl;
+		_tabBk[k] = 1.0 / (_pbDimension - _tabDk[k]) * (trace - somme);
+		// cout<<"tabB :  "<<_tabB[k]<<endl;
 	}
 	delete tabShapeW;
 	delete tabQW;

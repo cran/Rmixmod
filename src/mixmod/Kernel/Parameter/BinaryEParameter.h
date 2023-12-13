@@ -6,7 +6,7 @@
 
 /***************************************************************************
     This file is part of MIXMOD
-    
+
     MIXMOD is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -20,43 +20,45 @@
     You should have received a copy of the GNU General Public License
     along with MIXMOD.  If not, see <http://www.gnu.org/licenses/>.
 
-    All informations available on : http://www.mixmod.org                                                                                               
+    All informations available on : http://www.mixmod.org
 ***************************************************************************/
 #ifndef XEMBINARYEPARAMETER_H
 #define XEMBINARYEPARAMETER_H
 
 #include "mixmod/Kernel/Parameter/BinaryParameter.h"
 
-namespace XEM {
+namespace XEM
+{
 
 /**
 @author F LANGROGNET
  */
-class BinaryEParameter : public BinaryParameter {
+class BinaryEParameter : public BinaryParameter
+{
 
 public:
-	
 	/// Default constructor
 	BinaryEParameter();
 
 	/// Constructor
 	// called by XEMModel
-	BinaryEParameter(Model * iModel, ModelType * iModelType, int64_t * tabNbModality);
+	BinaryEParameter(Model *iModel, ModelType *iModelType, int64_t *tabNbModality);
 
 	/// Constructor
-	BinaryEParameter(const BinaryEParameter * iParameter);
+	using BinaryParameter::operator==;
+	BinaryEParameter(const BinaryEParameter *iParameter);
 
 	/// Destructor
 	~BinaryEParameter();
 
 	/// Comparison operator
-	virtual bool operator ==(const BinaryEParameter & param) const;
+	virtual bool operator==(const BinaryEParameter &param) const;
 
 	/// reset to default values
 	virtual void reset();
 
 	/// clone
-	Parameter * clone() const;
+	Parameter *clone() const;
 
 	/// selector :  return scatter value
 	double getScatter() const;
@@ -69,46 +71,43 @@ public:
 	long double getLogPdf(int64_t iSample, int64_t kCluster) const;
 
 	/** Compute probability density function
-		 for x vector and kCluster th cluster
+	     for x vector and kCluster th cluster
 	 */
-	double getPdf(Sample * x, int64_t kCluster) const;
+	double getPdf(Sample *x, int64_t kCluster) const;
 
 	/// getlogLikelihoodOne (one cluster)
 	double getLogLikelihoodOne() const;
 
-	/// Compute scatter(s) 
+	/// Compute scatter(s)
 	void computeScatter();
 
-	/// Compute random scatter(s) 
+	/// Compute random scatter(s)
 	void computeRandomScatter();
 
-	///recopy scatter from param (used for init  : USER)
-	void recopyScatter(Parameter * iParam);
+	/// recopy scatter from param (used for init  : USER)
+	void recopyScatter(Parameter *iParam);
 
-	///create Scatter from "Binary Parameter Ekjh"
-	void createScatter(double *** scatter);
+	/// create Scatter from "Binary Parameter Ekjh"
+	void createScatter(double ***scatter);
 
 	/// editScatter (for debug)
 	void editScatter(int64_t k);
 
-	/// editScatter 
-	void editScatter(std::ofstream & oFile, int64_t k, bool text = false);
+	/// editScatter
+	void editScatter(std::ofstream &oFile, int64_t k, bool text = false);
 
 	// Read Scatter in input file
-	void inputScatter(std::ifstream & fi, int64_t k);
-	void inputScatter(double *** scatters);
+	void inputScatter(std::ifstream &fi, int64_t k);
+	void inputScatter(double ***scatters);
 
-	double *** scatterToArray() const;
+	double ***scatterToArray() const;
 
 private:
-	
 	/// scatter
 	double _scatter;
 };
 
-inline double BinaryEParameter::getScatter() const {
-	return _scatter;
-}
+inline double BinaryEParameter::getScatter() const { return _scatter; }
 
 }
 

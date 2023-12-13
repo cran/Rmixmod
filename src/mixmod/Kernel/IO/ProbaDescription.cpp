@@ -6,7 +6,7 @@
 
 /***************************************************************************
     This file is part of MIXMOD
-    
+
     MIXMOD is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -20,29 +20,28 @@
     You should have received a copy of the GNU General Public License
     along with MIXMOD.  If not, see <http://www.gnu.org/licenses/>.
 
-    All informations available on : http://www.mixmod.org                                                                                               
+    All informations available on : http://www.mixmod.org
 ***************************************************************************/
 
 #include "mixmod/Kernel/IO/ProbaDescription.h"
 #include "mixmod/Kernel/IO/Proba.h"
-#include "mixmod/Kernel/Model/Model.h"
 #include "mixmod/Kernel/IO/QuantitativeColumnDescription.h"
+#include "mixmod/Kernel/Model/Model.h"
 #include <sstream>
 
-namespace XEM {
+namespace XEM
+{
 
 //------------
 // Constructor by default
 //------------
-ProbaDescription::ProbaDescription() : Description() {
-	_proba = NULL;
-}
+ProbaDescription::ProbaDescription() : Description() { _proba = NULL; }
 
 // ---------------------------
-//constructor by initilization
+// constructor by initilization
 // ---------------------------
-ProbaDescription::ProbaDescription(int64_t nbSample, int64_t nbCluster, 
-		FormatNumeric::FormatNumericFile format, std::string filename, std::string infoName) 
+ProbaDescription::ProbaDescription(int64_t nbSample, int64_t nbCluster, FormatNumeric::FormatNumericFile format,
+                                   std::string filename, std::string infoName)
 {
 	_infoName = "infoName";
 	_nbSample = nbSample;
@@ -69,7 +68,8 @@ ProbaDescription::ProbaDescription(int64_t nbSample, int64_t nbCluster,
 //------------
 // Constructor after an estimation->run
 //------------
-ProbaDescription::ProbaDescription(Model * model) : Description() {
+ProbaDescription::ProbaDescription(Model *model) : Description()
+{
 	if (model) {
 		_infoName = "Probability";
 		_nbSample = model->getNbSample();
@@ -86,8 +86,7 @@ ProbaDescription::ProbaDescription(Model * model) : Description() {
 			_columnDescription[iCol]->setName(name);
 		}
 		_proba = new Proba(model);
-	}
-	else {
+	} else {
 		THROW(OtherException, nullPointerError);
 	}
 }
@@ -95,34 +94,41 @@ ProbaDescription::ProbaDescription(Model * model) : Description() {
 //------------
 // Constructor by copy
 //------------
-ProbaDescription::ProbaDescription(ProbaDescription & probaDescription) {
+ProbaDescription::ProbaDescription(ProbaDescription &probaDescription) : Description(probaDescription)
+{
 	(*this) = probaDescription;
 }
 
 //------------
 // operator ==
 //------------
-bool ProbaDescription::operator==(ProbaDescription & probaDescription) const {
-	if (_fileName != probaDescription._fileName) return false;
-	if (_format != probaDescription._format) return false;
-	if (_infoName != probaDescription._infoName) return false;
-	if (_nbSample != probaDescription._nbSample) return false;
-	if (_nbColumn != probaDescription._nbColumn) return false;
+bool ProbaDescription::operator==(ProbaDescription &probaDescription) const
+{
+	if (_fileName != probaDescription._fileName)
+		return false;
+	if (_format != probaDescription._format)
+		return false;
+	if (_infoName != probaDescription._infoName)
+		return false;
+	if (_nbSample != probaDescription._nbSample)
+		return false;
+	if (_nbColumn != probaDescription._nbColumn)
+		return false;
 	for (int64_t i = 0; i < _nbColumn; ++i) {
-		if (_columnDescription[i]->getName() 
-				!= probaDescription.getColumnDescription(i)->getName())
-		{
+		if (_columnDescription[i]->getName() != probaDescription.getColumnDescription(i)->getName()) {
 			return false;
 		}
 	}
-	if (!(_proba == probaDescription.getProba())) return false;
+	if (!(_proba == probaDescription.getProba()))
+		return false;
 	return true;
 }
 
 //------------
 // operator =
 //------------
-ProbaDescription & ProbaDescription::operator=(ProbaDescription & probaDescription) {
+ProbaDescription &ProbaDescription::operator=(ProbaDescription &probaDescription)
+{
 	_fileName = probaDescription._fileName;
 	_format = probaDescription._format;
 	_infoName = probaDescription._infoName;
@@ -130,7 +136,7 @@ ProbaDescription & ProbaDescription::operator=(ProbaDescription & probaDescripti
 	_nbColumn = probaDescription._nbColumn;
 	_columnDescription.resize(_nbColumn);
 	for (int64_t i = 0; i < _nbColumn; ++i) {
-		const ColumnDescription * cd = probaDescription.getColumnDescription(i);
+		const ColumnDescription *cd = probaDescription.getColumnDescription(i);
 		_columnDescription[i] = cd->clone();
 	}
 	_proba = new Proba(*(probaDescription.getProba()));
@@ -140,7 +146,8 @@ ProbaDescription & ProbaDescription::operator=(ProbaDescription & probaDescripti
 //------------
 // Destructor
 //------------
-ProbaDescription::~ProbaDescription() {
+ProbaDescription::~ProbaDescription()
+{
 	if (_proba) {
 		delete _proba;
 	}
@@ -149,14 +156,15 @@ ProbaDescription::~ProbaDescription() {
 //--------
 // ostream
 //--------
-void ProbaDescription::saveNumericValues(std::string fileName) {
-	//if (_fileName==""){
+void ProbaDescription::saveNumericValues(std::string fileName)
+{
+	// if (_fileName==""){
 	std::ofstream fo(fileName.c_str(), ios::out);
 	_proba->edit(fo);
 	_fileName = fileName;
 	//}
 	/* else : if _fileName!="", probaDescription has been created by a XML file.
-	In this case, the numeric file already exists. 
+	In this case, the numeric file already exists.
 	 */
 }
 

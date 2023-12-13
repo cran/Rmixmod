@@ -6,7 +6,7 @@
 
 /***************************************************************************
     This file is part of MIXMOD
-    
+
     MIXMOD is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -20,77 +20,67 @@
     You should have received a copy of the GNU General Public License
     along with MIXMOD.  If not, see <http://www.gnu.org/licenses/>.
 
-    All informations available on : http://www.mixmod.org                                                                                               
+    All informations available on : http://www.mixmod.org
 ***************************************************************************/
 
 #include "mixmod/DiscriminantAnalysis/Learn/LearnModelOutput.h"
 #include "mixmod/Kernel/IO/LabelDescription.h"
 #include "mixmod/Kernel/Model/BinaryModel.h"
 
-namespace XEM {
+namespace XEM
+{
 
 //--------------------
 // Default Constructor
 //--------------------
-LearnModelOutput::LearnModelOutput() {
-    _CVLabel = nullptr;
-}
+LearnModelOutput::LearnModelOutput() { _CVLabel = nullptr; }
 
 //-----------------
-//  Copy constructor
+//  Initialization Constructor
 //-----------------
-LearnModelOutput::LearnModelOutput(const LearnModelOutput & cModelOutput) {
-	THROW(OtherException, internalMixmodError);
+LearnModelOutput::LearnModelOutput(Model *estimation) : ModelOutput(estimation) { _CVLabel = nullptr; }
+
+//-----------------
+//  Initialization Constructor
+//-----------------
+LearnModelOutput::LearnModelOutput(ModelType &modelType, int64_t nbCluster, std::vector<CriterionOutput *> &criterionOutput,
+                                   double likelihood, ParameterDescription &parameterDescription,
+                                   LabelDescription &labelDescription, ProbaDescription &probaDescription)
+    : ModelOutput(modelType, nbCluster, criterionOutput, likelihood, parameterDescription, labelDescription, probaDescription)
+{
+	_CVLabel = nullptr;
 }
 
 //-----------------
 //  Initialization Constructor
 //-----------------
-LearnModelOutput::LearnModelOutput(Model * estimation) : ModelOutput(estimation) {
-    _CVLabel = nullptr;
-}
-
-//-----------------
-//  Initialization Constructor
-//-----------------
-LearnModelOutput::LearnModelOutput(ModelType & modelType, 
-		int64_t nbCluster,
-		std::vector< CriterionOutput* >& criterionOutput, 
-		double likelihood, 
-		ParameterDescription& parameterDescription,
-		LabelDescription& labelDescription, 
-		ProbaDescription& probaDescription)
-: ModelOutput(modelType, nbCluster, criterionOutput, likelihood, 
-		parameterDescription, labelDescription, probaDescription) {
-  _CVLabel = nullptr;
-}
-
-//-----------------
-//  Initialization Constructor
-//-----------------
-LearnModelOutput::LearnModelOutput(ModelType& modelType, int64_t nbCluster, Exception& error) 
-: ModelOutput(modelType, nbCluster, error) {
-    _CVLabel = nullptr;
+LearnModelOutput::LearnModelOutput(ModelType &modelType, int64_t nbCluster, Exception &error)
+    : ModelOutput(modelType, nbCluster, error)
+{
+	_CVLabel = nullptr;
 }
 
 //-----------
 // Destructor
 //-----------
-LearnModelOutput::~LearnModelOutput() {
-  if (_CVLabel) delete _CVLabel;
+LearnModelOutput::~LearnModelOutput()
+{
+	if (_CVLabel)
+		delete _CVLabel;
 }
 
 /// set CV Labels
-void LearnModelOutput::setCVLabel(Model * estimation, std::vector<int64_t> & cvLabel) {
+void LearnModelOutput::setCVLabel(Model *estimation, std::vector<int64_t> &cvLabel)
+{
 	if (isBinary(estimation->getModelType()->_nameModel) && DATA_REDUCE) {
 		////
-		//binary case
+		// binary case
 
 		// cmake a copy of cvLabel
 		std::vector<int64_t> cvLabelCopy(cvLabel);
 
-		const std::vector<int64_t> & correspondenceOriginDataToReduceData = 
-				dynamic_cast<BinaryModel*> (estimation)->getCorrespondenceOriginDataToReduceData();
+		const std::vector<int64_t> &correspondenceOriginDataToReduceData =
+		    dynamic_cast<BinaryModel *>(estimation)->getCorrespondenceOriginDataToReduceData();
 		// get the true number of sample
 		const int64_t nbSample = correspondenceOriginDataToReduceData.size();
 

@@ -1,55 +1,48 @@
 /***************************************************************************
-							 SRC/MIXMOD_IOSTREAM/XEMNodeOutput.cpp  description
-	copyright            : (C) MIXMOD Team - 2001-2011
-	email                : contact@mixmod.org
+                             SRC/MIXMOD_IOSTREAM/XEMNodeOutput.cpp  description
+    copyright            : (C) MIXMOD Team - 2001-2011
+    email                : contact@mixmod.org
  ***************************************************************************/
 
 /***************************************************************************
-	This file is part of MIXMOD
-    
-	MIXMOD is free software: you can redistribute it and/or modify
-	it under the terms of the GNU General Public License as published by
-	the Free Software Foundation, either version 3 of the License, or
-	(at your option) any later version.
+    This file is part of MIXMOD
 
-	MIXMOD is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
+    MIXMOD is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-	You should have received a copy of the GNU General Public License
-	along with MIXMOD.  If not, see <http://www.gnu.org/licenses/>.
+    MIXMOD is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
 
-	All informations available on : http://www.mixmod.org                                                                                               
+    You should have received a copy of the GNU General Public License
+    along with MIXMOD.  If not, see <http://www.gnu.org/licenses/>.
+
+    All informations available on : http://www.mixmod.org
  ***************************************************************************/
 
 #include "mixmod_iostream/NodeOutput.h"
 #include "mixmod_iostream/DomData.h"
-#include <stdint.h>
 #include <algorithm>
+#include <stdint.h>
 
-namespace XEM {
+namespace XEM
+{
 
-  NodeOutput::NodeOutput() : xmlpp::Document() {
-	_rootOutput = create_root_node( "ListOutput" );    
-  }
+NodeOutput::NodeOutput() : xmlpp::Document() { _rootOutput = create_root_node("ListOutput"); }
 
-  NodeOutput::~NodeOutput() {
-  }
- 
-  NodeOutput::NodeOutput(string & s) : xmlpp::Document() {
-    set_internal_subset(s, "", "");
+NodeOutput::~NodeOutput() {}
 
-  }
-  
-  NodeOutput::NodeOutput( xmlpp::Element *rootOutput) {
-	_rootOutput = create_root_node_by_import(rootOutput);
-  }
+NodeOutput::NodeOutput(string &s) : xmlpp::Document() { set_internal_subset(s, "", ""); }
 
-//common part between Clustering & DA
+NodeOutput::NodeOutput(xmlpp::Element *rootOutput) { _rootOutput = create_root_node_by_import(rootOutput); }
+
+// common part between Clustering & DA
 /*
   NodeOutput::NodeOutput(ClusteringOutput* output, string& s) : xmlpp::Document() {
-	_rootOutput = create_root_node("ListOutput");        
+    _rootOutput = create_root_node("ListOutput");
   }
 */
-} //end namespace
+} // end namespace

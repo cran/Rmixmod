@@ -6,7 +6,7 @@
 
 /***************************************************************************
     This file is part of MIXMOD
-    
+
     MIXMOD is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -20,37 +20,37 @@
     You should have received a copy of the GNU General Public License
     along with MIXMOD.  If not, see <http://www.gnu.org/licenses/>.
 
-    All informations available on : http://www.mixmod.org                                                                                               
+    All informations available on : http://www.mixmod.org
 ***************************************************************************/
 
 #include "mixmod/Kernel/IO/BinaryData.h"
 #include "mixmod/Kernel/IO/BinarySample.h"
-#include "mixmod/Kernel/IO/Partition.h"
 #include "mixmod/Kernel/IO/DataDescription.h"
-#include "mixmod/Kernel/IO/WeightColumnDescription.h"
-#include "mixmod/Kernel/IO/QualitativeColumnDescription.h"
 #include "mixmod/Kernel/IO/IndividualColumnDescription.h"
+#include "mixmod/Kernel/IO/Partition.h"
+#include "mixmod/Kernel/IO/QualitativeColumnDescription.h"
+#include "mixmod/Kernel/IO/WeightColumnDescription.h"
 #include "mixmod/Utilities/Util.h"
 #include <list>
 
-namespace XEM {
+namespace XEM
+{
 
 //------------
 // Constructor
 //------------
-BinaryData::BinaryData() {
-	_reducedData = NULL;
-}
+BinaryData::BinaryData() { _reducedData = NULL; }
 
 //------------
 // Constructor
 //------------
-BinaryData::BinaryData(const BinaryData & iData) : Data(iData) {
+BinaryData::BinaryData(const BinaryData &iData) : Data(iData)
+{
 	int64_t i;
 	_reducedData = NULL;
-	Sample ** matrix = iData._matrix;
+	Sample **matrix = iData._matrix;
 
-	_matrix = new Sample*[_nbSample];
+	_matrix = new Sample *[_nbSample];
 	for (i = 0; i < _nbSample; i++)
 		_matrix[i] = new BinarySample(matrix[i]->getBinarySample());
 
@@ -63,14 +63,13 @@ BinaryData::BinaryData(const BinaryData & iData) : Data(iData) {
 //------------
 // Constructor
 //------------
-BinaryData::BinaryData(int64_t nbSample, int64_t pbDimension, std::vector<int64_t> nbModality) 
-: Data(nbSample, pbDimension) 
+BinaryData::BinaryData(int64_t nbSample, int64_t pbDimension, std::vector<int64_t> nbModality) : Data(nbSample, pbDimension)
 {
 	_reducedData = NULL;
 	int64_t j;
 	int64_t i;
 
-	_matrix = new Sample*[_nbSample];
+	_matrix = new Sample *[_nbSample];
 	for (i = 0; i < _nbSample; i++) {
 		_matrix[i] = new BinarySample(_pbDimension);
 	}
@@ -84,15 +83,14 @@ BinaryData::BinaryData(int64_t nbSample, int64_t pbDimension, std::vector<int64_
 //------------
 // Constructor
 //------------
-BinaryData::BinaryData(int64_t nbSample, int64_t pbDimension, 
-		std::vector<int64_t> nbModality, int64_t ** matrix) 
-: Data(nbSample, pbDimension) 
+BinaryData::BinaryData(int64_t nbSample, int64_t pbDimension, std::vector<int64_t> nbModality, int64_t **matrix)
+    : Data(nbSample, pbDimension)
 {
 	_reducedData = NULL;
 	int64_t j;
 	int64_t i;
 
-	_matrix = new Sample*[_nbSample];
+	_matrix = new Sample *[_nbSample];
 	for (i = 0; i < _nbSample; i++) {
 		_matrix[i] = new BinarySample(_pbDimension, matrix[i]);
 	}
@@ -106,15 +104,14 @@ BinaryData::BinaryData(int64_t nbSample, int64_t pbDimension,
 //------------
 // Constructor
 //------------
-BinaryData::BinaryData(int64_t nbSample, int64_t pbDimension,
-		const std::string & dataFileName, int64_t * tabNbModality) 
-: Data(nbSample, pbDimension) 
+BinaryData::BinaryData(int64_t nbSample, int64_t pbDimension, const std::string &dataFileName, int64_t *tabNbModality)
+    : Data(nbSample, pbDimension)
 {
 	_reducedData = NULL;
 	int64_t j;
 	int64_t i;
 
-	_matrix = new Sample*[_nbSample];
+	_matrix = new Sample *[_nbSample];
 	for (i = 0; i < _nbSample; i++) {
 		_matrix[i] = new BinarySample(_pbDimension);
 	}
@@ -134,11 +131,11 @@ BinaryData::BinaryData(int64_t nbSample, int64_t pbDimension,
 }
 
 //------------
-// Constructor 
+// Constructor
 //------------
-BinaryData::BinaryData(int64_t nbSample, int64_t pbDimension, int64_t * tabNbModality, 
-		double weightTotal, Sample **& matrix, double * weight) 
-: Data(nbSample, pbDimension, weightTotal, weight) 
+BinaryData::BinaryData(int64_t nbSample, int64_t pbDimension, int64_t *tabNbModality, double weightTotal, Sample **&matrix,
+                       double *weight)
+    : Data(nbSample, pbDimension, weightTotal, weight)
 {
 	_reducedData = NULL;
 	_matrix = matrix;
@@ -152,35 +149,34 @@ BinaryData::BinaryData(int64_t nbSample, int64_t pbDimension, int64_t * tabNbMod
 // Constructor (used in DCV context)
 //------------
 // originalData contains all the data set
-BinaryData::BinaryData(int64_t nbSample, int64_t pbDimension, 
-		Data * originalData, CVBlock & block) 
-: Data(nbSample, pbDimension) 
+BinaryData::BinaryData(int64_t nbSample, int64_t pbDimension, Data *originalData, CVBlock &block) : Data(nbSample, pbDimension)
 {
 	_reducedData = NULL;
-	BinaryData * origData = (BinaryData *) (originalData);
-	Sample ** origMatrix = origData->_matrix;
+	BinaryData *origData = (BinaryData *)(originalData);
+	Sample **origMatrix = origData->_matrix;
 
 	_tabNbModality = new int64_t[_pbDimension];
 	for (int64_t j = 0; j < _pbDimension; j++)
 		_tabNbModality[j] = origData->_tabNbModality[j];
 
 	_weightTotal = block._weightTotal;
-	_matrix = new Sample*[_nbSample];
+	_matrix = new Sample *[_nbSample];
 
 	for (int64_t i = 0; i < _nbSample; i++) {
-		_matrix[i] = new BinarySample(pbDimension, 
-				(origMatrix[block._tabWeightedIndividual[i].val]->getBinarySample())->getTabValue());
-		//cout<<"ind : "<<block._tabWeightedIndividual[i].val;
+		_matrix[i] =
+		    new BinarySample(pbDimension, (origMatrix[block._tabWeightedIndividual[i].val]->getBinarySample())->getTabValue());
+		// cout<<"ind : "<<block._tabWeightedIndividual[i].val;
 
 		_weight[i] = block._tabWeightedIndividual[i].weight;
-		//cout<<" - weight : "<<block._tabWeightedIndividual[i].weight<<endl;
+		// cout<<" - weight : "<<block._tabWeightedIndividual[i].weight<<endl;
 	}
 }
 
 //----------
-//Destructor
+// Destructor
 //----------
-BinaryData::~BinaryData() {
+BinaryData::~BinaryData()
+{
 	int64_t i;
 
 	if (_matrix) {
@@ -206,18 +202,20 @@ BinaryData::~BinaryData() {
 //-----------
 // Clone data
 //-----------
-Data * BinaryData::clone() const {
-	BinaryData * newData = new BinaryData(*this);
+Data *BinaryData::clone() const
+{
+	BinaryData *newData = new BinaryData(*this);
 	return (newData);
 }
 
 //------------------
 // Clone data matrix
 //------------------
-Sample ** BinaryData::cloneMatrix() {
+Sample **BinaryData::cloneMatrix()
+{
 	int64_t i;
 
-	Sample ** newMatrix = new Sample*[_nbSample];
+	Sample **newMatrix = new Sample *[_nbSample];
 	for (i = 0; i < _nbSample; i++) {
 		newMatrix[i] = new BinarySample(_matrix[i]->getBinarySample());
 	}
@@ -228,10 +226,11 @@ Sample ** BinaryData::cloneMatrix() {
 //------
 // input
 //------
-void BinaryData::input(std::ifstream & fi) {
+void BinaryData::input(std::ifstream &fi)
+{
 	int64_t i;
 	int64_t j;
-	int64_t * curSampleValue = new int64_t[_pbDimension];
+	int64_t *curSampleValue = new int64_t[_pbDimension];
 
 	for (i = 0; i < _nbSample; i++) {
 		for (j = 0; j < _pbDimension; j++) {
@@ -244,20 +243,21 @@ void BinaryData::input(std::ifstream & fi) {
 			if (curSampleValue[j] > _tabNbModality[j] || curSampleValue[j] <= 0) {
 				THROW(InputException, wrongValueInMultinomialCase);
 			}
-		}// end j
+		} // end j
 		(_matrix[i]->getBinarySample())->setDataTabValue(curSampleValue);
 		_weight[i] = 1;
 	}
 	_weightTotal = _nbSample;
 
-	delete [] curSampleValue;
+	delete[] curSampleValue;
 }
 
 //------
 // input
 //------
-void BinaryData::input(const DataDescription & dataDescription) {
-	int64_t* curSampleValue = new int64_t[_pbDimension];
+void BinaryData::input(const DataDescription &dataDescription)
+{
+	int64_t *curSampleValue = new int64_t[_pbDimension];
 	_weightTotal = 0.0;
 
 	_fileNameData = dataDescription.getFileName();
@@ -278,7 +278,7 @@ void BinaryData::input(const DataDescription & dataDescription) {
 		istringstream s(line);
 		string atom;
 		int64_t binaryVariableIndex = 0;
-    for (int64_t j = 0; j < dataDescription.getNbColumn(); j++) {
+		for (int64_t j = 0; j < dataDescription.getNbColumn(); j++) {
 			if (s.eof())
 				THROW(InputException, endDataFileReach);
 			do
@@ -286,23 +286,18 @@ void BinaryData::input(const DataDescription & dataDescription) {
 				getline(s, atom, sep);
 			while (atom.empty());
 
-			if (typeid (*(dataDescription.getColumnDescription(j))) 
-				== typeid (QualitativeColumnDescription)) 
-			{
+			const auto descJ = dataDescription.getColumnDescription(j);
+			if (typeid(*descJ) == typeid(QualitativeColumnDescription)) {
 				int64_t binValue = atoi(atom.c_str());
 				if (binValue > _tabNbModality[binaryVariableIndex] || binValue <= 0)
 					THROW(InputException, wrongValueInMultinomialCase);
 				curSampleValue[binaryVariableIndex] = binValue;
 				binaryVariableIndex++;
-			}
-			else {
-				if (typeid (*(dataDescription.getColumnDescription(j))) 
-						== typeid (WeightColumnDescription)) 
-				{
+			} else {
+				if (typeid(*descJ) == typeid(WeightColumnDescription)) {
 					_weight[i] = atof(atom.c_str());
-				}
-				else {
-					//ignore everything else
+				} else {
+					// ignore everything else
 				}
 			}
 		}
@@ -310,18 +305,19 @@ void BinaryData::input(const DataDescription & dataDescription) {
 		_weightTotal += _weight[i];
 	}
 
-	delete [] curSampleValue;
+	delete[] curSampleValue;
 }
 
 //-------
 // output
 //-------
-void BinaryData::output(std::ostream & fo) {
+void BinaryData::output(std::ostream &fo)
+{
 	fo << "Sample size: " << _nbSample;
 	fo << "  Dimension: " << _pbDimension;
 	fo << " values : " << endl;
 	for (int64_t i = 0; i < _nbSample; i++) {
-		int64_t * values = getDataTabValue(i);
+		int64_t *values = getDataTabValue(i);
 		for (int64_t j = 0; j < _pbDimension; j++) {
 			fo << values[j] << " ";
 		}
@@ -338,17 +334,16 @@ void BinaryData::output(std::ostream & fo) {
 // avec - potentiellement - beaucoup moins d'individus (et des poids).
 // En pratique, cela permet d'accélérer réellement les calculs.
 //--------------------
-Data * BinaryData::reduceData(std::vector<int64_t> & correspondenceOriginDataToReduceData, 
-		Partition * knownPartition, Partition * initPartition, 
-		Partition *& oKnownPartition, Partition *& oInitPartition) 
+Data *BinaryData::reduceData(std::vector<int64_t> &correspondenceOriginDataToReduceData, Partition *knownPartition,
+                             Partition *initPartition, Partition *&oKnownPartition, Partition *&oInitPartition)
 {
 	int64_t rOld, value;
-	int64_t * tabBaseMj = new int64_t[_nbSample];
+	int64_t *tabBaseMj = new int64_t[_nbSample];
 	int64_t j, k, sizeTabFactor;
 	int64_t idxDim;
 	int64_t idxSample, sizeList, i;
-	double * weight;
-	//Sample ** data;
+	double *weight;
+	// Sample ** data;
 
 	correspondenceOriginDataToReduceData.resize(_nbSample);
 
@@ -359,19 +354,19 @@ Data * BinaryData::reduceData(std::vector<int64_t> & correspondenceOriginDataToR
 	}
 	if (knownPartition && initPartition) {
 		maxTabFactor = maxTabFactor * _tabNbModality[_pbDimension - 1];
-		maxTabFactor = maxTabFactor * (knownPartition->_nbCluster + 1);
+		maxTabFactor = maxTabFactor * (knownPartition->getNbCluster() + 1);
 	}
 	if ((knownPartition && !initPartition) || (!knownPartition && initPartition)) {
 		maxTabFactor = maxTabFactor * _tabNbModality[_pbDimension - 1];
 	}
-	if (maxTabFactor > int64_t_max) {
+	if (maxTabFactor > static_cast<double>(int64_t_max)) {
 		THROW(NumericException, int64_t_max_error);
 	}
 
-	list<TWeightedIndividual*> listDiffIndiv;
-	list<TWeightedIndividual*>::iterator listIterator;
-	list<TWeightedIndividual*>::iterator listBegin;
-	list<TWeightedIndividual*>::iterator listEnd;
+	list<TWeightedIndividual *> listDiffIndiv;
+	list<TWeightedIndividual *>::iterator listIterator;
+	list<TWeightedIndividual *>::iterator listBegin;
+	list<TWeightedIndividual *>::iterator listEnd;
 
 	// tab of multiplicator value to set sample in base mj //
 	//-----------------------------------------------------//
@@ -380,22 +375,22 @@ Data * BinaryData::reduceData(std::vector<int64_t> & correspondenceOriginDataToR
 		sizeTabFactor++;
 	if (initPartition)
 		sizeTabFactor++;
-	int64_t * tabFactor = new int64_t[sizeTabFactor];
+	int64_t *tabFactor = new int64_t[sizeTabFactor];
 	tabFactor[0] = 1;
 	for (j = 1; j < _pbDimension; j++) {
 		tabFactor[j] = tabFactor[j - 1] * _tabNbModality[j - 1];
-		//cout<<"_tabNbModality["<<j-1<<"] : "<<_tabNbModality[j-1]<<endl;
-		//cout<<"tabFactor["<<j<<"] : "<<tabFactor[j]<<endl;
+		// cout<<"_tabNbModality["<<j-1<<"] : "<<_tabNbModality[j-1]<<endl;
+		// cout<<"tabFactor["<<j<<"] : "<<tabFactor[j]<<endl;
 	}
 	if (knownPartition && initPartition) {
 		tabFactor[_pbDimension] = tabFactor[_pbDimension - 1] * _tabNbModality[_pbDimension - 1];
-		//cout<<"tabFactor["<<_pbDimension<<"] : "<<tabFactor[_pbDimension]<<endl;
-		tabFactor[_pbDimension + 1] = tabFactor[_pbDimension]* (knownPartition->_nbCluster + 1);
-		//cout<<"tabFactor["<<_pbDimension+1<<"] : "<<tabFactor[_pbDimension+1]<<endl;
+		// cout<<"tabFactor["<<_pbDimension<<"] : "<<tabFactor[_pbDimension]<<endl;
+		tabFactor[_pbDimension + 1] = tabFactor[_pbDimension] * (knownPartition->getNbCluster() + 1);
+		// cout<<"tabFactor["<<_pbDimension+1<<"] : "<<tabFactor[_pbDimension+1]<<endl;
 	}
 	if ((knownPartition && !initPartition) || (!knownPartition && initPartition)) {
 		tabFactor[_pbDimension] = tabFactor[_pbDimension - 1] * _tabNbModality[_pbDimension - 1];
-		//cout<<"tabFactor["<<_pbDimension<<"] : "<<tabFactor[_pbDimension]<<endl;
+		// cout<<"tabFactor["<<_pbDimension<<"] : "<<tabFactor[_pbDimension]<<endl;
 	}
 
 	sizeList = 0;
@@ -418,7 +413,7 @@ Data * BinaryData::reduceData(std::vector<int64_t> & correspondenceOriginDataToR
 		if (!knownPartition && initPartition)
 			value += (initPartition->getGroupNumber(i) + 1) * tabFactor[_pbDimension];
 
-		//cout<<"value de l'indvidu "<<i+1<<" : "<<value<<endl;
+		// cout<<"value de l'indvidu "<<i+1<<" : "<<value<<endl;
 		tabBaseMj[i] = value;
 
 		// Search if sample already exist in list
@@ -431,7 +426,7 @@ Data * BinaryData::reduceData(std::vector<int64_t> & correspondenceOriginDataToR
 
 		// list empty
 		if (listBegin == listEnd) {
-			TWeightedIndividual * elem = new TWeightedIndividual;
+			TWeightedIndividual *elem = new TWeightedIndividual;
 			elem->val = value;
 			elem->weight = _weight[i];
 
@@ -446,7 +441,7 @@ Data * BinaryData::reduceData(std::vector<int64_t> & correspondenceOriginDataToR
 				if ((*listIterator)->val == value)
 					(*listIterator)->weight += _weight[i];
 				else {
-					TWeightedIndividual * elem = new TWeightedIndividual;
+					TWeightedIndividual *elem = new TWeightedIndividual;
 					elem->val = value;
 					elem->weight = _weight[i];
 
@@ -460,7 +455,7 @@ Data * BinaryData::reduceData(std::vector<int64_t> & correspondenceOriginDataToR
 				if ((*listIterator)->val == value)
 					(*listIterator)->weight += _weight[i];
 				else {
-					TWeightedIndividual * elem = new TWeightedIndividual;
+					TWeightedIndividual *elem = new TWeightedIndividual;
 					elem->val = value;
 					elem->weight = _weight[i];
 
@@ -478,7 +473,7 @@ Data * BinaryData::reduceData(std::vector<int64_t> & correspondenceOriginDataToR
 	// Create reduce matrix with reduce weight //
 	//-----------------------------------------//
 	weight = new double[sizeList];
-	Sample ** data = new Sample *[sizeList];
+	Sample **data = new Sample *[sizeList];
 	idxSample = 0;
 	listBegin = listDiffIndiv.begin();
 	listEnd = listDiffIndiv.end();
@@ -498,14 +493,13 @@ Data * BinaryData::reduceData(std::vector<int64_t> & correspondenceOriginDataToR
 		if ((knownPartition && !initPartition) || (!knownPartition && initPartition))
 			rOld = rOld % tabFactor[_pbDimension];
 
-		BinarySample * curDataSample = data[idxSample]->getBinarySample();
+		BinarySample *curDataSample = data[idxSample]->getBinarySample();
 		while (idxDim >= 0) {
 			curDataSample->setDataValue(idxDim, 1 + rOld / tabFactor[idxDim]);
 			rOld = rOld % tabFactor[idxDim];
 			idxDim--;
 		}
 		idxSample++;
-
 	}
 
 	// Set array of correspondence //
@@ -517,42 +511,42 @@ Data * BinaryData::reduceData(std::vector<int64_t> & correspondenceOriginDataToR
 			idxSample++;
 		}
 		correspondenceOriginDataToReduceData[i] = idxSample;
-		//cout<<correspondcenceOriginDataToReduceData[i]<<endl;
+		// cout<<correspondcenceOriginDataToReduceData[i]<<endl;
 	}
 
 	// Set reduce labels //
 	int64_t nbCluster;
 	if (initPartition) {
-		nbCluster = initPartition->_nbCluster;
+		nbCluster = initPartition->getNbCluster();
 		oInitPartition = new Partition();
 		oInitPartition->setDimension(sizeList, nbCluster);
-		oInitPartition->_tabValue = new int64_t*[sizeList];
+		int64_t ** tabValue = new int64_t *[sizeList];
 		for (i = 0; i < sizeList; i++) {
-			oInitPartition->_tabValue[i] = new int64_t[nbCluster];
+			tabValue[i] = new int64_t[nbCluster];
 		}
 		// l'algo suivant peut etre optimise (on fait eventuellement plusieurs fois la meme chose)
 		for (i = 0; i < _nbSample; i++) {
 			for (k = 0; k < nbCluster; k++)
-				oInitPartition->_tabValue[correspondenceOriginDataToReduceData[i]][k] = 
-						initPartition->_tabValue[i][k];
+				tabValue[correspondenceOriginDataToReduceData[i]][k] = initPartition->getTabValueI(i)[k];
 		}
-		//oInitLabel->_complete = true;
+		oInitPartition->setTabValue(tabValue);
+		// oInitLabel->_complete = true;
 	}
 
 	if (knownPartition) {
-		nbCluster = knownPartition->_nbCluster;
+		nbCluster = knownPartition->getNbCluster();
 		oKnownPartition = new Partition();
 		oKnownPartition->setDimension(sizeList, nbCluster);
-		oKnownPartition->_tabValue = new int64_t*[sizeList];
+		int64_t ** tabValue = new int64_t *[sizeList];
 		for (i = 0; i < sizeList; i++)
-			oKnownPartition->_tabValue[i] = new int64_t[nbCluster];
+			tabValue[i] = new int64_t[nbCluster];
 		// l'algo suivant peut etre optimise(on fait eventuellement plusieurs fois la meme chose)
 		for (i = 0; i < _nbSample; i++) {
 			for (k = 0; k < nbCluster; k++)
-				oKnownPartition->_tabValue[correspondenceOriginDataToReduceData[i]][k] = 
-						knownPartition->_tabValue[i][k];
+				tabValue[correspondenceOriginDataToReduceData[i]][k] = knownPartition->getTabValueI(i)[k];
 		}
-		//oKnownLabel->_complete = true;
+		oKnownPartition->setTabValue(tabValue);
+		// oKnownLabel->_complete = true;
 	}
 
 	///////////////////////////////////////////////
@@ -577,7 +571,7 @@ Data * BinaryData::reduceData(std::vector<int64_t> & correspondenceOriginDataToR
 	 cout<<weight[i]<<" ";
 	 cout<<endl;
    }
-   
+
 	 for (i=0; i<_nbSample; i++){
 	 cout<<"correspondcenceOriginDataToReduceData["<<i<<"] : "<<correspondcenceOriginDataToReduceData[i]<<endl;
    }*/
@@ -587,15 +581,14 @@ Data * BinaryData::reduceData(std::vector<int64_t> & correspondenceOriginDataToR
 		delete _reducedData;
 	}
 
-	_reducedData = new BinaryData(
-			sizeList, _pbDimension, _tabNbModality, _weightTotal, data, weight);
+	_reducedData = new BinaryData(sizeList, _pbDimension, _tabNbModality, _weightTotal, data, weight);
 
 	delete[] tabFactor;
 	delete[] tabBaseMj;
 	listIterator = listDiffIndiv.begin();
 
 	while (!listDiffIndiv.empty()) {
-		TWeightedIndividual * pelem = *listDiffIndiv.begin();
+		TWeightedIndividual *pelem = *listDiffIndiv.begin();
 		listDiffIndiv.pop_front();
 		delete pelem;
 	}
@@ -608,7 +601,8 @@ Data * BinaryData::reduceData(std::vector<int64_t> & correspondenceOriginDataToR
 //-------
 // Verify
 //-------
-bool BinaryData::verify()const {
+bool BinaryData::verify() const
+{
 	bool res = Data::verify();
 
 	// others verif  ?
@@ -619,7 +613,8 @@ bool BinaryData::verify()const {
 //------------------
 // Return tab value
 //-----------------
-int64_t * BinaryData::getDataTabValue(int64_t idxSample) const {
+int64_t *BinaryData::getDataTabValue(int64_t idxSample) const
+{
 	return (_matrix[idxSample]->getBinarySample())->getTabValue();
 }
 

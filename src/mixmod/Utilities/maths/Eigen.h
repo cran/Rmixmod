@@ -6,7 +6,7 @@
 
 /***************************************************************************
     This file is part of MIXMOD
-    
+
     MIXMOD is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -28,360 +28,346 @@
 #ifdef RPACKAGE
 #include <RcppEigen.h>
 #else
-#include <Eigen/Dense>
 #include <Eigen/Core>
+#include <Eigen/Dense>
 #endif
 
-#include <iostream>
 #include <fstream>
+#include <iostream>
 #include <sstream>
 #include <string.h>
 
-namespace XEM {
-namespace MATH {
+namespace XEM
+{
+namespace MATH
+{
 
 // TODO: copy constructors ?
 
-class DiagonalMatrix {
-	
+class DiagonalMatrix
+{
+
 public:
-	
-DiagonalMatrix(int dim) {
-	_dim = dim;
-	_value = new double[dim];
-}
-	
-~DiagonalMatrix() {
-	if (_value)
-		delete [] _value;
-}
-	
-double* Store() {
-	return _value;
-}
-	
-int Nrow() {
-	return _dim;
-}
-
-double* getValue(){
-	return _value;
-}
-
-// Fonction pour les tests unitaires, compare les termes de 2 matrices
-bool isAlmostEqual(DiagonalMatrix & dm,double epsilon) const {
-	bool res=true;
-	for (int i=0;i<dm.Nrow();i++){
-		if ( fabs( _value[i]-dm.getValue()[i] )>epsilon) res = false;
-	}
-	return res;
-}
-
-// Fonction pour les tests unitaires, remplissage d'une matrice à partir d'un fichier .txt
-void fillMatrix(std::string file){
-	std::ifstream fichiertmp(file,std::ios::in); // on ouvre en lecture
-	int i=0;
- 
-	// On verifie que le fichier est bien ouvert ...
-	if(!fichiertmp)
+	DiagonalMatrix(int dim)
 	{
-		std::cerr << "[ERROR] Impossible d'ouvrir le fichier " << file << std::endl;
+		_dim = dim;
+		_value = new double[dim];
 	}
-	
-	std::string ligne;
-	int n=0;
-	while(std::getline(fichiertmp, ligne)) n++;  //On lit chaque ligne du fichier que l'on stoke dans "ligne"
-		
-	_dim = n;
 
-	std::ifstream fichier(file,std::ios::in); 
-	while (std::getline(fichier, ligne)){
-		std::stringstream ss(ligne);
-		double tmp;
-		ss >> tmp;
-		_value[i]=tmp;i++;
+	~DiagonalMatrix()
+	{
+		if (_value)
+			delete[] _value;
 	}
-}
-	
+
+	double *Store() { return _value; }
+
+	int Nrow() { return _dim; }
+
+	double *getValue() { return _value; }
+
+	// Fonction pour les tests unitaires, compare les termes de 2 matrices
+	bool isAlmostEqual(DiagonalMatrix &dm, double epsilon) const
+	{
+		bool res = true;
+		for (int i = 0; i < dm.Nrow(); i++) {
+			if (fabs(_value[i] - dm.getValue()[i]) > epsilon)
+				res = false;
+		}
+		return res;
+	}
+
+	// Fonction pour les tests unitaires, remplissage d'une matrice à partir d'un fichier .txt
+	void fillMatrix(std::string file)
+	{
+		std::ifstream fichiertmp(file, std::ios::in); // on ouvre en lecture
+		int i = 0;
+
+		// On verifie que le fichier est bien ouvert ...
+		if (!fichiertmp) {
+			std::cerr << "[ERROR] Impossible d'ouvrir le fichier " << file << std::endl;
+		}
+
+		std::string ligne;
+		int n = 0;
+		while (std::getline(fichiertmp, ligne))
+			n++; // On lit chaque ligne du fichier que l'on stoke dans "ligne"
+
+		_dim = n;
+
+		std::ifstream fichier(file, std::ios::in);
+		while (std::getline(fichier, ligne)) {
+			std::stringstream ss(ligne);
+			double tmp;
+			ss >> tmp;
+			_value[i] = tmp;
+			i++;
+		}
+	}
+
 private:
-
 	int64_t _dim;
-	double* _value;
-	
+	double *_value;
 };
 
-class Matrix {
-	
+class Matrix
+{
+
 public:
-	
+	Matrix(int nrow, int ncol) { _value = new Eigen::MatrixXd(nrow, ncol); }
 
-Matrix(int nrow, int ncol) {
-	_value = new Eigen::MatrixXd(nrow, ncol);
-}
-
-~Matrix() {
-	if (_value)
-		delete _value;
-}
-
-double* Store() {
-	return _value->data();
-}
-	
-double* GetRow(int index) {
-	return _value->data() + index * _value->cols();
-}
-	
-int Nrow() {
-	return _value->rows();
-}
-	
-int Ncol() {
-	return _value->cols();
-}
-
-Eigen::MatrixXd* getValue(){
-	return _value;
-}
-
-// Fonction pour les tests unitaires, compare les valeurs de 2 matrices (on ne tient pas compte du signe
-// car on n'utilise cette fonction que pour le calcul du SVD et les vecteurs propres peuvent avoir un signe différent
-// suivant la bibliothèque.
-bool isAlmostEqual(Matrix & m,double epsilon) const {
-	bool res=true;
-	int ncol = _value->cols();
-	for(int j=0; j<ncol ;j++){
-		for(int i=0; i<ncol ; i++){
-			if ( fabs( fabs((_value)->data()[i*ncol+j])-fabs(m.getValue()->data()[i*ncol+j]) )>epsilon) res = false;
-		}
-	}
-	return res;
-}
-	
-// Fonction pour les tests unitaires, remplissage d'une matrice à partir d'un fichier .txt
-void fillMatrix(std::string file){
-	std::ifstream fichiertmp(file,std::ios::in); // on ouvre en lecture
-	int i=0;
- 
-	// On verifie que le fichier est bien ouvert ...
-	if(!fichiertmp)
+	~Matrix()
 	{
-		std::cerr << "[ERROR] Impossible d'ouvrir le fichier " << file << std::endl;
+		if (_value)
+			delete _value;
 	}
-	std::string ligne;
-	int n=0;
-	while(std::getline(fichiertmp, ligne)) n++;  //On lit chaque ligne du fichier que l'on stoke dans "ligne"
-	_value->resize(n,n);
 
-	std::ifstream fichier(file,std::ios::in); 
-	while (std::getline(fichier, ligne)){
-		int j=0;
-		// Construction pour une ligne
-		std::stringstream ss(ligne);
-		// Extraction des données pour une ligne
-		while(!ss.eof()){
-			double tmp;
-			ss >> tmp;
-//Not (*_value)(i,j)=tmp; anymore to be consistent with change line 294 (Eigen does not stock value like NEWMAT, U is actually transpose(eigenU))
-			(*_value)(j,i)=tmp;
-			j++;
-			if (j==n) break;
+	double *Store() { return _value->data(); }
+
+	double *GetRow(int index) { return _value->data() + index * _value->cols(); }
+
+	int Nrow() { return _value->rows(); }
+
+	int Ncol() { return _value->cols(); }
+
+	Eigen::MatrixXd *getValue() { return _value; }
+
+	// Fonction pour les tests unitaires, compare les valeurs de 2 matrices (on ne tient pas compte du signe
+	// car on n'utilise cette fonction que pour le calcul du SVD et les vecteurs propres peuvent avoir un signe différent
+	// suivant la bibliothèque.
+	bool isAlmostEqual(Matrix &m, double epsilon) const
+	{
+		bool res = true;
+		int ncol = _value->cols();
+		for (int j = 0; j < ncol; j++) {
+			for (int i = 0; i < ncol; i++) {
+				if (fabs(fabs((_value)->data()[i * ncol + j]) - fabs(m.getValue()->data()[i * ncol + j])) > epsilon)
+					res = false;
+			}
 		}
-	i++;
+		return res;
 	}
-}
-	
+
+	// Fonction pour les tests unitaires, remplissage d'une matrice à partir d'un fichier .txt
+	void fillMatrix(std::string file)
+	{
+		std::ifstream fichiertmp(file, std::ios::in); // on ouvre en lecture
+		int i = 0;
+
+		// On verifie que le fichier est bien ouvert ...
+		if (!fichiertmp) {
+			std::cerr << "[ERROR] Impossible d'ouvrir le fichier " << file << std::endl;
+		}
+		std::string ligne;
+		int n = 0;
+		while (std::getline(fichiertmp, ligne))
+			n++; // On lit chaque ligne du fichier que l'on stoke dans "ligne"
+		_value->resize(n, n);
+
+		std::ifstream fichier(file, std::ios::in);
+		while (std::getline(fichier, ligne)) {
+			int j = 0;
+			// Construction pour une ligne
+			std::stringstream ss(ligne);
+			// Extraction des données pour une ligne
+			while (!ss.eof()) {
+				double tmp;
+				ss >> tmp;
+				// Not (*_value)(i,j)=tmp; anymore to be consistent with change line 294 (Eigen does not stock value like
+				// NEWMAT, U is actually transpose(eigenU))
+				(*_value)(j, i) = tmp;
+				j++;
+				if (j == n)
+					break;
+			}
+			i++;
+		}
+	}
+
 private:
-	
-	Eigen::MatrixXd* _value;
-	
+	Eigen::MatrixXd *_value;
 };
 
-class SymmetricMatrix {
-	
+class SymmetricMatrix
+{
+
 public:
-	
-		
-// nrow == ncol
-SymmetricMatrix(int nrow) {
-	_value = new Eigen::MatrixXd(nrow, nrow);
-}
-	
-SymmetricMatrix(int nrow,double* store){
-	_value = new Eigen::MatrixXd(nrow, nrow);
-	updateData(store);
-}
-	
-~SymmetricMatrix() {
-	if (_value)
-		delete _value;
-  if (_store)
-    delete[] _store;
-}
-	
-Eigen::MatrixXd* getValue(){
-	return _value;
-}
+	// nrow == ncol
+	SymmetricMatrix(int nrow) { _value = new Eigen::MatrixXd(nrow, nrow); }
 
-int Nrow(){
-	return _value->rows();
-}
-
-
-	
-void setValue(Eigen::MatrixXd const& matEigen){
-	*_value=matEigen;
-}
-	
-double* Store() {
-	double* data = _value->data();
-	int nrow = _value->rows();
-	int i,j;
-	int z=0;
-	_store = new double [nrow*(nrow + 1)/2];
-	for(j=0; j<nrow ;j++){
-		for(i=0; i<j+1 ; i++){
-			_store[z]=data[i*nrow+j];z++;
-		}
-	}
-	return _store;
-}
-	
-void updateData(double* store) {
-	int i,j;
-	int z=0;
-	int ncol = _value->cols();
-	//Remplissage de la partie supérieure de la matrice
-	for(j=0; j<ncol ;j++){
-		for(i=0; i<j+1 ; i++) {
-			(*_value)(i,j)=store[z];
-			(*_value)(j,i)=store[z];
-			z++;
-		}
-	}
-	//(*_value) = (*_value).triangularView<Eigen::Upper>();
-}
-	
-// get determinant
-double determinant(double* store) {
-	updateData(store);
-  double det = _value->determinant();
-  return det;
-}
-	
-// get inverse
-SymmetricMatrix* Inverse(double* store) {
-	//TODO Chercher à optimiser le nombre d'objet
-	updateData(store);
-	int _s_pbDimension = _value->rows();
-  SymmetricMatrix* invMat = new SymmetricMatrix(_s_pbDimension);
-  Eigen::MatrixXd  eigenInverse = _value->inverse();
-  invMat->setValue(eigenInverse);
-  return invMat;
-}
-	
-// compute SVD (only matrices U and D, not V)
-void computeSVD(DiagonalMatrix* D, Matrix* U,double* store) {
-	// TODO: Eigen::ComputeThinU ?
-  updateData(store);
-
-//Switch when n > 16
-  if (_value->rows() < 16) {
-    auto svd = new Eigen::JacobiSVD<Eigen::MatrixXd>(*_value, Eigen::ComputeFullU);
-    auto eigenD = svd->singularValues();
-    auto eigenU = svd->matrixU();
-    for (int64_t i=0; i<eigenD.rows(); i++) 
-      D->Store()[i] = eigenD.data()[i];
-    //for (int64_t i=0; i<eigenU.rows()*eigenU.cols(); i++)
-    //  U->Store()[i] = eigenU.data()[i];
-    //Eigen does not stock value like NEWMAT, U is actually transpose(eigenU)
-    int64_t compt=0;
-    for (int64_t i=0; i<eigenU.rows(); i++) {
-      for (int64_t j=0; j<eigenU.cols(); j++) {
-        U->Store()[compt] = eigenU.data()[i+j*eigenU.cols()];
-        compt++;
-      }
-    }
-    delete svd;
-
-  }
-  else {
-    auto svd = new Eigen::BDCSVD<Eigen::MatrixXd>(*_value, Eigen::ComputeFullU);
-    auto eigenD = svd->singularValues();
-    auto eigenU = svd->matrixU();
-    for (int64_t i=0; i<eigenD.rows(); i++) 
-      D->Store()[i] = eigenD.data()[i];
-    //for (int64_t i=0; i<eigenU.rows()*eigenU.cols(); i++)
-    //  U->Store()[i] = eigenU.data()[i];
-    //Eigen does not stock value like NEWMAT, U is actually transpose(eigenU)
-    int64_t compt=0;
-    for (int64_t i=0; i<eigenU.rows(); i++) {
-      for (int64_t j=0; j<eigenU.cols(); j++) {
-        U->Store()[compt] = eigenU.data()[i+j*eigenU.cols()];
-        compt++;
-      }
-    }
-    delete svd;
-
-  } 
-}
-
-
-// Fonction pour les tests unitaires, compare les termes de 2 matrices
-bool isAlmostEqual(SymmetricMatrix & sm,double epsilon) const {
-	bool res=true;
-	int ncol = _value->cols();
-	for(int j=0; j<ncol ;j++){
-		for(int i=0; i<j+1 ; i++){
-			if ( fabs( (_value)->data()[i*ncol+j] -sm.getValue()->data()[i*ncol+j] )>epsilon) res = false;
-		}
-	}
-	return res;
-}
-
-// Fonction pour les tests unitaires, remplissage d'une matrice à partir d'un fichier .txt
-void fillMatrix(std::string file){
-	std::ifstream fichiertmp(file,std::ios::in); // on ouvre en lecture
-	int i=0;
- 
-	// On verifie que le fichier est bien ouvert ...
-	if(!fichiertmp)
+	SymmetricMatrix(int nrow, double *store)
 	{
-		std::cerr << "[ERROR] Impossible d'ouvrir le fichier " << file << std::endl;
+		_value = new Eigen::MatrixXd(nrow, nrow);
+		updateData(store);
 	}
-	
-	std::string ligne;
-	int n=0;
-	while(std::getline(fichiertmp, ligne)) n++;  //On lit chaque ligne du fichier que l'on stoke dans "ligne"
-		
-	_value->resize(n,n);
 
-	std::ifstream fichier(file,std::ios::in); 
-	while (std::getline(fichier, ligne)){
-		int j=0;
-		// Construction pour une ligne
-		std::stringstream ss(ligne);
-		// Extraction des données pour une ligne
-		while(!ss.eof()){
-			double tmp;
-			ss >> tmp;
-			(*_value)(i,j)=tmp;
-			j++;
-			if (j==n) break;
-		}
-	i++;
+	~SymmetricMatrix()
+	{
+		if (_value)
+			delete _value;
+		if (_store)
+			delete[] _store;
 	}
-}
-	
+
+	Eigen::MatrixXd *getValue() { return _value; }
+
+	int Nrow() { return _value->rows(); }
+
+	void setValue(Eigen::MatrixXd const &matEigen) { *_value = matEigen; }
+
+	double *Store()
+	{
+		double *data = _value->data();
+		int nrow = _value->rows();
+		int i, j;
+		int z = 0;
+		_store = new double[nrow * (nrow + 1) / 2];
+		for (j = 0; j < nrow; j++) {
+			for (i = 0; i < j + 1; i++) {
+				_store[z] = data[i * nrow + j];
+				z++;
+			}
+		}
+		return _store;
+	}
+
+	void updateData(double *store)
+	{
+		int i, j;
+		int z = 0;
+		int ncol = _value->cols();
+		// Remplissage de la partie supérieure de la matrice
+		for (j = 0; j < ncol; j++) {
+			for (i = 0; i < j + 1; i++) {
+				(*_value)(i, j) = store[z];
+				(*_value)(j, i) = store[z];
+				z++;
+			}
+		}
+		//(*_value) = (*_value).triangularView<Eigen::Upper>();
+	}
+
+	// get determinant
+	double determinant(double *store)
+	{
+		updateData(store);
+		double det = _value->determinant();
+		return det;
+	}
+
+	// get inverse
+	SymmetricMatrix *Inverse(double *store)
+	{
+		// TODO Chercher à optimiser le nombre d'objet
+		updateData(store);
+		int _s_pbDimension = _value->rows();
+		SymmetricMatrix *invMat = new SymmetricMatrix(_s_pbDimension);
+		Eigen::MatrixXd eigenInverse = _value->inverse();
+		invMat->setValue(eigenInverse);
+		return invMat;
+	}
+
+	// compute SVD (only matrices U and D, not V)
+	void computeSVD(DiagonalMatrix *D, Matrix *U, double *store)
+	{
+		// TODO: Eigen::ComputeThinU ?
+		updateData(store);
+
+		// Switch when n > 16
+		if (_value->rows() < 16) {
+			auto svd = new Eigen::JacobiSVD<Eigen::MatrixXd>(*_value, Eigen::ComputeFullU);
+			auto eigenD = svd->singularValues();
+			auto eigenU = svd->matrixU();
+			for (int64_t i = 0; i < eigenD.rows(); i++)
+				D->Store()[i] = eigenD.data()[i];
+			// for (int64_t i=0; i<eigenU.rows()*eigenU.cols(); i++)
+			//   U->Store()[i] = eigenU.data()[i];
+			// Eigen does not stock value like NEWMAT, U is actually transpose(eigenU)
+			int64_t compt = 0;
+			for (int64_t i = 0; i < eigenU.rows(); i++) {
+				for (int64_t j = 0; j < eigenU.cols(); j++) {
+					U->Store()[compt] = eigenU.data()[i + j * eigenU.cols()];
+					compt++;
+				}
+			}
+			delete svd;
+
+		} else {
+			auto svd = new Eigen::BDCSVD<Eigen::MatrixXd>(*_value, Eigen::ComputeFullU);
+			auto eigenD = svd->singularValues();
+			auto eigenU = svd->matrixU();
+			for (int64_t i = 0; i < eigenD.rows(); i++)
+				D->Store()[i] = eigenD.data()[i];
+			// for (int64_t i=0; i<eigenU.rows()*eigenU.cols(); i++)
+			//   U->Store()[i] = eigenU.data()[i];
+			// Eigen does not stock value like NEWMAT, U is actually transpose(eigenU)
+			int64_t compt = 0;
+			for (int64_t i = 0; i < eigenU.rows(); i++) {
+				for (int64_t j = 0; j < eigenU.cols(); j++) {
+					U->Store()[compt] = eigenU.data()[i + j * eigenU.cols()];
+					compt++;
+				}
+			}
+			delete svd;
+		}
+	}
+
+	// Fonction pour les tests unitaires, compare les termes de 2 matrices
+	bool isAlmostEqual(SymmetricMatrix &sm, double epsilon) const
+	{
+		bool res = true;
+		int ncol = _value->cols();
+		for (int j = 0; j < ncol; j++) {
+			for (int i = 0; i < j + 1; i++) {
+				if (fabs((_value)->data()[i * ncol + j] - sm.getValue()->data()[i * ncol + j]) > epsilon)
+					res = false;
+			}
+		}
+		return res;
+	}
+
+	// Fonction pour les tests unitaires, remplissage d'une matrice à partir d'un fichier .txt
+	void fillMatrix(std::string file)
+	{
+		std::ifstream fichiertmp(file, std::ios::in); // on ouvre en lecture
+		int i = 0;
+
+		// On verifie que le fichier est bien ouvert ...
+		if (!fichiertmp) {
+			std::cerr << "[ERROR] Impossible d'ouvrir le fichier " << file << std::endl;
+		}
+
+		std::string ligne;
+		int n = 0;
+		while (std::getline(fichiertmp, ligne))
+			n++; // On lit chaque ligne du fichier que l'on stoke dans "ligne"
+
+		_value->resize(n, n);
+
+		std::ifstream fichier(file, std::ios::in);
+		while (std::getline(fichier, ligne)) {
+			int j = 0;
+			// Construction pour une ligne
+			std::stringstream ss(ligne);
+			// Extraction des données pour une ligne
+			while (!ss.eof()) {
+				double tmp;
+				ss >> tmp;
+				(*_value)(i, j) = tmp;
+				j++;
+				if (j == n)
+					break;
+			}
+			i++;
+		}
+	}
+
 private:
-	
-	Eigen::MatrixXd* _value;
-	double* _store;
+	Eigen::MatrixXd *_value;
+	double *_store;
 };
 
-
 }
 }
-
 
 #endif

@@ -6,7 +6,7 @@
 
 /***************************************************************************
     This file is part of MIXMOD
-    
+
     MIXMOD is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -20,81 +20,77 @@
     You should have received a copy of the GNU General Public License
     along with MIXMOD.  If not, see <http://www.gnu.org/licenses/>.
 
-    All informations available on : http://www.mixmod.org                                                                                               
+    All informations available on : http://www.mixmod.org
 ***************************************************************************/
 #include "mixmod/Kernel/Parameter/GaussianEDDAParameter.h"
-#include "mixmod/Kernel/Parameter/GaussianParameter.h"
 #include "mixmod/Kernel/IO/GaussianData.h"
 #include "mixmod/Kernel/IO/GaussianSample.h"
 #include "mixmod/Kernel/Model/Model.h"
 #include "mixmod/Kernel/Model/ModelType.h"
 #include "mixmod/Kernel/Parameter/GaussianGeneralParameter.h"
-#include "mixmod/Utilities/Util.h"
-#include "mixmod/Kernel/IO/GaussianData.h"
-#include "mixmod/Utilities/Random.h"
-#include "mixmod/Matrix/Matrix.h"
+#include "mixmod/Kernel/Parameter/GaussianParameter.h"
 #include "mixmod/Matrix/DiagMatrix.h"
+#include "mixmod/Matrix/GeneralMatrix.h"
+#include "mixmod/Matrix/Matrix.h"
 #include "mixmod/Matrix/SphericalMatrix.h"
 #include "mixmod/Matrix/SymmetricMatrix.h"
-#include "mixmod/Matrix/GeneralMatrix.h"
+#include "mixmod/Utilities/Random.h"
+#include "mixmod/Utilities/Util.h"
 
-namespace XEM {
+namespace XEM
+{
 
 //-------------------- Constructors--------------
 
-GaussianEDDAParameter::GaussianEDDAParameter() : GaussianParameter() {
-	THROW(OtherException, wrongConstructorType);
-}
+GaussianEDDAParameter::GaussianEDDAParameter() : GaussianParameter() { THROW(OtherException, wrongConstructorType); }
 
 //--------------
-// constructor 
+// constructor
 //-------------
-GaussianEDDAParameter::GaussianEDDAParameter(Model * iModel, ModelType * iModelType) 
-: GaussianParameter(iModel, iModelType) 
+GaussianEDDAParameter::GaussianEDDAParameter(Model *iModel, ModelType *iModelType) : GaussianParameter(iModel, iModelType)
 {
-	_tabInvSqrtDetSigma = new double [_nbCluster];
+	_tabInvSqrtDetSigma = new double[_nbCluster];
 	for (int64_t k = 0; k < _nbCluster; k++) {
 		_tabInvSqrtDetSigma[k] = 1.0;
 	}
-	_tabInvSigma = new Matrix* [_nbCluster];
-	_tabSigma = new Matrix* [_nbCluster];
+	_tabInvSigma = new Matrix *[_nbCluster];
+	_tabSigma = new Matrix *[_nbCluster];
 }
 
 //------------------------------------------
 // constructor called if USER_initialisation
 //-------------------------------------------
-GaussianEDDAParameter::GaussianEDDAParameter(
-		int64_t iNbCluster, int64_t iPbDimension, ModelType * iModelType) 
-: GaussianParameter(iNbCluster, iPbDimension, iModelType) 
+GaussianEDDAParameter::GaussianEDDAParameter(int64_t iNbCluster, int64_t iPbDimension, ModelType *iModelType)
+    : GaussianParameter(iNbCluster, iPbDimension, iModelType)
 {
-	_tabInvSqrtDetSigma = new double [_nbCluster];
+	_tabInvSqrtDetSigma = new double[_nbCluster];
 	for (int64_t k = 0; k < _nbCluster; k++) {
 		_tabInvSqrtDetSigma[k] = 0.0;
 	}
-	_tabInvSigma = new Matrix* [_nbCluster];
-	_tabSigma = new Matrix* [_nbCluster];
+	_tabInvSigma = new Matrix *[_nbCluster];
+	_tabSigma = new Matrix *[_nbCluster];
 }
 
 //-----------------
 // copy constructor
 //-----------------
-GaussianEDDAParameter::GaussianEDDAParameter(const GaussianEDDAParameter * iParameter) 
-: GaussianParameter(iParameter) 
+GaussianEDDAParameter::GaussianEDDAParameter(const GaussianEDDAParameter *iParameter) : GaussianParameter(iParameter)
 {
 	int64_t k;
 	_tabInvSqrtDetSigma = new double[_nbCluster];
-	double * iTabInvSqrtDetSigma = iParameter->getTabInvSqrtDetSigma();
+	double *iTabInvSqrtDetSigma = iParameter->getTabInvSqrtDetSigma();
 	for (k = 0; k < _nbCluster; k++) {
 		_tabInvSqrtDetSigma[k] = iTabInvSqrtDetSigma[k];
 	}
-	_tabInvSigma = new Matrix* [_nbCluster];
-	_tabSigma = new Matrix* [_nbCluster];
+	_tabInvSigma = new Matrix *[_nbCluster];
+	_tabSigma = new Matrix *[_nbCluster];
 }
 
 /**************/
 /* Destructor */
 /**************/
-GaussianEDDAParameter::~GaussianEDDAParameter() {
+GaussianEDDAParameter::~GaussianEDDAParameter()
+{
 	if (_tabInvSqrtDetSigma) {
 		delete[] _tabInvSqrtDetSigma;
 		_tabInvSqrtDetSigma = NULL;
@@ -114,10 +110,13 @@ GaussianEDDAParameter::~GaussianEDDAParameter() {
 //---------------------
 /// Comparison operator
 //---------------------
-bool GaussianEDDAParameter::operator ==(const GaussianEDDAParameter & param) const {
-	if (!GaussianParameter::operator==(param)) return false;
+bool GaussianEDDAParameter::operator==(const GaussianEDDAParameter &param) const
+{
+	if (!GaussianParameter::operator==(param))
+		return false;
 	for (int64_t k = 0; k < _nbCluster; k++) {
-		if (_tabSigma[k] != param.getTabSigma()[k]) return false;
+		if (_tabSigma[k] != param.getTabSigma()[k])
+			return false;
 	}
 	return true;
 }
@@ -125,7 +124,8 @@ bool GaussianEDDAParameter::operator ==(const GaussianEDDAParameter & param) con
 //------------------------
 // reset to default values
 //------------------------
-void GaussianEDDAParameter::reset() {
+void GaussianEDDAParameter::reset()
+{
 	for (int64_t k = 0; k < _nbCluster; k++) {
 		_tabInvSqrtDetSigma[k] = 0.0;
 		*(_tabSigma[k]) = 1.0;
@@ -134,17 +134,18 @@ void GaussianEDDAParameter::reset() {
 	GaussianParameter::reset();
 }
 
-void GaussianEDDAParameter::getAllPdf(double** tabFik, double* tabProportion)const {
+void GaussianEDDAParameter::getAllPdf(double **tabFik, double *tabProportion) const
+{
 
-	GaussianData * data = _model->getGaussianData();
+	GaussianData *data = _model->getGaussianData();
 	int64_t nbSample = _model->getNbSample();
-	double * muk; // to store mu_k
+	double *muk;            // to store mu_k
 	double InvPiInvDetProp; // 1/(pi)^(d/2) * 1/det(\Sigma_k) ^ (.5) * p_k
-	Matrix * SigmakMoins1;
-	double ** matrix = data->getYStore(); // to store x_i i=1,...,n
+	Matrix *SigmakMoins1;
+	double **matrix = data->getYStore(); // to store x_i i=1,...,n
 
-	double ** p_matrix; // pointeur : parcours de y
-	double ** p_tabFik_i; // pointeur : parcours de tabFik
+	double **p_matrix;   // pointeur : parcours de y
+	double **p_tabFik_i; // pointeur : parcours de tabFik
 
 	double norme;
 
@@ -152,8 +153,8 @@ void GaussianEDDAParameter::getAllPdf(double** tabFik, double* tabProportion)con
 	int64_t i; // parcours des individus
 	int64_t k; // cluster index
 
-	double * xiMoinsMuk = data->getTmpTabOfSizePbDimension();
-	double * xi;
+	double *xiMoinsMuk = data->getTmpTabOfSizePbDimension();
+	double *xi;
 	int64_t p;
 
 	for (k = 0; k < _nbCluster; k++) {
@@ -161,7 +162,7 @@ void GaussianEDDAParameter::getAllPdf(double** tabFik, double* tabProportion)con
 		muk = _tabMean[k];
 		SigmakMoins1 = _tabInvSigma[k];
 
-		//computing
+		// computing
 		p_matrix = matrix; // pointe sur la premiere ligne des donnees
 		p_tabFik_i = tabFik;
 		for (i = 0; i < nbSample; i++) {
@@ -176,27 +177,28 @@ void GaussianEDDAParameter::getAllPdf(double** tabFik, double* tabProportion)con
 			p_matrix++;
 			p_tabFik_i++;
 		} // end for i
-	} // end for k
+	}     // end for k
 }
 
 //-------
 // getPdf
 //-------
-double GaussianEDDAParameter::getPdf(Sample * x, int64_t kCluster)const {
+double GaussianEDDAParameter::getPdf(Sample *x, int64_t kCluster) const
+{
 
-	GaussianData * data = _model->getGaussianData();
+	GaussianData *data = _model->getGaussianData();
 
-	double normPdf = 0.0; // Normal pdf
+	double normPdf = 0.0;                // Normal pdf
 	double invPi = data->getInv2PiPow(); // Inverse of (2*Pi)^(d/2)
 
 	// Compute (x-m)*inv(S)*(x-m)'
-	double * ligne = ((GaussianSample*) x)->getTabValue();
+	double *ligne = ((GaussianSample *)x)->getTabValue();
 
-	Matrix * Sigma_kMoins1 = _tabInvSigma[kCluster];
+	Matrix *Sigma_kMoins1 = _tabInvSigma[kCluster];
 
 	double norme;
-	double * muk = _tabMean[kCluster];
-	double * xiMoinsMuk = data->getTmpTabOfSizePbDimension();
+	double *muk = _tabMean[kCluster];
+	double *xiMoinsMuk = data->getTmpTabOfSizePbDimension();
 	int64_t p;
 
 	for (p = 0; p < _pbDimension; p++) {
@@ -212,17 +214,18 @@ double GaussianEDDAParameter::getPdf(Sample * x, int64_t kCluster)const {
 	return normPdf;
 }
 
-double GaussianEDDAParameter::getPdf(int64_t iSample, int64_t kCluster)const {
+double GaussianEDDAParameter::getPdf(int64_t iSample, int64_t kCluster) const
+{
 
-	GaussianData * data = _model->getGaussianData();
-	double * x = (data->getYStore())[iSample];
+	GaussianData *data = _model->getGaussianData();
+	double *x = (data->getYStore())[iSample];
 
-	Matrix * Sigma_kCluster_moins1 = _tabInvSigma[kCluster];
+	Matrix *Sigma_kCluster_moins1 = _tabInvSigma[kCluster];
 
 	double norme;
 
-	double * xiMoinsMuk = data->getTmpTabOfSizePbDimension();
-	double * muk = _tabMean[kCluster];
+	double *xiMoinsMuk = data->getTmpTabOfSizePbDimension();
+	double *muk = _tabMean[kCluster];
 
 	int64_t p;
 
@@ -241,7 +244,8 @@ double GaussianEDDAParameter::getPdf(int64_t iSample, int64_t kCluster)const {
 	return normPdf;
 }
 
-void GaussianEDDAParameter::updateTabInvSigmaAndDet() {
+void GaussianEDDAParameter::updateTabInvSigmaAndDet()
+{
 	int64_t k;
 	double detSigma;
 	for (k = 0; k < _nbCluster; k++) {
@@ -255,23 +259,22 @@ void GaussianEDDAParameter::updateTabInvSigmaAndDet() {
 //---------
 // MAP step
 //---------
-// update _tabWk and _W. 
+// update _tabWk and _W.
 // No need for this algo but if CV is the criterion, these values
 // must be updated
 /*void XEMGaussianEDDAParameter::MAPStep(){
-  computeTabWkW(); 
+  computeTabWkW();
 }*/
-
 
 //--------------------
 // init USER_PARTITION
 //--------------------
 
-void GaussianEDDAParameter::initForInitUSER_PARTITION(int64_t & nbInitializedCluster, 
-		bool * tabNotInitializedCluster, Partition * initPartition) 
+void GaussianEDDAParameter::initForInitUSER_PARTITION(int64_t &nbInitializedCluster, bool *tabNotInitializedCluster,
+                                                      Partition *initPartition)
 {
-	// init : tabSigma, _tabInvSigma, _tabInvSqrtDetSigma, 
-	DiagMatrix * matrixDataVar = new DiagMatrix(_pbDimension, 0.0);
+	// init : tabSigma, _tabInvSigma, _tabInvSqrtDetSigma,
+	DiagMatrix *matrixDataVar = new DiagMatrix(_pbDimension, 0.0);
 	computeGlobalDiagDataVariance(matrixDataVar);
 	// Vaiance matrix initialization to variance matrix of data (Symmetric, Diag or Spherical)
 	for (int64_t k = 0; k < _nbCluster; k++) {
@@ -281,42 +284,42 @@ void GaussianEDDAParameter::initForInitUSER_PARTITION(int64_t & nbInitializedClu
 	delete matrixDataVar;
 
 	// _tabMean
-	computeTabMeanInitUSER_PARTITION(
-			nbInitializedCluster, tabNotInitializedCluster, initPartition);
+	computeTabMeanInitUSER_PARTITION(nbInitializedCluster, tabNotInitializedCluster, initPartition);
 }
 
-void GaussianEDDAParameter::initUSER(Parameter * iParam) {
+void GaussianEDDAParameter::initUSER(Parameter *iParam)
+{
 	/*
-	  updated : _tabMean, _tabWk, _tabSigma, _tabProportion, _tabShape, 
+	  updated : _tabMean, _tabWk, _tabSigma, _tabProportion, _tabShape,
 	            _tabOrientation, _tabInvSigma, _tabInvSqrtDetSigma
 	 */
 	// recuperation
-	// we got an XEMGaussianGeneralParameter 
+	// we got an XEMGaussianGeneralParameter
 	// because of the implementation in class XEMStrategyType
 	// in gaussian cases the init parameters are allways General
-	GaussianGeneralParameter * param = (GaussianGeneralParameter *) iParam->getGaussianParameter();
-	double ** iTabMean = param->getTabMean();
-	double * iTabProportion = param->getTabProportion();
-	Matrix ** iTabWk = param->getTabWk();
-	Matrix ** iTabSigma = param->getTabSigma();
+	GaussianEDDAParameter *param = (GaussianEDDAParameter *)iParam->getGaussianParameter();
+	double **iTabMean = param->getTabMean();
+	double *iTabProportion = param->getTabProportion();
+	Matrix **iTabWk = param->getTabWk();
+	Matrix **iTabSigma = param->getTabSigma();
 	int64_t k;
 	for (k = 0; k < _nbCluster; k++) {
 		recopyTab(iTabMean[k], _tabMean[k], _pbDimension);
-		(* _tabWk[k]) = iTabWk[k];
-		(* _tabSigma[k]) = iTabSigma[k];
+		(*_tabWk[k]) = iTabWk[k];
+		(*_tabSigma[k]) = iTabSigma[k];
 		if (hasFreeProportion(_modelType->_nameModel)) {
 			_tabProportion[k] = iTabProportion[k];
-		}
-		else {
+		} else {
 			_tabProportion[k] = 1.0 / _nbCluster;
 		}
 	}
 }
 
-void GaussianEDDAParameter::input(std::ifstream & fi) {
+void GaussianEDDAParameter::input(std::ifstream &fi)
+{
 
 	int64_t j, k;
-	double * muk;
+	double *muk;
 	for (k = 0; k < _nbCluster; k++) {
 		muk = _tabMean[k];
 		// Proportions //
@@ -327,20 +330,21 @@ void GaussianEDDAParameter::input(std::ifstream & fi) {
 			muk[j] = getDoubleFromStream(fi);
 		// Variance matrix //
 		_tabSigma[k]->input(fi); // virtual method
-	} // end for k
+	}                            // end for k
 }
 
-//For Heterogeneous model.
-void GaussianEDDAParameter::input(std::ifstream & fi, int64_t nbVariables_binary, std::vector< int64_t > nbFactor) {
+// For Heterogeneous model.
+void GaussianEDDAParameter::input(std::ifstream &fi, int64_t nbVariables_binary, std::vector<int64_t> nbFactor)
+{
 
 	int64_t j, k;
-	double * muk;
-  double garbage;
-  int64_t sumNbFactor = 0;
-  for (int64_t l = 0; l < nbFactor.size(); l++) sumNbFactor += nbFactor[l]; 
-  for (int t = 0; t < _nbCluster * (1 + nbVariables_binary + sumNbFactor); t++) { 
-    garbage = getDoubleFromStream(fi);
-  }
+	double *muk;
+	int64_t sumNbFactor = 0;
+	for (uint64_t l = 0; l < nbFactor.size(); l++)
+		sumNbFactor += nbFactor[l];
+	for (int t = 0; t < _nbCluster * (1 + nbVariables_binary + sumNbFactor); t++) {
+		getDoubleFromStream(fi);
+	}
 	for (k = 0; k < _nbCluster; k++) {
 		muk = _tabMean[k];
 		// Proportions //
@@ -351,13 +355,11 @@ void GaussianEDDAParameter::input(std::ifstream & fi, int64_t nbVariables_binary
 			muk[j] = getDoubleFromStream(fi);
 		// Variance matrix //
 		_tabSigma[k]->input(fi); // virtual method
-	} // end for k
+	}                            // end for k
 }
 
-void GaussianEDDAParameter::input(double * proportions
-		, double ** means
-		, double *** variances
-		) {
+void GaussianEDDAParameter::input(double *proportions, double **means, double ***variances)
+{
 	for (int k = 0; k < _nbCluster; k++) {
 
 		// Proportions //
@@ -368,48 +370,51 @@ void GaussianEDDAParameter::input(double * proportions
 		}
 		// Variance matrix //
 		_tabSigma[k]->input(variances[k]); // virtual method
-	} // end for k
+	}                                      // end for k
 }
 
-void GaussianEDDAParameter::updateForCV(Model * originalModel, CVBlock & CVBlock) {
+void GaussianEDDAParameter::updateForCV(Model *originalModel, CVBlock &CVBlock)
+{
 	GaussianParameter::updateForCV(originalModel, CVBlock);
 	computeTabSigma();
 }
 
 /*-------------------------------------------------------------------------------------------
-	M step
-	------
-	
-	already updated :
-	- _model (_tabFik, _tabTik, _tabCik, _tabNk) if Estep is done before
-	- _model->_tabCik, _model->_tabNk if USER_PARTITION is done before (Disciminant analysis)
-	In all cases, only  _tabCik and _tabNk are needed 
-	
-	updated in this method :
-	- in XEMGaussianParameter::MStep :
-			-	_tabProportion
-			- _tabMean
-			- _tabWk 
-			- _W
-	- here :
-			- _tabSigma
-			- _tabInvSigma
-			- _tabInvSqrtDetSigma
+    M step
+    ------
+
+    already updated :
+    - _model (_tabFik, _tabTik, _tabCik, _tabNk) if Estep is done before
+    - _model->_tabCik, _model->_tabNk if USER_PARTITION is done before (Disciminant analysis)
+    In all cases, only  _tabCik and _tabNk are needed
+
+    updated in this method :
+    - in XEMGaussianParameter::MStep :
+            -	_tabProportion
+            - _tabMean
+            - _tabWk
+            - _W
+    - here :
+            - _tabSigma
+            - _tabInvSigma
+            - _tabInvSqrtDetSigma
 --------------------------------------------------------------------------------------------*/
-void GaussianEDDAParameter::MStep() {
+void GaussianEDDAParameter::MStep()
+{
 	GaussianParameter::MStep();
 	computeTabSigma();
 }
 
 //--------------------------------------------
-// initialize attributes before an InitRandom  
+// initialize attributes before an InitRandom
 //--------------------------------------------
-void GaussianEDDAParameter::initForInitRANDOM() {
-	DiagMatrix * matrixDataVar = new DiagMatrix(_pbDimension, 0.0);
+void GaussianEDDAParameter::initForInitRANDOM()
+{
+	DiagMatrix *matrixDataVar = new DiagMatrix(_pbDimension, 0.0);
 	computeGlobalDiagDataVariance(matrixDataVar);
 
 	// Vaiance matrix initialization to variance matrix of data (Symmetric, Diag or Spherical)
-	// init : tabSigma, _tabInvSigma, _tabInvSqrtDetSigma, 
+	// init : tabSigma, _tabInvSigma, _tabInvSqrtDetSigma,
 	for (int64_t k = 0; k < _nbCluster; k++) {
 		(*_tabSigma[k]) = matrixDataVar;
 	}
@@ -423,23 +428,24 @@ void GaussianEDDAParameter::initForInitRANDOM() {
 // -model->_tabSumF[i] pour ith sample = 0
 // i : 0 ->_nbSample-1
 //-----------------------------------------
-void GaussianEDDAParameter::computeTikUnderflow(int64_t i, double ** tabTik) {
+void GaussianEDDAParameter::computeTikUnderflow(int64_t i, double **tabTik)
+{
 
-	GaussianData * data = _model->getGaussianData();
-	int64_t * lnFk = new int64_t [_nbCluster];
-	long double * lnFkPrim = new long double[_nbCluster];
-	long double * fkPrim = new long double[_nbCluster];
+	GaussianData *data = _model->getGaussianData();
+	int64_t *lnFk = new int64_t[_nbCluster];
+	long double *lnFkPrim = new long double[_nbCluster];
+	long double *fkPrim = new long double[_nbCluster];
 	int64_t k, k0;
 	long double lnFkMax, fkTPrim;
 	long double detSigma;
 
-	double * ligne = (data->getYStore())[i];
+	double *ligne = (data->getYStore())[i];
 	long double norme;
-	double ** p_tabMean;
-	double * tabTik_i = tabTik[i];
+	double **p_tabMean;
+	double *tabTik_i = tabTik[i];
 
-	double * xiMoinsMuk = data->getTmpTabOfSizePbDimension();
-	double * muk;
+	double *xiMoinsMuk = data->getTmpTabOfSizePbDimension();
+	double *muk;
 
 	p_tabMean = _tabMean;
 	int64_t p;
@@ -454,8 +460,7 @@ void GaussianEDDAParameter::computeTikUnderflow(int64_t i, double ** tabTik) {
 
 		// compute lnFik[k]
 
-		lnFk[k] = log(_tabProportion[k]) - data->getHalfPbDimensionLog2Pi() 
-				- 0.5 * log(detSigma) - 0.5 * norme;
+		lnFk[k] = log(_tabProportion[k]) - data->getHalfPbDimensionLog2Pi() - 0.5 * log(detSigma) - 0.5 * norme;
 
 		p_tabMean++;
 	} // end for k
@@ -480,20 +485,20 @@ void GaussianEDDAParameter::computeTikUnderflow(int64_t i, double ** tabTik) {
 		initToZero(tabTik_i, _nbCluster);
 		k0 = GaussianParameter::computeClassAssigment(i);
 		tabTik_i[k0] = 1.0;
-	}
-	else {
+	} else {
 		for (k = 0; k < _nbCluster; k++) {
 			tabTik_i[k] = fkPrim[k] / fkTPrim;
 		}
 	}
 
-	delete [] lnFk;
-	delete [] lnFkPrim;
-	delete [] fkPrim;
+	delete[] lnFk;
+	delete[] lnFkPrim;
+	delete[] fkPrim;
 }
 
-//debug
-void GaussianEDDAParameter::edit() {
+// debug
+void GaussianEDDAParameter::edit()
+{
 	int64_t k;
 	for (k = 0; k < _nbCluster; k++) {
 		cout << "\tcomponent : " << k << endl;
@@ -518,7 +523,8 @@ void GaussianEDDAParameter::edit() {
 //------
 // Edit
 //-------
-void GaussianEDDAParameter::edit(std::ofstream & oFile, bool text) {
+void GaussianEDDAParameter::edit(std::ofstream &oFile, bool text)
+{
 	int64_t k;
 	if (text) {
 		for (k = 0; k < _nbCluster; k++) {
@@ -533,40 +539,37 @@ void GaussianEDDAParameter::edit(std::ofstream & oFile, bool text) {
 			oFile << endl;
 		}
 		oFile << endl;
-	}
-	else {
+	} else {
 		for (k = 0; k < _nbCluster; k++) {
 			putDoubleInStream(oFile, _tabProportion[k]);
 
 			editTab(_tabMean + k, 1, _pbDimension, oFile, " ", "");
 			_tabSigma[k]->edit(oFile, "");
 			oFile << endl;
-
 		}
 		oFile << endl;
-
 	}
 }
 
-void GaussianEDDAParameter::recopy(Parameter * otherParameter) {
+void GaussianEDDAParameter::recopy(Parameter *otherParameter)
+{
 
-	GaussianEDDAParameter * iParameter = 
-			(GaussianEDDAParameter *) otherParameter->getGaussianParameter();
+	GaussianEDDAParameter *iParameter = (GaussianEDDAParameter *)otherParameter->getGaussianParameter();
 	recopyTab(iParameter->getTabMean(), _tabMean, _nbCluster, _pbDimension);
 	//  _W->recopy(iParameter->getW());
 	(*_W) = iParameter->getW();
 
 	int64_t k;
-	Matrix ** iTabSigma = iParameter->getTabSigma();
-	Matrix ** iTabInvSigma = iParameter->getTabInvSigma();
-	Matrix ** iTabWk = iParameter->getTabWk();
+	Matrix **iTabSigma = iParameter->getTabSigma();
+	Matrix **iTabInvSigma = iParameter->getTabInvSigma();
+	Matrix **iTabWk = iParameter->getTabWk();
 	for (k = 0; k < _nbCluster; k++) {
 		// _tabSigma[k]->recopy(iTabSigma[k]);
-		(* _tabSigma[k]) = iTabSigma[k];
+		(*_tabSigma[k]) = iTabSigma[k];
 		// _tabInvSigma[k]->recopy(iTabInvSigma[k]);
 		(*_tabInvSigma[k]) = iTabInvSigma[k];
-		// _tabWk[k]->recopy(iTabWk[k]);  
-		(* _tabWk[k]) = iTabWk[k];
+		// _tabWk[k]->recopy(iTabWk[k]);
+		(*_tabWk[k]) = iTabWk[k];
 	}
 	recopyTab(iParameter->getTabInvSqrtDetSigma(), _tabInvSqrtDetSigma, _nbCluster);
 }

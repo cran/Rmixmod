@@ -6,7 +6,7 @@
 
 /***************************************************************************
     This file is part of MIXMOD
-    
+
     MIXMOD is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -20,7 +20,7 @@
     You should have received a copy of the GNU General Public License
     along with MIXMOD.  If not, see <http://www.gnu.org/licenses/>.
 
-    All informations available on : http://www.mixmod.org                                                                                               
+    All informations available on : http://www.mixmod.org
 ***************************************************************************/
 
 #ifndef XEM_DOMCLUSTERINGPROJECT_H
@@ -28,32 +28,33 @@
 
 #include "mixmod_iostream/DomProject.h"
 
-namespace XEM {
+namespace XEM
+{
 
-///use to create .mixmod file in Clustering case
-class DomClusteringProject : public DomProject {
+/// use to create .mixmod file in Clustering case
+class DomClusteringProject : public DomProject
+{
 
-public : 
-    
-	///constructor by default
-	DomClusteringProject();    
+public:
+	/// constructor by default
+	DomClusteringProject();
 
-	///destructor
+	/// destructor
 	virtual ~DomClusteringProject();
 
-	///constructor by initialization
+	/// constructor by initialization
 	DomClusteringProject(xmlpp::Element *root);
 
-	///fill the xmlpp::Document to create the .mixmod file from a ClusteringInput and ClusteringOutput
-	void writeClustering(string & s, ClusteringMain * cMain);
+	/// fill the xmlpp::Document to create the .mixmod file from a ClusteringInput and ClusteringOutput
+	void writeClustering(string &s, ClusteringMain *cMain);
 
-	///read a XML file and fill ClusteringInput
-	void readClustering(ClusteringInput * cInput);
+	/// read a XML file and fill ClusteringInput
+	void readClustering(ClusteringInput *cInput);
 
-	///read a XML file and fill ClusteringOutput
-	void readClustering(ClusteringOutput * cOutput);
+	/// read a XML file and fill ClusteringOutput
+	void readClustering(ClusteringOutput *cOutput);
 };
 
-} //end namespace
+} // end namespace
 
 #endif // XEM_DOMCLUSTERINGPROJECT_H

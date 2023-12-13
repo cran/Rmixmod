@@ -6,7 +6,7 @@
 
 /***************************************************************************
     This file is part of MIXMOD
-    
+
     MIXMOD is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -20,75 +20,73 @@
     You should have received a copy of the GNU General Public License
     along with MIXMOD.  If not, see <http://www.gnu.org/licenses/>.
 
-    All informations available on : http://www.mixmod.org                                                                                               
+    All informations available on : http://www.mixmod.org
 ***************************************************************************/
 #include "mixmod/Kernel/Parameter/GaussianSphericalParameter.h"
-#include "mixmod/Kernel/Parameter/GaussianGeneralParameter.h"
-#include "mixmod/Kernel/Parameter/GaussianEDDAParameter.h"
 #include "mixmod/Kernel/IO/GaussianData.h"
 #include "mixmod/Kernel/Model/Model.h"
 #include "mixmod/Kernel/Model/ModelType.h"
+#include "mixmod/Kernel/Parameter/GaussianEDDAParameter.h"
+#include "mixmod/Kernel/Parameter/GaussianGeneralParameter.h"
 #include "mixmod/Matrix/SphericalMatrix.h"
 
-namespace XEM {
+namespace XEM
+{
 
 /****************/
 /* Constructors */
 /****************/
 
-GaussianSphericalParameter::GaussianSphericalParameter() {
-	THROW(OtherException, wrongConstructorType);
-}
+GaussianSphericalParameter::GaussianSphericalParameter() { THROW(OtherException, wrongConstructorType); }
 
 //-------------------------------------------------------------------------------------
 // constructor called by XEMModel
 //-------------------------------------------------------------------------------------
-GaussianSphericalParameter::GaussianSphericalParameter(Model * iModel, ModelType * iModelType) 
-: GaussianEDDAParameter(iModel, iModelType) 
+GaussianSphericalParameter::GaussianSphericalParameter(Model *iModel, ModelType *iModelType)
+    : GaussianEDDAParameter(iModel, iModelType)
 {
 	int64_t k;
 	_W = new SphericalMatrix(_pbDimension);
 	for (k = 0; k < _nbCluster; k++) {
-		_tabSigma[k] = new SphericalMatrix(_pbDimension); //Id
-		_tabInvSigma[k] = new SphericalMatrix(_pbDimension); //Id
-		_tabWk[k] = new SphericalMatrix(_pbDimension); //Id
+		_tabSigma[k] = new SphericalMatrix(_pbDimension);    // Id
+		_tabInvSigma[k] = new SphericalMatrix(_pbDimension); // Id
+		_tabWk[k] = new SphericalMatrix(_pbDimension);       // Id
 	}
 }
 //-------------------------------------------------------------------------------------
 // constructor for ParameterDescription (C.Poli)
 //-------------------------------------------------------------------------------------
-GaussianSphericalParameter::GaussianSphericalParameter(int64_t iNbCluster, int64_t iPbDimension, ModelType * iModelType) 
-: GaussianEDDAParameter(iNbCluster, iPbDimension, iModelType) 
+GaussianSphericalParameter::GaussianSphericalParameter(int64_t iNbCluster, int64_t iPbDimension, ModelType *iModelType)
+    : GaussianEDDAParameter(iNbCluster, iPbDimension, iModelType)
 {
 	int64_t k;
 	_W = new SphericalMatrix(_pbDimension);
 	for (k = 0; k < _nbCluster; k++) {
-		_tabSigma[k] = new SphericalMatrix(_pbDimension); //Id
-		_tabInvSigma[k] = new SphericalMatrix(_pbDimension); //Id
-		_tabWk[k] = new SphericalMatrix(_pbDimension); //Id
+		_tabSigma[k] = new SphericalMatrix(_pbDimension);    // Id
+		_tabInvSigma[k] = new SphericalMatrix(_pbDimension); // Id
+		_tabWk[k] = new SphericalMatrix(_pbDimension);       // Id
 	}
 }
 
 //---------------------------------------------------------------------
 // copy constructor
 //---------------------------------------------------------------------
-GaussianSphericalParameter::GaussianSphericalParameter(
-		const GaussianSphericalParameter * iParameter) 
-: GaussianEDDAParameter(iParameter) 
+GaussianSphericalParameter::GaussianSphericalParameter(const GaussianSphericalParameter *iParameter)
+    : GaussianEDDAParameter(iParameter)
 {
 	int64_t k;
 
-	_W = new SphericalMatrix((SphericalMatrix *) (iParameter->getW())); // copy constructor
+	_W = new SphericalMatrix((SphericalMatrix *)(iParameter->getW())); // copy constructor
 
-	Matrix ** iTabWk = iParameter->getTabWk();
-	Matrix ** iTabSigma = iParameter->getTabSigma();
-	Matrix ** iTabInvSigma = iParameter->getTabInvSigma();
+	Matrix **iTabWk = iParameter->getTabWk();
+	Matrix **iTabSigma = iParameter->getTabSigma();
+	Matrix **iTabInvSigma = iParameter->getTabInvSigma();
 
 	for (k = 0; k < _nbCluster; k++) {
 		_tabWk[k] = new SphericalMatrix(_pbDimension);
-		(* _tabWk[k]) = iTabWk[k];
+		(*_tabWk[k]) = iTabWk[k];
 		_tabSigma[k] = new SphericalMatrix(_pbDimension);
-		(* _tabSigma[k]) = iTabSigma[k];
+		(*_tabSigma[k]) = iTabSigma[k];
 		_tabInvSigma[k] = new SphericalMatrix(_pbDimension);
 		(*_tabInvSigma[k]) = iTabInvSigma[k];
 	}
@@ -97,7 +95,8 @@ GaussianSphericalParameter::GaussianSphericalParameter(
 /**************/
 /* Destructor */
 /**************/
-GaussianSphericalParameter::~GaussianSphericalParameter() {
+GaussianSphericalParameter::~GaussianSphericalParameter()
+{
 
 	if (_tabSigma) {
 		for (int64_t k = 0; k < _nbCluster; k++) {
@@ -117,15 +116,17 @@ GaussianSphericalParameter::~GaussianSphericalParameter() {
 /*********/
 /* clone */
 /*********/
-Parameter * GaussianSphericalParameter::clone() const {
-	GaussianSphericalParameter * newParam = new GaussianSphericalParameter(this);
+Parameter *GaussianSphericalParameter::clone() const
+{
+	GaussianSphericalParameter *newParam = new GaussianSphericalParameter(this);
 	return (newParam);
 }
 
 /************/
 /* initUSER */
 /************/
-void GaussianSphericalParameter::initUSER(Parameter * iParam) {
+void GaussianSphericalParameter::initUSER(Parameter *iParam)
+{
 	GaussianEDDAParameter::initUSER(iParam);
 	updateTabInvSigmaAndDet();
 }
@@ -133,11 +134,12 @@ void GaussianSphericalParameter::initUSER(Parameter * iParam) {
 /*******************/
 /* computeTabSigma */
 /*******************/
-void GaussianSphericalParameter::computeTabSigma() {
+void GaussianSphericalParameter::computeTabSigma()
+{
 
 	// Initialization
-	GaussianData * data = _model->getGaussianData();
-	double * tabNk = _model->getTabNk();
+	GaussianData *data = _model->getGaussianData();
+	double *tabNk = _model->getTabNk();
 	int64_t k;
 	double sigmaValue;
 
@@ -182,9 +184,10 @@ void GaussianSphericalParameter::computeTabSigma() {
 }
 
 //-------------------
-//getLogLikelihoodOne
+// getLogLikelihoodOne
 //-------------------
-double GaussianSphericalParameter::getLogLikelihoodOne() const {
+double GaussianSphericalParameter::getLogLikelihoodOne() const
+{
 
 	/* Compute log-likelihood for one cluster
 	   useful for NEC criterion */
@@ -192,18 +195,18 @@ double GaussianSphericalParameter::getLogLikelihoodOne() const {
 	/* Initialization */
 	int64_t nbSample = _model->getNbSample();
 	int64_t i;
-	GaussianData * data = _model->getGaussianData();
+	GaussianData *data = _model->getGaussianData();
 	double logLikelihoodOne; // Log-likelihood for k=1
-	//double * Mean = new double[_pbDimension];
-    std::unique_ptr<double[]> Mean(new double[_pbDimension]);
-	double ** y = data->_yStore;
-	double * yi;
-	//SphericalMatrix * Sigma = new SphericalMatrix(_pbDimension);
-	//SphericalMatrix * W = new SphericalMatrix(_pbDimension);
+	                         // double * Mean = new double[_pbDimension];
+	std::unique_ptr<double[]> Mean(new double[_pbDimension]);
+	double **y = data->_yStore;
+	double *yi;
+	// SphericalMatrix * Sigma = new SphericalMatrix(_pbDimension);
+	// SphericalMatrix * W = new SphericalMatrix(_pbDimension);
 	std::unique_ptr<SphericalMatrix> Sigma(new SphericalMatrix(_pbDimension));
 	std::unique_ptr<SphericalMatrix> W(new SphericalMatrix(_pbDimension));
 	double norme;
-	double * weight = data->_weight;
+	double *weight = data->_weight;
 
 	//  Mean Estimator (empirical estimator)
 	double totalWeight = data->_weightTotal;
@@ -212,11 +215,11 @@ double GaussianSphericalParameter::getLogLikelihoodOne() const {
 
 	/* Compute the Cluster Scattering Matrix W */
 	int64_t p; // parcours
-	double * xiMoinsMuk = data->getTmpTabOfSizePbDimension();
+	double *xiMoinsMuk = data->getTmpTabOfSizePbDimension();
 	for (i = 0; i < nbSample; i++) {
 		yi = y[i];
 		for (p = 0; p < _pbDimension; p++) {
-          xiMoinsMuk[p] = yi[p] - Mean.get()[p];
+			xiMoinsMuk[p] = yi[p] - Mean.get()[p];
 		}
 		W->add(xiMoinsMuk, weight[i]);
 	}
@@ -227,15 +230,16 @@ double GaussianSphericalParameter::getLogLikelihoodOne() const {
 	Sigma->equalToMatrixDividedByDouble(W.get(), totalWeight); // virtual
 
 	// inverse of Sigma
-	//XEMSphericalMatrix * SigmaMoins1 = new XEMSphericalMatrix( _pbDimension);
-	Matrix * SigmaMoins1_p = NULL;
-	//SigmaMoins1->inverse(Sigma);// virtual
-	//cout<<"S"<<endl;
-	//Sigma->edit(cout,"");
-	Sigma->inverse(SigmaMoins1_p);//actually SigmaMoins1 are created by inverse() with "New Matrix..."
-    std::unique_ptr<Matrix> SigmaMoins1(SigmaMoins1_p); //instead of the final delete (still ugly, althtough better than the final delete...)
-	//cout<<"S-1"<<endl;
-	//SigmaMoins1->edit(cout,"");
+	// XEMSphericalMatrix * SigmaMoins1 = new XEMSphericalMatrix( _pbDimension);
+	Matrix *SigmaMoins1_p = NULL;
+	// SigmaMoins1->inverse(Sigma);// virtual
+	// cout<<"S"<<endl;
+	// Sigma->edit(cout,"");
+	Sigma->inverse(SigmaMoins1_p); // actually SigmaMoins1 are created by inverse() with "New Matrix..."
+	std::unique_ptr<Matrix> SigmaMoins1(
+	    SigmaMoins1_p); // instead of the final delete (still ugly, althtough better than the final delete...)
+	// cout<<"S-1"<<endl;
+	// SigmaMoins1->edit(cout,"");
 	NumericException error = NumericException(minDeterminantSigmaValueError);
 	double detSigma = Sigma->determinant(error); // virtual
 
@@ -244,7 +248,7 @@ double GaussianSphericalParameter::getLogLikelihoodOne() const {
 	for (i = 0; i < nbSample; i++) {
 		yi = y[i];
 		for (p = 0; p < _pbDimension; p++) {
-          xiMoinsMuk[p] = yi[p] - Mean.get()[p];
+			xiMoinsMuk[p] = yi[p] - Mean.get()[p];
 		}
 		norme = SigmaMoins1->norme(xiMoinsMuk); // virtual
 		logLikelihoodOne += norme * weight[i];
@@ -253,24 +257,25 @@ double GaussianSphericalParameter::getLogLikelihoodOne() const {
 	logLikelihoodOne += totalWeight * (data->getPbDimensionLog2Pi() + log(detSigma));
 	logLikelihoodOne *= -0.5;
 
-	//delete[] Mean;
+	// delete[] Mean;
 
-	//delete W;
-	//delete Sigma;
-	//delete SigmaMoins1;
+	// delete W;
+	// delete Sigma;
+	// delete SigmaMoins1;
 
 	return logLikelihoodOne;
 }
 
 //----------------
-//getFreeParameter
+// getFreeParameter
 //----------------
-int64_t GaussianSphericalParameter::getFreeParameter() const {
-	int64_t nbParameter; // Number of parameters //
-	int64_t k = _nbCluster; // Sample size          //
+int64_t GaussianSphericalParameter::getFreeParameter() const
+{
+	int64_t nbParameter;      // Number of parameters //
+	int64_t k = _nbCluster;   // Sample size          //
 	int64_t d = _pbDimension; // Sample dimension     //
 
-	int64_t alphaR = k*d; // alpha for for models with Restrainct proportions (Gaussian_p_...)
+	int64_t alphaR = k * d;           // alpha for for models with Restrainct proportions (Gaussian_p_...)
 	int64_t alphaF = (k * d) + k - 1; // alpha for models with Free proportions (Gaussian_pk_...)
 
 	switch (_modelType->_nameModel) {

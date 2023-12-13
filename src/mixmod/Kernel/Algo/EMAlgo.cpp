@@ -6,7 +6,7 @@
 
 /***************************************************************************
     This file is part of MIXMOD
-    
+
     MIXMOD is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -20,47 +20,42 @@
     You should have received a copy of the GNU General Public License
     along with MIXMOD.  If not, see <http://www.gnu.org/licenses/>.
 
-    All informations available on : http://www.mixmod.org                                                                                               
+    All informations available on : http://www.mixmod.org
 ***************************************************************************/
 #include "mixmod/Kernel/Algo/EMAlgo.h"
 #include "mixmod/Kernel/Model/Model.h"
 
-namespace XEM {
+namespace XEM
+{
 
 //-----------
-//Constructor
+// Constructor
 //-----------
-EMAlgo::EMAlgo() {
-}
+EMAlgo::EMAlgo() {}
 
-EMAlgo::EMAlgo(AlgoStopName algoStopName, double epsilon, int64_t nbIteration)
-: Algo(algoStopName, epsilon, nbIteration) {
-}
+EMAlgo::EMAlgo(AlgoStopName algoStopName, double epsilon, int64_t nbIteration) : Algo(algoStopName, epsilon, nbIteration) {}
 
 /// Copy constructor
-EMAlgo::EMAlgo(const EMAlgo & emAlgo) : Algo(emAlgo) {
-}
+EMAlgo::EMAlgo(const EMAlgo &emAlgo) : Algo(emAlgo) {}
 
 //----------
-//Destructor
+// Destructor
 //----------
-EMAlgo::~EMAlgo() {
-}
+EMAlgo::~EMAlgo() {}
 
 // clone
 //------
-Algo * EMAlgo::clone() {
-	return (new EMAlgo(*this));
-}
+Algo *EMAlgo::clone() { return (new EMAlgo(*this)); }
 
 //---
-//run
+// run
 //---
-void EMAlgo::run(Model *& model) {
+void EMAlgo::run(Model *&model)
+{
 
 	/*std::ostringstream numero;
 	std::string nomfic;
-    
+
 	std::string basestring ="parameter";
 	std::string suffix = ".txt" ;
 
@@ -83,18 +78,18 @@ void EMAlgo::run(Model *& model) {
 		cout << "Apres la 1ere iteration de EM :" << endl;
 		model->editDebugInformation();
 	}
-	
+
 	_indexIteration++;
 
 	while (continueAgain()) {
 		model->Estep(); // E Step
 		model->Mstep(); // M Step
-		
+
 		if (DEBUG > 0) {
 			cout << "Apres la " << _indexIteration << " eme iteration de EM :" << endl;
 			model->editDebugInformation();
 		}
-		
+
 		_indexIteration++;
 		_xml_old = _xml;
 		_xml = model->getLogLikelihood(true); // true : to compute fik

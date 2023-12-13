@@ -6,7 +6,7 @@
 
 /***************************************************************************
     This file is part of MIXMOD
-    
+
     MIXMOD is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -20,39 +20,36 @@
     You should have received a copy of the GNU General Public License
     along with MIXMOD.  If not, see <http://www.gnu.org/licenses/>.
 
-    All informations available on : http://www.mixmod.org                                                                                               
+    All informations available on : http://www.mixmod.org
 ***************************************************************************/
 
 #include "mixmod/Kernel/IO/LabelDescription.h"
+#include "mixmod/Kernel/IO/IndividualColumnDescription.h"
 #include "mixmod/Kernel/IO/Label.h"
-#include "mixmod/Kernel/Model/Model.h"
-#include "mixmod/Kernel/IO/WeightColumnDescription.h"
 #include "mixmod/Kernel/IO/QualitativeColumnDescription.h"
 #include "mixmod/Kernel/IO/QuantitativeColumnDescription.h"
-#include "mixmod/Kernel/IO/IndividualColumnDescription.h"
+#include "mixmod/Kernel/IO/WeightColumnDescription.h"
+#include "mixmod/Kernel/Model/Model.h"
 #include <algorithm>
 
-namespace XEM {
+namespace XEM
+{
 
 //------------
 // Constructor by default
 //------------
-LabelDescription::LabelDescription() : Description() {
+LabelDescription::LabelDescription() : Description()
+{
 	_label = NULL;
 	_nbCluster = 0;
 }
 
 // ---------------------------
-//constructor by initilization
+// constructor by initilization
 // ---------------------------
-LabelDescription::LabelDescription(
-		int64_t nbSample,
-		int64_t nbColumn,
-		std::vector< ColumnDescription* > columnDescription,
-		FormatNumeric::FormatNumericFile format,
-		std::string filename,
-		std::string infoName)
-: Description(nbSample, nbColumn, columnDescription, format, filename, infoName)
+LabelDescription::LabelDescription(int64_t nbSample, int64_t nbColumn, std::vector<ColumnDescription *> columnDescription,
+                                   FormatNumeric::FormatNumericFile format, std::string filename, std::string infoName)
+    : Description(nbSample, nbColumn, columnDescription, format, filename, infoName)
 {
 	_label = createLabel();
 	// get the number of cluster
@@ -62,8 +59,7 @@ LabelDescription::LabelDescription(
 //---------------------------------
 // constructor from a vector of int
 //----------------------------------
-LabelDescription::LabelDescription(int64_t nbSample, std::vector<int64_t> vLabel)
-: Description()
+LabelDescription::LabelDescription(int64_t nbSample, std::vector<int64_t> vLabel) : Description()
 {
 	// get the number of cluster
 	_nbCluster = *max_element(vLabel.begin(), vLabel.end());
@@ -77,8 +73,8 @@ LabelDescription::LabelDescription(int64_t nbSample, std::vector<int64_t> vLabel
 	std::string name("Label");
 	_columnDescription[0]->setName(name);
 
-  if (_nbSample != vLabel.size())
-    THROW (InputException, badNumberOfValuesInLabelInput);
+	if ((size_t)_nbSample != vLabel.size())
+		THROW(InputException, badNumberOfValuesInLabelInput);
 
 	_label = new Label(_nbSample);
 	_label->setLabel(vLabel, _nbSample);
@@ -87,7 +83,8 @@ LabelDescription::LabelDescription(int64_t nbSample, std::vector<int64_t> vLabel
 //-------------------------------------
 // Constructor after an estimation->run
 //--------------------------------------
-LabelDescription::LabelDescription(Model * estimation) : Description() {
+LabelDescription::LabelDescription(Model *estimation) : Description()
+{
 	if (estimation) {
 		_infoName = "Label";
 		_nbSample = estimation->getNbSample();
@@ -100,8 +97,7 @@ LabelDescription::LabelDescription(Model * estimation) : Description() {
 		_columnDescription[0]->setName(name);
 		_label = new Label(estimation);
 		_nbCluster = estimation->getNbCluster();
-	}
-	else {
+	} else {
 		THROW(OtherException, nullPointerError);
 	}
 }
@@ -109,14 +105,16 @@ LabelDescription::LabelDescription(Model * estimation) : Description() {
 //------------
 // Constructor by copy
 //------------
-LabelDescription::LabelDescription(LabelDescription & labelDescription) {
+LabelDescription::LabelDescription(LabelDescription &labelDescription) : Description(labelDescription)
+{
 	(*this) = labelDescription;
 }
 
 //------------
 // operator =
 //------------
-LabelDescription & LabelDescription::operator=(LabelDescription & labelDescription) {
+LabelDescription &LabelDescription::operator=(LabelDescription &labelDescription)
+{
 	_fileName = labelDescription._fileName;
 	_format = labelDescription._format;
 	_infoName = labelDescription._infoName;
@@ -131,36 +129,45 @@ LabelDescription & LabelDescription::operator=(LabelDescription & labelDescripti
 //---------------------
 /// Comparison operator
 //---------------------
-bool LabelDescription::operator ==(const LabelDescription & labelDescription) const {
-	if (_fileName != labelDescription._fileName) return false;
-	if (_format != labelDescription._format) return false;
-	if (_infoName != labelDescription._infoName) return false;
-	if (_nbSample != labelDescription._nbSample) return false;
-	if (_nbColumn != labelDescription._nbColumn) return false;
+bool LabelDescription::operator==(const LabelDescription &labelDescription) const
+{
+	if (_fileName != labelDescription._fileName)
+		return false;
+	if (_format != labelDescription._format)
+		return false;
+	if (_infoName != labelDescription._infoName)
+		return false;
+	if (_nbSample != labelDescription._nbSample)
+		return false;
+	if (_nbColumn != labelDescription._nbColumn)
+		return false;
 	for (int64_t i = 0; i < _nbColumn; ++i) {
-		if (_columnDescription[i]->getName()
-				!= labelDescription.getColumnDescription(i)->getName())
-		{
+		if (_columnDescription[i]->getName() != labelDescription.getColumnDescription(i)->getName()) {
 			return false;
 		}
 	}
-	if (_nbCluster != labelDescription._nbCluster) return false;
-	if (!(_label == labelDescription.getLabel())) return false;
+	if (_nbCluster != labelDescription._nbCluster)
+		return false;
+	if (!(_label == labelDescription.getLabel()))
+		return false;
 	return true;
 }
 
 //------------
 // Destructor
 //------------
-LabelDescription::~LabelDescription() {
-	if (_label) delete _label;
+LabelDescription::~LabelDescription()
+{
+	if (_label)
+		delete _label;
 }
 
 //--------
 // ostream
 //--------
-void LabelDescription::saveNumericValues(std::string fileName) {
-	//if (_fileName==""){
+void LabelDescription::saveNumericValues(std::string fileName)
+{
+	// if (_fileName==""){
 	std::ofstream fo(fileName.c_str(), ios::out);
 	_label->edit(fo);
 	_fileName = fileName;
@@ -170,23 +177,25 @@ void LabelDescription::saveNumericValues(std::string fileName) {
 	 */
 }
 
-Label* LabelDescription::createLabel() {
-	Label * label = new Label();
+Label *LabelDescription::createLabel()
+{
+	Label *label = new Label();
 
 	int64_t nbQualitativeVariable = 0;
 	int64_t nbIndividualVariable = 0;
 
 	for (int64_t i = 0; i < _nbColumn; i++) {
-		if (typeid (*(_columnDescription[i])) == typeid (QualitativeColumnDescription)) {
+		auto descI = _columnDescription[i];
+		if (typeid(*descI) == typeid(QualitativeColumnDescription)) {
 			nbQualitativeVariable++;
 		}
-		if (typeid (*(_columnDescription[i])) == typeid (QuantitativeColumnDescription)) {
+		if (typeid(*descI) == typeid(QuantitativeColumnDescription)) {
 			THROW(InputException, badLabelDescription);
 		}
-		if (typeid (*(_columnDescription[i])) == typeid (WeightColumnDescription)) {
+		if (typeid(*descI) == typeid(WeightColumnDescription)) {
 			THROW(InputException, tooManyWeightColumnDescription);
 		}
-		if (typeid (*(_columnDescription[i])) == typeid (IndividualColumnDescription)) {
+		if (typeid(*descI) == typeid(IndividualColumnDescription)) {
 			nbIndividualVariable++;
 		}
 	}
@@ -194,7 +203,7 @@ Label* LabelDescription::createLabel() {
 	if (nbQualitativeVariable != 1 || nbIndividualVariable > 1) {
 		THROW(InputException, badLabelDescription);
 	}
-	label-> input(*this);
+	label->input(*this);
 	return label;
 }
 

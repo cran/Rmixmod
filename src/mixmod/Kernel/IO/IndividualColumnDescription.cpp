@@ -6,7 +6,7 @@
 
 /***************************************************************************
     This file is part of MIXMOD
-    
+
     MIXMOD is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -20,36 +20,33 @@
     You should have received a copy of the GNU General Public License
     along with MIXMOD.  If not, see <http://www.gnu.org/licenses/>.
 
-    All informations available on : http://www.mixmod.org                                                                                               
+    All informations available on : http://www.mixmod.org
 ***************************************************************************/
 
 #include "mixmod/Kernel/IO/IndividualColumnDescription.h"
 
-namespace XEM {
+namespace XEM
+{
 
-IndividualColumnDescription::IndividualColumnDescription() : ColumnDescription() {
-}
+IndividualColumnDescription::IndividualColumnDescription() : ColumnDescription() {}
 
-IndividualColumnDescription::IndividualColumnDescription(int64_t index) 
-: ColumnDescription(index) 
+IndividualColumnDescription::IndividualColumnDescription(int64_t index) : ColumnDescription(index)
 {
 	_index = index;
 	_individualDescription.resize(0);
 }
 
-IndividualColumnDescription::~IndividualColumnDescription() {
-}
+IndividualColumnDescription::~IndividualColumnDescription() {}
 
-std::string IndividualColumnDescription::editType() {
-	return "Individual";
-}
+std::string IndividualColumnDescription::editType() { return "Individual"; }
 
-ColumnDescription * IndividualColumnDescription::clone()const {
-	IndividualColumnDescription * ICD = new IndividualColumnDescription();
+ColumnDescription *IndividualColumnDescription::clone() const
+{
+	IndividualColumnDescription *ICD = new IndividualColumnDescription();
 	ICD->_index = _index;
 	ICD->_name = _name;
 
-	//filling of structure which describes individuals
+	// filling of structure which describes individuals
 	ICD->_individualDescription.resize(_individualDescription.size());
 	for (unsigned int i = 0; i < _individualDescription.size(); ++i) {
 		IndividualDescription indDescription;
@@ -60,8 +57,7 @@ ColumnDescription * IndividualColumnDescription::clone()const {
 	return ICD;
 }
 
-void IndividualColumnDescription::setIndividualDescription(
-		IndividualDescription & individualDescription, unsigned int index) 
+void IndividualColumnDescription::setIndividualDescription(IndividualDescription &individualDescription, unsigned int index)
 {
 	if (index < _individualDescription.size()) {
 		_individualDescription[index].name = individualDescription.name;
@@ -69,14 +65,11 @@ void IndividualColumnDescription::setIndividualDescription(
 	}
 }
 
-void IndividualColumnDescription::insertIndividualDescription(
-		IndividualDescription individualDescription, unsigned int index) 
+void IndividualColumnDescription::insertIndividualDescription(IndividualDescription individualDescription, unsigned int index)
 {
 	if (index <= _individualDescription.size()) {
-		_individualDescription.insert(
-				_individualDescription.begin() + index, individualDescription);
-	}
-	else {
+		_individualDescription.insert(_individualDescription.begin() + index, individualDescription);
+	} else {
 		throw;
 	}
 }

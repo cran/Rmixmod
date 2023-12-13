@@ -6,7 +6,7 @@
 
 /***************************************************************************
     This file is part of MIXMOD
-    
+
     MIXMOD is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -20,7 +20,7 @@
     You should have received a copy of the GNU General Public License
     along with MIXMOD.  If not, see <http://www.gnu.org/licenses/>.
 
-    All informations available on : http://www.mixmod.org                                                                                               
+    All informations available on : http://www.mixmod.org
 ***************************************************************************/
 
 #ifndef XEMPROBADESCRIPTION_H
@@ -28,59 +28,56 @@
 
 #include "mixmod/Kernel/IO/Description.h"
 
-namespace XEM {
+namespace XEM
+{
 
 // pre-declaration
 class Model;
 class Proba;
 
-/** 
+/**
  \class XEMProbaDescription
  @author F. Langrognet
-		@date 2011
-		@brief XEMProbaDescription class derived from XEMDescription
+        @date 2011
+        @brief XEMProbaDescription class derived from XEMDescription
  */
-class ProbaDescription : public Description {
+class ProbaDescription : public Description
+{
 
 public:
-	
 	/// Default constructor
 	ProbaDescription();
 
-	///constructor by initilization
-	ProbaDescription(int64_t nbSample, int64_t nbCluster, FormatNumeric::FormatNumericFile format, std::string filename, std::string infoName = "");
+	/// constructor by initilization
+	ProbaDescription(int64_t nbSample, int64_t nbCluster, FormatNumeric::FormatNumericFile format, std::string filename,
+	                 std::string infoName = "");
 
-	///constructor after an estimation->run
-	ProbaDescription(Model * model);
+	/// constructor after an estimation->run
+	ProbaDescription(Model *model);
 
-
-	///constructor by copy
-	ProbaDescription(ProbaDescription & probaDescription);
+	/// constructor by copy
+	ProbaDescription(ProbaDescription &probaDescription);
 
 	/// Destructor
 	virtual ~ProbaDescription();
 
-
 	/// Comparison operator
-	bool operator==(ProbaDescription & probaDescription) const;
+	bool operator==(ProbaDescription &probaDescription) const;
 
-	///operator=    
-	ProbaDescription & operator=(ProbaDescription & probaDescription);
+	/// operator=
+	ProbaDescription &operator=(ProbaDescription &probaDescription);
 
-	Proba * getProba();
+	Proba *getProba();
 
 	void saveNumericValues(std::string fileName = "");
 
-	//void editProba(ostream & f) const;
+	// void editProba(ostream & f) const;
 
 private:
-
-	Proba * _proba;
+	Proba *_proba;
 };
 
-inline Proba * ProbaDescription::getProba() {
-	return _proba;
-}
+inline Proba *ProbaDescription::getProba() { return _proba; }
 
 }
 

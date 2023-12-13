@@ -6,7 +6,7 @@
 
 /***************************************************************************
     This file is part of MIXMOD
-    
+
     MIXMOD is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -20,40 +20,37 @@
     You should have received a copy of the GNU General Public License
     along with MIXMOD.  If not, see <http://www.gnu.org/licenses/>.
 
-    All informations available on : http://www.mixmod.org                                                                                               
+    All informations available on : http://www.mixmod.org
 ***************************************************************************/
 
 #include "mixmod/DiscriminantAnalysis/Predict/PredictStrategy.h"
 #include "mixmod/Kernel/Algo/MAPAlgo.h"
-#include "mixmod/Kernel/Parameter/Parameter.h"
 #include "mixmod/Kernel/Model/Model.h"
+#include "mixmod/Kernel/Parameter/Parameter.h"
 
-namespace XEM {
-
-//-----------
-//Constructor
-//-----------
-PredictStrategy::PredictStrategy(Parameter * classificationRule)
-: _classificationRule(classificationRule) {
-}
+namespace XEM
+{
 
 //-----------
-//Copy constructor
+// Constructor
 //-----------
-PredictStrategy::PredictStrategy(const PredictStrategy & strategy)
-: _classificationRule(strategy.getClassificationRule()) {
-}
+PredictStrategy::PredictStrategy(Parameter *classificationRule) : _classificationRule(classificationRule) {}
+
+//-----------
+// Copy constructor
+//-----------
+PredictStrategy::PredictStrategy(const PredictStrategy &strategy) : _classificationRule(strategy.getClassificationRule()) {}
 
 //----------
-//Destructor
+// Destructor
 //----------
-PredictStrategy::~PredictStrategy() {
-}
+PredictStrategy::~PredictStrategy() {}
 
 //---
-//run
+// run
 //---
-void PredictStrategy::run(Model * model) {
+void PredictStrategy::run(Model *model)
+{
 	// 1rst step of Discriminant analysis
 	// use the initUSER() to add parameter form the Learn Step
 	model->initUSER(_classificationRule);
@@ -63,8 +60,6 @@ void PredictStrategy::run(Model * model) {
 }
 
 // verify method
-bool PredictStrategy::verify() {
-	return true;
-}
+bool PredictStrategy::verify() { return true; }
 
 }

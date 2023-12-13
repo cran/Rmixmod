@@ -6,7 +6,7 @@
 
 /***************************************************************************
     This file is part of MIXMOD
-    
+
     MIXMOD is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -20,7 +20,7 @@
     You should have received a copy of the GNU General Public License
     along with MIXMOD.  If not, see <http://www.gnu.org/licenses/>.
 
-    All informations available on : http://www.mixmod.org                                                                                               
+    All informations available on : http://www.mixmod.org
 ***************************************************************************/
 /** @file XEMOtherException.h
  *  @brief Exception class for Other types of error handling.
@@ -32,26 +32,25 @@
 
 #include "mixmod/Utilities/exceptions/Exception.h"
 
-namespace XEM {
+namespace XEM
+{
 
-class OtherException : public Exception {
+class OtherException : public Exception
+{
 
 public:
+	OtherException(std::string file, int line, OtherError error) throw();
+	OtherException(OtherError) throw();
+	Exception *clone() throw();
+	virtual const char *what() const throw();
+	virtual bool operator==(const Exception &) const throw();
+	virtual void run(std::ostream &flux = std::cout) const throw();
 
-	OtherException(std::string file, int line, OtherError error) throw ();
-	OtherException(OtherError) throw ();
-	Exception * clone() throw ();
-	virtual const char* what() const throw ();
-	virtual bool operator==(const Exception&) const throw ();
-	virtual void run(std::ostream & flux = std::cout) const throw ();
+	virtual ~OtherException() throw() {}
 
-	virtual ~OtherException() throw () {
-	}
-
-
-	static std::map<OtherError, const char*> create_map()
+	static std::map<OtherError, const char *> create_map()
 	{
-		std::map<OtherError, const char*> m;
+		std::map<OtherError, const char *> m;
 
 		m.insert(std::make_pair(badFormat, "Bad Format"));
 		m.insert(std::make_pair(nullPointerError, "Internal error (Null pointer)"));
@@ -67,15 +66,14 @@ public:
 		m.insert(std::make_pair(xmlFeaturesNotAvailable, "XML features are not available"));
 		return m;
 	}
-	static std::map<OtherError, const char*> mapErrorMsg;
-    OtherError getErrorType() const throw();
-    
-protected:
+	static std::map<OtherError, const char *> mapErrorMsg;
+	OtherError getErrorType() const throw();
 
+protected:
 	OtherError _errorType;
 };
 
- inline OtherError OtherException::getErrorType() const throw() {return _errorType;}
+inline OtherError OtherException::getErrorType() const throw() { return _errorType; }
 }
 
 #endif /* XEMOTHEREXCEPTION_H_ */

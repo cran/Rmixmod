@@ -6,7 +6,7 @@
 
 /***************************************************************************
     This file is part of MIXMOD
-    
+
     MIXMOD is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -20,28 +20,29 @@
     You should have received a copy of the GNU General Public License
     along with MIXMOD.  If not, see <http://www.gnu.org/licenses/>.
 
-    All informations available on : http://www.mixmod.org                                                                                               
+    All informations available on : http://www.mixmod.org
 ***************************************************************************/
 #ifndef XEMProba_H
 #define XEMProba_H
 
 /** @brief Base class for Label(s)
-	@author F Langrognet
+    @author F Langrognet
  */
 
-#include <vector>
 #include <iostream>
 #include <stdint.h>
+#include <vector>
 
-namespace XEM {
+namespace XEM
+{
 
 // pre-declaration
 class Model;
 
-class Proba {
+class Proba
+{
 
 public:
-
 	/// Default constructor
 	Proba();
 
@@ -49,38 +50,37 @@ public:
 	Proba(int64_t nbSample, int64_t nbCluster);
 
 	/// Constructor
-	Proba(Model * model);
+	Proba(Model *model);
 
-	Proba(const Proba & iProba);
+	Proba(const Proba &iProba);
 
 	/// Destructor
 	virtual ~Proba();
 
 	/// Comparison operator
-	bool operator ==(const Proba & proba) const;
+	bool operator==(const Proba &proba) const;
 
 	/// editProba
-	void edit(std::ostream & stream);
+	void edit(std::ostream &stream);
 
 	/// getProba
-	double ** getTabProba() const;
+	double **getTabProba() const;
 
 	/// getProba
-	std::vector<std::vector<double> > getProba() const;
+	std::vector<std::vector<double>> getProba() const;
 
 	/// set Proba
-	void setProba(double ** proba, int64_t nbSample, int64_t nbCluster);
-	void setProba(std::vector<std::vector<double> > proba);
+	void setProba(double **proba, int64_t nbSample, int64_t nbCluster);
+	void setProba(std::vector<std::vector<double>> proba);
 
 	/// Selector
 	int64_t getNbSample() const;
 	int64_t getNbCluster() const;
 
-	///input stream
-	void input(std::ifstream & flux);
+	/// input stream
+	void input(std::ifstream &flux);
 
 private:
-
 	/// Number of samples
 	int64_t _nbSample;
 
@@ -88,21 +88,14 @@ private:
 	int64_t _nbCluster;
 
 	/// dim : _nbSample *_nbCluster
-	std::vector<std::vector<double> > _proba;
-
+	std::vector<std::vector<double>> _proba;
 };
 
-inline std::vector<std::vector<double> > Proba::getProba() const {
-	return _proba;
-}
+inline std::vector<std::vector<double>> Proba::getProba() const { return _proba; }
 
-inline int64_t Proba::getNbSample() const {
-	return _nbSample;
-}
+inline int64_t Proba::getNbSample() const { return _nbSample; }
 
-inline int64_t Proba::getNbCluster() const {
-	return _nbCluster;
-}
+inline int64_t Proba::getNbCluster() const { return _nbCluster; }
 
 }
 

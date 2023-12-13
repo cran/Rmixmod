@@ -6,7 +6,7 @@
 
 /***************************************************************************
     This file is part of MIXMOD
-    
+
     MIXMOD is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -20,49 +20,50 @@
     You should have received a copy of the GNU General Public License
     along with MIXMOD.  If not, see <http://www.gnu.org/licenses/>.
 
-    All informations available on : http://www.mixmod.org                                                                                               
+    All informations available on : http://www.mixmod.org
 ***************************************************************************/
 #ifndef XEMCriterionOutput_H
 #define XEMCriterionOutput_H
 
 #include "mixmod/Utilities/Util.h"
 
-namespace XEM {
+namespace XEM
+{
 
 /** @brief Base class for Label(s)
-	@author F Langrognet
+    @author F Langrognet
  */
 
-class CriterionOutput {
+class CriterionOutput
+{
 
 public:
-
 	/// Default constructor
 	CriterionOutput();
 
 	/// Copy constructor
-	CriterionOutput(const CriterionOutput& criterionOutput);
+	CriterionOutput(const CriterionOutput &criterionOutput);
 
 	/// constructor
 	CriterionOutput(CriterionName criterionName);
 
 	/// Constructor
-	CriterionOutput(CriterionName criterionName, double criterionValue, Exception& criterionErrorType);
+	CriterionOutput(CriterionName criterionName, double criterionValue, Exception &criterionErrorType);
 
 	/// Destructor
 	virtual ~CriterionOutput();
 
 	/// Comparison operator
-	bool operator ==(const CriterionOutput & criterionOutput) const;
+	bool operator==(const CriterionOutput &criterionOutput) const;
 
-	///editType
-	void editType(std::ostream & oFile) const;
+	/// editType
+	void editType(std::ostream &oFile) const;
 
-	///editValue
-	void editValue(std::ostream & oFile, bool text = false) const;
+	/// editValue
+	void editValue(std::ostream &oFile, bool text = false) const;
 
 	/// editTypeAndValue
-	void editTypeAndValue(std::ostream & oFile) const;
+	void editTypeAndValue(std::ostream &oFile) const;
 
 	//--------------
 	// get
@@ -74,7 +75,7 @@ public:
 	double getValue() const;
 
 	/// getError
-	Exception & getError() const;
+	Exception &getError() const;
 
 	//--------------
 	// set
@@ -86,42 +87,33 @@ public:
 	void setValue(double value);
 
 	/// setError
-	void setError(Exception& e);
+	void setError(Exception &e);
 
 private:
-	
 	/// Criterion value
 	double _value;
 
 	/// Error type in calculation of criterion value
-	Exception * _error;
+	Exception *_error;
 
 	/// criterion name
 	CriterionName _criterionName;
 };
 
-inline CriterionName CriterionOutput::getCriterionName() const {
-	return _criterionName;
-}
+inline CriterionName CriterionOutput::getCriterionName() const { return _criterionName; }
 
-inline double CriterionOutput::getValue() const {
-	return _value;
-}
+inline double CriterionOutput::getValue() const { return _value; }
 
-inline Exception & CriterionOutput::getError() const {
-	return *_error;
-}
+inline Exception &CriterionOutput::getError() const { return *_error; }
 
-inline void CriterionOutput::setCriterionName(CriterionName criterionName) {
-	_criterionName = criterionName;
-}
+inline void CriterionOutput::setCriterionName(CriterionName criterionName) { _criterionName = criterionName; }
 
-inline void CriterionOutput::setValue(double value) {
-	_value = value;
-}
+inline void CriterionOutput::setValue(double value) { _value = value; }
 
-inline void CriterionOutput::setError(Exception& e) {
-	if (_error) delete _error;
+inline void CriterionOutput::setError(Exception &e)
+{
+	if (_error)
+		delete _error;
 	_error = e.clone();
 }
 

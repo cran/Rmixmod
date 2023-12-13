@@ -6,7 +6,7 @@
 
 /***************************************************************************
     This file is part of MIXMOD
-    
+
     MIXMOD is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -20,56 +20,57 @@
     You should have received a copy of the GNU General Public License
     along with MIXMOD.  If not, see <http://www.gnu.org/licenses/>.
 
-    All informations available on : http://www.mixmod.org                                                                                               
+    All informations available on : http://www.mixmod.org
 ***************************************************************************/
 #ifndef XEMPREDICTINPUT_H
 #define XEMPREDICTINPUT_H
 
 #include "mixmod/Kernel/IO/Input.h"
 
-namespace XEM {
+namespace XEM
+{
 
 // pre-declaration
 class PredictStrategy;
 class Parameter;
 class ParameterDescription;
 
-/** 
+/**
  \class XEMPredictInput
  Main class for Predict Input (2nd step of discriminant analysis)
  @author F. Langrognet - R Lebret
-		@date 2012
-		@brief XEMPredictInput class derived from XEMInput
+        @date 2012
+        @brief XEMPredictInput class derived from XEMInput
  */
-class PredictInput : public Input {
+class PredictInput : public Input
+{
 
 public:
-
 	/// Default Constructor
 	PredictInput();
 
 	/// Copy Constructor
-	PredictInput(const PredictInput & CInput);
+	PredictInput(const PredictInput &CInput);
 
 	/// Initialisation constructor
-	PredictInput(DataDescription * predictData, ParameterDescription * classificationRule);
+	PredictInput(DataDescription *predictData, ParameterDescription *classificationRule);
 
 	/// Destructor
 	virtual ~PredictInput();
 
 	// accessor
-	Parameter * getClassificationRule() const;
+	Parameter *getClassificationRule() const;
 
 	/// setCriterionName
-	virtual void setCriterion(std::vector<CriterionName> const & criterionName);
+	virtual void setCriterion(std::vector<CriterionName> const &criterionName);
 
 	/// setCriterion
 	virtual void setCriterion(const CriterionName criterionName, unsigned int index);
 
-	///insertCriterion
+	/// insertCriterion
 	virtual void insertCriterion(const CriterionName criterionName, unsigned int index);
 
-	///addCriterion
+	/// addCriterion
 	virtual void addCriterion(const CriterionName criterionName);
 
 	/// getCriterion
@@ -79,29 +80,27 @@ public:
 	virtual void removeCriterion(unsigned int index);
 
 	// set model type
-	virtual void setModelType(const ModelType * modelType, unsigned int index);
+	virtual void setModelType(const ModelType *modelType, unsigned int index);
 
 	// insert model type
-	virtual void insertModelType(const ModelType * modelType, unsigned int index);
+	virtual void insertModelType(const ModelType *modelType, unsigned int index);
 
 	// remove model type
 	virtual void removeModelType(unsigned int index);
 
 	// add model type
-	virtual void addModel(ModelName const modelName );
+	virtual void addModel(ModelName const modelName);
 
 protected:
-	
 	/// pointer to a classification rule
-	Parameter * _classificationRule;
+	Parameter *_classificationRule = nullptr;
+	ParameterDescription * _parameterDescription = nullptr;
 	/// verif
 	virtual bool verif();
 };
 
 // accessor
-inline Parameter * PredictInput::getClassificationRule() const {
-	return _classificationRule;
-}
+inline Parameter *PredictInput::getClassificationRule() const { return _classificationRule; }
 
 }
 

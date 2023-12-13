@@ -6,7 +6,7 @@
 
 /***************************************************************************
     This file is part of MIXMOD
-    
+
     MIXMOD is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -20,11 +20,10 @@
     You should have received a copy of the GNU General Public License
     along with MIXMOD.  If not, see <http://www.gnu.org/licenses/>.
 
-    All informations available on : http://www.mixmod.org                                                                                               
+    All informations available on : http://www.mixmod.org
 ***************************************************************************/
 // Route to interface from any mathematical library to our code.
 // Only the following include would change if we try another library.
-
 
 #ifndef XEMmathLib
 #define XEMmathLib 1 // default is Eigen
@@ -47,16 +46,12 @@
 
 #endif
 
-
 /*
 enum Storage_type {
 
-	row = 0,         // stored by row
-	column = 1,      // stored by colmun
+    row = 0,         // stored by row
+    column = 1,      // stored by colmun
 };*/
-
-
-
 
 // Current setting: NEWMAT [seg fault with Eigen, TOFIX]
 //#include "mixmod/Utilities/maths/NEWMAT.h"

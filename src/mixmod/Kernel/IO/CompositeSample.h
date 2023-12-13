@@ -6,7 +6,7 @@
 
 /***************************************************************************
     This file is part of MIXMOD
-    
+
     MIXMOD is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -20,7 +20,7 @@
     You should have received a copy of the GNU General Public License
     along with MIXMOD.  If not, see <http://www.gnu.org/licenses/>.
 
-    All informations available on : http://www.mixmod.org                                                                                               
+    All informations available on : http://www.mixmod.org
 ***************************************************************************/
 #ifndef XEMCOMPOSITESAMPLE_H_
 #define XEMCOMPOSITESAMPLE_H_
@@ -30,47 +30,39 @@
  */
 #include "mixmod/Kernel/IO/Sample.h"
 
-namespace XEM {
+namespace XEM
+{
 
 class BinarySample;
 class GaussianSample;
 
-class CompositeSample : public Sample {
+class CompositeSample : public Sample
+{
 
 public:
-	
-	//Default constructor
+	// Default constructor
 	CompositeSample();
-	//Initialization constructor
-	CompositeSample(Sample*, Sample*);
+	// Initialization constructor
+	CompositeSample(Sample *, Sample *);
 	/**type-cast overloading for Binary sample*/
-	operator BinarySample*();
+	operator BinarySample *();
 	/**type-cast overloading for Gaussian sample*/
-	operator GaussianSample*();
+	operator GaussianSample *();
 
 	/** get gaussian sample*/
-	virtual GaussianSample* getGaussianSample() const {
-		return (GaussianSample*) _sampleComponent[1];
-	}
+	virtual GaussianSample *getGaussianSample() const { return (GaussianSample *)_sampleComponent[1]; }
 
 	/** get Binary sample*/
-	virtual BinarySample* getBinarySample() const {
-		return (BinarySample*) _sampleComponent[0];
-	}
+	virtual BinarySample *getBinarySample() const { return (BinarySample *)_sampleComponent[0]; }
 	virtual ~CompositeSample();
-	
+
 protected:
-	
-	vector<Sample*> _sampleComponent;
+	vector<Sample *> _sampleComponent;
 };
 
-inline CompositeSample::operator BinarySample *() {
-	return _sampleComponent[0]->getBinarySample();
-}
+inline CompositeSample::operator BinarySample *() { return _sampleComponent[0]->getBinarySample(); }
 
-inline CompositeSample::operator GaussianSample *() {
-	return _sampleComponent[1]->getGaussianSample();
-}
+inline CompositeSample::operator GaussianSample *() { return _sampleComponent[1]->getGaussianSample(); }
 
 }
 

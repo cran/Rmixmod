@@ -6,7 +6,7 @@
 
 /***************************************************************************
     This file is part of MIXMOD
-    
+
     MIXMOD is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -20,33 +20,34 @@
     You should have received a copy of the GNU General Public License
     along with MIXMOD.  If not, see <http://www.gnu.org/licenses/>.
 
-    All informations available on : http://www.mixmod.org                                                                                               
+    All informations available on : http://www.mixmod.org
 ***************************************************************************/
 #ifndef XEMSample_H
 #define XEMSample_H
 
-#include <stdint.h>
 #include "mixmod/Utilities/Util.h"
+#include <stdint.h>
 
-namespace XEM {
+namespace XEM
+{
 
 class GaussianSample;
 class BinarySample;
 
 /**
   @brief Base class for Sample
-  @author F Langrognet 
+  @author F Langrognet
  */
 
-class Sample {
+class Sample
+{
 
 public:
-
 	/// Constructor
 	Sample();
 
 	/// Constructor
-	Sample(Sample * iSample);
+	Sample(Sample *iSample);
 
 	/// Constructor
 	Sample(int64_t pbDimension);
@@ -54,26 +55,19 @@ public:
 	/// Destructor
 	virtual ~Sample();
 
-	virtual GaussianSample* getGaussianSample() const {
-		return (GaussianSample*)this;
-	}
+	virtual GaussianSample *getGaussianSample() const { return (GaussianSample *)this; }
 
-	virtual BinarySample* getBinarySample() const {
-		return (BinarySample*)this;
-	}
-	
+	virtual BinarySample *getBinarySample() const { return (BinarySample *)this; }
+
 	/// Selector
 	int64_t getPbDimension();
 
 protected:
-
 	/// Problem dimension
 	int64_t _pbDimension;
 };
 
-inline int64_t Sample::getPbDimension() {
-	return _pbDimension;
-}
+inline int64_t Sample::getPbDimension() { return _pbDimension; }
 
 }
 

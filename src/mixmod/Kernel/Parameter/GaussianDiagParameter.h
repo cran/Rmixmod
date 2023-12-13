@@ -6,7 +6,7 @@
 
 /***************************************************************************
     This file is part of MIXMOD
-    
+
     MIXMOD is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -20,14 +20,15 @@
     You should have received a copy of the GNU General Public License
     along with MIXMOD.  If not, see <http://www.gnu.org/licenses/>.
 
-    All informations available on : http://www.mixmod.org                                                                                               
+    All informations available on : http://www.mixmod.org
 ***************************************************************************/
 #ifndef XEMGaussianDiagParameter_H
 #define XEMGaussianDiagParameter_H
 
 #include "mixmod/Kernel/Parameter/GaussianEDDAParameter.h"
 
-namespace XEM {
+namespace XEM
+{
 
 // pre-declaration
 class DiagMatrix;
@@ -37,19 +38,19 @@ class DiagMatrix;
   @author F Langrognet
  */
 
-class GaussianDiagParameter : public GaussianEDDAParameter {
+class GaussianDiagParameter : public GaussianEDDAParameter
+{
 
 public:
-
 	/// Default constructor
 	GaussianDiagParameter();
 
 	/// Constructor
 	// called by XEMModel
-	GaussianDiagParameter(Model * iModel, ModelType * iModelType);
-    GaussianDiagParameter(int64_t iNbCluster, int64_t iPbDimension, ModelType * iModelType);
+	GaussianDiagParameter(Model *iModel, ModelType *iModelType);
+	GaussianDiagParameter(int64_t iNbCluster, int64_t iPbDimension, ModelType *iModelType);
 	/// Constructor (copy)
-	GaussianDiagParameter(const GaussianDiagParameter * iParameter);
+	GaussianDiagParameter(const GaussianDiagParameter *iParameter);
 
 	/// Destructor
 	virtual ~GaussianDiagParameter();
@@ -58,46 +59,40 @@ public:
 	virtual void reset();
 
 	/** @brief Selector
-		@return A copy of the model
+	    @return A copy of the model
 	 */
-	Parameter * clone() const;
+	Parameter *clone() const;
 
 	/// initialisation USER
-	void initUSER(Parameter * iParam);
+	void initUSER(Parameter *iParam);
 
 	/// Compute table of sigmas of the samples of each cluster
 	// NB : compute also lambda, shpae, orientation, wk, w
 	void computeTabSigma();
 
-
 	//     SELECTORS
 	// ------ / -------- //
 
-	double * getTabLambda() const;
+	double *getTabLambda() const;
 
-	//double ** getTabShape();
-	DiagMatrix** getTabShape() const;
+	// double ** getTabShape();
+	DiagMatrix **getTabShape() const;
 
 	double getLogLikelihoodOne() const;
 
 	int64_t getFreeParameter() const;
 
 protected:
-	
 	/// Table of volume of each cluster
-	double * _tabLambda; // Volume
+	double *_tabLambda; // Volume
 
-	//double ** _tabShape;  
-	DiagMatrix** _tabShape;
+	// double ** _tabShape;
+	DiagMatrix **_tabShape;
 };
 
-inline double * GaussianDiagParameter::getTabLambda() const {
-	return _tabLambda;
-}
+inline double *GaussianDiagParameter::getTabLambda() const { return _tabLambda; }
 
-inline DiagMatrix** GaussianDiagParameter::getTabShape() const {
-	return _tabShape;
-}
+inline DiagMatrix **GaussianDiagParameter::getTabShape() const { return _tabShape; }
 
 }
 

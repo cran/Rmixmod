@@ -6,7 +6,7 @@
 
 /***************************************************************************
     This file is part of MIXMOD
-    
+
     MIXMOD is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -20,7 +20,7 @@
     You should have received a copy of the GNU General Public License
     along with MIXMOD.  If not, see <http://www.gnu.org/licenses/>.
 
-    All informations available on : http://www.mixmod.org                                                                                               
+    All informations available on : http://www.mixmod.org
 ***************************************************************************/
 
 #ifndef XEM_DOMDAPROJECT_H
@@ -28,23 +28,24 @@
 
 #include "mixmod_iostream/DomProject.h"
 
-namespace XEM {
+namespace XEM
+{
 
-///use to create .mixmod file in DA case
-class DomDAProject : public DomProject {
+/// use to create .mixmod file in DA case
+class DomDAProject : public DomProject
+{
 
-public : 
-    
-	///constructor by default
+public:
+	/// constructor by default
 	DomDAProject();
 
-	///destructor
+	/// destructor
 	virtual ~DomDAProject();
 
-	///constructor
-	DomDAProject(string & s /*,XEMInput * input, XEMOutput * output*/);
+	/// constructor
+	DomDAProject(string &s /*,XEMInput * input, XEMOutput * output*/);
 };
 
-} //end namespace
+} // end namespace
 
 #endif // XEM_DOMDAPROJECT_H

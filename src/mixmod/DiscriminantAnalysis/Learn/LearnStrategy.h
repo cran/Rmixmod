@@ -6,7 +6,7 @@
 
 /***************************************************************************
     This file is part of MIXMOD
-    
+
     MIXMOD is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -20,42 +20,42 @@
     You should have received a copy of the GNU General Public License
     along with MIXMOD.  If not, see <http://www.gnu.org/licenses/>.
 
-    All informations available on : http://www.mixmod.org                                                                                               
+    All informations available on : http://www.mixmod.org
 ***************************************************************************/
 #ifndef XEMLearnStrategy_H
 #define XEMLearnStrategy_H
 
-namespace XEM {
+namespace XEM
+{
 
 // pre-declaration
 class Model;
 
-/** 
+/**
  \class XEMLearnStrategy
  Main class for Learn Strategy (1rst step of discriminant analysis)
  @author F. Langrognet - R Lebret
-		@date 2012
-		@brief XEMLearnStrategy class
+        @date 2012
+        @brief XEMLearnStrategy class
  */
-class  LearnStrategy {
+class LearnStrategy
+{
 
 public:
-
 	/// Default constructor
 	LearnStrategy();
 
 	/// Constructor
-	LearnStrategy(const LearnStrategy & strategy);
+	LearnStrategy(const LearnStrategy &strategy);
 
 	/// Destructor
 	~LearnStrategy();
 
 	/// Run method
-	void run(Model * model);
+	void run(Model *model);
 
 	// verify method
 	bool verify();
-
 };
 
 }

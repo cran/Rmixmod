@@ -6,7 +6,7 @@
 
 /***************************************************************************
     This file is part of MIXMOD
-    
+
     MIXMOD is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -20,32 +20,33 @@
     You should have received a copy of the GNU General Public License
     along with MIXMOD.  If not, see <http://www.gnu.org/licenses/>.
 
-    All informations available on : http://www.mixmod.org                                                                                               
+    All informations available on : http://www.mixmod.org
 ***************************************************************************/
 #ifndef XEMBICCRITERION_H
 #define XEMBICCRITERION_H
 
 #include "mixmod/Kernel/Criterion/Criterion.h"
 
-namespace XEM {
+namespace XEM
+{
 
 /**
   @brief Derived class of XEMCriterion for BIC Criterion
-  @author F Langrognet 
+  @author F Langrognet
  */
 
-class BICCriterion : public Criterion {
+class BICCriterion : public Criterion
+{
 
 public:
-
 	/// Default Constructor
-	BICCriterion(Model * model);
+	BICCriterion(Model *model);
 
 	/// Destructor
 	virtual ~BICCriterion();
 
 	/// Run method
-	virtual void run(CriterionOutput & output);
+	virtual void run(CriterionOutput &output);
 };
 
 }

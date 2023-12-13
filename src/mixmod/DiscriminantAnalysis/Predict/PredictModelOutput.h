@@ -6,7 +6,7 @@
 
 /***************************************************************************
     This file is part of MIXMOD
-    
+
     MIXMOD is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -20,45 +20,45 @@
     You should have received a copy of the GNU General Public License
     along with MIXMOD.  If not, see <http://www.gnu.org/licenses/>.
 
-    All informations available on : http://www.mixmod.org                                                                                               
+    All informations available on : http://www.mixmod.org
 ***************************************************************************/
 #ifndef XEMPREDICTMODELOUTPUT_H
 #define XEMPREDICTMODELOUTPUT_H
 
 #include "mixmod/Kernel/IO/ModelOutput.h"
 
-namespace XEM {
+namespace XEM
+{
 
 // pre-declaration
 class Model;
 
-/** 
+/**
  \class XEMPredictModelOutput
  @author F. Langrognet - R Lebret
-		@date 2012
-		@brief XEMPredictModelOutput class derived from XEMModelOutput
+        @date 2012
+        @brief XEMPredictModelOutput class derived from XEMModelOutput
  */
-class PredictModelOutput : public ModelOutput {
+class PredictModelOutput : public ModelOutput
+{
 
 public:
-
 	/// Default Constructor
 	PredictModelOutput();
 
 	/// Initialization Constructor 1
-	PredictModelOutput(Model * estimation);
+	PredictModelOutput(Model *estimation);
 
 	/// Initialization Constructor 2
-	PredictModelOutput(ModelType & modelType, int64_t nbCluster, 
-			std::vector<CriterionOutput*> & criterionOutput, double likelihood, 
-			ParameterDescription & parameterDescription, LabelDescription & labelDescription,
-			ProbaDescription & probaDescription);
+	PredictModelOutput(ModelType &modelType, int64_t nbCluster, std::vector<CriterionOutput *> &criterionOutput,
+	                   double likelihood, ParameterDescription &parameterDescription, LabelDescription &labelDescription,
+	                   ProbaDescription &probaDescription);
 
 	/// Initialization Constructor 3
-	PredictModelOutput(ModelType & modelType, int64_t nbCluster, Exception& error);
+	PredictModelOutput(ModelType &modelType, int64_t nbCluster, Exception &error);
 
 	/// Copy Constructor
-	PredictModelOutput(const PredictModelOutput & cModelOutput);
+	PredictModelOutput(const PredictModelOutput &cModelOutput) = delete;
 
 	/// Destructor
 	virtual ~PredictModelOutput();

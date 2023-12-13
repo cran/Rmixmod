@@ -6,7 +6,7 @@
 
 /***************************************************************************
     This file is part of MIXMOD
-    
+
     MIXMOD is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -20,38 +20,37 @@
     You should have received a copy of the GNU General Public License
     along with MIXMOD.  If not, see <http://www.gnu.org/licenses/>.
 
-    All informations available on : http://www.mixmod.org                                                                                               
+    All informations available on : http://www.mixmod.org
 ***************************************************************************/
 
 #include "mixmod/DiscriminantAnalysis/Learn/LearnStrategy.h"
-#include "mixmod/Kernel/Algo/MAlgo.h"
 #include "mixmod/Kernel/Algo/MAPAlgo.h"
+#include "mixmod/Kernel/Algo/MAlgo.h"
 #include "mixmod/Kernel/Model/Model.h"
 
-namespace XEM {
+namespace XEM
+{
 
 //-----------
-//Constructor
+// Constructor
 //-----------
-LearnStrategy::LearnStrategy() {
-}
+LearnStrategy::LearnStrategy() {}
 
 //-----------
-//Copy constructor
+// Copy constructor
 //-----------
-LearnStrategy::LearnStrategy(const LearnStrategy & strategy) {
-}
+LearnStrategy::LearnStrategy(const LearnStrategy &strategy) {}
 
 //----------
-//Destructor
+// Destructor
 //----------
-LearnStrategy::~LearnStrategy() {
-}
+LearnStrategy::~LearnStrategy() {}
 
 //---
-//run
+// run
 //---
-void LearnStrategy::run(Model * model) {
+void LearnStrategy::run(Model *model)
+{
 	// 1rst step of Discriminant analysis : USER_PARTITION with complete partition and M algorithm : only M step is done
 	MAlgo MAlgo;
 	MAlgo.run(model);
@@ -61,8 +60,6 @@ void LearnStrategy::run(Model * model) {
 }
 
 // verify method
-bool LearnStrategy::verify() {
-	return true;
-}
+bool LearnStrategy::verify() { return true; }
 
 }

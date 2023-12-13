@@ -6,7 +6,7 @@
 
 /***************************************************************************
     This file is part of MIXMOD
-    
+
     MIXMOD is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -20,18 +20,19 @@
     You should have received a copy of the GNU General Public License
     along with MIXMOD.  If not, see <http://www.gnu.org/licenses/>.
 
-    All informations available on : http://www.mixmod.org                                                                                               
+    All informations available on : http://www.mixmod.org
 ***************************************************************************/
 #include "mixmod/Kernel/Parameter/BinaryParameter.h"
-#include "mixmod/Kernel/Parameter/BinaryEkjhParameter.h"
 #include "mixmod/Kernel/IO/BinaryData.h"
 #include "mixmod/Kernel/IO/BinarySample.h"
+#include "mixmod/Kernel/IO/Partition.h"
 #include "mixmod/Kernel/Model/Model.h"
 #include "mixmod/Kernel/Model/ModelType.h"
-#include "mixmod/Kernel/IO/Partition.h"
+#include "mixmod/Kernel/Parameter/BinaryEkjhParameter.h"
 #include "mixmod/Utilities/Random.h"
 
-namespace XEM {
+namespace XEM
+{
 
 //////////////////////////////////
 //                              //
@@ -43,15 +44,12 @@ namespace XEM {
 // Constructor
 //------------
 // Default constructor
-BinaryParameter::BinaryParameter() : Parameter() {
-	THROW(OtherException, wrongConstructorType);
-}
+BinaryParameter::BinaryParameter() : Parameter() { THROW(OtherException, wrongConstructorType); }
 
 //------------
 // Constructor
 //------------
-BinaryParameter::BinaryParameter(Model * iModel, ModelType * iModelType, int64_t * tabNbModality) 
-: Parameter(iModel, iModelType) 
+BinaryParameter::BinaryParameter(Model *iModel, ModelType *iModelType, int64_t *tabNbModality) : Parameter(iModel, iModelType)
 {
 	int64_t j, k;
 
@@ -66,8 +64,8 @@ BinaryParameter::BinaryParameter(Model * iModel, ModelType * iModelType, int64_t
 		_totalNbModality += _tabNbModality[j];
 	}
 
-	// Centers 
-	_tabCenter = new int64_t*[_nbCluster];
+	// Centers
+	_tabCenter = new int64_t *[_nbCluster];
 	for (k = 0; k < _nbCluster; k++) {
 		_tabCenter[k] = new int64_t[_pbDimension];
 		for (j = 0; j < _pbDimension; j++) {
@@ -77,8 +75,7 @@ BinaryParameter::BinaryParameter(Model * iModel, ModelType * iModelType, int64_t
 
 	if (hasFreeProportion(iModelType->_nameModel)) {
 		_freeProportion = true;
-	}
-	else {
+	} else {
 		_freeProportion = false;
 	}
 }
@@ -86,9 +83,8 @@ BinaryParameter::BinaryParameter(Model * iModel, ModelType * iModelType, int64_t
 //------------
 // Constructor (if USER initialisation)
 //------------
-BinaryParameter::BinaryParameter(int64_t iNbCluster, int64_t iPbDimension, 
-		ModelType * iModelType, int64_t * tabNbModality) 
-: Parameter(iNbCluster, iPbDimension, iModelType) 
+BinaryParameter::BinaryParameter(int64_t iNbCluster, int64_t iPbDimension, ModelType *iModelType, int64_t *tabNbModality)
+    : Parameter(iNbCluster, iPbDimension, iModelType)
 {
 	int64_t j, k;
 
@@ -102,7 +98,7 @@ BinaryParameter::BinaryParameter(int64_t iNbCluster, int64_t iPbDimension,
 	}
 
 	// Centers
-	_tabCenter = new int64_t*[_nbCluster];
+	_tabCenter = new int64_t *[_nbCluster];
 	for (k = 0; k < _nbCluster; k++) {
 		_tabCenter[k] = new int64_t[_pbDimension];
 		for (j = 0; j < _pbDimension; j++) {
@@ -112,8 +108,7 @@ BinaryParameter::BinaryParameter(int64_t iNbCluster, int64_t iPbDimension,
 
 	if (hasFreeProportion(iModelType->_nameModel)) {
 		_freeProportion = true;
-	}
-	else {
+	} else {
 		_freeProportion = false;
 	}
 }
@@ -122,7 +117,8 @@ BinaryParameter::BinaryParameter(int64_t iNbCluster, int64_t iPbDimension,
 // Constructor
 //------------
 // copy constructor
-BinaryParameter::BinaryParameter(const BinaryParameter * iParameter) : Parameter(iParameter) {
+BinaryParameter::BinaryParameter(const BinaryParameter *iParameter) : Parameter(iParameter)
+{
 
 	// tab modality //
 	_tabNbModality = copyTab(iParameter->getTabNbModality(), _pbDimension);
@@ -137,7 +133,8 @@ BinaryParameter::BinaryParameter(const BinaryParameter * iParameter) : Parameter
 //-----------
 // Destructor
 //-----------
-BinaryParameter::~BinaryParameter() {
+BinaryParameter::~BinaryParameter()
+{
 	int64_t k;
 
 	if (_tabCenter) {
@@ -158,16 +155,21 @@ BinaryParameter::~BinaryParameter() {
 //---------------------
 /// Comparison operator
 //---------------------
-bool BinaryParameter::operator ==(const BinaryParameter & param) const {
-	if (!Parameter::operator==(param)) return false;
-	if (_totalNbModality != param.getTotalNbModality()) return false;
+bool BinaryParameter::operator==(const BinaryParameter &param) const
+{
+	if (!Parameter::operator==(param))
+		return false;
+	if (_totalNbModality != param.getTotalNbModality())
+		return false;
 	for (int64_t k = 0; k < _nbCluster; k++) {
 		for (int64_t j = 0; j < _pbDimension; j++) {
-			if (_tabCenter[k][j] != param.getTabCenter()[k][j]) return false;
+			if (_tabCenter[k][j] != param.getTabCenter()[k][j])
+				return false;
 		}
 	}
 	for (int64_t j = 0; j < _pbDimension; j++) {
-		if (_tabNbModality[j] != param.getTabNbModality()[j]) return false;
+		if (_tabNbModality[j] != param.getTabNbModality()[j])
+			return false;
 	}
 	return true;
 }
@@ -175,7 +177,8 @@ bool BinaryParameter::operator ==(const BinaryParameter & param) const {
 //-------------------------
 // reset to default values
 //------------------------
-void BinaryParameter::reset() {
+void BinaryParameter::reset()
+{
 	int64_t k, j;
 	for (k = 0; k < _nbCluster; k++) {
 		for (j = 0; j < _pbDimension; j++) {
@@ -188,19 +191,19 @@ void BinaryParameter::reset() {
 //------------------------------------------------------
 // getTabCenterIfOneCluster
 //------------------------------------------------------
-// Compute Center for One cluster 
+// Compute Center for One cluster
 // _tabCenter will not be changed
-void BinaryParameter::getTabCenterIfOneCluster(int64_t * tabCenter, 
-		double * tabNbSampleInMajorModality, double ** tabNbSamplePerModality) const 
+void BinaryParameter::getTabCenterIfOneCluster(int64_t *tabCenter, double *tabNbSampleInMajorModality,
+                                               double **tabNbSamplePerModality) const
 {
 	int64_t i;
 	int64_t j, h;
 	double max, nbSamplePerModality;
 	int64_t nbSample = _model->getNbSample();
 
-	Data * data = _model->getData();
-	Sample ** dataMatrix = data->_matrix;
-	BinarySample * curSample;
+	Data *data = _model->getData();
+	Sample **dataMatrix = data->_matrix;
+	BinarySample *curSample;
 
 	for (j = 0; j < _pbDimension; j++) {
 		max = 0.0;
@@ -229,7 +232,8 @@ void BinaryParameter::getTabCenterIfOneCluster(int64_t * tabCenter,
 //      compute method          //
 //                              //
 //////////////////////////////////
-void BinaryParameter::getAllPdf(double** tabFik, double* tabProportion) const {
+void BinaryParameter::getAllPdf(double **tabFik, double *tabProportion) const
+{
 	int64_t nbSample = _model->getNbSample();
 	int64_t i;
 	int64_t k;
@@ -246,24 +250,25 @@ void BinaryParameter::getAllPdf(double** tabFik, double* tabProportion) const {
 // -model->_tabSumF[i] pour ith sample = 0
 // i : 0 ->_nbSample-1
 //-----------------------------------------
-void BinaryParameter::computeTikUnderflow(int64_t i, double ** tabTik) {
+void BinaryParameter::computeTikUnderflow(int64_t i, double **tabTik)
+{
 	THROW(NumericException, sumFiNullInMultinomialCase);
 	/*
 	long double * lnFk      = new long double[_nbCluster];
 	long double * lnFkPrim  = new long double[_nbCluster];
 	long double * fkPrim    = new long double[_nbCluster];
-	double *  tabTik_i = tabTik[i];  
+	double *  tabTik_i = tabTik[i];
 	int64_t k,k0;
 	long double lnFkMax, fkTPrim;
-    
+
 	for (k=0; k<_nbCluster; k++){
 	  lnFk[k]       =  getLogPdf(i,k);
-	} 
+	}
 
 	lnFkMax = lnFk[0];
 	for (k=1; k<_nbCluster; k++){
 	  if (lnFk[k] > lnFkMax){
-		lnFkMax = lnFk[k];
+	    lnFkMax = lnFk[k];
 	  }
 	}
 
@@ -284,10 +289,10 @@ void BinaryParameter::computeTikUnderflow(int64_t i, double ** tabTik) {
 	}
 	else{
 	  for (k=0; k<_nbCluster; k++){
-		tabTik_i[k] = fkPrim[k] / fkTPrim;
+	    tabTik_i[k] = fkPrim[k] / fkTPrim;
 	  }
 	}
-  
+
 	delete [] lnFk;
 	delete [] lnFkPrim;
 	delete [] fkPrim;*/
@@ -299,41 +304,40 @@ void BinaryParameter::computeTikUnderflow(int64_t i, double ** tabTik) {
 // -  nbInitializedCluster
 // - tabInitializedCluster (array of size _nbCluster)
 //-----------------------------------------------------
-void BinaryParameter::computeTabCenterInitUSER_PARTITION(int64_t & nbInitializedCluster, 
-		bool * tabInitializedCluster, Partition * initPartition) 
+void BinaryParameter::computeTabCenterInitUSER_PARTITION(int64_t &nbInitializedCluster, bool *tabInitializedCluster,
+                                                         Partition *initPartition)
 {
 	int64_t j, k, h;
 	int64_t i;
 	double argMax, bestArgMax;
 
-	double ** tabTik = _model->getTabTik();
-	int64_t ** initPartitionValue = initPartition->_tabValue;
-	BinaryData * data = _model->getBinaryData();
-	Sample ** dataMatrix = data->getDataMatrix();
-	BinarySample * curSample;
-	int64_t * tabNbModality = data->getTabNbModality();
+	double **tabTik = _model->getTabTik();
+	int64_t **initPartitionValue = initPartition->getTabValue();
+	BinaryData *data = _model->getBinaryData();
+	Sample **dataMatrix = data->getDataMatrix();
+	BinarySample *curSample;
+	int64_t *tabNbModality = data->getTabNbModality();
 	int64_t nbSample = _model->getNbSample();
 
 	for (k = 0; k < _nbCluster; k++) {
-		//cout<<"k = "<<k<<endl;
+		// cout<<"k = "<<k<<endl;
 		for (j = 0; j < _pbDimension; j++) {
-			//cout<<"j = "<<j<<endl;
+			// cout<<"j = "<<j<<endl;
 			bestArgMax = 0.0;
 			_tabCenter[k][j] = 0;
 			for (h = 1; h <= tabNbModality[j]; h++) {
-				//cout<<"h = "<<h<<endl;
+				// cout<<"h = "<<h<<endl;
 				argMax = 0.0;
 				for (i = 0; i < nbSample; i++) {
 					curSample = dataMatrix[i]->getBinarySample();
 					if (curSample->getDataValue(j) == h) {
 						if (initPartitionValue[i][k] == 1) {
 							argMax += data->_weight[i];
-						}
-						else {
+						} else {
 							argMax += tabTik[i][k] * data->_weight[i];
 						}
 					}
-					//cout<<"argMax = "<<argMax<<endl;
+					// cout<<"argMax = "<<argMax<<endl;
 				} // end for i
 
 				if (argMax > bestArgMax) {
@@ -341,9 +345,9 @@ void BinaryParameter::computeTabCenterInitUSER_PARTITION(int64_t & nbInitialized
 					_tabCenter[k][j] = h;
 				}
 			} // end for h
-			//cout<<"bestArgMax = "<<bestArgMax<<endl;
-		} // end for j
-	} // end for k
+			  // cout<<"bestArgMax = "<<bestArgMax<<endl;
+		}     // end for j
+	}         // end for k
 
 	nbInitializedCluster = _nbCluster;
 	for (k = 0; k < _nbCluster; k++) {
@@ -351,18 +355,19 @@ void BinaryParameter::computeTabCenterInitUSER_PARTITION(int64_t & nbInitialized
 	}
 }
 
-void BinaryParameter::computeTabCenter() {
+void BinaryParameter::computeTabCenter()
+{
 	int64_t j, k, h;
 	int64_t i;
 	double argMax, bestArgMax;
 
-	double * tabNk = _model->getTabNk();
-	double ** tabCik = _model->getTabCik();
+	double *tabNk = _model->getTabNk();
+	double **tabCik = _model->getTabCik();
 
-	BinaryData * data = _model->getBinaryData();
-	Sample ** dataMatrix = data->getDataMatrix();
-	BinarySample * curSample;
-	int64_t * tabNbModality = data->getTabNbModality();
+	BinaryData *data = _model->getBinaryData();
+	Sample **dataMatrix = data->getDataMatrix();
+	BinarySample *curSample;
+	int64_t *tabNbModality = data->getTabNbModality();
 	int64_t nbSample = _model->getNbSample();
 
 	for (k = 0; k < _nbCluster; k++) {
@@ -388,18 +393,17 @@ void BinaryParameter::computeTabCenter() {
 			} // end for h
 
 		} // end for j
-	} // end for k
+	}     // end for k
 }
 
 //-----------------------------
 // updateForOneRunOfInitRANDOM
 //-----------------------------
-void BinaryParameter::updateForInitRANDOMorUSER_PARTITION(
-		Sample ** tabSampleForInit, bool * tabClusterToInitialize) 
+void BinaryParameter::updateForInitRANDOMorUSER_PARTITION(Sample **tabSampleForInit, bool *tabClusterToInitialize)
 {
 	// set _tabCenter value
-	int64_t * sampleValue = NULL;
-	Sample * curSample = NULL;
+	int64_t *sampleValue = NULL;
+	Sample *curSample = NULL;
 	for (int64_t k = 0; k < _nbCluster; k++) {
 		if (tabClusterToInitialize[k]) {
 			curSample = tabSampleForInit[k];
@@ -412,7 +416,6 @@ void BinaryParameter::updateForInitRANDOMorUSER_PARTITION(
 	computeRandomScatter(); // virtual
 }
 
-
 //////////////////////////////////
 //                              //
 //    initialization method     //
@@ -422,18 +425,18 @@ void BinaryParameter::updateForInitRANDOMorUSER_PARTITION(
 //----------
 // init USER
 //----------
-// note : iParam est de type XEMBinaryEkjhParameter (et proportion libre) 
-void BinaryParameter::initUSER(Parameter * iParam) {
+// note : iParam est de type XEMBinaryEkjhParameter (et proportion libre)
+void BinaryParameter::initUSER(Parameter *iParam)
+{
 	/*
 	 updated : _tabProportion, _tabCenter, _scatter
 	 */
 	int64_t j, k;
-	BinaryParameter * param = iParam->getBinaryParameter();
+	BinaryParameter *param = iParam->getBinaryParameter();
 
-
-	double * iTabProportion = param->getTabProportion();
-	int64_t ** iTabCenter = param->getTabCenter();
-	int64_t * iTabNbModality = param->getTabNbModality();
+	double *iTabProportion = param->getTabProportion();
+	int64_t **iTabCenter = param->getTabCenter();
+	int64_t *iTabNbModality = param->getTabNbModality();
 
 	_totalNbModality = param->getTotalNbModality();
 	for (j = 0; j < _pbDimension; j++)
@@ -443,8 +446,7 @@ void BinaryParameter::initUSER(Parameter * iParam) {
 		// proportion (no respecting model type)
 		if (!hasFreeProportion(_modelType->_nameModel)) {
 			_tabProportion[k] = 1.0 / _nbCluster;
-		}
-		else {
+		} else {
 			_tabProportion[k] = iTabProportion[k];
 		}
 
@@ -455,18 +457,18 @@ void BinaryParameter::initUSER(Parameter * iParam) {
 	}
 
 	// scatters
-	if (typeid (*param) == typeid (*this)) {
+	if (typeid(*param) == typeid(*this)) {
 		recopyScatter(param); // virtual
-	}
-	else {
+	} else {
 		createScatter(param->scatterToArray());
 	}
 }
 
 //-------------------------------------------
-// initialize attributes before an InitRandom 
+// initialize attributes before an InitRandom
 //-------------------------------------------
-void BinaryParameter::initForInitRANDOM() {
+void BinaryParameter::initForInitRANDOM()
+{
 	// none !
 }
 
@@ -476,18 +478,17 @@ void BinaryParameter::initForInitRANDOM() {
 // -  nbInitializedCluster
 // - tabInitializedCluster (array of size _nbCluster)
 //-------------------------
-void BinaryParameter::initForInitUSER_PARTITION(int64_t & nbInitializedCluster, 
-		bool * tabInitializedCluster, Partition * initPartition) 
+void BinaryParameter::initForInitUSER_PARTITION(int64_t &nbInitializedCluster, bool *tabInitializedCluster,
+                                                Partition *initPartition)
 {
-	// Set Centers 
+	// Set Centers
 	computeTabCenterInitUSER_PARTITION(nbInitializedCluster, tabInitializedCluster, initPartition);
 
 	if (nbInitializedCluster == _nbCluster) {
 		computeRandomScatter();
 	}
-	// sinon c'est fait plus tard 
+	// sinon c'est fait plus tard
 }
-
 
 //////////////////////////////////
 //                              //
@@ -496,20 +497,21 @@ void BinaryParameter::initForInitUSER_PARTITION(int64_t & nbInitializedCluster,
 //////////////////////////////////
 
 /*-------------------------------------------------------------------------------------------
-	M step
-	------
-	
-	already updated :
-	- _model (_tabFik, _tabTik, _tabCik, _tabNk) if Estep is done before
-	- _model->_tabCik, _model->_tabNk if USER_PARTITION is done before (Disciminant analysis)
-	In all cases, only  _tabCik and _tabNk are needed 
-	
-	updated in this method :
-	- _tabProportion
-	- _tabCenter
-	- _tabScatter
+    M step
+    ------
+
+    already updated :
+    - _model (_tabFik, _tabTik, _tabCik, _tabNk) if Estep is done before
+    - _model->_tabCik, _model->_tabNk if USER_PARTITION is done before (Disciminant analysis)
+    In all cases, only  _tabCik and _tabNk are needed
+
+    updated in this method :
+    - _tabProportion
+    - _tabCenter
+    - _tabScatter
 --------------------------------------------------------------------------------------------*/
-void BinaryParameter::MStep() {
+void BinaryParameter::MStep()
+{
 	/* Proportion estimator (if proportions free) */
 	computeTabProportion();
 
@@ -520,7 +522,6 @@ void BinaryParameter::MStep() {
 	computeScatter(); // virtual
 }
 
-
 //////////////////////////////////
 //                              //
 //        input/output          //
@@ -530,7 +531,8 @@ void BinaryParameter::MStep() {
 //--------------------------
 // Edit  : debug information
 //--------------------------
-void BinaryParameter::edit() {
+void BinaryParameter::edit()
+{
 	int64_t k, i;
 	for (k = 0; k < _nbCluster; k++) {
 		cout << "\tcomponent : " << k << endl;
@@ -549,7 +551,8 @@ void BinaryParameter::edit() {
 //-----
 // Edit
 //-----
-void BinaryParameter::edit(std::ofstream & oFile, bool text) {
+void BinaryParameter::edit(std::ofstream &oFile, bool text)
+{
 	int64_t j, k;
 
 	// Write in output text files
@@ -569,39 +572,40 @@ void BinaryParameter::edit(std::ofstream & oFile, bool text) {
 			editScatter(oFile, k, text); // virtual
 			oFile << endl << endl;
 
-		}// end for k
+		} // end for k
 		oFile << endl;
 	}
 
 	// Write in output numeric files
-  else {
-    for (k = 0; k < _nbCluster; k++) {
+	else {
+		for (k = 0; k < _nbCluster; k++) {
 			putDoubleInStream(oFile, _tabProportion[k]);
 
-      for (j = 0; j < _pbDimension; j++)
-        oFile << _tabCenter[k][j] << "  ";
-      oFile << endl;
-      editScatter(oFile, k, text); // virtual
-      oFile << endl << endl;
+			for (j = 0; j < _pbDimension; j++)
+				oFile << _tabCenter[k][j] << "  ";
+			oFile << endl;
+			editScatter(oFile, k, text); // virtual
+			oFile << endl << endl;
 
-    }// end for k
-    oFile << endl;
-  }
+		} // end for k
+		oFile << endl;
+	}
 }
 
 //------------------------------
 // Read Parameters in input file
 //------------------------------
-void BinaryParameter::input(std::ifstream & fi) {
+void BinaryParameter::input(std::ifstream &fi)
+{
 	int64_t j, k;
 
-  for (k = 0; k < _nbCluster; k++) {
+	for (k = 0; k < _nbCluster; k++) {
 
-    // Proportions //
+		// Proportions //
 		_tabProportion[k] = getDoubleFromStream(fi);
 
-    // Centers //
-    for (j = 0; j < _pbDimension; j++)
+		// Centers //
+		for (j = 0; j < _pbDimension; j++)
 			fi >> _tabCenter[k][j];
 
 		// Scatters //
@@ -612,10 +616,7 @@ void BinaryParameter::input(std::ifstream & fi) {
 //------------------------------
 // Read Parameters in input containers
 //------------------------------
-void BinaryParameter::input(
-		double * proportions, 
-		double ** centers, 
-		double *** scatters) 
+void BinaryParameter::input(double *proportions, double **centers, double ***scatters)
 {
 	int64_t j, k;
 
@@ -634,10 +635,11 @@ void BinaryParameter::input(
 	}
 }
 
-void BinaryParameter::updateForCV(Model * originalModel, CVBlock & CVBlock) {
-	//updates tabProportion, tabCenter and tabScatter
-	// Mstep could be could to do that
-	// even if this is a few slower function versus a real update
+void BinaryParameter::updateForCV(Model *originalModel, CVBlock &CVBlock)
+{
+	// updates tabProportion, tabCenter and tabScatter
+	//  Mstep could be could to do that
+	//  even if this is a few slower function versus a real update
 	MStep();
 }
 
@@ -645,8 +647,7 @@ void BinaryParameter::updateForCV(Model * originalModel, CVBlock & CVBlock) {
 // Others functions //
 //------------------//
 // compute Pdf in case nbCluster=1 (Scatter is a scalar)
-double computePdfOneCluster(Sample * x, int64_t * Center, 
-		double Scatter, int64_t * tabNbModality) 
+double computePdfOneCluster(Sample *x, int64_t *Center, double Scatter, int64_t *tabNbModality)
 {
 	double bernPdf = 1.0;
 	int64_t j;
@@ -661,8 +662,7 @@ double computePdfOneCluster(Sample * x, int64_t * Center,
 }
 
 // compute Pdf in case nbCluster=1 (Scatter is a array of double, depends on variables)
-double computePdfOneCluster(Sample * x, int64_t * Center, 
-		double * Scatter, int64_t * tabNbModality) 
+double computePdfOneCluster(Sample *x, int64_t *Center, double *Scatter, int64_t *tabNbModality)
 {
 	double bernPdf = 1.0;
 	int64_t j;
@@ -676,10 +676,9 @@ double computePdfOneCluster(Sample * x, int64_t * Center,
 	return bernPdf;
 }
 
-// compute Pdf in case nbCluster=1 
+// compute Pdf in case nbCluster=1
 // (Scatter is a array of double*double, depends on variables and modalities)
-double computePdfOneCluster(Sample * x, int64_t * Center, 
-		double ** Scatter, int64_t * tabNbModality) 
+double computePdfOneCluster(Sample *x, int64_t *Center, double **Scatter, int64_t *tabNbModality)
 {
 	double bernPdf = 1.0;
 	int64_t j;
@@ -695,9 +694,10 @@ double computePdfOneCluster(Sample * x, int64_t * Center,
 	return bernPdf;
 }
 
-void BinaryParameter::recopy(Parameter * otherParameter) {
+void BinaryParameter::recopy(Parameter *otherParameter)
+{
 
-	BinaryParameter * iParameter = otherParameter->getBinaryParameter();
+	BinaryParameter *iParameter = otherParameter->getBinaryParameter();
 
 	// tab modality //
 	recopyTab(iParameter->getTabNbModality(), _tabNbModality, _pbDimension);
@@ -705,7 +705,7 @@ void BinaryParameter::recopy(Parameter * otherParameter) {
 	// total number of modality //
 	_totalNbModality = iParameter->getTotalNbModality();
 
-	// Centers 
+	// Centers
 	recopyTab(iParameter->getTabCenter(), _tabCenter, _nbCluster, _pbDimension);
 
 	// Scatters

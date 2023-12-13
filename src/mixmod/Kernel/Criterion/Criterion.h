@@ -6,7 +6,7 @@
 
 /***************************************************************************
     This file is part of MIXMOD
-    
+
     MIXMOD is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -20,18 +20,19 @@
     You should have received a copy of the GNU General Public License
     along with MIXMOD.  If not, see <http://www.gnu.org/licenses/>.
 
-    All informations available on : http://www.mixmod.org                                                                                               
+    All informations available on : http://www.mixmod.org
 ***************************************************************************/
 #ifndef XEMCriterion_H
 #define XEMCriterion_H
 
 #include "mixmod/Utilities/Util.h"
 
-namespace XEM {
+namespace XEM
+{
 
 /**
-	@brief Base class for Criterion
-	@author F Langrognet 
+    @brief Base class for Criterion
+    @author F Langrognet
  */
 
 // pre-declaration
@@ -42,23 +43,22 @@ class CriterionOutput;
 // best values are always the smallest
 //-----------------------------------
 
-class Criterion {
+class Criterion
+{
 
 public:
-
 	/// Default constructor
-	Criterion(Model * model);
+	Criterion(Model *model);
 
 	/// Destructor
 	virtual ~Criterion();
 
 	/// Run method
-	virtual void run(CriterionOutput & output) = 0;
+	virtual void run(CriterionOutput &output) = 0;
 
 protected:
-	
 	/// a pointer to a model
-	Model * _model;
+	Model *_model;
 };
 
 }

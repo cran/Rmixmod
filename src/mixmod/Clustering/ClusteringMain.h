@@ -6,7 +6,7 @@
 
 /***************************************************************************
     This file is part of MIXMOD
-    
+
     MIXMOD is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -20,7 +20,7 @@
     You should have received a copy of the GNU General Public License
     along with MIXMOD.  If not, see <http://www.gnu.org/licenses/>.
 
-    All informations available on : http://www.mixmod.org                                                                                               
+    All informations available on : http://www.mixmod.org
 ***************************************************************************/
 
 #ifndef XEMCLUSTERINGMMAIN_H
@@ -28,26 +28,27 @@
 
 #include "mixmod/Utilities/Util.h"
 
-namespace XEM {
+namespace XEM
+{
 
 class Model;
 class ClusteringInput;
 class ClusteringOutput;
 
-/** 
+/**
  * @class ClusteringMain
  * @brief Main class for Clustering using mixture model(s)
  * @author F. Langrognet
  */
-class ClusteringMain {
+class ClusteringMain
+{
 
 public:
-
 	/// Invalid default constructor: clustering input and output must be provided.
 	ClusteringMain();
 
 	/// Build a ClusteringMain object from ClusteringInput and ClusteringOutput
-	ClusteringMain(ClusteringInput * cInput,  ClusteringOutput * output = NULL);
+	ClusteringMain(ClusteringInput *cInput, ClusteringOutput *output = nullptr);
 
 	/// Destructor
 	virtual ~ClusteringMain();
@@ -56,37 +57,33 @@ public:
 	void run(int seed = -1, IoMode iomode = IoMode::NUMERIC, int verbose = 0, int massiccc = 0);
 
 	/// Return pointer to input
-	ClusteringInput * getInput() const;
+	ClusteringInput *getInput() const;
 
 	/// Return pointer to output
-	ClusteringOutput * getOutput() const;
+	ClusteringOutput *getOutput() const;
 
 	// Set output pointer to null
 	void setOutputNull();
 
 private:
-
 	/// Input
-	ClusteringInput * _input;
-	
+	ClusteringInput *_input = nullptr;
+
 	/// Output
-	ClusteringOutput * _output;
+	ClusteringOutput *_output = nullptr;
 };
 
-inline  ClusteringInput * ClusteringMain::getInput() const {
+inline ClusteringInput *ClusteringMain::getInput() const
+{
 	if (_input)
 		return _input;
 	else
 		THROW(OtherException, nullPointerError);
 }
 
-inline ClusteringOutput * ClusteringMain::getOutput() const {
-	return _output;
-}
+inline ClusteringOutput *ClusteringMain::getOutput() const { return _output; }
 
-inline void ClusteringMain::setOutputNull() {
-	_output = NULL;
-}
+inline void ClusteringMain::setOutputNull() { _output = NULL; }
 
 }
 

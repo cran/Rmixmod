@@ -6,7 +6,7 @@
 
 /***************************************************************************
     This file is part of MIXMOD
-    
+
     MIXMOD is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -20,17 +20,19 @@
     You should have received a copy of the GNU General Public License
     along with MIXMOD.  If not, see <http://www.gnu.org/licenses/>.
 
-    All informations available on : http://www.mixmod.org                                                                                               
+    All informations available on : http://www.mixmod.org
 ***************************************************************************/
 #include "mixmod/Kernel/Algo/Algo.h"
 #include "mixmod/Kernel/Algo/EMAlgo.h"
 
-namespace XEM {
+namespace XEM
+{
 
 //-----------
-//Constructor
+// Constructor
 //-----------
-Algo::Algo() {
+Algo::Algo()
+{
 	_indexIteration = 0;
 	_algoStopName = defaultAlgoStopName;
 	_epsilon = defaultEpsilon;
@@ -40,7 +42,8 @@ Algo::Algo() {
 }
 
 // copy constructor
-Algo::Algo(const Algo & algo) {
+Algo::Algo(const Algo &algo)
+{
 	_indexIteration = algo._indexIteration;
 	_algoStopName = algo._algoStopName;
 	_epsilon = algo._epsilon;
@@ -49,7 +52,8 @@ Algo::Algo(const Algo & algo) {
 	_xml = algo._xml;
 }
 
-Algo::Algo(AlgoStopName algoStopName, double espsilon, int64_t nbIteration) {
+Algo::Algo(AlgoStopName algoStopName, double espsilon, int64_t nbIteration)
+{
 	_indexIteration = 1;
 	_algoStopName = algoStopName;
 	setEpsilon(espsilon);
@@ -59,19 +63,17 @@ Algo::Algo(AlgoStopName algoStopName, double espsilon, int64_t nbIteration) {
 }
 
 //----------
-//Destructor
+// Destructor
 //----------
-Algo::~Algo() {
-}
+Algo::~Algo() {}
 
-void Algo::setEpsilon(double epsilon) {
+void Algo::setEpsilon(double epsilon)
+{
 	if (epsilon < minEpsilon) {
 		THROW(InputException, epsilonTooSmall);
-	}
-	else if (epsilon > maxEpsilon) {
+	} else if (epsilon > maxEpsilon) {
 		THROW(InputException, epsilonTooLarge);
-	}
-	else {
+	} else {
 		_epsilon = epsilon;
 	}
 }
@@ -80,8 +82,9 @@ void Algo::setEpsilon(double epsilon) {
 // continueAgain
 //--------------
 /* Stopping rule for algorithm : continueAgain */
-bool Algo::continueAgain() {
-	//cout<<"Algo::continueAgain"<<endl;
+bool Algo::continueAgain()
+{
+	// cout<<"Algo::continueAgain"<<endl;
 	bool result, res1, res2;
 	double diff;
 	ofstream progressFile;
@@ -89,71 +92,70 @@ bool Algo::continueAgain() {
 	if (_indexIteration == 1) {
 		result = true;
 		return result;
-	}
-	else {
+	} else {
 
 		if (_indexIteration > maxNbIteration) {
 			result = false;
 			return result;
-		}
-		else {
+		} else {
 			switch (_algoStopName) {
-				case NBITERATION:
+			case NBITERATION:
+				if (MASSICCC == 10) {
+					progressFile.open("progress.json");
+					progressFile << "{ \"Progress\" : " << ((double)_indexIteration - 1.0) / (double)_nbIteration * 100.0
+					             << "}";
+					progressFile.close();
+				}
+				result = (_indexIteration <= _nbIteration);
+				break;
+
+			case EPSILON:
+				if (MASSICCC == 10) {
+					progressFile.open("progress.json");
+					progressFile << "{ \"Progress\" : " << ((double)_indexIteration - 1.0) / 1000.0 * 100.0 << "}";
+					progressFile.close();
+				}
+				if (_indexIteration <= 3) {
+					result = true;
+				} else {
+					diff = fabs(_xml - _xml_old);
+					result = (diff >= _epsilon);
+				}
+				if (!result) {
 					if (MASSICCC == 10) {
-						progressFile.open ("progress.json");
-						progressFile << "{ \"Progress\" : " << ((double)_indexIteration - 1.0)/(double)_nbIteration * 100.0 << "}";
+						progressFile.open("progress.json");
+						progressFile << "{ \"Progress\" : 100 }";
 						progressFile.close();
 					}
-					result = (_indexIteration <= _nbIteration);
-					break;
+				}
+				break;
 
-				case EPSILON:
+			case NBITERATION_EPSILON:
+				if (MASSICCC == 10) {
+					progressFile.open("progress.json");
+					progressFile << "{ \"Progress\" : " << ((double)_indexIteration - 1.0) / (double)_nbIteration * 100.0
+					             << "}";
+					progressFile.close();
+				}
+				res1 = (_indexIteration <= _nbIteration);
+				if (_indexIteration <= 3) {
+					res2 = true;
+				} else {
+					diff = fabs(_xml - _xml_old);
+					res2 = (diff >= _epsilon);
+				};
+				result = (res1 && res2);
+				if (!result) {
 					if (MASSICCC == 10) {
-						progressFile.open ("progress.json");
-						progressFile << "{ \"Progress\" : " << ((double)_indexIteration - 1.0)/1000.0 * 100.0 << "}";
+						progressFile.open("progress.json");
+						progressFile << "{ \"Progress\" : 100 }";
 						progressFile.close();
 					}
-					if (_indexIteration <= 3) {
-						result = true;
-					}
-					else {
-						diff = fabs(_xml - _xml_old);
-						result = (diff >= _epsilon);
-					}
-					if (!result) {
-						if (MASSICCC == 10) {
-							progressFile.open ("progress.json");
-							progressFile << "{ \"Progress\" : 100 }";
-							progressFile.close();
-						}
-						break;
-					}
+				}
+				break;
 
-				case NBITERATION_EPSILON:
-					if (MASSICCC == 10) {
-						progressFile.open ("progress.json");
-						progressFile << "{ \"Progress\" : " << ((double)_indexIteration - 1.0)/(double)_nbIteration * 100.0 << "}";
-						progressFile.close();
-					}
-					res1 = (_indexIteration <= _nbIteration);
-					if (_indexIteration <= 3) {
-						res2 = true;
-					}
-					else {
-						diff = fabs(_xml - _xml_old);
-						res2 = (diff >= _epsilon);
-					};
-					result = (res1 && res2);
-					if (!result) {
-						if (MASSICCC == 10) {
-							progressFile.open ("progress.json");
-							progressFile << "{ \"Progress\" : 100 }";
-							progressFile.close();
-						}
-						break;
-					}
-
-			default: result = (_indexIteration <= _nbIteration);
+			default:
+				result = (_indexIteration <= _nbIteration);
 			}
 			return result;
 		}
@@ -163,7 +165,8 @@ bool Algo::continueAgain() {
 //-----------
 // ostream <<
 //-----------
-std::ostream & operator <<(std::ostream & fo, Algo & algo) {
+std::ostream &operator<<(std::ostream &fo, Algo &algo)
+{
 	AlgoName algoName = algo.getAlgoName();
 	fo << "\t  Type : " << AlgoNameToString(algoName);
 
@@ -192,7 +195,8 @@ std::ostream & operator <<(std::ostream & fo, Algo & algo) {
 	return fo;
 }
 
-void Algo::edit(std::ostream & out) {
+void Algo::edit(std::ostream &out)
+{
 	AlgoName algoName = getAlgoName();
 	out << "\t  Type : " << AlgoNameToString(algoName) << endl;
 
@@ -223,11 +227,12 @@ void Algo::edit(std::ostream & out) {
 //----------------
 // others functions
 //
-Algo * createDefaultClusteringAlgo() {
+Algo *createDefaultClusteringAlgo()
+{
 	if (defaultClusteringAlgoName != EM) {
 		THROW(OtherException, internalMixmodError);
 	}
-	Algo * algo = new EMAlgo();
+	Algo *algo = new EMAlgo();
 	return algo;
 }
 

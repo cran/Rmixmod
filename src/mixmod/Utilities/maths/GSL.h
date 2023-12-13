@@ -18,337 +18,310 @@
 //****************************************************************************************|
 
 #ifndef mixmod_GSL_H
-#define	mixmod_GSL_H
+#define mixmod_GSL_H
 
-#include <gsl/gsl_linalg.h>
 #include <cmath>
+#include <gsl/gsl_linalg.h>
 
-namespace XEM {
-namespace MATH {
+namespace XEM
+{
+namespace MATH
+{
 
-class DiagonalMatrix {
+class DiagonalMatrix
+{
 
 public:
+	DiagonalMatrix(int dim) { _value = gsl_vector_alloc(dim); }
 
-	DiagonalMatrix(int dim)
-	{
-		_value = gsl_vector_alloc(dim);
-	}
+	~DiagonalMatrix() { gsl_vector_free(_value); }
 
-	~DiagonalMatrix()
-	{
-		gsl_vector_free(_value);
-	}
+	double *Store() { return _value->data; }
 
-	double* Store()
-	{
-		return _value->data;
-	}
-
-	double& operator[] (int i)
+	double &operator[](int i)
 	{
 		return _value->data[i];
-		//return gsl_vector_get(_value, i); //Does not return a reference
+		// return gsl_vector_get(_value, i); //Does not return a reference
 	}
 
-	int Nrow()
+	int Nrow() { return _value->size; }
+
+	gsl_vector *getValue() { return _value; }
+
+	// Fonction pour les tests unitaires, compare les termes de 2 matrices
+	bool isAlmostEqual(DiagonalMatrix &dm, double epsilon) const
 	{
-		return _value->size;
+		bool res = true;
+		for (int i = 0; i < dm.Nrow(); i++) {
+			if (fabs(_value->data[i] - dm.getValue()->data[i]) > epsilon)
+				res = false;
+		}
+		return res;
 	}
 
-gsl_vector* getValue(){
-	return _value;
-}
-
-// Fonction pour les tests unitaires, compare les termes de 2 matrices
-bool isAlmostEqual(DiagonalMatrix & dm,double epsilon) const {
-	bool res=true;
-	for (int i=0;i<dm.Nrow();i++){
-		if ( fabs( _value->data[i]-dm.getValue()->data[i] )>epsilon) res = false;
-	}
-	return res;
-}
-
-// Fonction pour les tests unitaires, remplissage d'une matrice à partir d'un fichier .txt
-void fillMatrix(std::string file){
-	std::ifstream fichiertmp(file,std::ios::in); // on ouvre en lecture
-	int i=0;
- 
-	// On verifie que le fichier est bien ouvert ...
-	if(!fichiertmp)
+	// Fonction pour les tests unitaires, remplissage d'une matrice à partir d'un fichier .txt
+	void fillMatrix(std::string file)
 	{
-		std::cerr << "[ERROR] Impossible d'ouvrir le fichier " << file << std::endl;
-	}
-	
-	std::string ligne;
-	int n=0;
-	while(std::getline(fichiertmp, ligne)) n++;  //On lit chaque ligne du fichier que l'on stoke dans "ligne"
-		
+		std::ifstream fichiertmp(file, std::ios::in); // on ouvre en lecture
+		int i = 0;
 
-	std::ifstream fichier(file,std::ios::in); 
-	while (std::getline(fichier, ligne)){
-		std::stringstream ss(ligne);
-		double tmp;
-		ss >> tmp;
-		_value->data[i]=tmp;i++;
-	}
-}
+		// On verifie que le fichier est bien ouvert ...
+		if (!fichiertmp) {
+			std::cerr << "[ERROR] Impossible d'ouvrir le fichier " << file << std::endl;
+		}
 
-	gsl_vector* _value;
+		std::string ligne;
+		int n = 0;
+		while (std::getline(fichiertmp, ligne))
+			n++; // On lit chaque ligne du fichier que l'on stoke dans "ligne"
+
+		std::ifstream fichier(file, std::ios::in);
+		while (std::getline(fichier, ligne)) {
+			std::stringstream ss(ligne);
+			double tmp;
+			ss >> tmp;
+			_value->data[i] = tmp;
+			i++;
+		}
+	}
+
+	gsl_vector *_value;
 };
 
-class Matrix {
-	
+class Matrix
+{
+
 public:
-	
-	Matrix(int nrow, int ncol)
+	Matrix(int nrow, int ncol) { _value = gsl_matrix_alloc(nrow, ncol); }
+
+	~Matrix() { gsl_matrix_free(_value); }
+
+	double *Store() { return _value->data; }
+
+	double &operator()(int i, int j)
 	{
-		_value = gsl_matrix_alloc(nrow, ncol);
+		return _value->data[i * (_value->size2) + j];
+		// return gsl_matrix_get(_value, i, j); //Does not return a reference
 	}
-	
-	~Matrix()
+
+	double *GetRow(int index) { return gsl_matrix_row(_value, index).vector.data; }
+
+	int Nrow() { return _value->size1; }
+
+	int Ncol() { return _value->size2; }
+
+	gsl_matrix *getValue() { return _value; }
+
+	// Fonction pour les tests unitaires, compare les valeurs de 2 matrices (on ne tient pas compte du signe
+	// car on n'utilise cette fonction que pour le calcul du SVD et les vecteurs propres peuvent avoir un signe différent
+	// suivant la bibliothèque.
+	bool isAlmostEqual(Matrix &m, double epsilon) const
+	{
+		bool res = true;
+		int ncol = _value->size2;
+		for (int j = 0; j < ncol; j++) {
+			for (int i = 0; i < ncol; i++) {
+				if (fabs(fabs((_value)->data[i * (_value->size2) + j]) - fabs(m.getValue()->data[i * (_value->size2) + j])) >
+				    epsilon)
+					res = false;
+			}
+		}
+		return res;
+	}
+
+	// Fonction pour les tests unitaires, remplissage d'une matrice à partir d'un fichier .txt
+	void fillMatrix(std::string file)
+	{
+		std::ifstream fichiertmp(file, std::ios::in); // on ouvre en lecture
+		int i = 0;
+
+		// On verifie que le fichier est bien ouvert ...
+		if (!fichiertmp) {
+			std::cerr << "[ERROR] Impossible d'ouvrir le fichier " << file << std::endl;
+		}
+		std::string ligne;
+		int n = 0;
+		while (std::getline(fichiertmp, ligne))
+			n++; // On lit chaque ligne du fichier que l'on stoke dans "ligne"
+		_value = gsl_matrix_alloc(n, n);
+
+		std::ifstream fichier(file, std::ios::in);
+		while (std::getline(fichier, ligne)) {
+			int j = 0;
+			// Construction pour une ligne
+			std::stringstream ss(ligne);
+			// Extraction des données pour une ligne
+			while (!ss.eof()) {
+				double tmp;
+				ss >> tmp;
+				(_value)->data[i * (_value->size2) + j] = tmp;
+				j++;
+				if (j == n)
+					break;
+			}
+			i++;
+		}
+	}
+
+	gsl_matrix *_value;
+};
+
+class SymmetricMatrix
+{
+
+public:
+	// nrow == ncol
+	SymmetricMatrix(int nrow) { _value = gsl_matrix_alloc(nrow, nrow); }
+
+	SymmetricMatrix(int nrow, double *store)
+	{
+		_value = gsl_matrix_alloc(nrow, nrow);
+		updateData(store);
+	}
+
+	~SymmetricMatrix()
 	{
 		gsl_matrix_free(_value);
+		if (_store)
+			delete[] _store;
 	}
 
-	double* Store()
+	gsl_matrix *getValue() { return _value; }
+
+	int Nrow() { return _value->size1; }
+
+	double *Store()
 	{
-		return _value->data;
-	}
-	
-	double& operator() (int i, int j)
-	{
-		return _value->data[i*(_value->size2)+j];
-		//return gsl_matrix_get(_value, i, j); //Does not return a reference
+		double *data = _value->data;
+		int nrow = _value->size1;
+		int i, j;
+		int z = 0;
+		_store = new double[nrow * (nrow + 1) / 2];
+		for (j = 0; j < nrow; j++) {
+			for (i = 0; i < j + 1; i++) {
+				_store[z] = data[i * nrow + j];
+				z++;
+			}
+		}
+		return _store;
 	}
 
-	double* GetRow(int index)
+	void updateData(double *store)
 	{
-		return gsl_matrix_row(_value, index).vector.data;
-	}
-	
-	int Nrow()
-	{
-		return _value->size1;
-	}
-	
-	int Ncol()
-	{
-		return _value->size2;
-	}
-  
-  gsl_matrix* getValue() {
-    return _value;
-  }
-
-// Fonction pour les tests unitaires, compare les valeurs de 2 matrices (on ne tient pas compte du signe
-// car on n'utilise cette fonction que pour le calcul du SVD et les vecteurs propres peuvent avoir un signe différent
-// suivant la bibliothèque.
-bool isAlmostEqual(Matrix & m,double epsilon) const {
-	bool res=true;
-	int ncol = _value->size2;
-	for(int j=0; j<ncol ;j++){
-		for(int i=0; i<ncol ; i++){
-			if ( fabs( fabs((_value)->data[i*(_value->size2)+j])-fabs(m.getValue()->data[i*(_value->size2)+j]) )>epsilon) res = false;
+		int i, j;
+		int z = 0;
+		int ncol = _value->size1;
+		for (j = 0; j < ncol; j++) {
+			for (i = 0; i < j + 1; i++) {
+				_value->data[i * ncol + j] = store[z];
+				_value->data[j * ncol + i] = store[z];
+				z++;
+			}
 		}
 	}
-	return res;
-}
-	
-// Fonction pour les tests unitaires, remplissage d'une matrice à partir d'un fichier .txt
-void fillMatrix(std::string file){
-	std::ifstream fichiertmp(file,std::ios::in); // on ouvre en lecture
-	int i=0;
- 
-	// On verifie que le fichier est bien ouvert ...
-	if(!fichiertmp)
+
+	// get determinant
+	double determinant(double *store)
 	{
-		std::cerr << "[ERROR] Impossible d'ouvrir le fichier " << file << std::endl;
+		updateData(store);
+		int nrow = _value->size1;
+		gsl_permutation *permutation = gsl_permutation_alloc(nrow);
+		int signum;
+		gsl_matrix *copyValue = gsl_matrix_alloc(nrow, nrow);
+		gsl_matrix_memcpy(copyValue, _value);
+		gsl_linalg_LU_decomp(copyValue, permutation, &signum);
+		double logDet = exp(gsl_linalg_LU_lndet(copyValue));
+		gsl_permutation_free(permutation);
+		gsl_matrix_free(copyValue);
+		return logDet;
 	}
-	std::string ligne;
-	int n=0;
-	while(std::getline(fichiertmp, ligne)) n++;  //On lit chaque ligne du fichier que l'on stoke dans "ligne"
-  _value = gsl_matrix_alloc(n, n);
 
-	std::ifstream fichier(file,std::ios::in); 
-	while (std::getline(fichier, ligne)){
-		int j=0;
-		// Construction pour une ligne
-		std::stringstream ss(ligne);
-		// Extraction des données pour une ligne
-		while(!ss.eof()){
-			double tmp;
-			ss >> tmp;
-			(_value)->data[i*(_value->size2)+j]=tmp;
-			j++;
-			if (j==n) break;
-		}
-	i++;
-	}
-}
-	
-	gsl_matrix* _value;
-};
-
-class SymmetricMatrix {
-	
-public:
-	
-// nrow == ncol
-SymmetricMatrix(int nrow)
-{
-	_value = gsl_matrix_alloc(nrow, nrow);
-}
-
-SymmetricMatrix(int nrow,double* store){
-  _value = gsl_matrix_alloc(nrow, nrow);
-  updateData(store);
-}
-	
-
-~SymmetricMatrix()
-{
-  gsl_matrix_free(_value);
-  if (_store)
-    delete[] _store;
-}
-	
-gsl_matrix* getValue() {
-  return _value;
-} 
-
-int Nrow(){
-	return _value->size1;
-}
-
-double* Store()
-{
-  double* data = _value->data;
-  int nrow = _value->size1;
-  int i,j;
-  int z=0;
-  _store = new double [nrow*(nrow + 1)/2];
-  for(j=0; j<nrow ;j++){
-    for(i=0; i<j+1 ; i++){
-      _store[z]=data[i*nrow+j];z++;
-    }
-  }
-  return _store;
-}
-	
-void updateData(double* store){
-  int i,j;
-  int z=0;
-  int ncol = _value->size1;
-  for(j=0; j<ncol ;j++){
-    for(i=0; i<j+1 ; i++){
-      _value->data[i*ncol + j]=store[z];
-      _value->data[j*ncol + i]=store[z];
-      z++;
-    }
-  }
-}
-
-// get determinant
-double determinant(double* store)
-{
-  updateData(store);
-  int nrow = _value->size1;
-  gsl_permutation* permutation = gsl_permutation_alloc(nrow);
-  int signum;
-  gsl_matrix* copyValue = gsl_matrix_alloc(nrow, nrow); 
-  gsl_matrix_memcpy(copyValue, _value);
-  gsl_linalg_LU_decomp(copyValue, permutation, &signum);
-  double logDet = exp(gsl_linalg_LU_lndet(copyValue));
-  gsl_permutation_free(permutation);
-  gsl_matrix_free(copyValue);
-  return logDet; 	
-}
-
-// get inverse
-SymmetricMatrix* Inverse(double* store)
-{
-  updateData(store);
-  int nrow = _value->size1;
-  gsl_permutation* permutation = gsl_permutation_alloc(nrow);
-  int signum;
-  gsl_matrix* LUdecomp = gsl_matrix_alloc_from_matrix(_value, 0, 0, nrow, nrow);
-  gsl_linalg_LU_decomp(LUdecomp, permutation, &signum);
-  SymmetricMatrix* inverse = new SymmetricMatrix(nrow);
-  gsl_linalg_LU_invert(LUdecomp, permutation, inverse->_value);
-  gsl_permutation_free(permutation);
-  gsl_matrix_free(LUdecomp);
-  return inverse;
-}
-
-// compute SVD (only matrices U and D, not V) 
-void computeSVD(DiagonalMatrix* D, Matrix* U, double* store)
-{
-  updateData(store);
-  int nrow = _value->size1;
-  // copy current matrix into U
-  for (int i=0; i<nrow; i++) {
-    for (int j=0; j<nrow; j++)
-      U->_value-> data[i*nrow + j] = _value-> data[i*nrow + j];
-  }
-  gsl_matrix* V = gsl_matrix_alloc(nrow, nrow);
-  gsl_vector* work = gsl_vector_alloc(nrow);
-  gsl_linalg_SV_decomp (U->_value, V, D->_value, work);
-  gsl_matrix_free(V);
-  gsl_vector_free(work);
-}
-
-// Fonction pour les tests unitaires, compare les termes de 2 matrices
-bool isAlmostEqual(SymmetricMatrix & sm,double epsilon) const {
-	bool res=true;
-	int ncol = _value->size2;
-	for(int j=0; j<ncol ;j++){
-		for(int i=0; i<j+1 ; i++){
-			if ( fabs( (_value)->data[i*(_value->size2)+j]-sm.getValue()->data[i*(_value->size2)+j] )>epsilon) res = false;
-		}
-	}
-	return res;
-}
-
-// Fonction pour les tests unitaires, remplissage d'une matrice à partir d'un fichier .txt
-void fillMatrix(std::string file){
-	std::ifstream fichiertmp(file,std::ios::in); // on ouvre en lecture
-	int i=0;
- 
-	// On verifie que le fichier est bien ouvert ...
-	if(!fichiertmp)
+	// get inverse
+	SymmetricMatrix *Inverse(double *store)
 	{
-		std::cerr << "[ERROR] Impossible d'ouvrir le fichier " << file << std::endl;
+		updateData(store);
+		int nrow = _value->size1;
+		gsl_permutation *permutation = gsl_permutation_alloc(nrow);
+		int signum;
+		gsl_matrix *LUdecomp = gsl_matrix_alloc_from_matrix(_value, 0, 0, nrow, nrow);
+		gsl_linalg_LU_decomp(LUdecomp, permutation, &signum);
+		SymmetricMatrix *inverse = new SymmetricMatrix(nrow);
+		gsl_linalg_LU_invert(LUdecomp, permutation, inverse->_value);
+		gsl_permutation_free(permutation);
+		gsl_matrix_free(LUdecomp);
+		return inverse;
 	}
-	
-	std::string ligne;
-	int n=0;
-	while(std::getline(fichiertmp, ligne)) n++;  //On lit chaque ligne du fichier que l'on stoke dans "ligne"
-		
-  _value = gsl_matrix_alloc(n, n);
 
-	std::ifstream fichier(file,std::ios::in); 
-	while (std::getline(fichier, ligne)){
-		int j=0;
-		// Construction pour une ligne
-		std::stringstream ss(ligne);
-		// Extraction des données pour une ligne
-		while(!ss.eof()){
-			double tmp;
-			ss >> tmp;
-			(_value)->data[i*(_value->size2)+j]=tmp;
-			j++;
-			if (j==n) break;
+	// compute SVD (only matrices U and D, not V)
+	void computeSVD(DiagonalMatrix *D, Matrix *U, double *store)
+	{
+		updateData(store);
+		int nrow = _value->size1;
+		// copy current matrix into U
+		for (int i = 0; i < nrow; i++) {
+			for (int j = 0; j < nrow; j++)
+				U->_value->data[i * nrow + j] = _value->data[i * nrow + j];
 		}
-	i++;
+		gsl_matrix *V = gsl_matrix_alloc(nrow, nrow);
+		gsl_vector *work = gsl_vector_alloc(nrow);
+		gsl_linalg_SV_decomp(U->_value, V, D->_value, work);
+		gsl_matrix_free(V);
+		gsl_vector_free(work);
 	}
-}
-	
+
+	// Fonction pour les tests unitaires, compare les termes de 2 matrices
+	bool isAlmostEqual(SymmetricMatrix &sm, double epsilon) const
+	{
+		bool res = true;
+		int ncol = _value->size2;
+		for (int j = 0; j < ncol; j++) {
+			for (int i = 0; i < j + 1; i++) {
+				if (fabs((_value)->data[i * (_value->size2) + j] - sm.getValue()->data[i * (_value->size2) + j]) > epsilon)
+					res = false;
+			}
+		}
+		return res;
+	}
+
+	// Fonction pour les tests unitaires, remplissage d'une matrice à partir d'un fichier .txt
+	void fillMatrix(std::string file)
+	{
+		std::ifstream fichiertmp(file, std::ios::in); // on ouvre en lecture
+		int i = 0;
+
+		// On verifie que le fichier est bien ouvert ...
+		if (!fichiertmp) {
+			std::cerr << "[ERROR] Impossible d'ouvrir le fichier " << file << std::endl;
+		}
+
+		std::string ligne;
+		int n = 0;
+		while (std::getline(fichiertmp, ligne))
+			n++; // On lit chaque ligne du fichier que l'on stoke dans "ligne"
+
+		_value = gsl_matrix_alloc(n, n);
+
+		std::ifstream fichier(file, std::ios::in);
+		while (std::getline(fichier, ligne)) {
+			int j = 0;
+			// Construction pour une ligne
+			std::stringstream ss(ligne);
+			// Extraction des données pour une ligne
+			while (!ss.eof()) {
+				double tmp;
+				ss >> tmp;
+				(_value)->data[i * (_value->size2) + j] = tmp;
+				j++;
+				if (j == n)
+					break;
+			}
+			i++;
+		}
+	}
 
 private:
-	
-	gsl_matrix* _value;
-  double* _store;
+	gsl_matrix *_value;
+	double *_store;
 };
 
 }

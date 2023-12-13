@@ -109,7 +109,6 @@ setMethod(
   f = "initialize",
   signature = c("GaussianModel"),
   definition = function(.Object, listModels, family, free.proportions, equal.proportions) {
-
     # spherical models
     spherical.free <- c("Gaussian_pk_L_I", "Gaussian_pk_Lk_I")
     spherical.equal <- c("Gaussian_p_L_I", "Gaussian_p_Lk_I")

@@ -6,7 +6,7 @@
 
 /***************************************************************************
     This file is part of MIXMOD
-    
+
     MIXMOD is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -20,29 +20,33 @@
     You should have received a copy of the GNU General Public License
     along with MIXMOD.  If not, see <http://www.gnu.org/licenses/>.
 
-    All informations available on : http://www.mixmod.org                                                                                               
+    All informations available on : http://www.mixmod.org
 ***************************************************************************/
 #include "mixmod/Kernel/IO/CompositeSample.h"
 
-namespace XEM {
+namespace XEM
+{
 
-CompositeSample::CompositeSample() {
+CompositeSample::CompositeSample()
+{
 	// TODO Auto-generated constructor stub
 }
 
-CompositeSample::CompositeSample(Sample* bsample, Sample* gsample) {
+CompositeSample::CompositeSample(Sample *bsample, Sample *gsample)
+{
 	_sampleComponent.resize(2);
 	_sampleComponent[0] = bsample;
 	_sampleComponent[1] = gsample;
 }
 
-CompositeSample::~CompositeSample() {
-//for (unsigned int i = 0; i < _sampleComponent.size(); ++i) {
-//  if (_sampleComponent[i]) {
-//    delete _sampleComponent[i];
-//    _sampleComponent[i] = NULL;
-//  }
-//}
+CompositeSample::~CompositeSample()
+{
+	// for (unsigned int i = 0; i < _sampleComponent.size(); ++i) {
+	//   if (_sampleComponent[i]) {
+	//     delete _sampleComponent[i];
+	//     _sampleComponent[i] = NULL;
+	//   }
+	// }
 }
 
 }
